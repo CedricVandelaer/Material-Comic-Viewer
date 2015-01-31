@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="android:Theme.Material">
+        <item name="android:colorPrimary">@color/Teal</item>
+        <item name="android:statusBarColor">@color/TealDark</item>
+        <item name="android:colorAccent">@color/BlueGrey</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@color/Black</item>
+    </style>
+</resources>

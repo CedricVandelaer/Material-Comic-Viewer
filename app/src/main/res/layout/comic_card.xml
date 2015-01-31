@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView
+xmlns:card_view="http://schemas.android.com/apk/res-auto"
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_height="wrap_content"
+android:layout_width="match_parent"
+android:layout_margin="10dp"
+card_view:cardElevation="8dp"
+android:id="@+id/card"
+    >
+
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/cover"
+            android:layout_height="170dp"
+            android:layout_width="110dp"
+            android:padding="10dp"/>
+
+        <TextView
+            android:text="Title"
+            android:id="@+id/title"
+            android:layout_toRightOf="@id/cover"
+            android:layout_width="fill_parent"
+            android:maxLines="4"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            android:padding="10dp"
+            />
+        <TextView
+            android:id="@+id/issue_number"
+            android:text="Issue number: "
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:layout_toRightOf="@id/cover"
+            android:textColor="#000000"
+            android:padding="10dp"/>
+        <TextView
+            android:id="@+id/page_count"
+            android:text="Pages: "
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/issue_number"
+            android:layout_toRightOf="@id/cover"
+            android:textColor="#000000"
+            android:padding="10dp"/>
+    </RelativeLayout>
+
+
+
+</android.support.v7.widget.CardView>
