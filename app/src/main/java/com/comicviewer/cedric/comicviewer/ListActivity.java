@@ -61,7 +61,7 @@ public class ListActivity extends Activity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(80));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(new ScaleInOutItemAnimator(mRecyclerView));
 
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getApplicationContext(), new RecyclerItemClickListener.OnItemClickListener() {
             @Override
@@ -178,7 +178,8 @@ public class ListActivity extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemInserted(mComicList.size()-1);
+            //mAdapter.notifyDataSetChanged();
 
         }
     }

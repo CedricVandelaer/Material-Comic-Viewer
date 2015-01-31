@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer;
 
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
@@ -17,8 +17,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -28,9 +26,17 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  */
 public class ComicPageFragment extends Fragment {
 
+    // The imageview for the comic
     private ImageViewTouch mFullscreenComicView;
+
+    // The path to the .cbr file (Directory + filename)
     private String mComicArchivePath;
+
+    // The filename of the file in the archive according to JUnrar
+    // (Notice that the filename also contains folders in the archive delimited by '\' instead of '/' )
     private String mImageFileName;
+
+    // int to keep track of the number of the page in the comic
     private int mPageNumber;
 
 
@@ -50,10 +56,18 @@ public class ComicPageFragment extends Fragment {
 
     }
 
-    public void loadImage()
+    public void loadImage(String filename)
     {
-        String imagePath = "file:"+getActivity().getFilesDir().getPath()+"/"+mImageFileName;
-        Picasso.with(getActivity()).load(imagePath).fit().into(mFullscreenComicView);
+        mFullscreenComicView.setImageBitmap(null);
+        Picasso picasso = new Picasso.Builder(getActivity()).listener(new Picasso.Listener() {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                exception.printStackTrace();
+            }
+        }).build();
+        String imagePath = "file:"+getActivity().getFilesDir().getPath()+"/"+filename;
+        Log.d("loadImage", imagePath);
+        picasso.with(getActivity()).load(imagePath).fit().into(mFullscreenComicView);
     }
 
     @Override
@@ -73,10 +87,10 @@ public class ComicPageFragment extends Fragment {
         return rootView;
     }
 
-    private class ExtractRarTask extends AsyncTask<Void, Void, Void>
+    private class ExtractRarTask extends AsyncTask<Void, Void, String>
     {
         @Override
-        protected Void doInBackground(Void... comicVar) {
+        protected String doInBackground(Void... comicVar) {
 
             File comic = new File(mComicArchivePath);
             try {
@@ -85,15 +99,16 @@ public class ComicPageFragment extends Fragment {
 
                 for (int j = 0; j < fileheaders.size(); j++) {
 
-                    File outputPage = new File(getActivity().getFilesDir(), mImageFileName);
+                    String extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
+                    File outputPage = new File(getActivity().getFilesDir(), extractedImageFile);
                     FileOutputStream osPage = new FileOutputStream(outputPage);
 
                     if (fileheaders.get(j).getFileNameString().equals(mImageFileName))
                     {
                         arch.extractFile(fileheaders.get(j),osPage);
-                        String imagePath = "file:"+getActivity().getFilesDir().getPath()+"/"+mImageFileName;
+                        String imagePath = "file:"+getActivity().getFilesDir().getPath()+"/"+extractedImageFile;
                         Log.d("ExtractImage", "Extracted "+imagePath);
-                        //Picasso.with(getActivity()).load(imagePath).fetch();
+                        return extractedImageFile;
                     }
                 }
 
@@ -107,9 +122,9 @@ public class ComicPageFragment extends Fragment {
         }
 
         @Override
-        public void onPostExecute(Void aVoid)
+        public void onPostExecute(String file)
         {
-            loadImage();
+            loadImage(file);
         }
     }
 
