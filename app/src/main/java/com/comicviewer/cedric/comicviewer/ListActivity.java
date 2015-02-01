@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,69 +42,31 @@ public class ListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-        requestWindowFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-
-        setContentView(R.layout.activity_list);
 
         setTransitions();
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.comic_list_recyclerview);
+        setContentView(R.layout.activity_list);
+        PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
+        setPreferences();
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
+        createRecyclerView();
+
+        initialiseAdapter(savedInstanceState);
 
 
-        mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(80));
-        mRecyclerView.setItemAnimator(new ScaleInOutItemAnimator(mRecyclerView));
 
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getApplicationContext(), new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                if (position < mComicList.size()) {
-                    Log.d("ItemClick", mComicList.get(position).getTitle());
-                    Picasso.with(getApplicationContext()).load(mComicList.get(position).getCoverImage()).fetch();
-                    Intent intent = new Intent(getApplicationContext(), DisplayComicActivity.class);
-                    intent.putExtra("Comic", mComicList.get(position));
-                    Bundle transitionbundle = ActivityOptions.makeSceneTransitionAnimation(ListActivity.this).toBundle();
-                    startActivity(intent, transitionbundle);
-                }
-            }
-        }));
+    }
 
-        if (savedInstanceState==null) {
-            mComicList = new ArrayList<Comic>();
+    private void setPreferences() {
+        View layout = getWindow().getDecorView().getRootView();
 
-            // specify an adapter (see also next example)
-            mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
-            mRecyclerView.setAdapter(mAdapter);
-
-            String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
-
-            searchComics(defaultPath);
-        }
-        else
-        {
-            mComicList = new ArrayList<Comic>();
-
-            for (int i=0;i<savedInstanceState.size();i++)
-            {
-                if ((Comic)savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
-                    mComicList.add((Comic)savedInstanceState.getParcelable("Comic "+ (i+1)));
-                mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
-                mRecyclerView.setAdapter(mAdapter);
-            }
-        }
     }
 
     private void setTransitions() {
-
+        requestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+        requestWindowFeature(Window.FEATURE_CONTENT_TRANSITIONS);
     }
 
 
@@ -118,25 +81,28 @@ public class ListActivity extends Activity {
         {
             if (checkRar(file[i].getName())) {
                 Comic newComic = new Comic(file[i].getName(), path);
-                new ExtractRarTask().execute(newComic);
+                new ExtractRarTask().execute(newComic, i);
             }
         }
 
     }
 
-    private class ExtractRarTask extends AsyncTask<Comic, Void, Void>
+    private class ExtractRarTask extends AsyncTask<Object, Void, Integer>
     {
         @Override
-        protected Void doInBackground(Comic... comicVar) {
+        protected Integer doInBackground(Object... comicVar) {
 
-            Comic newComic= comicVar[0];
+            Comic newComic= (Comic)comicVar[0];
+            int itemPosition = (Integer) comicVar[1];
             String filename = newComic.getFileName();
+
             String path = newComic.getFilePath()+ "/" + filename;
             File comic = new File(path);
             try {
                 Archive arch = new Archive(comic);
                 List<FileHeader> fileheaders = arch.getFileHeaders();
-                File output = new File(getFilesDir(), filename.substring(0, filename.lastIndexOf('.')) + "-cover.jpg");
+                String extractedImageFile = filename.substring(filename.lastIndexOf("\\")+1);
+                File output = new File(getFilesDir(), extractedImageFile);
                 FileOutputStream os = new FileOutputStream(output);
 
                 int pageCount = 0;
@@ -166,6 +132,8 @@ public class ListActivity extends Activity {
                 setComicColor(newComic);
 
                 mComicList.add(newComic);
+                return itemPosition;
+
             }
             catch (Exception e)
             {
@@ -176,11 +144,11 @@ public class ListActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            mAdapter.notifyItemInserted(mComicList.size()-1);
-            //mAdapter.notifyDataSetChanged();
+        protected void onPostExecute(Integer itempos) {
+            super.onPostExecute(itempos);
 
+            //mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemInserted(itempos);
         }
     }
 
@@ -239,9 +207,71 @@ public class ListActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            // Display the fragment as the main content.
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void createRecyclerView()
+    {
+        mRecyclerView = (RecyclerView) findViewById(R.id.comic_list_recyclerview);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(80));
+        mRecyclerView.setItemAnimator(new ScaleInOutItemAnimator(mRecyclerView));
+
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getApplicationContext(), new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (position < mComicList.size()) {
+                    Log.d("ItemClick", mComicList.get(position).getTitle());
+                    Picasso.with(getApplicationContext()).load(mComicList.get(position).getCoverImage()).fetch();
+                    Intent intent = new Intent(getApplicationContext(), DisplayComicActivity.class);
+                    intent.putExtra("Comic", mComicList.get(position));
+                    Bundle transitionbundle = ActivityOptions.makeSceneTransitionAnimation(ListActivity.this).toBundle();
+                    startActivity(intent, transitionbundle);
+                }
+            }
+        }));
+    }
+
+    private void initialiseAdapter(Bundle savedInstanceState)
+    {
+        if (savedInstanceState==null) {
+            mComicList = new ArrayList<Comic>();
+
+            // specify an adapter (see also next example)
+            mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
+            mRecyclerView.setAdapter(mAdapter);
+
+            String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
+
+            searchComics(defaultPath);
+        }
+        else
+        {
+            mComicList = new ArrayList<Comic>();
+
+            for (int i=0;i<savedInstanceState.size();i++)
+            {
+                if ((Comic)savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
+                    mComicList.add((Comic)savedInstanceState.getParcelable("Comic "+ (i+1)));
+                mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
+                mRecyclerView.setAdapter(mAdapter);
+            }
+        }
     }
 }

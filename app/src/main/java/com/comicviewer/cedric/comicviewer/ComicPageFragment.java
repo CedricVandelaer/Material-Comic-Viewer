@@ -59,15 +59,9 @@ public class ComicPageFragment extends Fragment {
     public void loadImage(String filename)
     {
         mFullscreenComicView.setImageBitmap(null);
-        Picasso picasso = new Picasso.Builder(getActivity()).listener(new Picasso.Listener() {
-            @Override
-            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                exception.printStackTrace();
-            }
-        }).build();
         String imagePath = "file:"+getActivity().getFilesDir().getPath()+"/"+filename;
         Log.d("loadImage", imagePath);
-        picasso.with(getActivity()).load(imagePath).fit().into(mFullscreenComicView);
+        Picasso.with(getActivity()).load(imagePath).fit().centerInside().into(mFullscreenComicView);
     }
 
     @Override
