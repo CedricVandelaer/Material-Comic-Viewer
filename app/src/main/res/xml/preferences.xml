@@ -7,7 +7,7 @@
         <ListPreference
             android:key="backgroundColor"
             android:title="Background color"
-            android:defaultValue="@string/backgroundcolor_setting1"
+            android:defaultValue="@string/backgroundcolor_setting2"
             android:entries="@array/Background_colors"
             android:entryValues="@array/Background_colors_values"
             />

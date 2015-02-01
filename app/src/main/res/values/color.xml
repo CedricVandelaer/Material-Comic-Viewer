@@ -7,4 +7,7 @@
     <color name="TealDark">#00796B</color>
     <color name="BlueGrey">#607D8B</color>
     <color name="Black">#000000</color>
+    <color name="WhiteBG">#fff3f3f3</color>
+    <color name="Red">#F44336</color>
+
 </resources>

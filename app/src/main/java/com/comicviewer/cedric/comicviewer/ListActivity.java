@@ -3,6 +3,7 @@ package com.comicviewer.cedric.comicviewer;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -48,7 +49,7 @@ public class ListActivity extends Activity {
         setContentView(R.layout.activity_list);
         PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
-        setPreferences();
+
 
         createRecyclerView();
 
@@ -62,6 +63,21 @@ public class ListActivity extends Activity {
     private void setPreferences() {
         View layout = getWindow().getDecorView().getRootView();
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String bgcolor = prefs.getString("backgroundColor", getString(R.string.backgroundcolor_setting2));
+
+        if (bgcolor.equals(getString(R.string.backgroundcolor_setting1)))
+        {
+            layout.setBackgroundColor(getResources().getColor(R.color.BlueGrey));
+        }
+        else if (bgcolor.equals(getString(R.string.backgroundcolor_setting2)))
+        {
+            layout.setBackgroundColor(getResources().getColor(R.color.Black));
+        }
+        else
+        {
+            layout.setBackgroundColor(getResources().getColor(R.color.WhiteBG));
+        }
     }
 
     private void setTransitions() {
@@ -189,6 +205,7 @@ public class ListActivity extends Activity {
     public void onResume()
     {
         super.onResume();
+        setPreferences();
     }
 
     @Override

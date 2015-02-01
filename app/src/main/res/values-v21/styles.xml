@@ -5,6 +5,5 @@
         <item name="android:statusBarColor">@color/TealDark</item>
         <item name="android:colorAccent">@color/BlueGrey</item>
         <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowBackground">@color/Black</item>
     </style>
 </resources>

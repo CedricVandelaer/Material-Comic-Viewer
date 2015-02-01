@@ -7,7 +7,7 @@
     <string name="title_activity_display_comic">DisplayComicActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="backgroundcolor_setting1">Dark</string>
+    <string name="backgroundcolor_setting1">Blue grey</string>
     <string name="backgroundcolor_setting2">True black</string>
     <string name="backgroundcolor_setting3">White</string>
     <string name="title_activity_settings">SettingsActivity</string>
