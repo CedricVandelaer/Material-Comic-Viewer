@@ -4,10 +4,24 @@
         <item>@string/backgroundcolor_setting1</item>
         <item>@string/backgroundcolor_setting2</item>
         <item>@string/backgroundcolor_setting3</item>
+        <item>@string/backgroundcolor_setting4</item>
+        <item>@string/backgroundcolor_setting5</item>
     </string-array>
     <string-array name="Background_colors_values">
         <item>@string/backgroundcolor_setting1</item>
         <item>@string/backgroundcolor_setting2</item>
         <item>@string/backgroundcolor_setting3</item>
+        <item>@string/backgroundcolor_setting4</item>
+        <item>@string/backgroundcolor_setting5</item>
+    </string-array>
+    <string-array name="Card_colors">
+        <item>@string/card_color_setting_1</item>
+        <item>@string/card_color_setting_2</item>
+        <item>@string/card_color_setting_3</item>
+    </string-array>
+    <string-array name="Card_colors_values">
+        <item>@string/card_color_setting_1</item>
+        <item>@string/card_color_setting_2</item>
+        <item>@string/card_color_setting_3</item>
     </string-array>
 </resources>

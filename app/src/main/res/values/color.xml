@@ -5,9 +5,12 @@
     <color name="lightbluesecondary">#0288D1</color>
     <color name="Teal">#009688</color>
     <color name="TealDark">#00796B</color>
-    <color name="BlueGrey">#607D8B</color>
+    <color name="TealLight">#80CBC4</color>
+    <color name="BlueGrey">#263238</color>
     <color name="Black">#000000</color>
     <color name="WhiteBG">#fff3f3f3</color>
     <color name="Red">#F44336</color>
+    <color name="Brown">#5D4037</color>
+    <color name="Grey">#616161</color>
 
 </resources>

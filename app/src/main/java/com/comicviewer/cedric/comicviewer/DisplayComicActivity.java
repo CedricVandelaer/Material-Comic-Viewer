@@ -3,6 +3,7 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -48,7 +49,6 @@ public class DisplayComicActivity extends FragmentActivity {
     private ViewPager mPager;
     private SmartFragmentStatePagerAdapter mPagerAdapter;
     private ArrayList<String> mPages;
-    private ComicPageFragment mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mPages = new ArrayList<String>();
 
-        loadPageNamesSync();
+        loadImageNames();
 
         mPager =  (ViewPager) findViewById(R.id.comicpager);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
@@ -92,7 +92,7 @@ public class DisplayComicActivity extends FragmentActivity {
     }
 
 
-    private void loadPageNamesSync()
+    private void loadImageNames()
     {
         String filename = mCurrentComic.getFileName();
         String path = mCurrentComic.getFilePath()+ "/" + filename;
@@ -105,6 +105,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
             for (int j = 0; j < fileheaders.size(); j++) {
 
+
                 String pageFileIndex = fileheaders.get(j).getFileNameString()
                         .substring(fileheaders.get(j).getFileNameString().length() - 7);
                 Matcher m = p.matcher(pageFileIndex);
@@ -112,7 +113,6 @@ public class DisplayComicActivity extends FragmentActivity {
                 {
                     mPages.add(fileheaders.get(j).getFileNameString());
                 }
-
             }
 
         }

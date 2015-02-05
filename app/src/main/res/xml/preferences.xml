@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-        android:title="Layout"
-        android:key="LayoutCategory"
-        >
-        <ListPreference
-            android:key="backgroundColor"
-            android:title="Background color"
-            android:defaultValue="@string/backgroundcolor_setting2"
-            android:entries="@array/Background_colors"
-            android:entryValues="@array/Background_colors_values"
-            />
-        </PreferenceCategory>
+
+    <ListPreference
+        android:key="backgroundColor"
+        android:title="Background color"
+        android:defaultValue="@string/backgroundcolor_setting2"
+        android:entries="@array/Background_colors"
+        android:entryValues="@array/Background_colors_values"
+        />
+    <ListPreference
+        android:key="cardColor"
+        android:title="Card color"
+        android:defaultValue="@string/card_color_setting_1"
+        android:entries="@array/Card_colors"
+        android:entryValues="@array/Card_colors_values"/>
 
 </PreferenceScreen>

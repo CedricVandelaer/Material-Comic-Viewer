@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer;
 
 
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -59,9 +60,12 @@ public class ComicPageFragment extends Fragment {
     public void loadImage(String filename)
     {
         mFullscreenComicView.setImageBitmap(null);
-        String imagePath = "file:"+getActivity().getFilesDir().getPath()+"/"+filename;
-        Log.d("loadImage", imagePath);
-        Picasso.with(getActivity()).load(imagePath).fit().centerInside().into(mFullscreenComicView);
+        if (filename!=null) {
+            String imagePath = "file:" + getActivity().getFilesDir().getPath() + "/" + filename;
+            Log.d("loadImage", imagePath);
+            Picasso.with(getActivity()).load(imagePath).fit().centerInside().into(mFullscreenComicView);
+        }
+
     }
 
     @Override
@@ -76,10 +80,16 @@ public class ComicPageFragment extends Fragment {
         mPageNumber = args.getInt("PageNumber");
         mFullscreenComicView = (ImageViewTouch) rootView.findViewById(R.id.fullscreen_comic);
 
-        new ExtractRarTask().execute();
-
         return rootView;
     }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        new ExtractRarTask().execute();
+    }
+
 
     private class ExtractRarTask extends AsyncTask<Void, Void, String>
     {
@@ -120,6 +130,8 @@ public class ComicPageFragment extends Fragment {
         {
             loadImage(file);
         }
+
     }
+
 
 }

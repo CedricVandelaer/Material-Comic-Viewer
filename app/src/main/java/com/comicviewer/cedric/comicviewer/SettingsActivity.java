@@ -17,6 +17,8 @@ public class SettingsActivity extends Activity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment()).commit();
 
+        getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.TealDark));
+
     }
 
     @Override

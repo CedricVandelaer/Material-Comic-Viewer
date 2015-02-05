@@ -10,6 +10,11 @@
     <string name="backgroundcolor_setting1">Blue grey</string>
     <string name="backgroundcolor_setting2">True black</string>
     <string name="backgroundcolor_setting3">White</string>
+    <string name="backgroundcolor_setting4">Brown</string>
+    <string name="backgroundcolor_setting5">Grey</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="card_color_setting_1">Muted colors</string>
+    <string name="card_color_setting_2">Vibrant colors</string>
+    <string name="card_color_setting_3">White cards</string>
 
 </resources>
