@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 
+import com.devspark.robototextview.widget.RobotoTextView;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.squareup.picasso.Callback;
@@ -37,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +63,10 @@ public class DisplayComicActivity extends FragmentActivity {
     //Arraylist containing the filenamestrings of the fileheaders of the pages
     private ArrayList<String> mPages;
 
+    private RobotoTextView mPageIndicator;
+
+    private boolean mShowPageNumbers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +82,8 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mPages = new ArrayList<String>();
 
+        mPageIndicator = (RobotoTextView) findViewById(R.id.page_indicator);
+
         loadImageNames();
 
         mPager =  (ViewPager) findViewById(R.id.comicpager);
@@ -85,6 +94,28 @@ public class DisplayComicActivity extends FragmentActivity {
         Log.d("Show in recents preference: ", ""+showInRecentsPref);
         if (showInRecentsPref) {
             new SetTaskDescritionTask().execute();
+        }
+
+
+    }
+
+    private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            if (mShowPageNumbers)
+                mPageIndicator.setText("" + (position+1)+" of "+ mPageCount);
+            else
+                mPageIndicator.setText("");
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
         }
     }
 
@@ -160,6 +191,13 @@ public class DisplayComicActivity extends FragmentActivity {
     public void onResume()
     {
         super.onResume();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mShowPageNumbers = prefs.getBoolean("showPageNumber",true);
+
+        if (mShowPageNumbers)
+            mPageIndicator.setText(""+(mPager.getCurrentItem()+1)+" of "+mPageCount);
+        mPager.setOnPageChangeListener(new ComicPageChangeListener());
     }
 
 
