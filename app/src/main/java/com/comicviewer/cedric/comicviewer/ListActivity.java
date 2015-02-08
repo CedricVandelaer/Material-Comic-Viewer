@@ -2,18 +2,14 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,17 +26,10 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +43,7 @@ public class ListActivity extends Activity {
     private FloatingActionButton mFab;
     private String mCardColorSetting;
     private ArrayList<String> mFilePaths;
+    private PreferenceSetter mPrefSetter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +55,7 @@ public class ListActivity extends Activity {
         setContentView(R.layout.activity_list);
         PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
-
+        mPrefSetter = new PreferenceSetter();
 
         createRecyclerView();
         createFab();
@@ -100,32 +90,11 @@ public class ListActivity extends Activity {
     }
 
     private void setPreferences() {
-        View layout = getWindow().getDecorView().getRootView();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mCardColorSetting = prefs.getString("cardColor", getString(R.string.card_color_setting_1));
-        String bgcolor = prefs.getString("backgroundColor", getString(R.string.backgroundcolor_setting2));
 
-        if (bgcolor.equals(getString(R.string.backgroundcolor_setting1)))
-        {
-            layout.setBackgroundColor(getResources().getColor(R.color.BlueGrey));
-        }
-        else if (bgcolor.equals(getString(R.string.backgroundcolor_setting2)))
-        {
-            layout.setBackgroundColor(getResources().getColor(R.color.Black));
-        }
-        else if(bgcolor.equals(getString(R.string.backgroundcolor_setting4)))
-        {
-            layout.setBackgroundColor(getResources().getColor(R.color.Brown));
-        }
-        else if(bgcolor.equals(getString(R.string.backgroundcolor_setting5)))
-        {
-            layout.setBackgroundColor(getResources().getColor(R.color.Grey));
-        }
-        else
-        {
-            layout.setBackgroundColor(getResources().getColor(R.color.WhiteBG));
-        }
+        mPrefSetter.setBackgroundColorPreference(this);
     }
 
     private void setTransitions() {
@@ -136,7 +105,7 @@ public class ListActivity extends Activity {
 
     private void searchComics() {
 
-        mFilePaths = getFilePaths();
+        mFilePaths = mPrefSetter.getFilePathsFromPreferences(this);
 
         ArrayList<String> files = new ArrayList<>();
         ArrayList<String> paths = new ArrayList<>();
@@ -176,11 +145,9 @@ public class ListActivity extends Activity {
 
     }
 
-    private ArrayList<String> getFilePaths() {
+    private ArrayList<String> getFilePathsFromCSVList(String csvList) {
         ArrayList<String> paths = new ArrayList<>();
 
-        String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
-        String csvList = getPreferences(Context.MODE_PRIVATE).getString("filePaths", defaultPath);
         String[] items = csvList.split(",");
         for(int i=0; i < items.length; i++){
             paths.add(items[i]);
@@ -216,9 +183,7 @@ public class ListActivity extends Activity {
             try {
                 Archive arch = new Archive(comic);
                 List<FileHeader> fileheaders = arch.getFileHeaders();
-                String extractedImageFile = filename.substring(filename.lastIndexOf("\\")+1);
-                File output = new File(getFilesDir(), extractedImageFile);
-                FileOutputStream os = new FileOutputStream(output);
+                String extractedImageFile = null;
 
                 int pageCount = 0;
                 Pattern p = Pattern.compile("\\d\\d");
@@ -229,9 +194,17 @@ public class ListActivity extends Activity {
                     String coverFileIndex = fileheaders.get(j).getFileNameString()
                             .substring(fileheaders.get(j).getFileNameString().length() - 7);
                     if (coverFileIndex.contains("000") && !coverFound) {
+                        extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
+                        File output = new File(getFilesDir(), extractedImageFile);
+                        FileOutputStream os = new FileOutputStream(output);
+
                         arch.extractFile(fileheaders.get(j), os);
                         coverFound = true;
                     } else if (coverFileIndex.contains("01") && !coverFound) {
+                        extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
+                        File output = new File(getFilesDir(), extractedImageFile);
+                        FileOutputStream os = new FileOutputStream(output);
+
                         arch.extractFile(fileheaders.get(j), os);
                         coverFound = true;
                     }
@@ -241,7 +214,7 @@ public class ListActivity extends Activity {
                         pageCount++;
 
                 }
-                newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + filename.substring(0, filename.lastIndexOf('.')) + "-cover.jpg");
+                newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
                 newComic.setPageCount(pageCount);
 
                 setComicColor(newComic);
@@ -298,6 +271,17 @@ public class ListActivity extends Activity {
         return false;
     }
 
+    private boolean checkZip(String filename)
+    {
+        int i=filename.lastIndexOf('.');
+        String extension = null;
+        if (i>0)
+            extension = filename.substring(i+1);
+        if (extension.equals("zip") || extension.equals("cbz"))
+            return true;
+        return false;
+    }
+
     @Override
     public void onSaveInstanceState(Bundle savedState)
     {
@@ -307,30 +291,23 @@ public class ListActivity extends Activity {
         {
             savedState.putParcelable("Comic "+ (i+1), mComicList.get(i));
         }
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-        savePaths();
-    }
-
-
-    private void savePaths()
-    {
 
         StringBuilder csvList = new StringBuilder();
         for(String s : mFilePaths){
             csvList.append(s);
             csvList.append(",");
         }
-        SharedPreferences prefs = getSharedPreferences("filePaths",Context.MODE_PRIVATE);
-        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putString("filePaths", csvList.toString());
 
-        sharedPreferencesEditor.commit();
+        savedState.putString("Filepaths",csvList.toString());
     }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        mPrefSetter.saveFilePaths(this,mFilePaths);
+    }
+
 
     @Override
     public void onResume()
@@ -349,7 +326,6 @@ public class ListActivity extends Activity {
 
     private class SetColorTask extends AsyncTask<Object,Void,Object>
     {
-
         @Override
         protected Object doInBackground(Object... params) {
             Comic comic = (Comic)params[0];
@@ -430,7 +406,6 @@ public class ListActivity extends Activity {
             public void onItemClick(View view, int position) {
                 if (position < mComicList.size()) {
                     Log.d("ItemClick", mComicList.get(position).getTitle());
-                    Picasso.with(getApplicationContext()).load(mComicList.get(position).getCoverImage()).fetch();
                     Intent intent = new Intent(getApplicationContext(), DisplayComicActivity.class);
                     intent.putExtra("Comic", mComicList.get(position));
                     Bundle transitionbundle = ActivityOptions.makeSceneTransitionAnimation(ListActivity.this).toBundle();
@@ -445,8 +420,7 @@ public class ListActivity extends Activity {
         if (savedInstanceState==null) {
             mComicList = new ArrayList<Comic>();
 
-            // specify an adapter (see also next example)
-            mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
+            mAdapter = new ComicAdapter(this, mComicList);
             mRecyclerView.setAdapter(mAdapter);
 
             searchComics();
@@ -461,6 +435,10 @@ public class ListActivity extends Activity {
                     mComicList.add((Comic)savedInstanceState.getParcelable("Comic "+ (i+1)));
                 mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
                 mRecyclerView.setAdapter(mAdapter);
+            }
+            if (savedInstanceState.getString("Filepaths")!=null)
+            {
+                mFilePaths = getFilePathsFromCSVList(savedInstanceState.getString("Filepaths"));
             }
         }
     }

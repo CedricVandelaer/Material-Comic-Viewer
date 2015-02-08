@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Cédric on 23/01/2015.
+ * Class to show a comic in the comiclist
  */
 public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
@@ -26,7 +27,6 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
-
 
 
     @Override
@@ -52,8 +52,6 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         if (mComicList.get(i).mCoverColor!=-1) {
             comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
-
-
         }
 
 
@@ -70,7 +68,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             Picasso.with(mContext)
                     .load(mComicList.get(i).getCoverImage())
                     .placeholder(R.drawable.comicplaceholder)
-                    .fit().centerCrop()
+                    .fit().centerInside()
                     .into(comicItemViewHolder.mCoverPicture);
         }
 

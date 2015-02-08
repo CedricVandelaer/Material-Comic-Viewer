@@ -12,6 +12,7 @@ import org.w3c.dom.Text;
 
 /**
  * Created by Cédric on 23/01/2015.
+ * The viewholder for the comiclist
  */
 public class ComicItemViewHolder extends RecyclerView.ViewHolder{
 

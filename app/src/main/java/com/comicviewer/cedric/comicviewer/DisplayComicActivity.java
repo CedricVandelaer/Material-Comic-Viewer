@@ -40,14 +40,22 @@ import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
-
+/**
+ * The activity to display a fullscreen comic
+ */
 public class DisplayComicActivity extends FragmentActivity {
 
 
+    //The comic to be displayed
     private Comic mCurrentComic;
+
+    //The number of pages of the comic
     private int mPageCount;
+
     private ViewPager mPager;
     private SmartFragmentStatePagerAdapter mPagerAdapter;
+
+    //Arraylist containing the filenamestrings of the fileheaders of the pages
     private ArrayList<String> mPages;
 
     @Override
@@ -78,6 +86,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
     }
 
+    //Function to initialise immersive mode
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -92,34 +101,12 @@ public class DisplayComicActivity extends FragmentActivity {
     }
 
 
+    /**
+     * Function to get the filenamestrings of the files in the archive
+     */
     private void loadImageNames()
     {
-        String filename = mCurrentComic.getFileName();
-        String path = mCurrentComic.getFilePath()+ "/" + filename;
-        File comic = new File(path);
-        try {
-            Archive arch = new Archive(comic);
-            List<FileHeader> fileheaders = arch.getFileHeaders();
-
-            Pattern p = Pattern.compile("\\d\\d");
-
-            for (int j = 0; j < fileheaders.size(); j++) {
-
-
-                String pageFileIndex = fileheaders.get(j).getFileNameString()
-                        .substring(fileheaders.get(j).getFileNameString().length() - 7);
-                Matcher m = p.matcher(pageFileIndex);
-                if (m.find())
-                {
-                    mPages.add(fileheaders.get(j).getFileNameString());
-                }
-            }
-
-        }
-        catch (Exception e)
-        {
-            Log.e("ExtractRarTask", e.getMessage());
-        }
+        mPages = Extractor.loadImageNamesFromComic(mCurrentComic);
     }
 
 

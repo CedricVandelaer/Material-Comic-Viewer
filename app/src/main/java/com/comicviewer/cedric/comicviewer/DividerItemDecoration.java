@@ -6,6 +6,7 @@ import android.view.View;
 
 /**
  * Created by Cédric on 24/01/2015.
+ * Class to show a gap between the recyclerviewitems
  */
 
 

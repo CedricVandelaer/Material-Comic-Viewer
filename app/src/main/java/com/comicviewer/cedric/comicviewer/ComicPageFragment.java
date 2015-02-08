@@ -57,6 +57,7 @@ public class ComicPageFragment extends Fragment {
 
     }
 
+    //Function to load an image, gets called after extracting the image
     public void loadImage(String filename)
     {
         mFullscreenComicView.setImageBitmap(null);
@@ -104,11 +105,12 @@ public class ComicPageFragment extends Fragment {
                 for (int j = 0; j < fileheaders.size(); j++) {
 
                     String extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
-                    File outputPage = new File(getActivity().getFilesDir(), extractedImageFile);
-                    FileOutputStream osPage = new FileOutputStream(outputPage);
 
                     if (fileheaders.get(j).getFileNameString().equals(mImageFileName))
                     {
+                        File outputPage = new File(getActivity().getFilesDir(), extractedImageFile);
+                        FileOutputStream osPage = new FileOutputStream(outputPage);
+
                         arch.extractFile(fileheaders.get(j),osPage);
                         String imagePath = "file:"+getActivity().getFilesDir().getPath()+"/"+extractedImageFile;
                         Log.d("ExtractImage", "Extracted "+imagePath);
