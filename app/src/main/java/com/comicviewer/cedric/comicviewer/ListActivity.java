@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -44,13 +45,11 @@ public class ListActivity extends Activity {
     private String mCardColorSetting;
     private ArrayList<String> mFilePaths;
     private PreferenceSetter mPrefSetter;
+    private boolean mUseRecents;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-        setTransitions();
 
         setContentView(R.layout.activity_list);
         PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
@@ -95,13 +94,9 @@ public class ListActivity extends Activity {
         mCardColorSetting = prefs.getString("cardColor", getString(R.string.card_color_setting_1));
 
         mPrefSetter.setBackgroundColorPreference(this);
-    }
 
-    private void setTransitions() {
-        requestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-        requestWindowFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        mUseRecents = prefs.getBoolean("useRecents",true);
     }
-
 
     private void searchComics() {
 
@@ -305,7 +300,7 @@ public class ListActivity extends Activity {
     public void onDestroy()
     {
         super.onDestroy();
-        mPrefSetter.saveFilePaths(this,mFilePaths);
+        mPrefSetter.saveFilePaths(this, mFilePaths);
     }
 
 
@@ -315,6 +310,7 @@ public class ListActivity extends Activity {
         super.onResume();
         setPreferences();
         calcComicColorsAsync();
+        addOnRecyclerViewClickListener();
     }
 
     private void calcComicColorsAsync() {
@@ -397,10 +393,14 @@ public class ListActivity extends Activity {
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-
         mRecyclerView.addItemDecoration(new DividerItemDecoration(120));
         mRecyclerView.setItemAnimator(new ScaleInOutItemAnimator(mRecyclerView));
 
+
+    }
+
+    private void addOnRecyclerViewClickListener()
+    {
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getApplicationContext(), new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -408,8 +408,12 @@ public class ListActivity extends Activity {
                     Log.d("ItemClick", mComicList.get(position).getTitle());
                     Intent intent = new Intent(getApplicationContext(), DisplayComicActivity.class);
                     intent.putExtra("Comic", mComicList.get(position));
-                    Bundle transitionbundle = ActivityOptions.makeSceneTransitionAnimation(ListActivity.this).toBundle();
-                    startActivity(intent, transitionbundle);
+
+                    if (mUseRecents) {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                    }
+                    startActivity(intent);
                 }
             }
         }));

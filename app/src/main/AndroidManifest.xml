@@ -10,7 +10,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:maxRecents="4">
         <activity
             android:name=".ListActivity"
             android:label="@string/app_name" >

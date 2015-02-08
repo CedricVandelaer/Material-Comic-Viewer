@@ -8,6 +8,7 @@ import com.github.junrar.rarfile.FileHeader;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +53,7 @@ public class Extractor {
             Log.e("ExtractRarTask", e.getMessage());
         }
 
+        Collections.sort(pages);
         return pages;
     }
 

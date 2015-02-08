@@ -3,6 +3,7 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -62,13 +64,8 @@ public class DisplayComicActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-        requestWindowFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-
         setContentView(R.layout.activity_display_comic);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-
-        setTransitions();
 
         Intent intent = getIntent();
 
@@ -84,7 +81,35 @@ public class DisplayComicActivity extends FragmentActivity {
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
+        boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
+        Log.d("Show in recents preference: ", ""+showInRecentsPref);
+        if (showInRecentsPref) {
+            new SetTaskDescritionTask().execute();
+        }
     }
+
+    private class SetTaskDescritionTask extends AsyncTask
+    {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            ActivityManager.TaskDescription tdscr = null;
+            try {
+                tdscr = new ActivityManager.TaskDescription(mCurrentComic.getTitle(),
+                        Picasso.with(getApplicationContext()).load(mCurrentComic.getCoverImage()).resize(85,50).get(),
+                        mCurrentComic.mCoverColor);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (tdscr!=null)
+                setTaskDescription(tdscr);
+
+            return null;
+        }
+    }
+
 
     //Function to initialise immersive mode
     @Override
@@ -166,9 +191,4 @@ public class DisplayComicActivity extends FragmentActivity {
         finishAfterTransition();
     }
 
-    private void setTransitions()
-    {
-        getWindow().setExitTransition(new Explode());
-        getWindow().setEnterTransition(new Slide());
-    }
 }
