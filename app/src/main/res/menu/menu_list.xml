@@ -1,5 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".ListActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" android:showAsAction="never" />
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="1"
+        android:title="@string/refresh"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_autorenew_white_48dp"/>
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="2"
+        android:icon="@drawable/ic_settings_white_48dp"
+        app:showAsAction="ifRoom|withText"
+        />
+    <item android:id="@+id/action_about"
+        android:title="About"
+        app:showAsAction="ifRoom|withText"
+        android:icon="@drawable/ic_help_white_48dp"
+        android:orderInCategory="3"/>
+
 </menu>

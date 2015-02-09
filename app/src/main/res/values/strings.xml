@@ -16,5 +16,7 @@
     <string name="card_color_setting_1">Muted colors</string>
     <string name="card_color_setting_2">Vibrant colors</string>
     <string name="card_color_setting_3">White cards</string>
+    <string name="refresh">Refresh</string>
+    <string name="title_activity_about">AboutActivity</string>
 
 </resources>

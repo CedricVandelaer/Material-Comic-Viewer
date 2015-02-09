@@ -100,13 +100,15 @@ public class ListActivity extends Activity {
 
     private void searchComics() {
 
-        mFilePaths = mPrefSetter.getFilePathsFromPreferences(this);
-
+        // list of filenames
         ArrayList<String> files = new ArrayList<>();
+        // list of directories to search from
         ArrayList<String> paths = new ArrayList<>();
 
+        // map to map the filenames to their directories
         Map<String,String> map = new HashMap<String,String>();
 
+        // search for all files in that path
         for (int i=0;i<mFilePaths.size();i++)
         {
             String path = mFilePaths.get(i);
@@ -122,20 +124,45 @@ public class ListActivity extends Activity {
             }
         }
 
+        // remove already added comics
+        if (mComicList!=null)
+        {
+            for (int i=0;i<mComicList.size();i++)
+            {
+                for (int j=0;j<files.size();j++)
+                {
+                    if (mComicList.get(i).getFileName().equals(files.get(j)))
+                    {
+                        files.remove(j);
+                        paths.remove(j);
+                    }
+                }
+            }
+        }
+
+        // map the filenames to their directories
         for (int i=0;i<files.size();i++) {
             map.put(files.get(i),paths.get(i));
         }
 
+        //create treemap to sort the filenames
         Map<String,String> treemap = new TreeMap<String,String>(map);
 
         int i=0;
         for (String str:treemap.keySet())
         {
-            if (checkRar(str)) {
-                Comic newComic = new Comic(str, map.get(str));
-                new ExtractRarTask().execute(newComic, i);
+            File file = new File(str);
+            if (!file.isDirectory()) {
+                if (checkRar(str)) {
+                    Comic newComic = new Comic(str, map.get(str));
+                    new ExtractRarTask().execute(newComic, i);
+                    i++;
+                }
+                else if (checkZip(str))
+                {
+                    //TODO: implement zip
+                }
             }
-            i++;
         }
 
     }
@@ -259,10 +286,21 @@ public class ListActivity extends Activity {
     {
         int i=filename.lastIndexOf('.');
         String extension = null;
+        File file = new File(filename);
         if (i>0)
             extension = filename.substring(i+1);
-        if (extension.equals("rar") || extension.equals("cbr"))
-            return true;
+        try
+        {
+            if (extension.equals("rar") || extension.equals("cbr"))
+                return true;
+        }
+        catch (Exception e)
+        {
+            Log.e("CheckRar", e.getMessage());
+            Log.e("CheckRar", filename);
+            return false;
+        }
+
         return false;
     }
 
@@ -272,8 +310,18 @@ public class ListActivity extends Activity {
         String extension = null;
         if (i>0)
             extension = filename.substring(i+1);
-        if (extension.equals("zip") || extension.equals("cbz"))
-            return true;
+        try
+        {
+            if (extension.equals("zip") || extension.equals("cbz"))
+                return true;
+        }
+        catch (Exception e)
+        {
+            Log.e("CheckZip", e.getMessage());
+            Log.e("CheckZip", filename);
+            return false;
+        }
+
         return false;
     }
 
@@ -372,8 +420,30 @@ public class ListActivity extends Activity {
         if (id == R.id.action_settings) {
             // Display the fragment as the main content.
             Intent intent = new Intent(this, SettingsActivity.class);
+            ArrayList<CharSequence> charsequencePathsList = new ArrayList<>();
+            for (int i=0;i<mFilePaths.size();i++)
+            {
+                charsequencePathsList.add(mFilePaths.get(i));
+                Log.d("Path", mFilePaths.get(i));
+            }
+            intent.putCharSequenceArrayListExtra("pathList",charsequencePathsList);
             startActivity(intent);
             return true;
+        }
+        else if (id == R.id.action_refresh)
+        {
+
+            for (int i=mComicList.size()-1;i>=0;i--)
+            {
+                mComicList.remove(i);
+                mAdapter.notifyItemRemoved(i);
+            }
+            searchComics();
+        }
+        else if (id==R.id.action_about)
+        {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -394,7 +464,7 @@ public class ListActivity extends Activity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(120));
-        mRecyclerView.setItemAnimator(new ScaleInOutItemAnimator(mRecyclerView));
+        mRecyclerView.setItemAnimator(new SlideInOutLeftItemAnimator(mRecyclerView));
 
 
     }
@@ -421,7 +491,11 @@ public class ListActivity extends Activity {
 
     private void initialiseAdapter(Bundle savedInstanceState)
     {
+
         if (savedInstanceState==null) {
+
+            mFilePaths = mPrefSetter.getFilePathsFromPreferences(this);
+
             mComicList = new ArrayList<Comic>();
 
             mAdapter = new ComicAdapter(this, mComicList);
@@ -444,6 +518,12 @@ public class ListActivity extends Activity {
             {
                 mFilePaths = getFilePathsFromCSVList(savedInstanceState.getString("Filepaths"));
             }
+            else
+            {
+                mFilePaths = new ArrayList<>();
+                mFilePaths.add(Environment.getExternalStorageDirectory().toString() + "/ComicViewer");
+            }
+
         }
     }
 }

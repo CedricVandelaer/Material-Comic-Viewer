@@ -7,7 +7,7 @@
         <ListPreference
             android:key="backgroundColor"
             android:title="Background color"
-            android:defaultValue="@string/backgroundcolor_setting2"
+            android:defaultValue="@string/backgroundcolor_setting1"
             android:entries="@array/Background_colors"
             android:entryValues="@array/Background_colors_values"
             />
@@ -30,6 +30,10 @@
             android:key="useRecents"
             android:title="Show comics in recents screen"
             android:defaultValue="true"/>
+        <MultiSelectListPreference
+            android:key="pathList"
+            android:title="Remove added paths">
+        </MultiSelectListPreference>
     </PreferenceCategory>
 
 
