@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -53,10 +54,15 @@ public class PreferenceSetter {
     public ArrayList<String> getFilePathsFromPreferences(Activity activity) {
         ArrayList<String> paths = new ArrayList<>();
 
+        Log.d("PreferenceSetter", "getFilePathsFromPreferences called");
+        
         String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
-        String csvList = activity.getPreferences(Context.MODE_PRIVATE).getString("filePaths", defaultPath);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        String csvList = prefs.getString("Filepaths", defaultPath);
+        Log.d("PreferenceSetter", "csvList: "+csvList);
         String[] items = csvList.split(",");
         for(int i=0; i < items.length; i++){
+            Log.d("PreferenceSetter","Get paths from preferences: "+i+":"+items[i]);
             paths.add(items[i]);
         }
         //remove duplicates
@@ -78,15 +84,19 @@ public class PreferenceSetter {
 
     public void saveFilePaths(Activity activity, ArrayList<String> filepaths)
     {
-        StringBuilder csvList = new StringBuilder();
-        for(String s : filepaths){
-            csvList.append(s);
-            csvList.append(",");
-        }
-        SharedPreferences prefs = activity.getSharedPreferences("filePaths",Context.MODE_PRIVATE);
-        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putString("filePaths", csvList.toString());
 
-        sharedPreferencesEditor.commit();
+        Log.d("PreferenceSetter", "saveFilePaths called");
+
+        StringBuilder csvList = new StringBuilder();
+        for(int i=0;i<filepaths.size();i++){
+            csvList.append(filepaths.get(i));
+            csvList.append(",");
+            Log.d("PreferenceSetter","save paths: "+filepaths.get(i));
+        }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
+        sharedPreferencesEditor.putString("Filepaths", csvList.toString());
+
+        sharedPreferencesEditor.apply();
     }
 }

@@ -166,7 +166,6 @@ public class ListActivity extends Activity {
                 }
                 else if (checkZip(str))
                 {
-                    //TODO: implement zip
                     Comic newComic = new Comic(str, map.get(str));
                     new ExtractZipTask().execute(newComic, i);
                     i++;
@@ -177,6 +176,8 @@ public class ListActivity extends Activity {
     }
 
     private ArrayList<String> getFilePathsFromCSVList(String csvList) {
+        
+        Log.d("ListActivity", "getFilePathsFromCSVList called");
         ArrayList<String> paths = new ArrayList<>();
 
         String[] items = csvList.split(",");
@@ -469,9 +470,9 @@ public class ListActivity extends Activity {
     }
 
     @Override
-    public void onDestroy()
+    public void onStop()
     {
-        super.onDestroy();
+        super.onStop();
         mPrefSetter.saveFilePaths(this, mFilePaths);
     }
 
@@ -638,6 +639,7 @@ public class ListActivity extends Activity {
                 mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
                 mRecyclerView.setAdapter(mAdapter);
             }
+            
             if (savedInstanceState.getString("Filepaths")!=null)
             {
                 mFilePaths = getFilePathsFromCSVList(savedInstanceState.getString("Filepaths"));
