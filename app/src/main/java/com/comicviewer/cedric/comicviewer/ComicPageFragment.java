@@ -97,7 +97,6 @@ public class ComicPageFragment extends Fragment {
     {
         super.onActivityCreated(savedInstanceState);
 
-        Log.d("ComicPageFragment", mComicArchivePath);
         String extension = "";
 
         int i = mComicArchivePath.lastIndexOf('.');
@@ -132,8 +131,6 @@ public class ComicPageFragment extends Fragment {
                         FileOutputStream osPage = new FileOutputStream(outputPage);
 
                         arch.extractFile(fileheaders.get(j),osPage);
-                        String imagePath = "file:"+getActivity().getFilesDir().getPath()+"/"+extractedImageFile;
-                        Log.d("ExtractImage", "Extracted "+imagePath);
                         return extractedImageFile;
                     }
                 }
@@ -162,7 +159,7 @@ public class ComicPageFragment extends Fragment {
 
             File comic = new File(mComicArchivePath);
 
-            String filename;
+            String filename = null;
             InputStream is;
             ZipInputStream zis;
             try
@@ -172,8 +169,9 @@ public class ComicPageFragment extends Fragment {
                 ZipEntry ze;
                 byte[] buffer = new byte[1024];
                 int count;
+                boolean pageFound=false;
 
-                while ((ze = zis.getNextEntry()) != null)
+                while ((ze = zis.getNextEntry()) != null && !pageFound)
                 {
                     filename = ze.getName();
 
@@ -185,22 +183,30 @@ public class ComicPageFragment extends Fragment {
                         continue;
                     }
 
+                    if (filename.contains("/"))
+                        filename = filename.substring(filename.lastIndexOf("/")+1);
+
                     File output = new File(getActivity().getFilesDir(), filename);
 
                     if (filename.equals(mImageFileName))
                     {
                         FileOutputStream fout = new FileOutputStream(output);
 
+                        Log.d("Extractzip", "About to extract: "+ filename);
+
                         while ((count = zis.read(buffer)) != -1) {
                             fout.write(buffer, 0, count);
                         }
                         fout.close();
+                        pageFound=true;
 
                     }
                     zis.closeEntry();
                 }
 
                 zis.close();
+
+                return filename;
 
             }
             catch (Exception e)

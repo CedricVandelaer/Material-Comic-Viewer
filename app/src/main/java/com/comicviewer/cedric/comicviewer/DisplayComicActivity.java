@@ -163,7 +163,7 @@ public class DisplayComicActivity extends FragmentActivity {
      */
     private void loadImageNames()
     {
-        mPages = Extractor.loadImageNamesFromComicRar(mCurrentComic);
+        mPages = Extractor.loadImageNamesFromComic(mCurrentComic);
     }
 
 

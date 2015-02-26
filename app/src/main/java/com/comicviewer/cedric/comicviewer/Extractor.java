@@ -28,7 +28,14 @@ public class Extractor {
     {
         String filename = comicToExtract.getFileName();
 
-        if (filename.split(".")[-1].equals("rar")|| filename.split(".")[-1].equals("cbr"))
+        String extension = "";
+
+        int i = filename.lastIndexOf('.');
+        if (i > 0) {
+            extension = filename.substring(i+1);
+        }
+
+        if (extension.equals("rar")|| extension.equals("cbr"))
         {
             return loadImageNamesFromComicRar(comicToExtract);
         }
@@ -114,7 +121,10 @@ public class Extractor {
                 Matcher m = p.matcher(coverFileIndex);
                 if (m.find())
                 {
+                    if (filename.contains("/"))
+                        filename= filename.substring(filename.lastIndexOf("/")+1);
                     pages.add(filename);
+                    Log.d("Extractor", "added filename: "+filename);
                 }
                 zis.closeEntry();
             }
