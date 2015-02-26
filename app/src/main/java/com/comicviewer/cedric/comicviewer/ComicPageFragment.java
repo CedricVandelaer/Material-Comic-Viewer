@@ -15,9 +15,17 @@ import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -88,7 +96,19 @@ public class ComicPageFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        new ExtractRarTask().execute();
+
+        Log.d("ComicPageFragment", mComicArchivePath);
+        String extension = "";
+
+        int i = mComicArchivePath.lastIndexOf('.');
+        if (i > 0) {
+            extension = mComicArchivePath.substring(i+1);
+        }
+
+        if (extension.equals("rar") || extension.equals("cbr"))
+            new ExtractRarTask().execute();
+        else
+            new ExtractZipTask().execute();
     }
 
 
@@ -123,6 +143,71 @@ public class ComicPageFragment extends Fragment {
             {
                 Log.e("ExtractRarTask", e.getMessage());
             }
+
+            return null;
+        }
+
+        @Override
+        public void onPostExecute(String file)
+        {
+            loadImage(file);
+        }
+
+    }
+
+    private class ExtractZipTask extends AsyncTask<Void, Void, String>
+    {
+        @Override
+        protected String doInBackground(Void... comicVar) {
+
+            File comic = new File(mComicArchivePath);
+
+            String filename;
+            InputStream is;
+            ZipInputStream zis;
+            try
+            {
+                is = new FileInputStream(comic);
+                zis = new ZipInputStream(new BufferedInputStream(is));
+                ZipEntry ze;
+                byte[] buffer = new byte[1024];
+                int count;
+
+                while ((ze = zis.getNextEntry()) != null)
+                {
+                    filename = ze.getName();
+
+                    String coverFileIndex = filename.substring(filename.length() - 7);
+
+                    //Ignore directories
+                    if (ze.isDirectory())
+                    {
+                        continue;
+                    }
+
+                    File output = new File(getActivity().getFilesDir(), filename);
+
+                    if (filename.equals(mImageFileName))
+                    {
+                        FileOutputStream fout = new FileOutputStream(output);
+
+                        while ((count = zis.read(buffer)) != -1) {
+                            fout.write(buffer, 0, count);
+                        }
+                        fout.close();
+
+                    }
+                    zis.closeEntry();
+                }
+
+                zis.close();
+
+            }
+            catch (Exception e)
+            {
+                Log.e("ExtractZipTask", e.getMessage());
+            }
+
 
             return null;
         }

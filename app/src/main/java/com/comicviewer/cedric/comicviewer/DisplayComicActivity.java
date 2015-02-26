@@ -87,11 +87,12 @@ public class DisplayComicActivity extends FragmentActivity {
         loadImageNames();
 
         mPager =  (ViewPager) findViewById(R.id.comicpager);
+        mPager.setOffscreenPageLimit(2);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
-        Log.d("Show in recents preference: ", ""+showInRecentsPref);
+
         if (showInRecentsPref) {
             new SetTaskDescritionTask().execute();
         }
@@ -162,7 +163,7 @@ public class DisplayComicActivity extends FragmentActivity {
      */
     private void loadImageNames()
     {
-        mPages = Extractor.loadImageNamesFromComic(mCurrentComic);
+        mPages = Extractor.loadImageNamesFromComicRar(mCurrentComic);
     }
 
 

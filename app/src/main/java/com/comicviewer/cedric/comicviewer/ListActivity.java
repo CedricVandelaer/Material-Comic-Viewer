@@ -24,8 +24,12 @@ import com.github.junrar.rarfile.FileHeader;
 import com.melnykov.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +37,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 
 public class ListActivity extends Activity {
@@ -161,6 +167,9 @@ public class ListActivity extends Activity {
                 else if (checkZip(str))
                 {
                     //TODO: implement zip
+                    Comic newComic = new Comic(str, map.get(str));
+                    new ExtractZipTask().execute(newComic, i);
+                    i++;
                 }
             }
         }
@@ -189,6 +198,121 @@ public class ListActivity extends Activity {
             }
         }
         return paths;
+    }
+
+    private class ExtractZipTask extends AsyncTask<Object, Void, Integer>
+    {
+        @Override
+        protected Integer doInBackground(Object... comicVar) {
+
+            Comic newComic= (Comic)comicVar[0];
+            int itemPosition = (Integer) comicVar[1];
+            String filename = newComic.getFileName();
+            String extractedImageFile = null;
+            int pageCount = 0;
+
+            InputStream is;
+            ZipInputStream zis;
+            try
+            {
+                String path = newComic.getFilePath();
+                is = new FileInputStream(path + "/" + filename);
+                zis = new ZipInputStream(new BufferedInputStream(is));
+                ZipEntry ze;
+                byte[] buffer = new byte[1024];
+                int count;
+
+                boolean coverFound = false;
+
+                Pattern p = Pattern.compile("\\d\\d");
+
+                while ((ze = zis.getNextEntry()) != null)
+                {
+                    filename = ze.getName();
+
+                    String coverFileIndex = filename.substring(filename.length() - 7);
+
+                    // Need to create directories if not exists, or
+                    // it will generate an Exception...
+                    if (ze.isDirectory())
+                    {
+                        continue;
+                    }
+
+                    Matcher m = p.matcher(coverFileIndex);
+                    if (m.find())
+                        pageCount++;
+
+                    File output;
+
+                    if (filename.contains("/")) {
+                        output = new File(getFilesDir(), filename.substring(filename.lastIndexOf("/")));
+                    }
+                    else {
+                        output = new File(getFilesDir(), filename);
+                    }
+
+                    if (coverFileIndex.contains("000") && !coverFound) {
+
+                        FileOutputStream fout = new FileOutputStream(output);
+
+                        while ((count = zis.read(buffer)) != -1) {
+                            fout.write(buffer, 0, count);
+                        }
+                        fout.close();
+
+                        if (filename.contains("/"))
+                            extractedImageFile = filename.substring(filename.lastIndexOf("/")+1);
+                        else
+                            extractedImageFile = filename;
+
+                        coverFound = true;
+                    } else if (coverFileIndex.contains("01") && !coverFound) {
+
+                        FileOutputStream fout = new FileOutputStream(output);
+
+                        while ((count = zis.read(buffer)) != -1) {
+                            fout.write(buffer, 0, count);
+                        }
+                        fout.close();
+
+                        if (filename.contains("/"))
+                            extractedImageFile = filename.substring(filename.lastIndexOf("/")+1);
+                        else
+                            extractedImageFile = filename;
+
+                        coverFound = true;
+                    }
+
+                    zis.closeEntry();
+                }
+
+                newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
+                newComic.setPageCount(pageCount);
+                zis.close();
+
+                setComicColor(newComic);
+
+                mComicList.add(newComic);
+
+                return itemPosition;
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Integer itempos) {
+            super.onPostExecute(itempos);
+
+            //mAdapter.notifyDataSetChanged();
+            if (itempos!=null)
+                mAdapter.notifyItemInserted(itempos);
+        }
     }
 
     private class ExtractRarTask extends AsyncTask<Object, Void, Integer>

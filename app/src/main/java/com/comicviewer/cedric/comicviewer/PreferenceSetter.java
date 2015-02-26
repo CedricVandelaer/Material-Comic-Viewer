@@ -26,22 +26,27 @@ public class PreferenceSetter {
         if (bgcolor.equals(activity.getString(R.string.backgroundcolor_setting1)))
         {
             layout.setBackgroundColor(activity.getResources().getColor(R.color.BlueGrey));
+            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.BlueGrey));
         }
         else if (bgcolor.equals(activity.getString(R.string.backgroundcolor_setting2)))
         {
             layout.setBackgroundColor(activity.getResources().getColor(R.color.Black));
+            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Black));
         }
         else if(bgcolor.equals(activity.getString(R.string.backgroundcolor_setting4)))
         {
             layout.setBackgroundColor(activity.getResources().getColor(R.color.Brown));
+            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Brown));
         }
         else if(bgcolor.equals(activity.getString(R.string.backgroundcolor_setting5)))
         {
             layout.setBackgroundColor(activity.getResources().getColor(R.color.Grey));
+            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Grey));
         }
         else
         {
             layout.setBackgroundColor(activity.getResources().getColor(R.color.WhiteBG));
+            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Black));
         }
     }
 
