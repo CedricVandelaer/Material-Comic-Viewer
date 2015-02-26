@@ -57,7 +57,7 @@ public class DisplayComicActivity extends FragmentActivity {
     //The number of pages of the comic
     private int mPageCount;
 
-    private ViewPager mPager;
+    private ComicViewPager mPager;
     private SmartFragmentStatePagerAdapter mPagerAdapter;
 
     //Arraylist containing the filenamestrings of the fileheaders of the pages
@@ -86,7 +86,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
         loadImageNames();
 
-        mPager =  (ViewPager) findViewById(R.id.comicpager);
+        mPager =  (ComicViewPager) findViewById(R.id.comicpager);
         mPager.setOffscreenPageLimit(2);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
@@ -98,6 +98,11 @@ public class DisplayComicActivity extends FragmentActivity {
         }
 
 
+    }
+
+    public void enablePaging(boolean toggle)
+    {
+        this.mPager.setPagingEnabled(toggle);
     }
 
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {

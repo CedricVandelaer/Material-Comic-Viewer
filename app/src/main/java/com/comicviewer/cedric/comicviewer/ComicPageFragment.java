@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -89,6 +90,19 @@ public class ComicPageFragment extends Fragment {
         mPageNumber = args.getInt("PageNumber");
         mFullscreenComicView = (ImageViewTouch) rootView.findViewById(R.id.fullscreen_comic);
 
+        mFullscreenComicView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if (mFullscreenComicView.getScale() > 1f) {
+                    ((DisplayComicActivity)getActivity()).enablePaging(false);
+                } else {
+                    ((DisplayComicActivity)getActivity()).enablePaging(true);
+                }
+                return false;
+            }
+        });
+
         return rootView;
     }
 
@@ -130,7 +144,7 @@ public class ComicPageFragment extends Fragment {
                         File outputPage = new File(getActivity().getFilesDir(), extractedImageFile);
                         FileOutputStream osPage = new FileOutputStream(outputPage);
 
-                        arch.extractFile(fileheaders.get(j),osPage);
+                        arch.extractFile(fileheaders.get(j), osPage);
                         return extractedImageFile;
                     }
                 }
