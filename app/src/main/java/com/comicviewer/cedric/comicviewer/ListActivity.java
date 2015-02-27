@@ -82,8 +82,6 @@ public class ListActivity extends Activity {
                     public void directorySelected(File directory) {
                         Log.d(getClass().getName(), "selected dir " + directory.toString());
                         mFilePaths.add(directory.toString());
-                        mComicList.clear();
-                        mAdapter.notifyDataSetChanged();
                         searchComics();
                     }
                 });
@@ -102,6 +100,8 @@ public class ListActivity extends Activity {
         mPrefSetter.setBackgroundColorPreference(this);
 
         mUseRecents = prefs.getBoolean("useRecents",true);
+        
+        mFilePaths = mPrefSetter.getFilePathsFromPreferences(this);
     }
 
     private void searchComics() {
@@ -123,25 +123,12 @@ public class ListActivity extends Activity {
 
             File fileList[] = f.listFiles();
 
-            for (int j=0;j<fileList.length;j++)
+            if (fileList!=null)
             {
-                files.add(fileList[j].getName());
-                paths.add(path);
-            }
-        }
-
-        // remove already added comics
-        if (mComicList!=null)
-        {
-            for (int i=0;i<mComicList.size();i++)
-            {
-                for (int j=0;j<files.size();j++)
+                for (int j=0;j<fileList.length;j++)
                 {
-                    if (mComicList.get(i).getFileName().equals(files.get(j)))
-                    {
-                        files.remove(j);
-                        paths.remove(j);
-                    }
+                    files.add(fileList[j].getName());
+                    paths.add(path);
                 }
             }
         }
@@ -159,46 +146,36 @@ public class ListActivity extends Activity {
         {
             File file = new File(str);
             if (!file.isDirectory()) {
-                if (checkRar(str)) {
-                    Comic newComic = new Comic(str, map.get(str));
-                    new ExtractRarTask().execute(newComic, i);
-                    i++;
-                }
-                else if (checkZip(str))
-                {
-                    Comic newComic = new Comic(str, map.get(str));
-                    new ExtractZipTask().execute(newComic, i);
-                    i++;
+                if (!comicFileInList(str)) {
+                    if (checkRar(str)) {
+                        Comic newComic = new Comic(str, map.get(str));
+                        new ExtractRarTask().execute(newComic, i);
+                        i++;
+                    } else if (checkZip(str)) {
+                        Comic newComic = new Comic(str, map.get(str));
+                        new ExtractZipTask().execute(newComic, i);
+                        i++;
+                    }
                 }
             }
         }
 
     }
-
-    private ArrayList<String> getFilePathsFromCSVList(String csvList) {
-        
-        Log.d("ListActivity", "getFilePathsFromCSVList called");
-        ArrayList<String> paths = new ArrayList<>();
-
-        String[] items = csvList.split(",");
-        for(int i=0; i < items.length; i++){
-            paths.add(items[i]);
-        }
-        //remove duplicates
-        for (int i=0;i<paths.size();i++)
+    
+    private boolean comicFileInList(String filename)
+    {
+        if (mComicList!=null)
         {
-            for (int j=0;j<paths.size();j++)
+            for (int i=0;i<mComicList.size();i++)
             {
-                if (i!=j)
+                if (mComicList.get(i).getFileName().equals(filename))
                 {
-                    if (paths.get(i).equals(paths.get(j)))
-                    {
-                        paths.remove(j);
-                    }
+                    return true;
                 }
+                
             }
         }
-        return paths;
+        return false;
     }
 
     private class ExtractZipTask extends AsyncTask<Object, Void, Integer>
@@ -214,6 +191,7 @@ public class ListActivity extends Activity {
 
             InputStream is;
             ZipInputStream zis;
+            
             try
             {
                 String path = newComic.getFilePath();
@@ -294,7 +272,7 @@ public class ListActivity extends Activity {
 
                 setComicColor(newComic);
 
-                mComicList.add(newComic);
+                mComicList.add(itemPosition,newComic);
 
                 return itemPosition;
             }
@@ -366,7 +344,7 @@ public class ListActivity extends Activity {
 
                 setComicColor(newComic);
 
-                mComicList.add(newComic);
+                mComicList.add(itemPosition,newComic);
                 return itemPosition;
 
             }
@@ -468,6 +446,13 @@ public class ListActivity extends Activity {
 
         savedState.putString("Filepaths",csvList.toString());
     }
+    
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        mPrefSetter.saveFilePaths(this,mFilePaths);
+    }
 
     @Override
     public void onStop()
@@ -484,6 +469,7 @@ public class ListActivity extends Activity {
         setPreferences();
         calcComicColorsAsync();
         addOnRecyclerViewClickListener();
+        searchComics();
     }
 
     private void calcComicColorsAsync() {
@@ -611,16 +597,16 @@ public class ListActivity extends Activity {
     private void initialiseAdapter(Bundle savedInstanceState)
     {
 
+        mFilePaths = mPrefSetter.getFilePathsFromPreferences(this);
+        
         if (savedInstanceState==null) {
-
-            mFilePaths = mPrefSetter.getFilePathsFromPreferences(this);
 
             mComicList = new ArrayList<Comic>();
 
             mAdapter = new ComicAdapter(this, mComicList);
             mRecyclerView.setAdapter(mAdapter);
 
-            searchComics();
+            //searchComics();
         }
         else
         {
@@ -634,16 +620,6 @@ public class ListActivity extends Activity {
                 mRecyclerView.setAdapter(mAdapter);
             }
             
-            if (savedInstanceState.getString("Filepaths")!=null)
-            {
-                mFilePaths = getFilePathsFromCSVList(savedInstanceState.getString("Filepaths"));
-            }
-            else
-            {
-                mFilePaths = new ArrayList<>();
-                mFilePaths.add(Environment.getExternalStorageDirectory().toString() + "/ComicViewer");
-            }
-
         }
     }
 }

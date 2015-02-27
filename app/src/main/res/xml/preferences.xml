@@ -30,11 +30,13 @@
             android:key="useRecents"
             android:title="Show comics in recents screen"
             android:defaultValue="true"/>
+        <!--
         <MultiSelectListPreference
             android:key="pathList"
             android:title="Remove added paths"
             >
         </MultiSelectListPreference>
+        -->
     </PreferenceCategory>
 
 

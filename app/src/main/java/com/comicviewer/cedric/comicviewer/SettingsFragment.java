@@ -1,22 +1,13 @@
 package com.comicviewer.cedric.comicviewer;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Environment;
-import android.preference.ListPreference;
-import android.preference.MultiSelectListPreference;
-import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -72,29 +63,28 @@ public class SettingsFragment extends PreferenceFragment{
 
         mPathListing = paths.toArray(new CharSequence[paths.size()]);
 
-        createListPreference();
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
+        
+        CustomMultiSelectListPreference multiListPref = createListPreference(paths,paths);
+        
+        targetCategory.addPreference(multiListPref);
+        
 
     }
 
-    private void createListPreference()
+    private CustomMultiSelectListPreference createListPreference(ArrayList<CharSequence> keys, ArrayList<CharSequence> values)
     {
-        MultiSelectListPreference pathPreference = (MultiSelectListPreference) findPreference("pathList");
+        CustomMultiSelectListPreference listPref = new CustomMultiSelectListPreference(getActivity(),keys,values, "Choose paths to remove");
         
-        pathPreference.setSummary(getString(R.string.path_preference_summary));
+        listPref.setTitle("Remove added paths");
+        listPref.setSummary(getString(R.string.path_preference_summary));
 
-        pathPreference.setEntries(mPathListing);
-        pathPreference.setEntryValues(mPathListing);
-
-        pathPreference.setPositiveButtonText("Remove");
-        pathPreference.setNegativeButtonText("Cancel");
+        listPref.setPositiveButtonText("Remove");
+        listPref.setNegativeButtonText("Cancel");
         
-        pathPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                Log.d("OnPreferenceChange", (String)preference.getTitle());
-                return false;
-            }
-        });
+
+        return listPref;
+        
     }
 
 }

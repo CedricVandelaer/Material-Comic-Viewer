@@ -63,6 +63,8 @@ public class PreferenceSetter {
         for(int i=0; i < items.length; i++){
             paths.add(items[i]);
         }
+        if (paths.size()<1)
+            paths.add(defaultPath);
         //remove duplicates
         for (int i=0;i<paths.size();i++)
         {
@@ -82,8 +84,6 @@ public class PreferenceSetter {
 
     public void saveFilePaths(Activity activity, ArrayList<String> filepaths)
     {
-
-
         StringBuilder csvList = new StringBuilder();
         for(int i=0;i<filepaths.size();i++){
             csvList.append(filepaths.get(i));
