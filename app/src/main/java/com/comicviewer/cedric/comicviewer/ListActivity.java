@@ -1,8 +1,6 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,7 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
@@ -112,7 +109,7 @@ public class ListActivity extends Activity {
         ArrayList<String> paths = new ArrayList<>();
 
         // map to map the filenames to their directories
-        Map<String,String> map = new HashMap<String,String>();
+        Map<String,String> map = new HashMap<>();
 
         // search for all files in that path
         for (int i=0;i<mFilePaths.size();i++)
@@ -139,7 +136,7 @@ public class ListActivity extends Activity {
         }
 
         //create treemap to sort the filenames
-        Map<String,String> treemap = new TreeMap<String,String>(map);
+        Map<String,String> treemap = new TreeMap<>(map);
 
         int i=0;
         for (String str:treemap.keySet())
@@ -159,7 +156,59 @@ public class ListActivity extends Activity {
                 }
             }
         }
+        //Check to remove removed items
+        removeOldComics(treemap);
+        
+        //Check for doubles
+        removeDoubleComics();
 
+    }
+    
+    private void removeOldComics(Map treemap)
+    {
+        for (int j=0;j<mComicList.size();j++)
+        {
+            Comic comicToRemove = mComicList.get(j);
+            boolean isInList = false;
+
+            for (int k=0;k<treemap.keySet().size();k++)
+            {
+                if (treemap.containsKey(comicToRemove.getFileName()))
+                {
+                    isInList=true;
+                }
+            }
+            if (!isInList)
+            {
+                mComicList.remove(j);
+                mAdapter.notifyItemRemoved(j);
+            }
+        }
+        
+    }
+    
+    private void removeDoubleComics()
+    {
+        for (int j=0;j<mComicList.size();j++)
+        {
+            Comic currentComic = mComicList.get(j);
+            boolean isDouble = false;
+            for (int k=0;k<mComicList.size();k++)
+            {
+                if (j!=k)
+                {
+                    if(currentComic.getFileName().equals(mComicList.get(k).getFileName()))
+                    {
+                        isDouble = true;
+                    }
+                }
+                
+            }
+            if (isDouble) {
+                mComicList.remove(j);
+                mAdapter.notifyItemRemoved(j);
+            }
+        }   
     }
     
     private boolean comicFileInList(String filename)
@@ -168,7 +217,7 @@ public class ListActivity extends Activity {
         {
             for (int i=0;i<mComicList.size();i++)
             {
-                if (mComicList.get(i).getFileName().equals(filename))
+                if (mComicList.get(i).getFileName().trim().equals(filename.trim()))
                 {
                     return true;
                 }
@@ -389,7 +438,6 @@ public class ListActivity extends Activity {
     {
         int i=filename.lastIndexOf('.');
         String extension = null;
-        File file = new File(filename);
         if (i>0)
             extension = filename.substring(i+1);
         try
@@ -601,7 +649,7 @@ public class ListActivity extends Activity {
         
         if (savedInstanceState==null) {
 
-            mComicList = new ArrayList<Comic>();
+            mComicList = new ArrayList<>();
 
             mAdapter = new ComicAdapter(this, mComicList);
             mRecyclerView.setAdapter(mAdapter);
@@ -610,11 +658,11 @@ public class ListActivity extends Activity {
         }
         else
         {
-            mComicList = new ArrayList<Comic>();
+            mComicList = new ArrayList<>();
 
             for (int i=0;i<savedInstanceState.size();i++)
             {
-                if ((Comic)savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
+                if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
                     mComicList.add((Comic)savedInstanceState.getParcelable("Comic "+ (i+1)));
                 mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
                 mRecyclerView.setAdapter(mAdapter);
