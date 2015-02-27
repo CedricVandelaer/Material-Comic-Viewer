@@ -544,14 +544,8 @@ public class ListActivity extends Activity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             // Display the fragment as the main content.
+            mPrefSetter.saveFilePaths(this,mFilePaths);
             Intent intent = new Intent(this, SettingsActivity.class);
-            ArrayList<CharSequence> charsequencePathsList = new ArrayList<>();
-            for (int i=0;i<mFilePaths.size();i++)
-            {
-                charsequencePathsList.add(mFilePaths.get(i));
-                Log.d("Path", mFilePaths.get(i));
-            }
-            intent.putCharSequenceArrayListExtra("pathList",charsequencePathsList);
             startActivity(intent);
             return true;
         }

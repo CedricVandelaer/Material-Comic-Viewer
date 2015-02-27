@@ -18,12 +18,8 @@ public class SettingsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Intent intent = getIntent();
-        ArrayList<CharSequence> paths = intent.getCharSequenceArrayListExtra("pathList");
-
         getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, SettingsFragment.newInstance(paths)).commit();
+                .replace(android.R.id.content, SettingsFragment.newInstance()).commit();
 
         getActionBar().setTitle("Settings");
         getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.TealDark));

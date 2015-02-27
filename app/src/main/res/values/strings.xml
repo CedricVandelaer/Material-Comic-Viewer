@@ -25,4 +25,5 @@
         their poor performance, overly complex interfaces or just because I didn\'t like how they looked. Well anyway, have fun reading
         comics with Comic Viewer!
     </string>
+    <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 </resources>
