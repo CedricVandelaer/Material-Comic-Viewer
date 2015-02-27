@@ -18,5 +18,11 @@
     <string name="card_color_setting_3">White cards</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
-
+    <string name="about_text">
+        Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
+        science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan
+        of android so I decided to make a comic viewer app in my free time. I wasn\'t really happy with existing apps because of 
+        their poor performance, overly complex interfaces or just because I didn\'t like how they looked. Well anyway, have fun reading
+        comics with Comic Viewer!
+    </string>
 </resources>

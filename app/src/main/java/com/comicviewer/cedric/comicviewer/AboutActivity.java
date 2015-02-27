@@ -3,8 +3,17 @@ package com.comicviewer.cedric.comicviewer;
 import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
+import android.widget.TextView;
+
+import uk.co.deanwild.flowtextview.FlowTextView;
 
 
 public class AboutActivity extends Activity {
