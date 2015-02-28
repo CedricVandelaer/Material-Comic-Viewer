@@ -282,12 +282,14 @@ public class ListActivity extends Activity {
 
                     if (coverFileIndex.contains("000") && !coverFound) {
 
-                        FileOutputStream fout = new FileOutputStream(output);
+                        if (!output.exists()) {
+                            FileOutputStream fout = new FileOutputStream(output);
 
-                        while ((count = zis.read(buffer)) != -1) {
-                            fout.write(buffer, 0, count);
+                            while ((count = zis.read(buffer)) != -1) {
+                                fout.write(buffer, 0, count);
+                            }
+                            fout.close();
                         }
-                        fout.close();
 
                         if (filename.contains("/"))
                             extractedImageFile = filename.substring(filename.lastIndexOf("/")+1);
@@ -297,12 +299,14 @@ public class ListActivity extends Activity {
                         coverFound = true;
                     } else if (coverFileIndex.contains("01") && !coverFound) {
 
-                        FileOutputStream fout = new FileOutputStream(output);
+                        if (!output.exists()) {
+                            FileOutputStream fout = new FileOutputStream(output);
 
-                        while ((count = zis.read(buffer)) != -1) {
-                            fout.write(buffer, 0, count);
+                            while ((count = zis.read(buffer)) != -1) {
+                                fout.write(buffer, 0, count);
+                            }
+                            fout.close();
                         }
-                        fout.close();
 
                         if (filename.contains("/"))
                             extractedImageFile = filename.substring(filename.lastIndexOf("/")+1);
@@ -369,17 +373,25 @@ public class ListActivity extends Activity {
                             .substring(fileheaders.get(j).getFileNameString().length() - 7);
                     if (coverFileIndex.contains("000") && !coverFound) {
                         extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
+                        
                         File output = new File(getFilesDir(), extractedImageFile);
-                        FileOutputStream os = new FileOutputStream(output);
-
-                        arch.extractFile(fileheaders.get(j), os);
+                        
+                        if (!output.exists()) {
+                            FileOutputStream os = new FileOutputStream(output);
+                            arch.extractFile(fileheaders.get(j), os);
+                        }
+                        
                         coverFound = true;
                     } else if (coverFileIndex.contains("01") && !coverFound) {
                         extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
+                        
                         File output = new File(getFilesDir(), extractedImageFile);
-                        FileOutputStream os = new FileOutputStream(output);
-
-                        arch.extractFile(fileheaders.get(j), os);
+                        
+                        if (!output.exists()) {
+                            FileOutputStream os = new FileOutputStream(output);
+                            arch.extractFile(fileheaders.get(j), os);
+                        }
+                        
                         coverFound = true;
                     }
 

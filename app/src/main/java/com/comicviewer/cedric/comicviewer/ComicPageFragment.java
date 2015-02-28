@@ -142,9 +142,12 @@ public class ComicPageFragment extends Fragment {
                     if (fileheaders.get(j).getFileNameString().equals(mImageFileName))
                     {
                         File outputPage = new File(getActivity().getFilesDir(), extractedImageFile);
-                        FileOutputStream osPage = new FileOutputStream(outputPage);
+                        
+                        if (!outputPage.exists()) {
+                            FileOutputStream osPage = new FileOutputStream(outputPage);
+                            arch.extractFile(fileheaders.get(j), osPage);
+                        }
 
-                        arch.extractFile(fileheaders.get(j), osPage);
                         return extractedImageFile;
                     }
                 }
@@ -204,14 +207,15 @@ public class ComicPageFragment extends Fragment {
 
                     if (filename.equals(mImageFileName))
                     {
-                        FileOutputStream fout = new FileOutputStream(output);
+                        
+                        if (!output.exists()) {
+                            FileOutputStream fout = new FileOutputStream(output);
 
-                        Log.d("Extractzip", "About to extract: "+ filename);
-
-                        while ((count = zis.read(buffer)) != -1) {
-                            fout.write(buffer, 0, count);
+                            while ((count = zis.read(buffer)) != -1) {
+                                fout.write(buffer, 0, count);
+                            }
+                            fout.close();
                         }
-                        fout.close();
                         pageFound=true;
 
                     }

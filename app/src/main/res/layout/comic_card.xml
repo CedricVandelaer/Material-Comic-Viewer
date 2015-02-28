@@ -20,7 +20,7 @@
             android:layout_width="110dp"
             android:padding="10dp"/>
 
-        <TextView
+        <com.devspark.robototextview.widget.RobotoTextView
             android:text="Title"
             android:id="@+id/title"
             android:layout_toRightOf="@id/cover"
@@ -31,7 +31,7 @@
             android:textSize="24sp"
             android:padding="10dp"
             />
-        <TextView
+        <com.devspark.robototextview.widget.RobotoTextView
             android:id="@+id/issue_number"
             android:text="Issue number: "
             android:layout_width="fill_parent"
@@ -40,7 +40,7 @@
             android:layout_toRightOf="@id/cover"
             android:textColor="#000000"
             android:padding="10dp"/>
-        <TextView
+        <com.devspark.robototextview.widget.RobotoTextView
             android:id="@+id/page_count"
             android:text="Pages: "
             android:layout_width="fill_parent"
