@@ -4,6 +4,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,7 +22,6 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected CardView mCardView;
     protected TextView mIssueNumber;
     protected TextView mPageCount;
-
 
     public ComicItemViewHolder(View itemView) {
         super(itemView);

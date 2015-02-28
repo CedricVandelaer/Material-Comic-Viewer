@@ -1,10 +1,15 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 
 import com.squareup.picasso.Picasso;
 
@@ -19,6 +24,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     private ArrayList<Comic> mComicList;
     private Context mContext;
     private LayoutInflater mInflater;
+    private int lastPosition=-1;
 
     public ComicAdapter(Context context, ArrayList<Comic> comics)
     {
@@ -41,6 +47,9 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     @Override
     public void onBindViewHolder(final ComicItemViewHolder comicItemViewHolder, int i) {
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String cardColor = prefs.getString("cardColor",mContext.getString(R.string.card_color_setting_1));
+        
         comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle());
         if (mComicList.get(i).getIssueNumber()!=-1)
             comicItemViewHolder.mIssueNumber.setText("Issue number: "+mComicList.get(i).getIssueNumber());
@@ -51,6 +60,8 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             comicItemViewHolder.mPageCount.setText("Pages: "+mComicList.get(i).getPageCount());
         else
             comicItemViewHolder.mPageCount.setText("");
+        
+        setAnimation(comicItemViewHolder.mCardView,i);
 
         if (mComicList.get(i).mCoverColor!=-1) 
         {
@@ -87,6 +98,18 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                     .fit().centerInside()
                     .into(comicItemViewHolder.mCoverPicture);
         }
+
+    }
+
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+
+        if (position>lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.up_from_bottom);
+            viewToAnimate.startAnimation(animation);
+        }
+        lastPosition = position;
 
     }
 
