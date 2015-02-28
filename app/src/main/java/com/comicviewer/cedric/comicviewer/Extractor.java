@@ -13,10 +13,12 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -94,20 +96,18 @@ public class Extractor {
 
         ArrayList<String> pages= new ArrayList<String>();
 
-        InputStream is;
-        ZipInputStream zis;
         try
         {
-            is = new FileInputStream(path + "/" + filename);
-            zis = new ZipInputStream(new BufferedInputStream(is));
+            ZipFile zip = new ZipFile(path + "/" + filename);
             ZipEntry ze;
-            byte[] buffer = new byte[1024];
-            int count;
 
             Pattern p = Pattern.compile("\\d\\d");
 
-            while ((ze = zis.getNextEntry()) != null)
+            Enumeration<? extends ZipEntry> entries = zip.entries();
+
+            while (entries.hasMoreElements())
             {
+                ze = entries.nextElement();
                 filename = ze.getName();
 
                 String coverFileIndex = filename.substring(filename.length() - 7);
@@ -126,10 +126,7 @@ public class Extractor {
                     pages.add(filename);
                     Log.d("Extractor", "added filename: "+filename);
                 }
-                zis.closeEntry();
             }
-
-            zis.close();
 
         }
         catch (Exception e)

@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -12,9 +13,11 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
@@ -28,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +39,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 
@@ -49,7 +54,10 @@ public class ListActivity extends Activity {
     private ArrayList<String> mFilePaths;
     private PreferenceSetter mPrefSetter;
     private boolean mUseRecents;
-
+    private int mProgress;
+    private int mTotalComicCount;
+    private ProgressDialog mLoadDialog;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,7 +146,11 @@ public class ListActivity extends Activity {
         //create treemap to sort the filenames
         Map<String,String> treemap = new TreeMap<>(map);
 
+        mTotalComicCount = countComics(treemap);
+        mProgress = 0;
+        
         int i=0;
+        showProgressDialog(mProgress, mTotalComicCount);
         for (String str:treemap.keySet())
         {
             File file = new File(str);
@@ -162,6 +174,41 @@ public class ListActivity extends Activity {
         //Check for doubles
         removeDoubleComics();
 
+    }
+    
+    private void showProgressDialog(int progress, int total)
+    {
+
+        if (mLoadDialog==null)
+        {
+            mLoadDialog = new ProgressDialog(this);
+            mLoadDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mLoadDialog.setCanceledOnTouchOutside(false);
+            mLoadDialog.setInverseBackgroundForced(false);
+            mLoadDialog.getWindow().setGravity(Gravity.BOTTOM);
+        }
+
+        mLoadDialog.setMessage("Loading comic "+mProgress+" of "+mTotalComicCount);
+        mLoadDialog.show();
+        
+        if (!(progress<total)) {
+            mLoadDialog.cancel();
+            mLoadDialog = null;
+        }
+        
+    }
+    
+    private int countComics(Map treemap)
+    {
+        int count = 0;
+        for (Object str:treemap.keySet())
+        {
+            if (!comicFileInList((String)str))
+            {
+                count++;
+            }
+        }
+        return count;
     }
     
     private void removeOldComics(Map treemap)
@@ -235,33 +282,31 @@ public class ListActivity extends Activity {
             Comic newComic= (Comic)comicVar[0];
             int itemPosition = (Integer) comicVar[1];
             String filename = newComic.getFileName();
+            String path = newComic.getFilePath();
             String extractedImageFile = null;
             int pageCount = 0;
 
             InputStream is;
-            ZipInputStream zis;
+            ZipInputStream zis; 
             
             try
             {
-                String path = newComic.getFilePath();
-                is = new FileInputStream(path + "/" + filename);
-                zis = new ZipInputStream(new BufferedInputStream(is));
-                ZipEntry ze;
-                byte[] buffer = new byte[1024];
+                ZipFile zip = new ZipFile(path + "/" + filename);
                 int count;
 
                 boolean coverFound = false;
 
                 Pattern p = Pattern.compile("\\d\\d");
 
-                while ((ze = zis.getNextEntry()) != null)
+                Enumeration<? extends ZipEntry> entries = zip.entries();
+                
+                for (;entries.hasMoreElements();)
                 {
+                    ZipEntry ze = entries.nextElement();
                     filename = ze.getName();
 
                     String coverFileIndex = filename.substring(filename.length() - 7);
 
-                    // Need to create directories if not exists, or
-                    // it will generate an Exception...
                     if (ze.isDirectory())
                     {
                         continue;
@@ -283,12 +328,19 @@ public class ListActivity extends Activity {
                     if (coverFileIndex.contains("000") && !coverFound) {
 
                         if (!output.exists()) {
+                            is = new FileInputStream(path + "/" + filename);
+                            zis = new ZipInputStream(new BufferedInputStream(is));
+                            
+                            byte[] buffer = new byte[1024];
+                            
                             FileOutputStream fout = new FileOutputStream(output);
 
                             while ((count = zis.read(buffer)) != -1) {
                                 fout.write(buffer, 0, count);
                             }
                             fout.close();
+                            zis.closeEntry();
+                            zis.close();
                         }
 
                         if (filename.contains("/"))
@@ -300,12 +352,18 @@ public class ListActivity extends Activity {
                     } else if (coverFileIndex.contains("01") && !coverFound) {
 
                         if (!output.exists()) {
+                            is = new FileInputStream(path + "/" + filename);
+                            zis = new ZipInputStream(new BufferedInputStream(is));
+                            byte[] buffer = new byte[1024];
+                            
                             FileOutputStream fout = new FileOutputStream(output);
 
                             while ((count = zis.read(buffer)) != -1) {
                                 fout.write(buffer, 0, count);
                             }
                             fout.close();
+                            zis.closeEntry();
+                            zis.close();
                         }
 
                         if (filename.contains("/"))
@@ -315,13 +373,11 @@ public class ListActivity extends Activity {
 
                         coverFound = true;
                     }
-
-                    zis.closeEntry();
                 }
 
                 newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
                 newComic.setPageCount(pageCount);
-                zis.close();
+                
 
                 setComicColor(newComic);
 
@@ -344,6 +400,8 @@ public class ListActivity extends Activity {
             //mAdapter.notifyDataSetChanged();
             if (itempos!=null)
                 mAdapter.notifyItemInserted(itempos);
+            mProgress++;
+            showProgressDialog(mProgress,mTotalComicCount);
         }
     }
 
@@ -423,6 +481,8 @@ public class ListActivity extends Activity {
 
             //mAdapter.notifyDataSetChanged();
             mAdapter.notifyItemInserted(itempos);
+            mProgress++;
+            showProgressDialog(mProgress,mTotalComicCount);
         }
     }
 
