@@ -71,9 +71,11 @@ public class ComicPageFragment extends Fragment {
     {
         mFullscreenComicView.setImageBitmap(null);
         if (filename!=null) {
-            String imagePath = "file:" + getActivity().getFilesDir().getPath() + "/" + filename;
-            Log.d("loadImage", imagePath);
-            Picasso.with(getActivity()).load(imagePath).fit().centerInside().into(mFullscreenComicView);
+            if (getActivity()!=null) {
+                String imagePath = "file:" + getActivity().getFilesDir().getPath() + "/" + filename;
+                Log.d("loadImage", imagePath);
+                Picasso.with(getActivity()).load(imagePath).fit().centerInside().into(mFullscreenComicView);
+            }
         }
 
     }

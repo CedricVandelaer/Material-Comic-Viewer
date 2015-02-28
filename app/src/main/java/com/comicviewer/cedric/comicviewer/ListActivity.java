@@ -17,21 +17,18 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.melnykov.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +36,6 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 
@@ -71,7 +67,6 @@ public class ListActivity extends Activity {
         createFab();
 
         initialiseAdapter(savedInstanceState);
-
 
     }
 
@@ -158,11 +153,19 @@ public class ListActivity extends Activity {
                 if (!comicFileInList(str)) {
                     if (checkRar(str)) {
                         Comic newComic = new Comic(str, map.get(str));
+                        mComicList.add(i,newComic);
+                        mAdapter.notifyItemInserted(i);
                         new ExtractRarTask().execute(newComic, i);
+                        mProgress++;
+                        showProgressDialog(mProgress,mTotalComicCount);
                         i++;
                     } else if (checkZip(str)) {
                         Comic newComic = new Comic(str, map.get(str));
+                        mComicList.add(i,newComic);
+                        mAdapter.notifyItemInserted(i);
                         new ExtractZipTask().execute(newComic, i);
+                        mProgress++;
+                        showProgressDialog(mProgress,mTotalComicCount);
                         i++;
                     }
                 }
@@ -281,31 +284,37 @@ public class ListActivity extends Activity {
 
             Comic newComic= (Comic)comicVar[0];
             int itemPosition = (Integer) comicVar[1];
-            String filename = newComic.getFileName();
+            String archivefilename = newComic.getFileName();
+            String filename=null;
             String path = newComic.getFilePath();
             String extractedImageFile = null;
             int pageCount = 0;
 
             InputStream is;
-            ZipInputStream zis; 
-            
+            ZipInputStream zis;
+            byte[] buffer = new byte[4096];
+
             try
             {
-                ZipFile zip = new ZipFile(path + "/" + filename);
+                is = new FileInputStream(path+"/"+ archivefilename);
+                zis = new ZipInputStream(is);
                 int count;
 
                 boolean coverFound = false;
 
                 Pattern p = Pattern.compile("\\d\\d");
 
-                Enumeration<? extends ZipEntry> entries = zip.entries();
+                ZipEntry ze = null;
                 
-                for (;entries.hasMoreElements();)
+                while ((ze = zis.getNextEntry()) != null)
                 {
-                    ZipEntry ze = entries.nextElement();
                     filename = ze.getName();
 
-                    String coverFileIndex = filename.substring(filename.length() - 7);
+                    String coverFileIndex = filename.substring(filename.length() - 8);
+
+                    if (filename.contains("/")) {
+                        filename = filename.substring(filename.lastIndexOf("/")+1);
+                    }
 
                     if (ze.isDirectory())
                     {
@@ -318,21 +327,13 @@ public class ListActivity extends Activity {
 
                     File output;
 
-                    if (filename.contains("/")) {
-                        output = new File(getFilesDir(), filename.substring(filename.lastIndexOf("/")));
-                    }
-                    else {
-                        output = new File(getFilesDir(), filename);
-                    }
+                    output = new File(getFilesDir(), filename);
 
                     if (coverFileIndex.contains("000") && !coverFound) {
 
-                        if (!output.exists()) {
-                            is = new FileInputStream(path + "/" + filename);
-                            zis = new ZipInputStream(new BufferedInputStream(is));
+                        if (!output.exists()) {                            
                             
-                            byte[] buffer = new byte[1024];
-                            
+                            Log.d("Lol", "Ik kom hier");
                             FileOutputStream fout = new FileOutputStream(output);
 
                             while ((count = zis.read(buffer)) != -1) {
@@ -340,21 +341,17 @@ public class ListActivity extends Activity {
                             }
                             fout.close();
                             zis.closeEntry();
-                            zis.close();
+                            
                         }
 
-                        if (filename.contains("/"))
-                            extractedImageFile = filename.substring(filename.lastIndexOf("/")+1);
-                        else
-                            extractedImageFile = filename;
+                        extractedImageFile = filename;
 
                         coverFound = true;
                     } else if (coverFileIndex.contains("01") && !coverFound) {
 
                         if (!output.exists()) {
-                            is = new FileInputStream(path + "/" + filename);
-                            zis = new ZipInputStream(new BufferedInputStream(is));
-                            byte[] buffer = new byte[1024];
+
+                            Log.d("Lol", "Ik kom hier");
                             
                             FileOutputStream fout = new FileOutputStream(output);
 
@@ -363,17 +360,14 @@ public class ListActivity extends Activity {
                             }
                             fout.close();
                             zis.closeEntry();
-                            zis.close();
                         }
 
-                        if (filename.contains("/"))
-                            extractedImageFile = filename.substring(filename.lastIndexOf("/")+1);
-                        else
-                            extractedImageFile = filename;
+                        extractedImageFile = filename.substring(filename.lastIndexOf("/")+1);
 
                         coverFound = true;
                     }
                 }
+                zis.close();
 
                 newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
                 newComic.setPageCount(pageCount);
@@ -381,7 +375,6 @@ public class ListActivity extends Activity {
 
                 setComicColor(newComic);
 
-                mComicList.add(itemPosition,newComic);
 
                 return itemPosition;
             }
@@ -399,9 +392,7 @@ public class ListActivity extends Activity {
 
             //mAdapter.notifyDataSetChanged();
             if (itempos!=null)
-                mAdapter.notifyItemInserted(itempos);
-            mProgress++;
-            showProgressDialog(mProgress,mTotalComicCount);
+                mAdapter.notifyItemChanged(itempos);
         }
     }
 
@@ -463,7 +454,6 @@ public class ListActivity extends Activity {
 
                 setComicColor(newComic);
 
-                mComicList.add(itemPosition,newComic);
                 return itemPosition;
 
             }
@@ -480,26 +470,36 @@ public class ListActivity extends Activity {
             super.onPostExecute(itempos);
 
             //mAdapter.notifyDataSetChanged();
-            mAdapter.notifyItemInserted(itempos);
-            mProgress++;
-            showProgressDialog(mProgress,mTotalComicCount);
+            if (itempos!=null)
+                mAdapter.notifyItemChanged(itempos);
         }
     }
 
     private void setComicColor(Comic comic)
     {
         try {
-            Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+            
             int color;
             if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
+                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                 color = Palette.generate(thumbnail, 32).getMutedColor(R.color.Teal);
             }
             else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
+                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                 color = Palette.generate(thumbnail, 32).getLightVibrantColor(R.color.Teal);
             }
-            else {
+            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_3))){
                 color = getResources().getColor(R.color.WhiteBG);
             }
+            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_4)))
+            {
+                color = getResources().getColor(R.color.BlueGrey);
+            }
+            else
+            {
+                color = getResources().getColor(R.color.Black);
+            }
+            
             comic.setComicColor(color);
         } catch (Exception e) {
             Log.e("Palette", e.getMessage());
@@ -587,9 +587,10 @@ public class ListActivity extends Activity {
     {
         super.onResume();
         setPreferences();
+        searchComics();
         calcComicColorsAsync();
         addOnRecyclerViewClickListener();
-        searchComics();
+        
     }
 
     private void calcComicColorsAsync() {
@@ -607,16 +608,24 @@ public class ListActivity extends Activity {
             int i = (Integer)params[1];
 
             try {
-                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                
                 int color;
                 if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
+                    Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                     color = Palette.generate(thumbnail, 32).getMutedColor(R.color.Teal);
                 }
                 else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
+                    Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                     color = Palette.generate(thumbnail, 32).getLightVibrantColor(R.color.Teal);
                 }
-                else {
+                else if(mCardColorSetting.equals(getString(R.string.card_color_setting_3))) {
                     color = getResources().getColor(R.color.WhiteBG);
+                }
+                else if(mCardColorSetting.equals(getString(R.string.card_color_setting_4))) {
+                    color = getResources().getColor(R.color.BlueGrey);
+                }
+                else {
+                    color = getResources().getColor(R.color.Black);
                 }
                 comic.setComicColor(color);
             } catch (Exception e) {
@@ -726,7 +735,6 @@ public class ListActivity extends Activity {
             mAdapter = new ComicAdapter(this, mComicList);
             mRecyclerView.setAdapter(mAdapter);
 
-            //searchComics();
         }
         else
         {
@@ -736,7 +744,7 @@ public class ListActivity extends Activity {
             {
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
                     mComicList.add((Comic)savedInstanceState.getParcelable("Comic "+ (i+1)));
-                mAdapter = new ComicAdapter(getApplicationContext(), mComicList);
+                mAdapter = new ComicAdapter(this, mComicList);
                 mRecyclerView.setAdapter(mAdapter);
             }
             

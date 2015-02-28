@@ -91,14 +91,15 @@ public class Extractor {
      */
     public static ArrayList<String> loadImageNamesFromComicZip(Comic comicToExtract)
     {
-        String filename = comicToExtract.getFileName();
+        String archivefilename = comicToExtract.getFileName();
         String path = comicToExtract.getFilePath();
+        String filename = null;
 
         ArrayList<String> pages= new ArrayList<String>();
 
         try
         {
-            ZipFile zip = new ZipFile(path + "/" + filename);
+            ZipFile zip = new ZipFile(path + "/" + archivefilename);
             ZipEntry ze;
 
             Pattern p = Pattern.compile("\\d\\d");
@@ -111,6 +112,9 @@ public class Extractor {
                 filename = ze.getName();
 
                 String coverFileIndex = filename.substring(filename.length() - 7);
+                
+                if (filename.contains("/"))
+                    filename = filename.substring(filename.lastIndexOf("/")+1);
 
                 //Ignore directories
                 if (ze.isDirectory())
@@ -121,8 +125,6 @@ public class Extractor {
                 Matcher m = p.matcher(coverFileIndex);
                 if (m.find())
                 {
-                    if (filename.contains("/"))
-                        filename= filename.substring(filename.lastIndexOf("/")+1);
                     pages.add(filename);
                     Log.d("Extractor", "added filename: "+filename);
                 }

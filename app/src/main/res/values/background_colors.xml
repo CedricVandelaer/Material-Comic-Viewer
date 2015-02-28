@@ -18,10 +18,14 @@
         <item>@string/card_color_setting_1</item>
         <item>@string/card_color_setting_2</item>
         <item>@string/card_color_setting_3</item>
+        <item>@string/card_color_setting_4</item>
+        <item>@string/card_color_setting_5</item>
     </string-array>
     <string-array name="Card_colors_values">
         <item>@string/card_color_setting_1</item>
         <item>@string/card_color_setting_2</item>
         <item>@string/card_color_setting_3</item>
+        <item>@string/card_color_setting_4</item>
+        <item>@string/card_color_setting_5</item>
     </string-array>
 </resources>

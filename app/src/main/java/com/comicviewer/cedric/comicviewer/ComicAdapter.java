@@ -41,16 +41,32 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     @Override
     public void onBindViewHolder(final ComicItemViewHolder comicItemViewHolder, int i) {
 
-        final int index = i;
         comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle());
         if (mComicList.get(i).getIssueNumber()!=-1)
             comicItemViewHolder.mIssueNumber.setText("Issue number: "+mComicList.get(i).getIssueNumber());
         else
             comicItemViewHolder.mIssueNumber.setText("");
 
-        comicItemViewHolder.mPageCount.setText("Pages: "+mComicList.get(i).getPageCount());
+        if (mComicList.get(i).getPageCount()!=0)
+            comicItemViewHolder.mPageCount.setText("Pages: "+mComicList.get(i).getPageCount());
+        else
+            comicItemViewHolder.mPageCount.setText("");
 
-        if (mComicList.get(i).mCoverColor!=-1) {
+        if (mComicList.get(i).mCoverColor!=-1) 
+        {
+            if (mComicList.get(i).mCoverColor==mContext.getResources().getColor(R.color.Black)
+                    || mComicList.get(i).mCoverColor==mContext.getResources().getColor(R.color.BlueGrey))
+            {
+                comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.White));
+                comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
+                comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.White));
+            }
+            else
+            {
+                comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.Black));
+                comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.Black));
+                comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.Black));
+            }
             comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
         }
 

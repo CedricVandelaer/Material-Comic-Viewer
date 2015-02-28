@@ -12,5 +12,6 @@
     <color name="Red">#F44336</color>
     <color name="Brown">#5D4037</color>
     <color name="Grey">#616161</color>
+    <color name="White">#FFFFFF</color>
 
 </resources>
