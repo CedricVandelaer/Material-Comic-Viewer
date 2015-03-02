@@ -32,7 +32,10 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -149,31 +152,42 @@ public class ListActivity extends Activity {
         
         int i=0;
         showProgressDialog(mProgress, mTotalComicCount);
+        
+        // create array for the zips to extract after the rars
+        Hashtable<Integer, Comic> zipsToExtract = new Hashtable<>();
+        
         for (String str:treemap.keySet())
         {
             File file = new File(str);
             if (!file.isDirectory()) {
                 if (!comicFileInList(str)) {
-                    if (checkRar(str)) {
+                    if (checkRar(str) || checkZip(str)) {
                         Comic newComic = new Comic(str, map.get(str));
                         mComicList.add(i,newComic);
                         mAdapter.notifyItemInserted(i);
-                        new ExtractRarTask().execute(newComic, i);
+                        if (checkRar(str))
+                            new ExtractRarTask().execute(newComic, i);
+                        else
+                        {
+                            zipsToExtract.put(i, newComic);
+                        }
                         mProgress++;
                         showProgressDialog(mProgress,mTotalComicCount);
                         i++;
-                    } else if (checkZip(str)) {
-                        Comic newComic = new Comic(str, map.get(str));
-                        mComicList.add(i,newComic);
-                        mAdapter.notifyItemInserted(i);
-                        new ExtractZipTask().execute(newComic, i);
-                        mProgress++;
-                        showProgressDialog(mProgress,mTotalComicCount);
-                        i++;
-                    }
+                    } 
                 }
             }
         }
+        
+        // extract found zips
+        Enumeration e = zipsToExtract.keys();
+        
+        while (e.hasMoreElements())
+        {
+            Integer key = (Integer) e.nextElement();
+            new ExtractZipTask().execute(zipsToExtract.get(key),key);
+        }
+        
         //Check to remove removed items
         removeOldComics(treemap);
         
@@ -305,78 +319,68 @@ public class ListActivity extends Activity {
                 zis = new ZipInputStream(is);
                 int count;
 
-                boolean coverFound = false;
-
-                Pattern p = Pattern.compile("\\d\\d");
-
                 ZipEntry ze = null;
                 
-                while ((ze = zis.getNextEntry()) != null)
-                {
+                // search all comic pages
+                while ((ze = zis.getNextEntry()) != null) {
                     filename = ze.getName();
 
-                    String coverFileIndex = filename.substring(filename.length() - 8);
-
                     if (filename.contains("/")) {
-                        filename = filename.substring(filename.lastIndexOf("/")+1);
+                        filename = filename.substring(filename.lastIndexOf("/") + 1);
                     }
 
-                    if (ze.isDirectory())
-                    {
+                    if (ze.isDirectory()) {
                         continue;
                     }
 
-                    Matcher m = p.matcher(coverFileIndex);
-                    if (m.find())
+                    if (isPicture(filename)) {
                         pageCount++;
-
-                    File output;
-
-                    output = new File(getFilesDir(), filename);
-
-                    if (coverFileIndex.contains("000") && !coverFound) {
-
-                        if (!output.exists()) {                            
-                            
-                            Log.d("Lol", "Ik kom hier");
-                            FileOutputStream fout = new FileOutputStream(output);
-
-                            while ((count = zis.read(buffer)) != -1) {
-                                fout.write(buffer, 0, count);
-                            }
-                            fout.close();
-                            zis.closeEntry();
-                            
-                        }
-
-                        extractedImageFile = filename;
-
-                        coverFound = true;
-                    } else if (coverFileIndex.contains("01") && !coverFound) {
-
-                        if (!output.exists()) {
-
-                            Log.d("Lol", "Ik kom hier");
-                            
-                            FileOutputStream fout = new FileOutputStream(output);
-
-                            while ((count = zis.read(buffer)) != -1) {
-                                fout.write(buffer, 0, count);
-                            }
-                            fout.close();
-                            zis.closeEntry();
-                        }
-
-                        extractedImageFile = filename.substring(filename.lastIndexOf("/")+1);
-
-                        coverFound = true;
+                        pages.add(filename);
                     }
                 }
+                
+                // sort the pages
+                Collections.sort(pages);
+
+                is = new FileInputStream(path+"/"+ archivefilename);
+                zis = new ZipInputStream(is);
+                
+                // go through pages again
+                while ((ze = zis.getNextEntry()) != null) {
+
+                    // get the next entry name
+                    filename = ze.getName();
+
+                    if (filename.contains("/")) {
+                        filename = filename.substring(filename.lastIndexOf("/") + 1);
+                    }
+
+                    // if entry == first page (cover page)->extract
+                    if (filename.equals(pages.get(0))) {
+
+                        File output;
+
+                        output = new File(getFilesDir(), filename);
+
+                        // check if file already extracted first
+                        if (!output.exists()) {
+                            FileOutputStream fout = new FileOutputStream(output);
+
+                            while ((count = zis.read(buffer)) != -1) {
+                                fout.write(buffer, 0, count);
+                            }
+                            fout.close();
+                            zis.closeEntry();
+                        }
+                        extractedImageFile = filename;
+                    }
+
+                }
+                
                 zis.close();
 
                 newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
                 newComic.setPageCount(pageCount);
-                
 
                 setComicColor(newComic);
 
