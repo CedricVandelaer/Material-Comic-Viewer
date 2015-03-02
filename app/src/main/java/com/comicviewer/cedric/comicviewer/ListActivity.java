@@ -367,6 +367,10 @@ public class ListActivity extends Activity {
 
                         File output;
 
+                        // get rid of special chars causing problems
+                        if (filename.contains("#"))
+                            filename = filename.replaceAll("#","");
+                        
                         output = new File(getFilesDir(), filename);
 
                         // check if file already extracted first
@@ -460,7 +464,11 @@ public class ListActivity extends Activity {
 
                 // the outputfilename
                 extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\") + 1);
-
+                
+                // get rid of special chars causing problems
+                if (extractedImageFile.contains("#"))
+                    extractedImageFile = extractedImageFile.replaceAll("#","");
+                
                 // the output file
                 File output = new File(getFilesDir(), extractedImageFile);
 

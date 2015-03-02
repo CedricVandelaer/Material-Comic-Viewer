@@ -60,17 +60,13 @@ public class Extractor {
             Archive arch = new Archive(comic);
             List<FileHeader> fileheaders = arch.getFileHeaders();
 
-            Pattern p = Pattern.compile("\\d\\d");
-
             for (int j = 0; j < fileheaders.size(); j++) {
 
-
-                String pageFileIndex = fileheaders.get(j).getFileNameString()
-                        .substring(fileheaders.get(j).getFileNameString().length() - 7);
-                Matcher m = p.matcher(pageFileIndex);
-                if (m.find())
+                if (isPicture(fileheaders.get(j).getFileNameString()))
                 {
-                    pages.add(fileheaders.get(j).getFileNameString());
+                    String pagefile = fileheaders.get(j).getFileNameString();
+                    
+                    pages.add(pagefile);
                 }
             }
 
@@ -79,9 +75,6 @@ public class Extractor {
         {
             Log.e("ExtractRarTask", e.getMessage());
         }
-
-        if (pages.size()==0)
-            return loadImageNamesFromComicZip(comicToExtract);
         
         Collections.sort(pages);
         return pages;
@@ -103,16 +96,12 @@ public class Extractor {
             ZipFile zip = new ZipFile(path + "/" + archivefilename);
             ZipEntry ze;
 
-            Pattern p = Pattern.compile("\\d\\d");
-
             Enumeration<? extends ZipEntry> entries = zip.entries();
 
             while (entries.hasMoreElements())
             {
                 ze = entries.nextElement();
                 filename = ze.getName();
-
-                String coverFileIndex = filename.substring(filename.length() - 7);
                 
                 if (filename.contains("/"))
                     filename = filename.substring(filename.lastIndexOf("/")+1);
@@ -123,8 +112,7 @@ public class Extractor {
                     continue;
                 }
 
-                Matcher m = p.matcher(coverFileIndex);
-                if (m.find())
+                if (isPicture(filename))
                 {
                     pages.add(filename);
                     Log.d("Extractor", "added filename: "+filename);
@@ -186,6 +174,25 @@ public class Extractor {
             return false;
         }
 
+    }
+
+    private static boolean isPicture(String filename)
+    {
+        String extension = "notAPicture";
+        try {
+            extension = filename.substring(filename.lastIndexOf(".") + 1);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (extension.equals("jpg") || extension.equals("jpeg")
+                || extension.equals("png"))
+        {
+            return true;
+        }
+        return false;
     }
 
 }

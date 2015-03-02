@@ -139,6 +139,10 @@ public class ComicPageFragment extends Fragment {
 
                     if (fileheaders.get(j).getFileNameString().equals(mImageFileName))
                     {
+                        // get rid of special chars
+                        if (extractedImageFile.contains("#"))
+                            extractedImageFile = extractedImageFile.replaceAll("#","");
+                        
                         File outputPage = new File(getActivity().getFilesDir(), extractedImageFile);
                         
                         if (!outputPage.exists()) {
@@ -193,8 +197,6 @@ public class ComicPageFragment extends Fragment {
                 {
                     filename = ze.getName();
 
-                    String coverFileIndex = filename.substring(filename.length() - 7);
-
                     //Ignore directories
                     if (ze.isDirectory())
                     {
@@ -203,6 +205,10 @@ public class ComicPageFragment extends Fragment {
 
                     if (filename.contains("/"))
                         filename = filename.substring(filename.lastIndexOf("/")+1);
+
+                    // get rid of special chars
+                    if (filename.contains("#"))
+                        filename = filename.replaceAll("#","");
 
                     File output = new File(getActivity().getFilesDir(), filename);
 
