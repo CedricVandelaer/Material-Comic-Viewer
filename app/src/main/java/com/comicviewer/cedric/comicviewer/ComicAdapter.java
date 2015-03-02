@@ -50,9 +50,6 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
     @Override
     public void onBindViewHolder(final ComicItemViewHolder comicItemViewHolder, int i) {
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String cardColor = prefs.getString("cardColor",mContext.getString(R.string.card_color_setting_1));
         
         comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle());
         if (mComicList.get(i).getIssueNumber()!=-1)
@@ -60,7 +57,12 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         else
             comicItemViewHolder.mIssueNumber.setText("");
 
-        if (mComicList.get(i).getPageCount()!=0)
+        if (mComicList.get(i).getYear()!=-1)
+            comicItemViewHolder.mYear.setText("Year: "+mComicList.get(i).getYear());
+        else
+            comicItemViewHolder.mYear.setText("");
+
+        if (mComicList.get(i).getPageCount()!=-1)
             comicItemViewHolder.mPageCount.setText("Pages: "+mComicList.get(i).getPageCount());
         else
             comicItemViewHolder.mPageCount.setText("");

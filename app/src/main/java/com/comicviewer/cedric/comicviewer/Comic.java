@@ -9,6 +9,8 @@ import android.util.Log;
 import com.github.junrar.Archive;
 
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Cédric on 23/01/2015.
@@ -35,26 +37,56 @@ public class Comic implements Parcelable {
 
     //The color of the card displaying the comic
     int mCoverColor;
+    
+    //The year of the comic
+    int mYear;
 
     public Comic(String filename, String filePath)
     {
         mFileName = filename;
+        mFilePath = filePath;
 
         createTitle(filename);
+        
         mCoverColor = -1;
-        mPageCount = 0;
+        mPageCount = -1;
+        
         try {
-            mIssueNumber = Integer.parseInt(mTitle.substring(mTitle.lastIndexOf(' ') + 1).replaceAll("\\D+", ""));
+            Pattern pattern = Pattern.compile("\\d\\d\\d\\d");
+            Matcher matcher = pattern.matcher(filename);
+            if (matcher.find())
+            {
+                Log.d("Comic",matcher.group(0));
+                mYear = Integer.parseInt(matcher.group(0));
+            }
+            else
+            {
+                mYear = -1;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            mYear = -1;
+        }
+        
+        try {
+            int i = 0;
+            while (!Character.isDigit(filename.charAt(i))) 
+                i++;
+            int j = i;
+            while (Character.isDigit(filename.charAt(j))) 
+                j++;
+            mIssueNumber = Integer.parseInt(filename.substring(i, j));
         }
         catch (Exception e)
         {
             mIssueNumber = -1;
             Log.e("IssueNumber", e.getMessage());
         }
-        mTitle = mTitle.substring(0,mTitle.lastIndexOf(' '));
+
 
         mCoverImage = null;
-        mFilePath = filePath;
     }
 
 
@@ -65,12 +97,24 @@ public class Comic implements Parcelable {
 
     private void createTitle(String filename)
     {
-        mTitle = filename.substring(0,filename.lastIndexOf('.'));
-        mTitle = filename.replace('_',' ');
-        if (mTitle.contains("("))
-            mTitle = mTitle.substring(0,mTitle.indexOf('('));
-        mTitle=mTitle.replace(""+0,"");
-        mTitle=mTitle.trim();
+        String delimiter = "COMICVIEWERDELIM";
+        
+        if (filename.contains("("))
+            mTitle = filename.substring(0,filename.indexOf('('));
+        else
+            mTitle = filename;
+        
+        mTitle = mTitle.replaceAll("_"," ");
+        
+        mTitle = mTitle.trim();
+        
+        mTitle = mTitle.replaceAll("\\d+", delimiter);
+        
+        if (mTitle.contains(delimiter)) {
+            mTitle = mTitle.substring(0, mTitle.indexOf(delimiter));
+        }
+        
+        mTitle = mTitle.trim();
     }
 
     private void readFromParcel(Parcel in)
@@ -82,6 +126,7 @@ public class Comic implements Parcelable {
         mIssueNumber = in.readInt();
         mPageCount = in.readInt();
         mCoverColor = in.readInt();
+        mYear = in.readInt();
     }
 
     public void setComicColor(int color)
@@ -108,6 +153,8 @@ public class Comic implements Parcelable {
     {
         return mFileName;
     }
+    
+    public int getYear() { return mYear; }
 
     public String getFilePath()
     {
@@ -145,6 +192,7 @@ public class Comic implements Parcelable {
         dest.writeInt(mIssueNumber);
         dest.writeInt(mPageCount);
         dest.writeInt(mCoverColor);
+        dest.writeInt(mYear);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()

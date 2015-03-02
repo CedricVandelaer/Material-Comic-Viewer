@@ -215,7 +215,7 @@ public class ListActivity extends Activity {
             mLoadDialog.getWindow().setGravity(Gravity.BOTTOM);
         }
 
-        mLoadDialog.setMessage("Loading comic "+mProgress+" of "+mTotalComicCount);
+        mLoadDialog.setMessage("Loaded comic "+mProgress+" of "+mTotalComicCount);
         mLoadDialog.show();
         
         if (!(progress<total)) {

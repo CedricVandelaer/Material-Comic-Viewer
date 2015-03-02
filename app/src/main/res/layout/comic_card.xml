@@ -15,8 +15,8 @@
         android:layout_height="match_parent">
         <ImageView
             android:id="@+id/cover"
-            android:layout_height="170dp"
-            android:layout_width="110dp"
+            android:layout_height="200dp"
+            android:layout_width="130dp"
             android:padding="10dp"/>
 
         <com.devspark.robototextview.widget.RobotoTextView
@@ -24,7 +24,7 @@
             android:id="@+id/title"
             android:layout_toRightOf="@id/cover"
             android:layout_width="fill_parent"
-            android:maxLines="4"
+            android:maxLines="3"
             android:layout_height="wrap_content"
             android:textColor="#000000"
             android:textSize="24sp"
@@ -38,7 +38,8 @@
             android:layout_below="@id/title"
             android:layout_toRightOf="@id/cover"
             android:textColor="#000000"
-            android:padding="10dp"/>
+            android:padding="6dp"
+            android:layout_marginLeft="4dp"/>
         <com.devspark.robototextview.widget.RobotoTextView
             android:id="@+id/page_count"
             android:text="Pages: "
@@ -47,7 +48,18 @@
             android:layout_below="@id/issue_number"
             android:layout_toRightOf="@id/cover"
             android:textColor="#000000"
-            android:padding="10dp"/>
+            android:layout_marginLeft="4dp"
+            android:padding="6dp"/>
+        <com.devspark.robototextview.widget.RobotoTextView
+            android:id="@+id/year"
+            android:text="Year: "
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/page_count"
+            android:layout_toRightOf="@id/cover"
+            android:textColor="#000000"
+            android:layout_marginLeft="4dp"
+            android:padding="6dp"/>
     </RelativeLayout>
 
 

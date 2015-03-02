@@ -22,6 +22,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected CardView mCardView;
     protected TextView mIssueNumber;
     protected TextView mPageCount;
+    protected TextView mYear;
 
     public ComicItemViewHolder(View itemView) {
         super(itemView);
@@ -31,6 +32,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         mTitle = (TextView) itemView.findViewById(R.id.title);
         mPageCount = (TextView) itemView.findViewById(R.id.page_count);
         mCardView = (CardView) itemView.findViewById(R.id.card);
+        mYear = (TextView) itemView.findViewById(R.id.year);
 
     }
 
