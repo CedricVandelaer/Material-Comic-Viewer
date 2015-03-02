@@ -78,12 +78,14 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                 comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.White));
                 comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
                 comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.White));
+                comicItemViewHolder.mYear.setTextColor(mContext.getResources().getColor(R.color.White));
             }
             else
             {
                 comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.Black));
                 comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.Black));
                 comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.Black));
+                comicItemViewHolder.mYear.setTextColor(mContext.getResources().getColor(R.color.Black));
             }
             comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
         }
