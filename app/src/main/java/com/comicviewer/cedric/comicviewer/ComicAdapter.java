@@ -9,8 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -62,6 +65,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             comicItemViewHolder.mPageCount.setText("");
         
         setAnimation(comicItemViewHolder.mCardView,i);
+        
 
         if (mComicList.get(i).mCoverColor!=-1) 
         {
@@ -103,14 +107,11 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
     private void setAnimation(View viewToAnimate, int position)
     {
-        // If the bound view wasn't previously displayed on screen, it's animated
+        YoYo.with(Techniques.BounceIn)
+                .duration(400)
+                .playOn(viewToAnimate);
 
-        if (position>lastPosition) {
-            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.up_from_bottom);
-            viewToAnimate.startAnimation(animation);
-        }
         lastPosition = position;
-
     }
 
     @Override

@@ -28,7 +28,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -290,6 +293,8 @@ public class ListActivity extends Activity {
             String extractedImageFile = null;
             int pageCount = 0;
 
+            ArrayList<String> pages = new ArrayList<String>();
+
             InputStream is;
             ZipInputStream zis;
             byte[] buffer = new byte[4096];
@@ -404,6 +409,7 @@ public class ListActivity extends Activity {
             Comic newComic= (Comic)comicVar[0];
             int itemPosition = (Integer) comicVar[1];
             String filename = newComic.getFileName();
+            ArrayList<FileHeader> pages= new ArrayList<FileHeader>();
 
             String path = newComic.getFilePath()+ "/" + filename;
             File comic = new File(path);
@@ -413,42 +419,43 @@ public class ListActivity extends Activity {
                 String extractedImageFile = null;
 
                 int pageCount = 0;
-                Pattern p = Pattern.compile("\\d\\d");
 
-                boolean coverFound = false;
+                // search for comic pages in the archive
                 for (int j = 0; j < fileheaders.size(); j++) {
 
-                    String coverFileIndex = fileheaders.get(j).getFileNameString()
-                            .substring(fileheaders.get(j).getFileNameString().length() - 7);
-                    if (coverFileIndex.contains("000") && !coverFound) {
-                        extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
-                        
-                        File output = new File(getFilesDir(), extractedImageFile);
-                        
-                        if (!output.exists()) {
-                            FileOutputStream os = new FileOutputStream(output);
-                            arch.extractFile(fileheaders.get(j), os);
+                    if (isPicture(fileheaders.get(j).getFileNameString())) {
+                        if (!fileheaders.get(j).isDirectory()) {
+                            pages.add(fileheaders.get(j));
+                            pageCount++;
                         }
-                        
-                        coverFound = true;
-                    } else if (coverFileIndex.contains("01") && !coverFound) {
-                        extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
-                        
-                        File output = new File(getFilesDir(), extractedImageFile);
-                        
-                        if (!output.exists()) {
-                            FileOutputStream os = new FileOutputStream(output);
-                            arch.extractFile(fileheaders.get(j), os);
-                        }
-                        
-                        coverFound = true;
                     }
-
-                    Matcher m = p.matcher(coverFileIndex);
-                    if (m.find())
-                        pageCount++;
-
                 }
+                
+                // sort the pages
+                Collections.sort(pages, new Comparator<FileHeader>() {
+                    @Override
+                    public int compare(FileHeader lhs, FileHeader rhs) {
+                        int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getFileNameString(), rhs.getFileNameString());
+                        if (res == 0) {
+                            res = lhs.getFileNameString().compareTo(rhs.getFileNameString());
+                        }
+                        return res;
+                    }
+                });
+                
+                // the outputfilename
+                extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\")+1);
+                
+                // the output file
+                File output = new File(getFilesDir(), extractedImageFile);
+                
+                // if file!=extracted -> extract
+                if (!output.exists()) {
+                    FileOutputStream os = new FileOutputStream(output);
+                    arch.extractFile(pages.get(0), os);
+                }
+
+                
                 newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
                 newComic.setPageCount(pageCount);
 
@@ -473,6 +480,25 @@ public class ListActivity extends Activity {
             if (itempos!=null)
                 mAdapter.notifyItemChanged(itempos);
         }
+    }
+    
+    private boolean isPicture(String filename)
+    {
+        String extension = "notAPicture";
+        try {
+            extension = filename.substring(filename.lastIndexOf(".") + 1);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
+        if (extension.equals("jpg") || extension.equals("jpeg")
+                || extension.equals("png"))
+        {
+            return true;
+        }
+        return false;
     }
 
     private void setComicColor(Comic comic)

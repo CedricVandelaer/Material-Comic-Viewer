@@ -13,8 +13,6 @@ import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.TextView;
 
-import uk.co.deanwild.flowtextview.FlowTextView;
-
 
 public class AboutActivity extends Activity {
 
