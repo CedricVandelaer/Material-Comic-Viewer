@@ -18,6 +18,13 @@
     <string name="card_color_setting_3">White</string>
     <string name="card_color_setting_4">Blue grey</string>
     <string name="card_color_setting_5">Real black</string>
+    <string name="scroll_animation_setting_1">None</string>
+    <string name="scroll_animation_setting_2">Bounce In</string>
+    <string name="scroll_animation_setting_3">Stand up</string>
+    <string name="scroll_animation_setting_4">Fade in</string>
+    <string name="scroll_animation_setting_5">Tada</string>
+    <string name="card_size_setting_1">Small cards</string>
+    <string name="card_size_setting_2">Normal cards</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="about_text">

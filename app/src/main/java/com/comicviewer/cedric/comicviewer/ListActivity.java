@@ -127,7 +127,6 @@ public class ListActivity extends Activity {
         for (int i=0;i<mFilePaths.size();i++)
         {
             String path = mFilePaths.get(i);
-            Log.d("SearchComics", "Path: "+path);
             File f = new File(path);
             f.mkdirs();
 

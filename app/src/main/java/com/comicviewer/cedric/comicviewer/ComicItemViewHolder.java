@@ -1,5 +1,7 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,12 +29,33 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     public ComicItemViewHolder(View itemView) {
         super(itemView);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(itemView.getContext());
+        String cardSize = prefs.getString("cardSize", itemView.getContext().getString(R.string.card_size_setting_2));
+        
+        if (cardSize.equals(itemView.getContext().getString(R.string.card_size_setting_2)))
+            initialiseNormalCard(itemView);
+        else
+            initialiseSmallCard(itemView);
+    }
+    
+    private void initialiseNormalCard(View itemView)
+    {
         mIssueNumber = (TextView) itemView.findViewById(R.id.issue_number);
         mCoverPicture = (ImageView) itemView.findViewById(R.id.cover);
         mTitle = (TextView) itemView.findViewById(R.id.title);
         mPageCount = (TextView) itemView.findViewById(R.id.page_count);
         mCardView = (CardView) itemView.findViewById(R.id.card);
         mYear = (TextView) itemView.findViewById(R.id.year);
+        
+    }
+
+    private void initialiseSmallCard(View itemView)
+    {
+        mIssueNumber = (TextView) itemView.findViewById(R.id.small_issue_number);
+        mTitle = (TextView) itemView.findViewById(R.id.small_title);
+        mPageCount = (TextView) itemView.findViewById(R.id.small_page_count);
+        mCardView = (CardView) itemView.findViewById(R.id.small_card);
+        mYear = (TextView) itemView.findViewById(R.id.small_year);
 
     }
 

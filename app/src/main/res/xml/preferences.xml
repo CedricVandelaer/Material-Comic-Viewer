@@ -17,6 +17,18 @@
             android:defaultValue="@string/card_color_setting_1"
             android:entries="@array/Card_colors"
             android:entryValues="@array/Card_colors_values"/>
+        <ListPreference
+            android:key="scrollAnimation"
+            android:title="Scroll animation"
+            android:defaultValue="@string/scroll_animation_setting_2"
+            android:entries="@array/Scroll_animations"
+            android:entryValues="@array/Scroll_animations_values"/>
+        <ListPreference
+            android:key="cardSize"
+            android:title="Card appearance"
+            android:defaultValue="@string/card_size_setting_2"
+            android:entries="@array/Card_sizes"
+            android:entryValues="@array/Card_sizes_values"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -30,13 +42,7 @@
             android:key="useRecents"
             android:title="Show comics in recents screen"
             android:defaultValue="true"/>
-        <!--
-        <MultiSelectListPreference
-            android:key="pathList"
-            android:title="Remove added paths"
-            >
-        </MultiSelectListPreference>
-        -->
+        
     </PreferenceCategory>
 
 

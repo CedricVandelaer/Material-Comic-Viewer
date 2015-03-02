@@ -28,4 +28,26 @@
         <item>@string/card_color_setting_4</item>
         <item>@string/card_color_setting_5</item>
     </string-array>
+    <string-array name="Scroll_animations">
+        <item>@string/scroll_animation_setting_1</item>
+        <item>@string/scroll_animation_setting_2</item>
+        <item>@string/scroll_animation_setting_3</item>
+        <item>@string/scroll_animation_setting_4</item>
+        <item>@string/scroll_animation_setting_5</item>
+    </string-array>
+    <string-array name="Scroll_animations_values">
+        <item>@string/scroll_animation_setting_1</item>
+        <item>@string/scroll_animation_setting_2</item>
+        <item>@string/scroll_animation_setting_3</item>
+        <item>@string/scroll_animation_setting_4</item>
+        <item>@string/scroll_animation_setting_5</item>
+    </string-array>
+    <string-array name="Card_sizes">
+        <item>@string/card_size_setting_1</item>
+        <item>@string/card_size_setting_2</item>
+    </string-array>
+    <string-array name="Card_sizes_values">
+        <item>@string/card_size_setting_1</item>
+        <item>@string/card_size_setting_2</item>
+    </string-array>
 </resources>
