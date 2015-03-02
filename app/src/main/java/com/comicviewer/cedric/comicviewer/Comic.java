@@ -38,6 +38,12 @@ public class Comic implements Parcelable {
     //The color of the card displaying the comic
     int mCoverColor;
     
+    //The color of the primary text
+    int mPrimaryTextColor;
+
+    //The color of the secondary text
+    int mSecondaryTextColor;
+    
     //The year of the comic
     int mYear;
 
@@ -49,6 +55,8 @@ public class Comic implements Parcelable {
         createTitle(filename);
         
         mCoverColor = -1;
+        mPrimaryTextColor=-1;
+        mSecondaryTextColor=-1;
         mPageCount = -1;
         
         try {
@@ -125,9 +133,15 @@ public class Comic implements Parcelable {
         mIssueNumber = in.readInt();
         mPageCount = in.readInt();
         mCoverColor = in.readInt();
+        mPrimaryTextColor = in.readInt();
+        mSecondaryTextColor = in.readInt();
         mYear = in.readInt();
     }
 
+    public void setPrimaryTextColor(int color) { mPrimaryTextColor = color;}
+    
+    public void setSecondaryTextColor(int color) { mSecondaryTextColor = color;}
+    
     public void setComicColor(int color)
     {
         mCoverColor = color;
@@ -191,6 +205,8 @@ public class Comic implements Parcelable {
         dest.writeInt(mIssueNumber);
         dest.writeInt(mPageCount);
         dest.writeInt(mCoverColor);
+        dest.writeInt(mPrimaryTextColor);
+        dest.writeInt(mSecondaryTextColor);
         dest.writeInt(mYear);
     }
 

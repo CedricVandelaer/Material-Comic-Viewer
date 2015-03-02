@@ -17,6 +17,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SearchView;
 
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
@@ -60,6 +61,7 @@ public class ListActivity extends Activity {
     private int mProgress;
     private int mTotalComicCount;
     private ProgressDialog mLoadDialog;
+    private SearchView mSearchView;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,7 @@ public class ListActivity extends Activity {
         createFab();
 
         initialiseAdapter(savedInstanceState);
+
 
     }
 
@@ -594,29 +597,42 @@ public class ListActivity extends Activity {
     private void setComicColor(Comic comic)
     {
         try {
-            
             int color;
+            int primaryTextColor;
+            int secondaryTextColor;
+
             if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(850, 500).centerInside().get();
-                color = Palette.generate(thumbnail, 32).getMutedColor(R.color.Teal);
+                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
+                color = mutedSwatch.getRgb();
+                primaryTextColor = mutedSwatch.getTitleTextColor();
+                secondaryTextColor = mutedSwatch.getBodyTextColor();
             }
             else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(850, 500).centerInside().get();
-                color = Palette.generate(thumbnail, 32).getVibrantColor(R.color.Teal);
+                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
+                color = lightVibrantSwatch.getRgb();
+                primaryTextColor = lightVibrantSwatch.getTitleTextColor();
+                secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
             }
-            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_3))){
+            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_3))) {
                 color = getResources().getColor(R.color.WhiteBG);
+                primaryTextColor = getResources().getColor(R.color.Black);
+                secondaryTextColor = getResources().getColor(R.color.BlueGrey);
             }
-            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_4)))
-            {
+            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_4))) {
                 color = getResources().getColor(R.color.BlueGrey);
+                primaryTextColor = getResources().getColor(R.color.White);
+                secondaryTextColor = getResources().getColor(R.color.WhiteBG);
             }
-            else
-            {
+            else {
                 color = getResources().getColor(R.color.Black);
+                primaryTextColor = getResources().getColor(R.color.White);
+                secondaryTextColor = getResources().getColor(R.color.WhiteBG);
             }
-            
             comic.setComicColor(color);
+            comic.setPrimaryTextColor(primaryTextColor);
+            comic.setSecondaryTextColor(secondaryTextColor);
         } catch (Exception e) {
             Log.e("Palette", e.getMessage());
         }
@@ -695,26 +711,42 @@ public class ListActivity extends Activity {
             int i = (Integer)params[1];
 
             try {
-                
                 int color;
+                int primaryTextColor;
+                int secondaryTextColor;
+                
                 if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
                     Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
-                    color = Palette.generate(thumbnail, 32).getMutedColor(R.color.Teal);
+                    Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
+                    color = mutedSwatch.getRgb();
+                    primaryTextColor = mutedSwatch.getTitleTextColor();
+                    secondaryTextColor = mutedSwatch.getBodyTextColor();
                 }
                 else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
                     Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
-                    color = Palette.generate(thumbnail, 32).getLightVibrantColor(R.color.Teal);
+                    Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
+                    color = lightVibrantSwatch.getRgb();
+                    primaryTextColor = lightVibrantSwatch.getTitleTextColor();
+                    secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
                 }
                 else if(mCardColorSetting.equals(getString(R.string.card_color_setting_3))) {
                     color = getResources().getColor(R.color.WhiteBG);
+                    primaryTextColor = getResources().getColor(R.color.Black);
+                    secondaryTextColor = getResources().getColor(R.color.BlueGrey);
                 }
                 else if(mCardColorSetting.equals(getString(R.string.card_color_setting_4))) {
                     color = getResources().getColor(R.color.BlueGrey);
+                    primaryTextColor = getResources().getColor(R.color.White);
+                    secondaryTextColor = getResources().getColor(R.color.WhiteBG);
                 }
                 else {
                     color = getResources().getColor(R.color.Black);
+                    primaryTextColor = getResources().getColor(R.color.White);
+                    secondaryTextColor = getResources().getColor(R.color.WhiteBG);
                 }
                 comic.setComicColor(color);
+                comic.setPrimaryTextColor(primaryTextColor);
+                comic.setSecondaryTextColor(secondaryTextColor);
             } catch (Exception e) {
                 Log.e("Palette", e.getMessage());
             }

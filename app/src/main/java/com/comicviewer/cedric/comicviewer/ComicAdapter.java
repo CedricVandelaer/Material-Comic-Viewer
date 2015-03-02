@@ -147,20 +147,13 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         if (mComicList.get(i).mCoverColor!=-1)
         {
-            if (mComicList.get(i).mCoverColor==mContext.getResources().getColor(R.color.Black)
-                    || mComicList.get(i).mCoverColor==mContext.getResources().getColor(R.color.BlueGrey))
+            if (mComicList.get(i).mPrimaryTextColor!= -1 && mComicList.get(i).mSecondaryTextColor!=-1)
             {
-                comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.White));
-                comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
-                comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.White));
-                comicItemViewHolder.mYear.setTextColor(mContext.getResources().getColor(R.color.White));
-            }
-            else
-            {
-                comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mYear.setTextColor(mContext.getResources().getColor(R.color.Black));
+                comicItemViewHolder.mTitle.setTextColor(mComicList.get(i).mPrimaryTextColor);
+                
+                comicItemViewHolder.mIssueNumber.setTextColor(mComicList.get(i).mPrimaryTextColor);
+                comicItemViewHolder.mPageCount.setTextColor(mComicList.get(i).mPrimaryTextColor);
+                comicItemViewHolder.mYear.setTextColor(mComicList.get(i).mPrimaryTextColor);
             }
             comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
         }
@@ -193,7 +186,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             comicItemViewHolder.mIssueNumber.setText("");
 
         if (mComicList.get(i).getYear()!=-1)
-            comicItemViewHolder.mYear.setText(""+mComicList.get(i).getYear());
+            comicItemViewHolder.mYear.setText("Year: "+mComicList.get(i).getYear());
         else
             comicItemViewHolder.mYear.setText("");
 
@@ -207,20 +200,13 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         if (mComicList.get(i).mCoverColor!=-1)
         {
-            if (mComicList.get(i).mCoverColor==mContext.getResources().getColor(R.color.Black)
-                    || mComicList.get(i).mCoverColor==mContext.getResources().getColor(R.color.BlueGrey))
+            if (mComicList.get(i).mPrimaryTextColor!= -1 && mComicList.get(i).mSecondaryTextColor!=-1)
             {
-                comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.White));
-                comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
-                comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.White));
-                comicItemViewHolder.mYear.setTextColor(mContext.getResources().getColor(R.color.White));
-            }
-            else
-            {
-                comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mYear.setTextColor(mContext.getResources().getColor(R.color.Black));
+                comicItemViewHolder.mTitle.setTextColor(mComicList.get(i).mPrimaryTextColor);
+
+                comicItemViewHolder.mIssueNumber.setTextColor(mComicList.get(i).mPrimaryTextColor);
+                comicItemViewHolder.mPageCount.setTextColor(mComicList.get(i).mPrimaryTextColor);
+                comicItemViewHolder.mYear.setTextColor(mComicList.get(i).mPrimaryTextColor);
             }
             comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
         }
