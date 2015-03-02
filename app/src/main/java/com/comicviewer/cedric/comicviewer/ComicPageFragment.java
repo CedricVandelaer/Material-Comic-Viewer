@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,17 +114,12 @@ public class ComicPageFragment extends Fragment {
     {
         super.onActivityCreated(savedInstanceState);
 
-        String extension = "";
+        File file = new File(mComicArchivePath);
 
-        int i = mComicArchivePath.lastIndexOf('.');
-        if (i > 0) {
-            extension = mComicArchivePath.substring(i+1);
-        }
-
-        if (extension.equals("rar") || extension.equals("cbr"))
-            new ExtractRarTask().execute();
-        else
+        if (isZipArchive(file))
             new ExtractZipTask().execute();
+        else
+            new ExtractRarTask().execute();
     }
 
 
@@ -158,6 +154,9 @@ public class ComicPageFragment extends Fragment {
             catch (Exception e)
             {
                 Log.e("ExtractRarTask", e.getMessage());
+                
+                // try if zip archive
+                new ExtractZipTask().execute();
             }
 
             return null;
@@ -245,6 +244,54 @@ public class ComicPageFragment extends Fragment {
         }
 
     }
+
+    private static boolean isZipArchive(File file) {
+        try {
+            InputStream is = new FileInputStream(file);
+            boolean isZipped = new ZipInputStream(is).getNextEntry() != null;
+            return isZipped;
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean isRarArchive(File filFile) {
+
+        try {
+
+            byte[] bytSignature = new byte[] {0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00};
+            FileInputStream fisFileInputStream = new FileInputStream(filFile);
+
+            byte[] bytHeader = new byte[20];
+            fisFileInputStream.read(bytHeader);
+
+            Short shoFlags = (short) (((bytHeader[10]&0xFF)<<8) | (bytHeader[11]&0xFF));
+
+            //Check if is an archive
+            if (Arrays.equals(Arrays.copyOfRange(bytHeader, 0, 7), bytSignature)) {
+                //Check if is a spanned archive
+                if ((shoFlags & 0x0100) != 0) {
+                    //Check if it the first part of a spanned archive
+                    if ((shoFlags & 0x0001) != 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
 
 
 }

@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -30,20 +31,17 @@ public class Extractor {
     {
         String filename = comicToExtract.getFileName();
 
-        String extension = "";
+        String path = comicToExtract.getFilePath()+"/"+filename;
+        
+        File file = new File(path);
 
-        int i = filename.lastIndexOf('.');
-        if (i > 0) {
-            extension = filename.substring(i+1);
-        }
-
-        if (extension.equals("rar")|| extension.equals("cbr"))
+        if (isZipArchive(file))
         {
-            return loadImageNamesFromComicRar(comicToExtract);
+            return loadImageNamesFromComicZip(comicToExtract);
         }
         else
         {
-            return loadImageNamesFromComicZip(comicToExtract);
+            return loadImageNamesFromComicRar(comicToExtract);
         }
     }
 
@@ -82,6 +80,9 @@ public class Extractor {
             Log.e("ExtractRarTask", e.getMessage());
         }
 
+        if (pages.size()==0)
+            return loadImageNamesFromComicZip(comicToExtract);
+        
         Collections.sort(pages);
         return pages;
     }
@@ -138,6 +139,53 @@ public class Extractor {
 
         Collections.sort(pages);
         return pages;
+    }
+
+    private static boolean isZipArchive(File file) {
+        try {
+            InputStream is = new FileInputStream(file);
+            boolean isZipped = new ZipInputStream(is).getNextEntry() != null;
+            return isZipped;
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean isRarArchive(File filFile) {
+
+        try {
+
+            byte[] bytSignature = new byte[] {0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00};
+            FileInputStream fisFileInputStream = new FileInputStream(filFile);
+
+            byte[] bytHeader = new byte[20];
+            fisFileInputStream.read(bytHeader);
+
+            Short shoFlags = (short) (((bytHeader[10]&0xFF)<<8) | (bytHeader[11]&0xFF));
+
+            //Check if is an archive
+            if (Arrays.equals(Arrays.copyOfRange(bytHeader, 0, 7), bytSignature)) {
+                //Check if is a spanned archive
+                if ((shoFlags & 0x0100) != 0) {
+                    //Check if it the first part of a spanned archive
+                    if ((shoFlags & 0x0001) != 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
+
     }
 
 }

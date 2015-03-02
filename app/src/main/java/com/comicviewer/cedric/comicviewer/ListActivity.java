@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Dictionary;
@@ -158,21 +159,27 @@ public class ListActivity extends Activity {
         
         for (String str:treemap.keySet())
         {
-            File file = new File(str);
+            File file = new File(map.get(str)+"/"+str);
             if (!file.isDirectory()) {
                 if (!comicFileInList(str)) {
-                    if (checkRar(str) || checkZip(str)) {
+                    
+                    boolean isZip = isZipArchive(file);
+                    boolean isRar = false;
+                    if (!isZip)
+                        isRar = isRarArchive(file);
+                    
+                    if (isRar || isZip) {
                         Comic newComic = new Comic(str, map.get(str));
                         mComicList.add(i,newComic);
                         mAdapter.notifyItemInserted(i);
-                        if (checkRar(str))
-                            new ExtractRarTask().execute(newComic, i);
-                        else
+                        if (isZip)
                         {
                             zipsToExtract.put(i, newComic);
+                        } 
+                        else
+                        {
+                            new ExtractRarTask().execute(newComic, i);
                         }
-                        mProgress++;
-                        showProgressDialog(mProgress,mTotalComicCount);
                         i++;
                     } 
                 }
@@ -399,9 +406,11 @@ public class ListActivity extends Activity {
         protected void onPostExecute(Integer itempos) {
             super.onPostExecute(itempos);
 
-            //mAdapter.notifyDataSetChanged();
-            if (itempos!=null)
+            if (itempos!=null) {
                 mAdapter.notifyItemChanged(itempos);
+                mProgress++;
+                showProgressDialog(mProgress,mTotalComicCount);
+            }
         }
     }
 
@@ -416,7 +425,9 @@ public class ListActivity extends Activity {
             ArrayList<FileHeader> pages= new ArrayList<FileHeader>();
 
             String path = newComic.getFilePath()+ "/" + filename;
+
             File comic = new File(path);
+
             try {
                 Archive arch = new Archive(comic);
                 List<FileHeader> fileheaders = arch.getFileHeaders();
@@ -434,7 +445,7 @@ public class ListActivity extends Activity {
                         }
                     }
                 }
-                
+
                 // sort the pages
                 Collections.sort(pages, new Comparator<FileHeader>() {
                     @Override
@@ -446,20 +457,20 @@ public class ListActivity extends Activity {
                         return res;
                     }
                 });
-                
+
                 // the outputfilename
-                extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\")+1);
-                
+                extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\") + 1);
+
                 // the output file
                 File output = new File(getFilesDir(), extractedImageFile);
-                
+
                 // if file!=extracted -> extract
                 if (!output.exists()) {
                     FileOutputStream os = new FileOutputStream(output);
                     arch.extractFile(pages.get(0), os);
                 }
 
-                
+
                 newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
                 newComic.setPageCount(pageCount);
 
@@ -467,11 +478,10 @@ public class ListActivity extends Activity {
 
                 return itemPosition;
 
+            } catch (Exception e) {
+                Log.d("ExtractRarTask",e.getMessage());
             }
-            catch (Exception e)
-            {
-                Log.e("ExtractRarTask", e.getMessage());
-            }
+
 
             return null;
         }
@@ -481,9 +491,47 @@ public class ListActivity extends Activity {
             super.onPostExecute(itempos);
 
             //mAdapter.notifyDataSetChanged();
-            if (itempos!=null)
+            if (itempos!=null) {
                 mAdapter.notifyItemChanged(itempos);
+                mProgress++;
+                showProgressDialog(mProgress,mTotalComicCount);
+            }
         }
+    }
+
+    public static Boolean isRarArchive(File filFile) {
+
+        try {
+
+            byte[] bytSignature = new byte[] {0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00};
+            FileInputStream fisFileInputStream = new FileInputStream(filFile);
+
+            byte[] bytHeader = new byte[20];
+            fisFileInputStream.read(bytHeader);
+
+            Short shoFlags = (short) (((bytHeader[10]&0xFF)<<8) | (bytHeader[11]&0xFF));
+
+            //Check if is an archive
+            if (Arrays.equals(Arrays.copyOfRange(bytHeader, 0, 7), bytSignature)) {
+                //Check if is a spanned archive
+                if ((shoFlags & 0x0100) != 0) {
+                    //Check if it the first part of a spanned archive
+                    if ((shoFlags & 0x0001) != 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
+
     }
     
     private boolean isPicture(String filename)
@@ -536,46 +584,17 @@ public class ListActivity extends Activity {
         }
     }
 
-    private boolean checkRar(String filename)
-    {
-        int i=filename.lastIndexOf('.');
-        String extension = null;
-        if (i>0)
-            extension = filename.substring(i+1);
-        try
+
+    private boolean isZipArchive(File file) {
+        try {
+            InputStream is = new FileInputStream(file);
+            boolean isZipped = new ZipInputStream(is).getNextEntry() != null;
+            return isZipped;
+        } catch (Exception e)
         {
-            if (extension.equals("rar") || extension.equals("cbr"))
-                return true;
-        }
-        catch (Exception e)
-        {
-            Log.e("CheckRar", e.getMessage());
-            Log.e("CheckRar", filename);
+            e.printStackTrace();
             return false;
         }
-
-        return false;
-    }
-
-    private boolean checkZip(String filename)
-    {
-        int i=filename.lastIndexOf('.');
-        String extension = null;
-        if (i>0)
-            extension = filename.substring(i+1);
-        try
-        {
-            if (extension.equals("zip") || extension.equals("cbz"))
-                return true;
-        }
-        catch (Exception e)
-        {
-            Log.e("CheckZip", e.getMessage());
-            Log.e("CheckZip", filename);
-            return false;
-        }
-
-        return false;
     }
 
     @Override
