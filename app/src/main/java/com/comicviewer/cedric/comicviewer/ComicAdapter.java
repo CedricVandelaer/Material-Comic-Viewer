@@ -47,9 +47,13 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         if (cardSize.equals(mContext.getString(R.string.card_size_setting_2))) {
             return 0;
         }
-        else
+        else if (cardSize.equals(mContext.getString(R.string.card_size_setting_1)))
         {
             return 1;
+        }
+        else
+        {
+            return 2;
         }
     }
 
@@ -61,9 +65,13 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         if (viewType == 0) {
             v = mInflater.inflate(R.layout.comic_card, null);
         }
-        else
+        else if (viewType == 1)
         {
             v = mInflater.inflate(R.layout.small_comic_card, null);
+        }
+        else
+        {
+            v = mInflater.inflate(R.layout.comic_card_image_bg, null);
         }
 
         ComicItemViewHolder vh = new ComicItemViewHolder(v);
@@ -72,20 +80,48 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(final ComicItemViewHolder comicItemViewHolder, int i) {
+    public void onBindViewHolder(final ComicItemViewHolder comicItemViewHolder, int position) {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         String cardSize = prefs.getString("cardSize",mContext.getString(R.string.card_size_setting_2));
 
         if (cardSize.equals(mContext.getString(R.string.card_size_setting_2))) {
-            initialiseNormalCard(comicItemViewHolder,i);
+            initialiseNormalCard(comicItemViewHolder,position);
+        }
+        else if (cardSize.equals(mContext.getString(R.string.card_size_setting_1)))
+        {
+            initialiseSmallCard(comicItemViewHolder, position);
         }
         else
         {
-            initialiseSmallCard(comicItemViewHolder, i);
+            initialiseCardBg(comicItemViewHolder, position);
+        }
+
+    }
+    
+    private void initialiseCardBg(final ComicItemViewHolder comicItemViewHolder, int i)
+    {
+        comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle()+" "+mComicList.get(i).getIssueNumber());
+        if (mComicList.get(i).getCoverImage()==null)
+        {
+            comicItemViewHolder.mCoverPicture.setImageBitmap(null);
+
+        }
+        else
+        {
+            
+
+            if (mComicList.get(i).mCoverColor!=-1)
+            {
+                comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
+            }
+            
+            Picasso.with(mContext)
+                    .load(mComicList.get(i).getCoverImage())
+                    .fit().centerCrop()
+                    .into(comicItemViewHolder.mCoverPicture);
         }
         
-
     }
     
     private void initialiseNormalCard(final ComicItemViewHolder comicItemViewHolder, int i)

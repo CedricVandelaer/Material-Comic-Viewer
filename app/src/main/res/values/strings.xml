@@ -25,6 +25,7 @@
     <string name="scroll_animation_setting_5">Tada</string>
     <string name="card_size_setting_1">Small cards</string>
     <string name="card_size_setting_2">Normal cards</string>
+    <string name="card_size_setting_3">Comic cover cards</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="about_text">

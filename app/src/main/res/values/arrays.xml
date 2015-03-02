@@ -45,9 +45,11 @@
     <string-array name="Card_sizes">
         <item>@string/card_size_setting_1</item>
         <item>@string/card_size_setting_2</item>
+        <item>@string/card_size_setting_3</item>
     </string-array>
     <string-array name="Card_sizes_values">
         <item>@string/card_size_setting_1</item>
         <item>@string/card_size_setting_2</item>
+        <item>@string/card_size_setting_3</item>
     </string-array>
 </resources>

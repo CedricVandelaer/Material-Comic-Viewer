@@ -34,8 +34,17 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         
         if (cardSize.equals(itemView.getContext().getString(R.string.card_size_setting_2)))
             initialiseNormalCard(itemView);
-        else
+        else if (cardSize.equals(itemView.getContext().getString(R.string.card_size_setting_1)))
             initialiseSmallCard(itemView);
+        else
+            initialiseCardComicBg(itemView);
+    }
+    
+    private void initialiseCardComicBg(View itemView)
+    {
+        mCoverPicture = (ImageView) itemView.findViewById(R.id.card_bg_image);
+        mCardView = (CardView) itemView.findViewById(R.id.card_bg);
+        mTitle = (TextView) itemView.findViewById(R.id.replacement_title);
     }
     
     private void initialiseNormalCard(View itemView)
