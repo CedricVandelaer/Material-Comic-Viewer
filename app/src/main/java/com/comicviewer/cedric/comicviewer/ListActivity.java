@@ -41,8 +41,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -61,7 +59,6 @@ public class ListActivity extends Activity {
     private int mProgress;
     private int mTotalComicCount;
     private ProgressDialog mLoadDialog;
-    private SearchView mSearchView;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -735,9 +732,11 @@ public class ListActivity extends Activity {
                     secondaryTextColor = getResources().getColor(R.color.BlueGrey);
                 }
                 else if(mCardColorSetting.equals(getString(R.string.card_color_setting_4))) {
+                    Log.d("cardcolor", "Ik kom hier");
                     color = getResources().getColor(R.color.BlueGrey);
                     primaryTextColor = getResources().getColor(R.color.White);
                     secondaryTextColor = getResources().getColor(R.color.WhiteBG);
+                    Log.d("cardcolor", "color: "+color+" prim: "+primaryTextColor+" sec: "+secondaryTextColor);
                 }
                 else {
                     color = getResources().getColor(R.color.Black);

@@ -97,13 +97,14 @@ public class ComicPageFragment extends Fragment {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                if (mFullscreenComicView.getScale() > 1.05f) {
+                if (mFullscreenComicView.getScale() > 1f) {
                     ((DisplayComicActivity)getActivity()).enablePaging(false);
                 } else {
                     ((DisplayComicActivity)getActivity()).enablePaging(true);
                 }
                 return false;
             }
+
 
         });
 
