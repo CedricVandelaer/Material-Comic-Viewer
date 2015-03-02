@@ -56,7 +56,6 @@ public class Comic implements Parcelable {
             Matcher matcher = pattern.matcher(filename);
             if (matcher.find())
             {
-                Log.d("Comic",matcher.group(0));
                 mYear = Integer.parseInt(matcher.group(0));
             }
             else

@@ -120,8 +120,10 @@ public class ListActivity extends Activity {
 
         // map to map the filenames to their directories
         Map<String,String> map = new HashMap<>();
+        
+        mFilePaths = searchSubFolders(mFilePaths);
 
-        // search for all files in that path
+        // search for all files in all paths
         for (int i=0;i<mFilePaths.size();i++)
         {
             String path = mFilePaths.get(i);
@@ -201,6 +203,31 @@ public class ListActivity extends Activity {
         //Check for doubles
         removeDoubleComics();
 
+    }
+    
+    private ArrayList<String> searchSubFolders(ArrayList<String> paths)
+    {
+        ArrayList<String> allFoldersInPaths = new ArrayList<>();
+        
+        for (int i=0;i<paths.size();i++)
+        {
+            File root = new File(paths.get(i));
+            
+            if (root.isDirectory()) {
+                
+                allFoldersInPaths.add(paths.get(i));
+                File[] subFiles = root.listFiles();
+                ArrayList<String> subFolders = new ArrayList<>();
+                
+                for (int j = 0; j < subFiles.length; j++) {
+                    subFolders.add(root.getName()+"/"+subFiles[j]);
+                }
+                allFoldersInPaths.addAll(searchSubFolders(subFolders));
+            }
+            
+        }
+        
+        return allFoldersInPaths;
     }
     
     private void showProgressDialog(int progress, int total)

@@ -98,7 +98,6 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         }
         else
         {
-            Log.d("Adapter",mComicList.get(i).getCoverImage());
             Picasso.with(mContext)
                     .load(mComicList.get(i).getCoverImage())
                     .placeholder(R.drawable.comicplaceholder)
