@@ -127,6 +127,7 @@ public class ListActivity extends Activity {
         for (int i=0;i<mFilePaths.size();i++)
         {
             String path = mFilePaths.get(i);
+            Log.d("SearchComics", "Path: "+path);
             File f = new File(path);
             f.mkdirs();
 
@@ -136,8 +137,11 @@ public class ListActivity extends Activity {
             {
                 for (int j=0;j<fileList.length;j++)
                 {
-                    files.add(fileList[j].getName());
-                    paths.add(path);
+                    if (!fileList[j].isDirectory())
+                    {
+                        files.add(fileList[j].getName());
+                        paths.add(path);
+                    }
                 }
             }
         }
@@ -220,7 +224,7 @@ public class ListActivity extends Activity {
                 ArrayList<String> subFolders = new ArrayList<>();
                 
                 for (int j = 0; j < subFiles.length; j++) {
-                    subFolders.add(root.getName()+"/"+subFiles[j]);
+                    subFolders.add(subFiles[j].toString());
                 }
                 allFoldersInPaths.addAll(searchSubFolders(subFolders));
             }
@@ -594,12 +598,12 @@ public class ListActivity extends Activity {
             
             int color;
             if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(850, 500).centerInside().get();
                 color = Palette.generate(thumbnail, 32).getMutedColor(R.color.Teal);
             }
             else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
-                color = Palette.generate(thumbnail, 32).getLightVibrantColor(R.color.Teal);
+                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(850, 500).centerInside().get();
+                color = Palette.generate(thumbnail, 32).getVibrantColor(R.color.Teal);
             }
             else if(mCardColorSetting.equals(getString(R.string.card_color_setting_3))){
                 color = getResources().getColor(R.color.WhiteBG);
