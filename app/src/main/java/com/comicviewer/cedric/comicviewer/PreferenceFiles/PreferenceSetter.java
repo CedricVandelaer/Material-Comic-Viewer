@@ -84,7 +84,34 @@ public class PreferenceSetter {
         return paths;
     }
 
-    public void saveFilePaths(Activity activity, ArrayList<String> filepaths)
+    public ArrayList getExcludedPaths(Activity activity)
+    {
+        ArrayList<String> paths = new ArrayList<>();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        String csvList = prefs.getString("Excludedpaths", null);
+
+        if (csvList!=null) {
+            String[] items = csvList.split(",");
+            for (int i = 0; i < items.length; i++) {
+                paths.add(items[i]);
+            }
+            //remove duplicates
+            for (int i = 0; i < paths.size() - 1; i++) {
+                for (int j = i + 1; j < paths.size(); j++) {
+                    if (i != j) {
+                        if (paths.get(i).equals(paths.get(j))) {
+                            paths.remove(j);
+                        }
+                    }
+                }
+            } 
+        }
+        return paths;
+        
+    }
+    
+    public void saveFilePaths(Activity activity, ArrayList<String> filepaths, ArrayList<String> excludedpaths)
     {
         StringBuilder csvList = new StringBuilder();
         for(int i=0;i<filepaths.size();i++){
@@ -94,6 +121,17 @@ public class PreferenceSetter {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
         sharedPreferencesEditor.putString("Filepaths", csvList.toString());
+
+        sharedPreferencesEditor.apply();
+
+        csvList = new StringBuilder();
+        for(int i=0;i<excludedpaths.size();i++){
+            csvList.append(excludedpaths.get(i));
+            csvList.append(",");
+        }
+
+        sharedPreferencesEditor = prefs.edit();
+        sharedPreferencesEditor.putString("Excludedpaths", csvList.toString());
 
         sharedPreferencesEditor.apply();
     }

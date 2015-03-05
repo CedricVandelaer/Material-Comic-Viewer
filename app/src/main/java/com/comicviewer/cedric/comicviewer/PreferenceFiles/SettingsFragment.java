@@ -39,6 +39,7 @@ public class SettingsFragment extends PreferenceFragment{
         addPreferencesFromResource(R.xml.preferences);
 
         ArrayList<CharSequence> paths = new ArrayList<>();
+        ArrayList<CharSequence> excludedPaths = new ArrayList<>();
 
         String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -48,10 +49,21 @@ public class SettingsFragment extends PreferenceFragment{
         for(int i=0; i < items.length; i++){
             paths.add(items[i]);
         }
+
+        csvList = prefs.getString("Excludedpaths", null);
+
+        //remove excluded paths
+        if (csvList!=null) {
+            items = csvList.split(",");
+            for (int i = 0; i < items.length; i++) {
+                if (paths.contains(items[i]))
+                    paths.remove(items[i]);
+            }
+        }
         //remove duplicates
         for (int i=0;i<paths.size();i++)
         {
-            for (int j=0;j<paths.size();j++)
+            for (int j=i+1;j<paths.size()-1;j++)
             {
                 if (i!=j)
                 {

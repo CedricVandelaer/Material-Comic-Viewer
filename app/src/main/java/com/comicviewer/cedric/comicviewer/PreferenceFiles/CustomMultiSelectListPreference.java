@@ -184,11 +184,21 @@ public class CustomMultiSelectListPreference extends ListPreference {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
             sharedPreferencesEditor.putString("Filepaths", csvList.toString());
-
+            
             CharSequence[] charSqNewList = new CharSequence[newItemList.size()];
             setEntries(newItemList.toArray(charSqNewList));
             setEntryValues(charSqNewList);
 
+            sharedPreferencesEditor.apply();
+
+            //add to excluded paths
+            sharedPreferencesEditor = prefs.edit();
+            csvList = new StringBuilder();
+            for(int i=0;i<selectedValues.size();i++){
+                csvList.append(selectedValues.get(i));
+                csvList.append(",");
+            }
+            sharedPreferencesEditor.putString("Excludedpaths", csvList.toString());
             sharedPreferencesEditor.apply();
             
         }
