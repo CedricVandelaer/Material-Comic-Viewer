@@ -1,8 +1,6 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.comicviewer.cedric.comicviewer.R;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.squareup.picasso.Picasso;
@@ -21,11 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 

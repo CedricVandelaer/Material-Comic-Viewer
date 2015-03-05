@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

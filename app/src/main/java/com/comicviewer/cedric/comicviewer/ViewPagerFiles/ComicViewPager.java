@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

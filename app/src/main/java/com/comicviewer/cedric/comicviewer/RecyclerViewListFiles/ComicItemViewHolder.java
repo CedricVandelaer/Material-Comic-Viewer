@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.comicviewer.cedric.comicviewer.R;
 
 import org.w3c.dom.Text;
 

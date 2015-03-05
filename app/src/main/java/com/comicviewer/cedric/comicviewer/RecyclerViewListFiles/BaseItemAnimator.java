@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;

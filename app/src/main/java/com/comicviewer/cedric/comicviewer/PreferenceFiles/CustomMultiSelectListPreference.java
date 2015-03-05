@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 
 import java.util.ArrayList;
 import java.util.Arrays;

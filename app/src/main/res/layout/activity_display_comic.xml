@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    tools:context="com.comicviewer.cedric.comicviewer.DisplayComicActivity">
+    tools:context="com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity">
 
 
-    <com.comicviewer.cedric.comicviewer.ComicViewPager
+    <com.comicviewer.cedric.comicviewer.ViewPagerFiles.ComicViewPager
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

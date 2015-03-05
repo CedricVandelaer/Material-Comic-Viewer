@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

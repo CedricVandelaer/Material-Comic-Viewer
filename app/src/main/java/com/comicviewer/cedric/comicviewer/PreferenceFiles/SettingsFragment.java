@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 
 
 import android.content.SharedPreferences;
@@ -8,6 +8,8 @@ import android.os.Environment;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+
+import com.comicviewer.cedric.comicviewer.R;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -14,13 +14,19 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.comicviewer.cedric.comicviewer.AboutActivity;
+import com.comicviewer.cedric.comicviewer.Comic;
+import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
+import com.comicviewer.cedric.comicviewer.FileDialog;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsActivity;
+import com.comicviewer.cedric.comicviewer.Utilities;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.melnykov.fab.FloatingActionButton;
@@ -31,12 +37,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -62,6 +65,7 @@ public class ListActivity extends Activity {
     private int mTotalComicCount;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressDialog mLoadDialog;
+    private boolean mFirstLoad;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +81,31 @@ public class ListActivity extends Activity {
 
         initialiseAdapter(savedInstanceState);
 
+        
+        initialiseRefresh();
+        mFirstLoad = true;
 
     }
+    
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        
+    }
 
+    private void initialiseRefresh()
+    {
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                searchComics();
+            }
+        });
+        
+    }
 
     private void createFab() {
         mFab = (FloatingActionButton)findViewById(R.id.fab);
@@ -118,6 +144,105 @@ public class ListActivity extends Activity {
     private void searchComics() {
         
 
+        
+        
+        mFilePaths = searchSubFolders(mFilePaths);
+
+        
+        Map<String,String> map = findFilesInPaths();
+
+        //create treemap to sort the filenames
+        Map<String,String> treemap = new TreeMap(map);
+
+        mTotalComicCount = countComics(treemap);
+        mProgress = 0;
+        
+        Log.d("SearchComics", "Progress: "+mProgress+" Total: "+mTotalComicCount);
+        
+        int i=0;
+
+        if (mFirstLoad) {
+            mSwipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            });
+            mFirstLoad = false;
+        }
+        else
+        {
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
+        
+        // create array for the zips to extract after the rars
+        Hashtable<Integer, Comic> zipsToExtract = new Hashtable<>();
+        
+        for (String str:treemap.keySet())
+        {
+            
+            File file = new File(map.get(str)+"/"+str);
+            
+            Log.d("SearchComics","i: "+i+" Str: "+str);
+            if (!file.isDirectory()) {
+                if (Utilities.checkExtension(str)) {
+                    if (!comicFileInList(str)) {
+
+                        boolean isZip = Utilities.isZipArchive(file);
+                        boolean isRar = false;
+                        if (!isZip)
+                            isRar = Utilities.isRarArchive(file);
+
+                        if (isRar || isZip) {
+                            Comic newComic = new Comic(str, map.get(str));
+                            mComicList.add(i, newComic);
+                            mAdapter.notifyItemInserted(i);
+                            if (isZip) {
+                                zipsToExtract.put(i, newComic);
+                            } else {
+                                new ExtractRarTask().execute(newComic, i);
+                            }
+                            i++;
+                        } else {
+                            mProgress++;
+                            showProgressDialog(mProgress, mTotalComicCount);
+                        }
+                    } else {
+                        i++;
+                        mProgress++;
+                        showProgressDialog(mProgress, mTotalComicCount);
+                    }
+                }else
+                {
+                    mProgress++;
+                    showProgressDialog(mProgress, mTotalComicCount);
+                }
+
+            }
+        }
+        
+        showProgressDialog(mProgress,mTotalComicCount);
+        
+        // extract found zips
+        Enumeration e = zipsToExtract.keys();
+        
+        while (e.hasMoreElements())
+        {
+            Integer key = (Integer) e.nextElement();
+            new ExtractZipTask().execute(zipsToExtract.get(key),key);
+        }
+        
+        //Check to remove removed items
+        removeOldComics(treemap);
+        
+        //Check for doubles
+        removeDoubleComics();
+
+
+    }
+    
+    private Map findFilesInPaths()
+    {
         // list of filenames
         ArrayList<String> files = new ArrayList<>();
         // list of directories to search from
@@ -125,8 +250,6 @@ public class ListActivity extends Activity {
 
         // map to map the filenames to their directories
         Map<String,String> map = new HashMap<>();
-        
-        mFilePaths = searchSubFolders(mFilePaths);
 
         // search for all files in all paths
         for (int i=0;i<mFilePaths.size();i++)
@@ -155,64 +278,7 @@ public class ListActivity extends Activity {
             map.put(files.get(i),paths.get(i));
         }
 
-        //create treemap to sort the filenames
-        Map<String,String> treemap = new TreeMap<>(map);
-
-        mTotalComicCount = countComics(treemap);
-        mProgress = 0;
-        
-        int i=0;
-
-        
-        // create array for the zips to extract after the rars
-        Hashtable<Integer, Comic> zipsToExtract = new Hashtable<>();
-        
-        for (String str:treemap.keySet())
-        {
-            File file = new File(map.get(str)+"/"+str);
-            if (!file.isDirectory()) {
-                if (!comicFileInList(str)) {
-                    
-                    boolean isZip = isZipArchive(file);
-                    boolean isRar = false;
-                    if (!isZip)
-                        isRar = isRarArchive(file);
-                    
-                    if (isRar || isZip) {
-                        Comic newComic = new Comic(str, map.get(str));
-                        mComicList.add(i,newComic);
-                        mAdapter.notifyItemInserted(i);
-                        if (isZip)
-                        {
-                            zipsToExtract.put(i, newComic);
-                        } 
-                        else
-                        {
-                            new ExtractRarTask().execute(newComic, i);
-                        }
-                        i++;
-                    }
-                }
-
-            }
-        }
-        
-        // extract found zips
-        Enumeration e = zipsToExtract.keys();
-        
-        while (e.hasMoreElements())
-        {
-            Integer key = (Integer) e.nextElement();
-            new ExtractZipTask().execute(zipsToExtract.get(key),key);
-        }
-        
-        //Check to remove removed items
-        removeOldComics(treemap);
-        
-        //Check for doubles
-        removeDoubleComics();
-
-
+        return map;
     }
     
     private ArrayList<String> searchSubFolders(ArrayList<String> paths)
@@ -242,24 +308,9 @@ public class ListActivity extends Activity {
     
     private void showProgressDialog(int progress, int total)
     {
-
-        if (mLoadDialog==null)
-        {
-            mLoadDialog = new ProgressDialog(this);
-            mLoadDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mLoadDialog.setCanceledOnTouchOutside(false);
-            mLoadDialog.setInverseBackgroundForced(false);
-            mLoadDialog.getWindow().setGravity(Gravity.BOTTOM);
+        if (progress>=total) {
+            mSwipeRefreshLayout.setRefreshing(false);
         }
-
-        mLoadDialog.setMessage("Loaded comic "+mProgress+" of "+mTotalComicCount);
-        mLoadDialog.show();
-        
-        if (!(progress<total)) {
-            mLoadDialog.cancel();
-            mLoadDialog = null;
-        }
-        
     }
     
     private int countComics(Map treemap)
@@ -267,10 +318,8 @@ public class ListActivity extends Activity {
         int count = 0;
         for (Object str:treemap.keySet())
         {
-            if (!comicFileInList((String)str))
-            {
                 count++;
-            }
+            
         }
         return count;
     }
@@ -377,7 +426,7 @@ public class ListActivity extends Activity {
                         continue;
                     }
 
-                    if (isPicture(filename)) {
+                    if (Utilities.isPicture(filename)) {
                         pageCount++;
                         pages.add(filename);
                     }
@@ -449,9 +498,9 @@ public class ListActivity extends Activity {
 
             if (itempos!=null) {
                 mAdapter.notifyItemChanged(itempos);
-                mProgress++;
-                showProgressDialog(mProgress,mTotalComicCount);
             }
+            mProgress++;
+            showProgressDialog(mProgress,mTotalComicCount);
         }
     }
 
@@ -480,7 +529,7 @@ public class ListActivity extends Activity {
                 // search for comic pages in the archive
                 for (int j = 0; j < fileheaders.size(); j++) {
 
-                    if (isPicture(fileheaders.get(j).getFileNameString())) {
+                    if (Utilities.isPicture(fileheaders.get(j).getFileNameString())) {
                         if (!fileheaders.get(j).isDirectory()) {
                             pages.add(fileheaders.get(j));
                             pageCount++;
@@ -542,65 +591,12 @@ public class ListActivity extends Activity {
             //mAdapter.notifyDataSetChanged();
             if (itempos!=null) {
                 mAdapter.notifyItemChanged(itempos);
-                mProgress++;
-                showProgressDialog(mProgress,mTotalComicCount);
             }
+            mProgress++;
+            showProgressDialog(mProgress,mTotalComicCount);
         }
     }
 
-    public static Boolean isRarArchive(File filFile) {
-
-        try {
-
-            byte[] bytSignature = new byte[] {0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00};
-            FileInputStream fisFileInputStream = new FileInputStream(filFile);
-
-            byte[] bytHeader = new byte[20];
-            fisFileInputStream.read(bytHeader);
-
-            Short shoFlags = (short) (((bytHeader[10]&0xFF)<<8) | (bytHeader[11]&0xFF));
-
-            //Check if is an archive
-            if (Arrays.equals(Arrays.copyOfRange(bytHeader, 0, 7), bytSignature)) {
-                //Check if is a spanned archive
-                if ((shoFlags & 0x0100) != 0) {
-                    //Check if it the first part of a spanned archive
-                    if ((shoFlags & 0x0001) != 0) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return true;
-                }
-            } else {
-                return true;
-            }
-
-        } catch (Exception e) {
-            return false;
-        }
-
-    }
-    
-    private boolean isPicture(String filename)
-    {
-        String extension = "notAPicture";
-        try {
-            extension = filename.substring(filename.lastIndexOf(".") + 1);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        
-        if (extension.equals("jpg") || extension.equals("jpeg")
-                || extension.equals("png"))
-        {
-            return true;
-        }
-        return false;
-    }
 
     private void setComicColor(Comic comic)
     {
@@ -647,18 +643,6 @@ public class ListActivity extends Activity {
     }
 
 
-    private boolean isZipArchive(File file) {
-        try {
-            InputStream is = new FileInputStream(file);
-            boolean isZipped = new ZipInputStream(is).getNextEntry() != null;
-            return isZipped;
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     @Override
     public void onSaveInstanceState(Bundle savedState)
     {
@@ -677,6 +661,8 @@ public class ListActivity extends Activity {
 
         savedState.putString("Filepaths",csvList.toString());
     }
+    
+    
     
     @Override
     public void onPause()
@@ -791,16 +777,6 @@ public class ListActivity extends Activity {
             startActivity(intent);
             return true;
         }
-        else if (id == R.id.action_refresh)
-        {
-
-            for (int i=mComicList.size()-1;i>=0;i--)
-            {
-                mComicList.remove(i);
-                mAdapter.notifyItemRemoved(i);
-            }
-            searchComics();
-        }
         else if (id==R.id.action_about)
         {
             Intent intent = new Intent(this, AboutActivity.class);
@@ -836,6 +812,7 @@ public class ListActivity extends Activity {
             @Override
             public void onItemClick(View view, int position) {
 
+                if (!mSwipeRefreshLayout.isRefreshing()) {
                     if (position < mComicList.size()) {
                         Log.d("ItemClick", mComicList.get(position).getTitle());
                         Intent intent = new Intent(getApplicationContext(), DisplayComicActivity.class);
@@ -848,6 +825,12 @@ public class ListActivity extends Activity {
                         startActivity(intent);
 
                     }
+                }
+                else
+                {
+                    Toast loadMessage = Toast.makeText(ListActivity.this,"Please wait until loading has finished...",Toast.LENGTH_SHORT);
+                    loadMessage.show();
+                }
             }
         }));
     }
@@ -880,5 +863,6 @@ public class ListActivity extends Activity {
         }
     }
 
+    
     
 }

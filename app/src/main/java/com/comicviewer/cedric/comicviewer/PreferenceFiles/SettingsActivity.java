@@ -1,16 +1,9 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.PreferenceManager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 
-import java.util.ArrayList;
+import com.comicviewer.cedric.comicviewer.R;
 
 
 public class SettingsActivity extends Activity {

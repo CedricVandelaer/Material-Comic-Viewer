@@ -140,12 +140,18 @@ public class Comic implements Parcelable {
 
     public void setPrimaryTextColor(int color) { mPrimaryTextColor = color;}
     
+    public int getPrimaryTextColor() { return mPrimaryTextColor;}
+    
     public void setSecondaryTextColor(int color) { mSecondaryTextColor = color;}
+    
+    public int getSecondaryTextColor() { return mSecondaryTextColor;}
     
     public void setComicColor(int color)
     {
         mCoverColor = color;
     }
+    
+    public int getComicColor() { return mCoverColor;}
 
     public int getPageCount()
     {

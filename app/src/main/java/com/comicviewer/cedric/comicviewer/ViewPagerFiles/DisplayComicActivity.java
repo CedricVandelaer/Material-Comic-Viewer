@@ -1,10 +1,7 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,36 +11,19 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.transition.Explode;
-import android.transition.Slide;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.widget.ImageView;
 
+import com.comicviewer.cedric.comicviewer.Comic;
+import com.comicviewer.cedric.comicviewer.Extractor;
+import com.comicviewer.cedric.comicviewer.R;
 import com.devspark.robototextview.widget.RobotoTextView;
-import com.github.junrar.Archive;
-import com.github.junrar.rarfile.FileHeader;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.prefs.Preferences;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
 /**
  * The activity to display a fullscreen comic
@@ -135,7 +115,7 @@ public class DisplayComicActivity extends FragmentActivity {
             try {
                 tdscr = new ActivityManager.TaskDescription(mCurrentComic.getTitle(),
                         Picasso.with(getApplicationContext()).load(mCurrentComic.getCoverImage()).resize(85,50).get(),
-                        mCurrentComic.mCoverColor);
+                        mCurrentComic.getComicColor());
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,18 +1,15 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
-import android.widget.FrameLayout;
 
+import com.comicviewer.cedric.comicviewer.Comic;
+import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.squareup.picasso.Picasso;
@@ -111,9 +108,9 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         {
             
 
-            if (mComicList.get(i).mCoverColor!=-1)
+            if (mComicList.get(i).getComicColor()!=-1)
             {
-                comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
+                comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).getComicColor());
             }
             
             Picasso.with(mContext)
@@ -145,16 +142,16 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         setAnimation(comicItemViewHolder.mCardView,i);
 
 
-        if (mComicList.get(i).mCoverColor!=-1)
+        if (mComicList.get(i).getComicColor()!=-1)
         {
 
-            comicItemViewHolder.mTitle.setTextColor(mComicList.get(i).mPrimaryTextColor);
+            comicItemViewHolder.mTitle.setTextColor(mComicList.get(i).getPrimaryTextColor());
 
-            comicItemViewHolder.mIssueNumber.setTextColor(mComicList.get(i).mPrimaryTextColor);
-            comicItemViewHolder.mPageCount.setTextColor(mComicList.get(i).mPrimaryTextColor);
-            comicItemViewHolder.mYear.setTextColor(mComicList.get(i).mPrimaryTextColor);
+            comicItemViewHolder.mIssueNumber.setTextColor(mComicList.get(i).getPrimaryTextColor());
+            comicItemViewHolder.mPageCount.setTextColor(mComicList.get(i).getPrimaryTextColor());
+            comicItemViewHolder.mYear.setTextColor(mComicList.get(i).getPrimaryTextColor());
 
-            comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
+            comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).getComicColor());
         }
 
 
@@ -197,16 +194,16 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         setAnimation(comicItemViewHolder.mCardView,i);
 
 
-        if (mComicList.get(i).mCoverColor!=-1)
+        if (mComicList.get(i).getComicColor()!=-1)
         {
 
-            comicItemViewHolder.mTitle.setTextColor(mComicList.get(i).mPrimaryTextColor);
+            comicItemViewHolder.mTitle.setTextColor(mComicList.get(i).getPrimaryTextColor());
 
-            comicItemViewHolder.mIssueNumber.setTextColor(mComicList.get(i).mPrimaryTextColor);
-            comicItemViewHolder.mPageCount.setTextColor(mComicList.get(i).mPrimaryTextColor);
-            comicItemViewHolder.mYear.setTextColor(mComicList.get(i).mPrimaryTextColor);
+            comicItemViewHolder.mIssueNumber.setTextColor(mComicList.get(i).getPrimaryTextColor());
+            comicItemViewHolder.mPageCount.setTextColor(mComicList.get(i).getPrimaryTextColor());
+            comicItemViewHolder.mYear.setTextColor(mComicList.get(i).getPrimaryTextColor());
 
-            comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).mCoverColor);
+            comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).getComicColor());
         }
 
     }
