@@ -5,21 +5,23 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.app.Fragment;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.SearchView;
-import android.widget.Toast;
+import android.view.ViewGroup;
 
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
@@ -31,24 +33,32 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 
-public class ListActivity extends Activity {
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link ComicListFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link ComicListFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class ComicListFragment extends Fragment {
 
+    private OnFragmentInteractionListener mListener;
     ArrayList<Comic> mComicList;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -60,15 +70,77 @@ public class ListActivity extends Activity {
     private boolean mUseRecents;
     private int mProgress;
     private int mTotalComicCount;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressDialog mLoadDialog;
+
+
+    public static ComicListFragment newInstance() {
+        ComicListFragment fragment = new ComicListFragment();
+
+
+        return fragment;
+    }
+
+    public ComicListFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_comic_list, container, false);
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        public void onFragmentInteraction(Uri uri);
+    }
     
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_list);
-        PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
         mPrefSetter = new PreferenceSetter();
 
@@ -76,19 +148,17 @@ public class ListActivity extends Activity {
         createFab();
 
         initialiseAdapter(savedInstanceState);
-
-
     }
 
 
     private void createFab() {
-        mFab = (FloatingActionButton)findViewById(R.id.fab);
+        mFab = (FloatingActionButton)getActivity().findViewById(R.id.fab);
         mFab.attachToRecyclerView(mRecyclerView);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 File path = new File(Environment.getExternalStorageDirectory().getPath());
-                FileDialog dialog = new FileDialog(ListActivity.this, path);
+                FileDialog dialog = new FileDialog( getActivity() , path);
                 dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
                     public void directorySelected(File directory) {
                         Log.d(getClass().getName(), "selected dir " + directory.toString());
@@ -105,18 +175,17 @@ public class ListActivity extends Activity {
 
     private void setPreferences() {
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mCardColorSetting = prefs.getString("cardColor", getString(R.string.card_color_setting_1));
 
-        mPrefSetter.setBackgroundColorPreference(this);
+        mPrefSetter.setBackgroundColorPreference(getActivity());
 
         mUseRecents = prefs.getBoolean("useRecents",true);
-        
-        mFilePaths = mPrefSetter.getFilePathsFromPreferences(this);
+
+        mFilePaths = mPrefSetter.getFilePathsFromPreferences(getActivity());
     }
 
     private void searchComics() {
-        
 
         // list of filenames
         ArrayList<String> files = new ArrayList<>();
@@ -125,7 +194,7 @@ public class ListActivity extends Activity {
 
         // map to map the filenames to their directories
         Map<String,String> map = new HashMap<>();
-        
+
         mFilePaths = searchSubFolders(mFilePaths);
 
         // search for all files in all paths
@@ -160,24 +229,24 @@ public class ListActivity extends Activity {
 
         mTotalComicCount = countComics(treemap);
         mProgress = 0;
-        
-        int i=0;
 
-        
+        int i=0;
+        showProgressDialog(mProgress, mTotalComicCount);
+
         // create array for the zips to extract after the rars
         Hashtable<Integer, Comic> zipsToExtract = new Hashtable<>();
-        
+
         for (String str:treemap.keySet())
         {
             File file = new File(map.get(str)+"/"+str);
             if (!file.isDirectory()) {
                 if (!comicFileInList(str)) {
-                    
+
                     boolean isZip = isZipArchive(file);
                     boolean isRar = false;
                     if (!isZip)
                         isRar = isRarArchive(file);
-                    
+
                     if (isRar || isZip) {
                         Comic newComic = new Comic(str, map.get(str));
                         mComicList.add(i,newComic);
@@ -185,7 +254,7 @@ public class ListActivity extends Activity {
                         if (isZip)
                         {
                             zipsToExtract.put(i, newComic);
-                        } 
+                        }
                         else
                         {
                             new ExtractRarTask().execute(newComic, i);
@@ -193,59 +262,57 @@ public class ListActivity extends Activity {
                         i++;
                     }
                 }
-
             }
         }
-        
+
         // extract found zips
         Enumeration e = zipsToExtract.keys();
-        
+
         while (e.hasMoreElements())
         {
             Integer key = (Integer) e.nextElement();
             new ExtractZipTask().execute(zipsToExtract.get(key),key);
         }
-        
+
         //Check to remove removed items
         removeOldComics(treemap);
-        
+
         //Check for doubles
         removeDoubleComics();
 
-
     }
-    
+
     private ArrayList<String> searchSubFolders(ArrayList<String> paths)
     {
         ArrayList<String> allFoldersInPaths = new ArrayList<>();
-        
+
         for (int i=0;i<paths.size();i++)
         {
             File root = new File(paths.get(i));
-            
+
             if (root.isDirectory()) {
-                
+
                 allFoldersInPaths.add(paths.get(i));
                 File[] subFiles = root.listFiles();
                 ArrayList<String> subFolders = new ArrayList<>();
-                
+
                 for (int j = 0; j < subFiles.length; j++) {
                     subFolders.add(subFiles[j].toString());
                 }
                 allFoldersInPaths.addAll(searchSubFolders(subFolders));
             }
-            
+
         }
-        
+
         return allFoldersInPaths;
     }
-    
+
     private void showProgressDialog(int progress, int total)
     {
 
         if (mLoadDialog==null)
         {
-            mLoadDialog = new ProgressDialog(this);
+            mLoadDialog = new ProgressDialog(getActivity());
             mLoadDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mLoadDialog.setCanceledOnTouchOutside(false);
             mLoadDialog.setInverseBackgroundForced(false);
@@ -254,14 +321,14 @@ public class ListActivity extends Activity {
 
         mLoadDialog.setMessage("Loaded comic "+mProgress+" of "+mTotalComicCount);
         mLoadDialog.show();
-        
+
         if (!(progress<total)) {
             mLoadDialog.cancel();
             mLoadDialog = null;
         }
-        
+
     }
-    
+
     private int countComics(Map treemap)
     {
         int count = 0;
@@ -274,7 +341,7 @@ public class ListActivity extends Activity {
         }
         return count;
     }
-    
+
     private void removeOldComics(Map treemap)
     {
         for (int j=0;j<mComicList.size();j++)
@@ -295,9 +362,9 @@ public class ListActivity extends Activity {
                 mAdapter.notifyItemRemoved(j);
             }
         }
-        
+
     }
-    
+
     private void removeDoubleComics()
     {
         for (int j=0;j<mComicList.size();j++)
@@ -313,15 +380,15 @@ public class ListActivity extends Activity {
                         isDouble = true;
                     }
                 }
-                
+
             }
             if (isDouble) {
                 mComicList.remove(j);
                 mAdapter.notifyItemRemoved(j);
             }
-        }   
+        }
     }
-    
+
     private boolean comicFileInList(String filename)
     {
         if (mComicList!=null)
@@ -332,7 +399,7 @@ public class ListActivity extends Activity {
                 {
                     return true;
                 }
-                
+
             }
         }
         return false;
@@ -364,7 +431,7 @@ public class ListActivity extends Activity {
                 int count;
 
                 ZipEntry ze = null;
-                
+
                 // search all comic pages
                 while ((ze = zis.getNextEntry()) != null) {
                     filename = ze.getName();
@@ -382,13 +449,13 @@ public class ListActivity extends Activity {
                         pages.add(filename);
                     }
                 }
-                
+
                 // sort the pages
                 Collections.sort(pages);
 
                 is = new FileInputStream(path+"/"+ archivefilename);
                 zis = new ZipInputStream(is);
-                
+
                 // go through pages again
                 while ((ze = zis.getNextEntry()) != null) {
 
@@ -407,8 +474,8 @@ public class ListActivity extends Activity {
                         // get rid of special chars causing problems
                         if (filename.contains("#"))
                             filename = filename.replaceAll("#","");
-                        
-                        output = new File(getFilesDir(), filename);
+
+                        output = new File(getActivity().getFilesDir(), filename);
 
                         // check if file already extracted first
                         if (!output.exists()) {
@@ -424,10 +491,10 @@ public class ListActivity extends Activity {
                     }
 
                 }
-                
+
                 zis.close();
 
-                newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
+                newComic.setCoverImage("file:" + getActivity().getFilesDir().toString() + "/" + extractedImageFile);
                 newComic.setPageCount(pageCount);
 
                 setComicColor(newComic);
@@ -455,7 +522,7 @@ public class ListActivity extends Activity {
         }
     }
 
-    public class ExtractRarTask extends AsyncTask<Object, Void, Integer>
+    private class ExtractRarTask extends AsyncTask<Object, Void, Integer>
     {
         @Override
         protected Integer doInBackground(Object... comicVar) {
@@ -464,7 +531,6 @@ public class ListActivity extends Activity {
             int itemPosition = (Integer) comicVar[1];
             String filename = newComic.getFileName();
             ArrayList<FileHeader> pages= new ArrayList<FileHeader>();
-            boolean isAlreadyExtracted=false;
 
             String path = newComic.getFilePath()+ "/" + filename;
 
@@ -502,28 +568,25 @@ public class ListActivity extends Activity {
 
                 // the outputfilename
                 extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\") + 1);
-                
+
                 // get rid of special chars causing problems
                 if (extractedImageFile.contains("#"))
                     extractedImageFile = extractedImageFile.replaceAll("#","");
-                
+
                 // the output file
-                File output = new File(getFilesDir(), extractedImageFile);
+                File output = new File(getActivity().getFilesDir(), extractedImageFile);
 
                 // if file!=extracted -> extract
-                if (!(isAlreadyExtracted=output.exists())) {
+                if (!output.exists()) {
                     FileOutputStream os = new FileOutputStream(output);
                     arch.extractFile(pages.get(0), os);
                 }
 
-                String coverImage = "file:" + getFilesDir().toString() + "/" + extractedImageFile;
 
-                newComic.setCoverImage(coverImage);
+                newComic.setCoverImage("file:" + getActivity().getFilesDir().toString() + "/" + extractedImageFile);
                 newComic.setPageCount(pageCount);
 
                 setComicColor(newComic);
-                
-
 
                 return itemPosition;
 
@@ -582,7 +645,7 @@ public class ListActivity extends Activity {
         }
 
     }
-    
+
     private boolean isPicture(String filename)
     {
         String extension = "notAPicture";
@@ -593,7 +656,7 @@ public class ListActivity extends Activity {
         {
             e.printStackTrace();
         }
-        
+
         if (extension.equals("jpg") || extension.equals("jpeg")
                 || extension.equals("png"))
         {
@@ -610,14 +673,14 @@ public class ListActivity extends Activity {
             int secondaryTextColor;
 
             if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                Bitmap thumbnail = Picasso.with(getActivity()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                 Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
                 color = mutedSwatch.getRgb();
                 primaryTextColor = mutedSwatch.getTitleTextColor();
                 secondaryTextColor = mutedSwatch.getBodyTextColor();
             }
             else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                Bitmap thumbnail = Picasso.with(getActivity()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                 Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
                 color = lightVibrantSwatch.getRgb();
                 primaryTextColor = lightVibrantSwatch.getTitleTextColor();
@@ -677,19 +740,19 @@ public class ListActivity extends Activity {
 
         savedState.putString("Filepaths",csvList.toString());
     }
-    
+
     @Override
     public void onPause()
     {
         super.onPause();
-        mPrefSetter.saveFilePaths(this,mFilePaths);
+        mPrefSetter.saveFilePaths(getActivity(),mFilePaths);
     }
 
     @Override
     public void onStop()
     {
         super.onStop();
-        mPrefSetter.saveFilePaths(this, mFilePaths);
+        mPrefSetter.saveFilePaths(getActivity(), mFilePaths);
     }
 
 
@@ -701,7 +764,7 @@ public class ListActivity extends Activity {
         searchComics();
         calcComicColorsAsync();
         addOnRecyclerViewClickListener();
-        
+
     }
 
     private void calcComicColorsAsync() {
@@ -722,16 +785,16 @@ public class ListActivity extends Activity {
                 int color;
                 int primaryTextColor;
                 int secondaryTextColor;
-                
+
                 if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                    Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                    Bitmap thumbnail = Picasso.with(getActivity()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                     Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
                     color = mutedSwatch.getRgb();
                     primaryTextColor = mutedSwatch.getTitleTextColor();
                     secondaryTextColor = mutedSwatch.getBodyTextColor();
                 }
                 else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                    Bitmap thumbnail = Picasso.with(getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                    Bitmap thumbnail = Picasso.with(getActivity()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                     Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
                     color = lightVibrantSwatch.getRgb();
                     primaryTextColor = lightVibrantSwatch.getTitleTextColor();
@@ -770,10 +833,9 @@ public class ListActivity extends Activity {
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_list, menu);
-        return true;
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -786,8 +848,8 @@ public class ListActivity extends Activity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             // Display the fragment as the main content.
-            mPrefSetter.saveFilePaths(this,mFilePaths);
-            Intent intent = new Intent(this, SettingsActivity.class);
+            mPrefSetter.saveFilePaths(getActivity(),mFilePaths);
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
             startActivity(intent);
             return true;
         }
@@ -803,7 +865,7 @@ public class ListActivity extends Activity {
         }
         else if (id==R.id.action_about)
         {
-            Intent intent = new Intent(this, AboutActivity.class);
+            Intent intent = new Intent(getActivity(), AboutActivity.class);
             startActivity(intent);
         }
 
@@ -812,14 +874,14 @@ public class ListActivity extends Activity {
 
     private void createRecyclerView()
     {
-        mRecyclerView = (RecyclerView) findViewById(R.id.comic_list_recyclerview);
+        mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.comic_list_recyclerview);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(getActivity());
 
 
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -832,22 +894,20 @@ public class ListActivity extends Activity {
 
     private void addOnRecyclerViewClickListener()
     {
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getApplicationContext(), new RecyclerItemClickListener.OnItemClickListener() {
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                if (position < mComicList.size()) {
+                    Log.d("ItemClick", mComicList.get(position).getTitle());
+                    Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
+                    intent.putExtra("Comic", mComicList.get(position));
 
-                    if (position < mComicList.size()) {
-                        Log.d("ItemClick", mComicList.get(position).getTitle());
-                        Intent intent = new Intent(getApplicationContext(), DisplayComicActivity.class);
-                        intent.putExtra("Comic", mComicList.get(position));
-
-                        if (mUseRecents) {
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                        }
-                        startActivity(intent);
-
+                    if (mUseRecents) {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                     }
+                    startActivity(intent);
+                }
             }
         }));
     }
@@ -855,13 +915,13 @@ public class ListActivity extends Activity {
     private void initialiseAdapter(Bundle savedInstanceState)
     {
 
-        mFilePaths = mPrefSetter.getFilePathsFromPreferences(this);
-        
+        mFilePaths = mPrefSetter.getFilePathsFromPreferences(getActivity());
+
         if (savedInstanceState==null) {
 
             mComicList = new ArrayList<>();
 
-            mAdapter = new ComicAdapter(this, mComicList);
+            mAdapter = new ComicAdapter(getActivity(), mComicList);
             mRecyclerView.setAdapter(mAdapter);
 
         }
@@ -873,12 +933,10 @@ public class ListActivity extends Activity {
             {
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
                     mComicList.add((Comic)savedInstanceState.getParcelable("Comic "+ (i+1)));
-                mAdapter = new ComicAdapter(this, mComicList);
+                mAdapter = new ComicAdapter(getActivity(), mComicList);
                 mRecyclerView.setAdapter(mAdapter);
             }
-            
+
         }
     }
-
-    
 }

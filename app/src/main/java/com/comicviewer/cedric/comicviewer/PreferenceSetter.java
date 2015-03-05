@@ -66,9 +66,9 @@ public class PreferenceSetter {
         if (paths.size()<1)
             paths.add(defaultPath);
         //remove duplicates
-        for (int i=0;i<paths.size();i++)
+        for (int i=0;i<paths.size()-1;i++)
         {
-            for (int j=0;j<paths.size();j++)
+            for (int j=i+1;j<paths.size();j++)
             {
                 if (i!=j)
                 {
