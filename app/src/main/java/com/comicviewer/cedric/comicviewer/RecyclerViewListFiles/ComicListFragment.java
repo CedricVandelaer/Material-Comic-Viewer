@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -23,23 +23,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.comicviewer.cedric.comicviewer.AboutActivity;
+import com.comicviewer.cedric.comicviewer.Comic;
+import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsActivity;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.ComicAdapter;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.RecyclerItemClickListener;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.SlideInOutLeftItemAnimator;
+import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.Utilities;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
 import com.github.junrar.Archive;
-import com.github.junrar.rarfile.FileHeader;
+
 import com.melnykov.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
+import net.lingala.zip4j.core.ZipFile;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,8 +49,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 
 /**
@@ -92,7 +90,7 @@ public class ComicListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(false);
     }
 
     @Override
@@ -100,6 +98,8 @@ public class ComicListFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
+
+        mFirstLoad = true;
         
         PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
@@ -111,7 +111,6 @@ public class ComicListFragment extends Fragment {
         initialiseAdapter(savedInstanceState);
 
         initialiseRefresh(v);
-        mFirstLoad = true;
         
         // Inflate the layout for this fragment
         return v;
@@ -452,96 +451,75 @@ public class ComicListFragment extends Fragment {
             Comic newComic= (Comic)comicVar[0];
             int itemPosition = (Integer) comicVar[1];
             String archivefilename = newComic.getFileName();
-            String filename=null;
             String path = newComic.getFilePath();
             String extractedImageFile = null;
             int pageCount = 0;
+            boolean isAlreadyExtracted = false;
 
-            ArrayList<String> pages = new ArrayList<String>();
+            ArrayList<net.lingala.zip4j.model.FileHeader> pages = new ArrayList<net.lingala.zip4j.model.FileHeader>();
 
-            InputStream is;
-            ZipInputStream zis;
-            byte[] buffer = new byte[4096];
+            try {
+                ZipFile zipFile = new ZipFile(path + "/" + archivefilename);
+                List<net.lingala.zip4j.model.FileHeader> fileheaders = zipFile.getFileHeaders();
 
-            try
-            {
-                is = new FileInputStream(path+"/"+ archivefilename);
-                zis = new ZipInputStream(is);
-                int count;
+                // search for comic pages in the archive
+                for (int j = 0; j < fileheaders.size(); j++) {
 
-                ZipEntry ze = null;
-
-                // search all comic pages
-                while ((ze = zis.getNextEntry()) != null) {
-                    filename = ze.getName();
-
-                    if (filename.contains("/")) {
-                        filename = filename.substring(filename.lastIndexOf("/") + 1);
-                    }
-
-                    if (ze.isDirectory()) {
-                        continue;
-                    }
-
-                    if (Utilities.isPicture(filename)) {
-                        pageCount++;
-                        pages.add(filename);
-                    }
-                }
-
-                // sort the pages
-                Collections.sort(pages);
-
-                is = new FileInputStream(path+"/"+ archivefilename);
-                zis = new ZipInputStream(is);
-
-                // go through pages again
-                while ((ze = zis.getNextEntry()) != null) {
-
-                    // get the next entry name
-                    filename = ze.getName();
-
-                    if (filename.contains("/")) {
-                        filename = filename.substring(filename.lastIndexOf("/") + 1);
-                    }
-
-                    // if entry == first page (cover page)->extract
-                    if (filename.equals(pages.get(0))) {
-
-                        File output;
-
-                        // get rid of special chars causing problems
-                        if (filename.contains("#"))
-                            filename = filename.replaceAll("#","");
-
-                        output = new File(getActivity().getFilesDir(), filename);
-
-                        // check if file already extracted first
-                        if (!output.exists()) {
-                            FileOutputStream fout = new FileOutputStream(output);
-
-                            while ((count = zis.read(buffer)) != -1) {
-                                fout.write(buffer, 0, count);
-                            }
-                            fout.close();
-                            zis.closeEntry();
+                    if (Utilities.isPicture(fileheaders.get(j).getFileName())) {
+                        if (!fileheaders.get(j).isDirectory()) {
+                            pages.add(fileheaders.get(j));
+                            pageCount++;
                         }
-                        extractedImageFile = filename;
                     }
+                }
+                
+                // sort the pages
+                Collections.sort(pages, new Comparator<net.lingala.zip4j.model.FileHeader>() {
+                    @Override
+                    public int compare(net.lingala.zip4j.model.FileHeader lhs, net.lingala.zip4j.model.FileHeader rhs) {
+                        int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getFileName(), rhs.getFileName());
+                        if (res == 0) {
+                            res = lhs.getFileName().compareTo(rhs.getFileName());
+                        }
+                        return res;
+                    }
+                });
 
+                // the outputfilename
+                extractedImageFile = pages.get(0).getFileName().substring(pages.get(0).getFileName().lastIndexOf("\\") + 1);
+
+                if (extractedImageFile.contains("/"))
+                    extractedImageFile = extractedImageFile.substring(extractedImageFile.lastIndexOf("/")+1);
+                
+                // get rid of special chars causing problems
+                if (extractedImageFile.contains("#"))
+                    extractedImageFile = extractedImageFile.replaceAll("#","");
+
+                // the output file
+                File output = new File(getActivity().getFilesDir(), extractedImageFile);
+
+                // if file!=extracted -> extract
+                if (!(isAlreadyExtracted=output.exists())) {
+                    zipFile.extractFile(pages.get(0), getActivity().getFilesDir().getAbsolutePath()+"/"+extractedImageFile);
                 }
 
-                zis.close();
+                String coverImage = "file:" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
 
-                newComic.setCoverImage("file:" + getActivity().getFilesDir().toString() + "/" + extractedImageFile);
-                newComic.setPageCount(pageCount);
+                if (newComic.getCoverImage()==null) {
+                    newComic.setCoverImage(coverImage);
+                    newComic.setPageCount(pageCount);
 
-                setComicColor(newComic);
-
+                    setComicColor(newComic);
+                }
+                else
+                {
+                    return null;
+                }
 
                 return itemPosition;
+                
             }
-            catch(IOException e)
+            catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -569,7 +547,7 @@ public class ComicListFragment extends Fragment {
             Comic newComic= (Comic)comicVar[0];
             int itemPosition = (Integer) comicVar[1];
             String filename = newComic.getFileName();
-            ArrayList<FileHeader> pages= new ArrayList<FileHeader>();
+            ArrayList<com.github.junrar.rarfile.FileHeader> pages= new ArrayList<com.github.junrar.rarfile.FileHeader>();
             boolean isAlreadyExtracted=false;
 
             String path = newComic.getFilePath()+ "/" + filename;
@@ -578,7 +556,7 @@ public class ComicListFragment extends Fragment {
 
             try {
                 Archive arch = new Archive(comic);
-                List<FileHeader> fileheaders = arch.getFileHeaders();
+                List<com.github.junrar.rarfile.FileHeader> fileheaders = arch.getFileHeaders();
                 String extractedImageFile = null;
 
                 int pageCount = 0;
@@ -595,9 +573,9 @@ public class ComicListFragment extends Fragment {
                 }
 
                 // sort the pages
-                Collections.sort(pages, new Comparator<FileHeader>() {
+                Collections.sort(pages, new Comparator<com.github.junrar.rarfile.FileHeader>() {
                     @Override
-                    public int compare(FileHeader lhs, FileHeader rhs) {
+                    public int compare(com.github.junrar.rarfile.FileHeader lhs, com.github.junrar.rarfile.FileHeader rhs) {
                         int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getFileNameString(), rhs.getFileNameString());
                         if (res == 0) {
                             res = lhs.getFileNameString().compareTo(rhs.getFileNameString());
@@ -624,12 +602,16 @@ public class ComicListFragment extends Fragment {
 
                 String coverImage = "file:" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
 
-                newComic.setCoverImage(coverImage);
-                newComic.setPageCount(pageCount);
+                if (newComic.getCoverImage()==null) {
+                    newComic.setCoverImage(coverImage);
+                    newComic.setPageCount(pageCount);
 
-                setComicColor(newComic);
-
-
+                    setComicColor(newComic);
+                }
+                else
+                {
+                    return null;
+                }
 
                 return itemPosition;
 
@@ -717,6 +699,8 @@ public class ComicListFragment extends Fragment {
         }
 
         savedState.putString("Filepaths",csvList.toString());
+        
+        savedState.putBoolean("Loaded",mFirstLoad);
     }
 
 
@@ -795,9 +779,17 @@ public class ComicListFragment extends Fragment {
                     primaryTextColor = getResources().getColor(R.color.White);
                     secondaryTextColor = getResources().getColor(R.color.WhiteBG);
                 }
-                comic.setComicColor(color);
-                comic.setPrimaryTextColor(primaryTextColor);
-                comic.setSecondaryTextColor(secondaryTextColor);
+                if (comic.getComicColor()!=color 
+                        && comic.getPrimaryTextColor()!=primaryTextColor 
+                        && comic.getSecondaryTextColor()!=secondaryTextColor) {
+                    comic.setComicColor(color);
+                    comic.setPrimaryTextColor(primaryTextColor);
+                    comic.setSecondaryTextColor(secondaryTextColor);
+                }
+                else
+                {
+                    return null;
+                }
             } catch (Exception e) {
                 Log.e("Palette", e.getMessage());
             }
@@ -807,7 +799,10 @@ public class ComicListFragment extends Fragment {
         @Override
         protected void onPostExecute(Object param)
         {
-            mAdapter.notifyItemChanged(((int)param));
+            if (param!=null)
+            {
+                mAdapter.notifyItemChanged(((int)param));
+            }
         }
     }
 
@@ -917,6 +912,8 @@ public class ComicListFragment extends Fragment {
                 mAdapter = new ComicAdapter(getActivity(), mComicList);
                 mRecyclerView.setAdapter(mAdapter);
             }
+            
+            mFirstLoad = savedInstanceState.getBoolean("Loaded");
 
         }
     }

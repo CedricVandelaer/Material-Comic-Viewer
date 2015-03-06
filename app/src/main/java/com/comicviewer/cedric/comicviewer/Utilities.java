@@ -6,10 +6,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.zip.ZipInputStream;
+
+import net.lingala.zip4j.core.ZipFile;
 
 /**
  * Created by Cédric on 5/03/2015.
+ * Utilities for extension checking or filetype checking
  */
 public class Utilities {
     
@@ -17,8 +19,6 @@ public class Utilities {
     {
         try {
             String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
-            
-            Log.d("Utilities",extension);
             
             if (extension.equals("rar") || extension.equals("cbr") || extension.equals("cbz") || extension.equals("zip"))
             {
@@ -90,6 +90,17 @@ public class Utilities {
     }
 
     public static boolean isZipArchive(File file) {
+
+        try {
+            ZipFile zipFile = new ZipFile(file);
+            return zipFile.isValidZipFile();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+        /*
         try {
             InputStream is = new FileInputStream(file);
             boolean isZipped = new ZipInputStream(is).getNextEntry() != null;
@@ -99,5 +110,6 @@ public class Utilities {
             e.printStackTrace();
             return false;
         }
+        */
     }
 }

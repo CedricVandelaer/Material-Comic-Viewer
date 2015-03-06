@@ -31,6 +31,8 @@ import com.github.junrar.rarfile.FileHeader;
 import com.melnykov.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
+import net.lingala.zip4j.core.ZipFile;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -73,6 +75,8 @@ public class ListActivity extends Activity {
         setContentView(R.layout.activity_list);
         PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
+        mFirstLoad = true;
+        
         mPrefSetter = new PreferenceSetter();
 
         createRecyclerView();
@@ -81,7 +85,6 @@ public class ListActivity extends Activity {
         initialiseAdapter(savedInstanceState);
         
         initialiseRefresh();
-        mFirstLoad = true;
 
     }
     
@@ -156,8 +159,7 @@ public class ListActivity extends Activity {
 
         mTotalComicCount = countComics(treemap);
         mProgress = 0;
-        
-        Log.d("SearchComics", "Progress: "+mProgress+" Total: "+mTotalComicCount);
+
         
         int i=0;
 
@@ -398,96 +400,75 @@ public class ListActivity extends Activity {
             Comic newComic= (Comic)comicVar[0];
             int itemPosition = (Integer) comicVar[1];
             String archivefilename = newComic.getFileName();
-            String filename=null;
             String path = newComic.getFilePath();
             String extractedImageFile = null;
             int pageCount = 0;
+            boolean isAlreadyExtracted = false;
 
-            ArrayList<String> pages = new ArrayList<String>();
+            ArrayList<net.lingala.zip4j.model.FileHeader> pages = new ArrayList<net.lingala.zip4j.model.FileHeader>();
 
-            InputStream is;
-            ZipInputStream zis;
-            byte[] buffer = new byte[4096];
+            try {
+                ZipFile zipFile = new ZipFile(path + "/" + archivefilename);
+                List<net.lingala.zip4j.model.FileHeader> fileheaders = zipFile.getFileHeaders();
 
-            try
-            {
-                is = new FileInputStream(path+"/"+ archivefilename);
-                zis = new ZipInputStream(is);
-                int count;
+                // search for comic pages in the archive
+                for (int j = 0; j < fileheaders.size(); j++) {
 
-                ZipEntry ze = null;
-                
-                // search all comic pages
-                while ((ze = zis.getNextEntry()) != null) {
-                    filename = ze.getName();
-
-                    if (filename.contains("/")) {
-                        filename = filename.substring(filename.lastIndexOf("/") + 1);
-                    }
-
-                    if (ze.isDirectory()) {
-                        continue;
-                    }
-
-                    if (Utilities.isPicture(filename)) {
-                        pageCount++;
-                        pages.add(filename);
-                    }
-                }
-                
-                // sort the pages
-                Collections.sort(pages);
-
-                is = new FileInputStream(path+"/"+ archivefilename);
-                zis = new ZipInputStream(is);
-                
-                // go through pages again
-                while ((ze = zis.getNextEntry()) != null) {
-
-                    // get the next entry name
-                    filename = ze.getName();
-
-                    if (filename.contains("/")) {
-                        filename = filename.substring(filename.lastIndexOf("/") + 1);
-                    }
-
-                    // if entry == first page (cover page)->extract
-                    if (filename.equals(pages.get(0))) {
-
-                        File output;
-
-                        // get rid of special chars causing problems
-                        if (filename.contains("#"))
-                            filename = filename.replaceAll("#","");
-                        
-                        output = new File(getFilesDir(), filename);
-
-                        // check if file already extracted first
-                        if (!output.exists()) {
-                            FileOutputStream fout = new FileOutputStream(output);
-
-                            while ((count = zis.read(buffer)) != -1) {
-                                fout.write(buffer, 0, count);
-                            }
-                            fout.close();
-                            zis.closeEntry();
+                    if (Utilities.isPicture(fileheaders.get(j).getFileName())) {
+                        if (!fileheaders.get(j).isDirectory()) {
+                            pages.add(fileheaders.get(j));
+                            pageCount++;
                         }
-                        extractedImageFile = filename;
                     }
-
                 }
-                
-                zis.close();
 
-                newComic.setCoverImage("file:" + getFilesDir().toString() + "/" + extractedImageFile);
-                newComic.setPageCount(pageCount);
+                // sort the pages
+                Collections.sort(pages, new Comparator<net.lingala.zip4j.model.FileHeader>() {
+                    @Override
+                    public int compare(net.lingala.zip4j.model.FileHeader lhs, net.lingala.zip4j.model.FileHeader rhs) {
+                        int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getFileName(), rhs.getFileName());
+                        if (res == 0) {
+                            res = lhs.getFileName().compareTo(rhs.getFileName());
+                        }
+                        return res;
+                    }
+                });
 
-                setComicColor(newComic);
+                // the outputfilename
+                extractedImageFile = pages.get(0).getFileName().substring(pages.get(0).getFileName().lastIndexOf("\\") + 1);
 
+                if (extractedImageFile.contains("/"))
+                    extractedImageFile = extractedImageFile.substring(extractedImageFile.lastIndexOf("/")+1);
+
+                // get rid of special chars causing problems
+                if (extractedImageFile.contains("#"))
+                    extractedImageFile = extractedImageFile.replaceAll("#","");
+
+                // the output file
+                File output = new File(getFilesDir(), extractedImageFile);
+
+                // if file!=extracted -> extract
+                if (!(isAlreadyExtracted=output.exists())) {
+                    zipFile.extractFile(pages.get(0), getFilesDir().getAbsolutePath()+"/"+extractedImageFile);
+                }
+
+                String coverImage = "file:" + getFilesDir().toString() + "/" + extractedImageFile;
+
+                if (newComic.getCoverImage()==null) {
+                    newComic.setCoverImage(coverImage);
+                    newComic.setPageCount(pageCount);
+
+                    setComicColor(newComic);
+                }
+                else
+                {
+                    return null;
+                }
 
                 return itemPosition;
+
             }
-            catch(IOException e)
+            catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -515,7 +496,7 @@ public class ListActivity extends Activity {
             Comic newComic= (Comic)comicVar[0];
             int itemPosition = (Integer) comicVar[1];
             String filename = newComic.getFileName();
-            ArrayList<FileHeader> pages= new ArrayList<FileHeader>();
+            ArrayList<com.github.junrar.rarfile.FileHeader> pages= new ArrayList<com.github.junrar.rarfile.FileHeader>();
             boolean isAlreadyExtracted=false;
 
             String path = newComic.getFilePath()+ "/" + filename;
@@ -524,7 +505,7 @@ public class ListActivity extends Activity {
 
             try {
                 Archive arch = new Archive(comic);
-                List<FileHeader> fileheaders = arch.getFileHeaders();
+                List<com.github.junrar.rarfile.FileHeader> fileheaders = arch.getFileHeaders();
                 String extractedImageFile = null;
 
                 int pageCount = 0;
@@ -541,9 +522,9 @@ public class ListActivity extends Activity {
                 }
 
                 // sort the pages
-                Collections.sort(pages, new Comparator<FileHeader>() {
+                Collections.sort(pages, new Comparator<com.github.junrar.rarfile.FileHeader>() {
                     @Override
-                    public int compare(FileHeader lhs, FileHeader rhs) {
+                    public int compare(com.github.junrar.rarfile.FileHeader lhs, com.github.junrar.rarfile.FileHeader rhs) {
                         int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getFileNameString(), rhs.getFileNameString());
                         if (res == 0) {
                             res = lhs.getFileNameString().compareTo(rhs.getFileNameString());
@@ -554,11 +535,11 @@ public class ListActivity extends Activity {
 
                 // the outputfilename
                 extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\") + 1);
-                
+
                 // get rid of special chars causing problems
                 if (extractedImageFile.contains("#"))
                     extractedImageFile = extractedImageFile.replaceAll("#","");
-                
+
                 // the output file
                 File output = new File(getFilesDir(), extractedImageFile);
 
@@ -570,11 +551,16 @@ public class ListActivity extends Activity {
 
                 String coverImage = "file:" + getFilesDir().toString() + "/" + extractedImageFile;
 
-                newComic.setCoverImage(coverImage);
-                newComic.setPageCount(pageCount);
+                if (newComic.getCoverImage()==null) {
+                    newComic.setCoverImage(coverImage);
+                    newComic.setPageCount(pageCount);
 
-                setComicColor(newComic);
-                
+                    setComicColor(newComic);
+                }
+                else {
+                    return null;
+                }
+
 
 
                 return itemPosition;
@@ -663,6 +649,8 @@ public class ListActivity extends Activity {
         }
 
         savedState.putString("Filepaths",csvList.toString());
+        
+        savedState.putBoolean("Loaded",mFirstLoad);
     }
     
     
@@ -741,9 +729,17 @@ public class ListActivity extends Activity {
                     primaryTextColor = getResources().getColor(R.color.White);
                     secondaryTextColor = getResources().getColor(R.color.WhiteBG);
                 }
-                comic.setComicColor(color);
-                comic.setPrimaryTextColor(primaryTextColor);
-                comic.setSecondaryTextColor(secondaryTextColor);
+                if (comic.getComicColor()!=color
+                        && comic.getPrimaryTextColor()!=primaryTextColor
+                        && comic.getSecondaryTextColor()!=secondaryTextColor) {
+                    comic.setComicColor(color);
+                    comic.setPrimaryTextColor(primaryTextColor);
+                    comic.setSecondaryTextColor(secondaryTextColor);
+                }
+                else
+                {
+                    return null;
+                }
             } catch (Exception e) {
                 Log.e("Palette", e.getMessage());
             }
@@ -753,7 +749,8 @@ public class ListActivity extends Activity {
         @Override
         protected void onPostExecute(Object param)
         {
-            mAdapter.notifyItemChanged(((int)param));
+            if (param!=null)
+                mAdapter.notifyItemChanged(((int)param));
         }
     }
 
@@ -863,6 +860,8 @@ public class ListActivity extends Activity {
                 mAdapter = new ComicAdapter(this, mComicList);
                 mRecyclerView.setAdapter(mAdapter);
             }
+
+            mFirstLoad = savedInstanceState.getBoolean("Loaded");
             
         }
     }
