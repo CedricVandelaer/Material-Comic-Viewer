@@ -184,8 +184,7 @@ public class ListActivity extends Activity {
         {
             
             File file = new File(map.get(str)+"/"+str);
-            
-            Log.d("SearchComics","i: "+i+" Str: "+str);
+
             if (!file.isDirectory()) {
                 if (Utilities.checkExtension(str)) {
                     if (!comicFileInList(str)) {
@@ -437,9 +436,11 @@ public class ListActivity extends Activity {
                 // the outputfilename
                 extractedImageFile = pages.get(0).getFileName().substring(pages.get(0).getFileName().lastIndexOf("\\") + 1);
 
+                /*
                 if (extractedImageFile.contains("/"))
                     extractedImageFile = extractedImageFile.substring(extractedImageFile.lastIndexOf("/")+1);
-
+                */
+                
                 // get rid of special chars causing problems
                 if (extractedImageFile.contains("#"))
                     extractedImageFile = extractedImageFile.replaceAll("#","");
@@ -449,7 +450,7 @@ public class ListActivity extends Activity {
 
                 // if file!=extracted -> extract
                 if (!(isAlreadyExtracted=output.exists())) {
-                    zipFile.extractFile(pages.get(0), getFilesDir().getAbsolutePath()+"/"+extractedImageFile);
+                    zipFile.extractFile(pages.get(0), getFilesDir().getAbsolutePath());
                 }
 
                 String coverImage = "file:" + getFilesDir().toString() + "/" + extractedImageFile;

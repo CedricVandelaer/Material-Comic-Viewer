@@ -5,22 +5,12 @@ import android.util.Log;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
+
+import net.lingala.zip4j.core.ZipFile;
 
 /**
  * Created by Cédric on 8/02/2015.
@@ -35,7 +25,7 @@ public class Extractor {
         
         File file = new File(path);
 
-        if (isZipArchive(file))
+        if (Utilities.isZipArchive(file))
         {
             return loadImageNamesFromComicZip(comicToExtract);
         }
@@ -62,7 +52,7 @@ public class Extractor {
 
             for (int j = 0; j < fileheaders.size(); j++) {
 
-                if (isPicture(fileheaders.get(j).getFileNameString()))
+                if (Utilities.isPicture(fileheaders.get(j).getFileNameString()))
                 {
                     String pagefile = fileheaders.get(j).getFileNameString();
                     
@@ -91,108 +81,33 @@ public class Extractor {
 
         ArrayList<String> pages= new ArrayList<String>();
 
-        try
-        {
+        try {
             ZipFile zip = new ZipFile(path + "/" + archivefilename);
-            ZipEntry ze;
+            List<net.lingala.zip4j.model.FileHeader> fileHeaders = zip.getFileHeaders();
 
-            Enumeration<? extends ZipEntry> entries = zip.entries();
+            for (int j = 0; j < fileHeaders.size(); j++) {
 
-            while (entries.hasMoreElements())
-            {
-                ze = entries.nextElement();
-                filename = ze.getName();
-                
-                if (filename.contains("/"))
-                    filename = filename.substring(filename.lastIndexOf("/")+1);
-
-                //Ignore directories
-                if (ze.isDirectory())
+                if (Utilities.isPicture(fileHeaders.get(j).getFileName()))
                 {
-                    continue;
-                }
+                    String pagefile = fileHeaders.get(j).getFileName();
 
-                if (isPicture(filename))
-                {
-                    pages.add(filename);
-                    Log.d("Extractor", "added filename: "+filename);
+                    if (pagefile.contains("/"))
+                        pagefile = pagefile.substring(pagefile.lastIndexOf("/")+1);
+
+                    pages.add(pagefile);
                 }
             }
-
+            
         }
         catch (Exception e)
         {
-            Log.e("ExtractZipTask", e.getMessage());
+            e.printStackTrace();
         }
 
         Collections.sort(pages);
         return pages;
     }
 
-    private static boolean isZipArchive(File file) {
-        try {
-            InputStream is = new FileInputStream(file);
-            boolean isZipped = new ZipInputStream(is).getNextEntry() != null;
-            return isZipped;
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
-    public static Boolean isRarArchive(File filFile) {
-
-        try {
-
-            byte[] bytSignature = new byte[] {0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00};
-            FileInputStream fisFileInputStream = new FileInputStream(filFile);
-
-            byte[] bytHeader = new byte[20];
-            fisFileInputStream.read(bytHeader);
-
-            Short shoFlags = (short) (((bytHeader[10]&0xFF)<<8) | (bytHeader[11]&0xFF));
-
-            //Check if is an archive
-            if (Arrays.equals(Arrays.copyOfRange(bytHeader, 0, 7), bytSignature)) {
-                //Check if is a spanned archive
-                if ((shoFlags & 0x0100) != 0) {
-                    //Check if it the first part of a spanned archive
-                    if ((shoFlags & 0x0001) != 0) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return true;
-                }
-            } else {
-                return true;
-            }
-
-        } catch (Exception e) {
-            return false;
-        }
-
-    }
-
-    private static boolean isPicture(String filename)
-    {
-        String extension = "notAPicture";
-        try {
-            extension = filename.substring(filename.lastIndexOf(".") + 1);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        if (extension.equals("jpg") || extension.equals("jpeg")
-                || extension.equals("png"))
-        {
-            return true;
-        }
-        return false;
-    }
 
 }

@@ -11,19 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.Utilities;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.squareup.picasso.Picasso;
+
+import net.lingala.zip4j.core.ZipFile;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -114,7 +116,7 @@ public class ComicPageFragment extends Fragment {
 
         File file = new File(mComicArchivePath);
 
-        if (isZipArchive(file))
+        if (Utilities.isZipArchive(file))
             new ExtractZipTask().execute();
         else
             new ExtractRarTask().execute();
@@ -148,6 +150,7 @@ public class ComicPageFragment extends Fragment {
                             arch.extractFile(fileheaders.get(j), osPage);
                         }
 
+                        Log.d("Extract rar",extractedImageFile);
                         return extractedImageFile;
                     }
                 }
@@ -156,9 +159,6 @@ public class ComicPageFragment extends Fragment {
             catch (Exception e)
             {
                 Log.e("ExtractRarTask", e.getMessage());
-                
-                // try if zip archive
-                new ExtractZipTask().execute();
             }
 
             return null;
@@ -177,6 +177,55 @@ public class ComicPageFragment extends Fragment {
         @Override
         protected String doInBackground(Void... comicVar) {
 
+            try {
+                ZipFile zipFile = new ZipFile(mComicArchivePath);
+                
+                List<net.lingala.zip4j.model.FileHeader> fileHeaders = zipFile.getFileHeaders();
+                
+                for (int i=0;i<fileHeaders.size();i++)
+                {
+                    String extractedImageFile = null;
+                    if (fileHeaders.get(i).getFileName().contains("\\"))
+                    {
+                        extractedImageFile = fileHeaders.get(i).getFileName().substring(fileHeaders.get(i).getFileName().lastIndexOf("\\")+1);
+                    }
+                    else
+                    {
+                        extractedImageFile = fileHeaders.get(i).getFileName();
+                    }
+
+                    if (extractedImageFile.contains("/"))
+                        extractedImageFile = extractedImageFile.substring(extractedImageFile.lastIndexOf("/")+1);
+
+                    
+                    Log.d("ExtractZip",extractedImageFile);
+                    Log.d("mImageFileName", mImageFileName);
+                    
+                    if (extractedImageFile.equals(mImageFileName))
+                    {
+                        // get rid of special chars
+                        if (extractedImageFile.contains("#"))
+                            extractedImageFile = extractedImageFile.replaceAll("#","");
+
+                        File outputPage = new File(getActivity().getFilesDir(), fileHeaders.get(i).getFileName());
+
+                        if (!outputPage.exists()) {
+                            //FileOutputStream osPage = new FileOutputStream(outputPage);
+                            String extractPath = getActivity().getFilesDir().getAbsolutePath();
+                            Log.d("Extractpath",extractPath);
+                            zipFile.extractFile(fileHeaders.get(i), extractPath);
+                        }
+
+                        return fileHeaders.get(i).getFileName();
+                    }
+                }
+            } 
+            catch (Exception e) 
+            {
+                e.printStackTrace();
+            }
+            
+            /*
             File comic = new File(mComicArchivePath);
 
             String filename = null;
@@ -236,7 +285,7 @@ public class ComicPageFragment extends Fragment {
             {
                 Log.e("ExtractZipTask", e.getMessage());
             }
-
+            */
 
             return null;
         }
@@ -245,53 +294,6 @@ public class ComicPageFragment extends Fragment {
         public void onPostExecute(String file)
         {
             loadImage(file);
-        }
-
-    }
-
-    private static boolean isZipArchive(File file) {
-        try {
-            InputStream is = new FileInputStream(file);
-            boolean isZipped = new ZipInputStream(is).getNextEntry() != null;
-            return isZipped;
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public static Boolean isRarArchive(File filFile) {
-
-        try {
-
-            byte[] bytSignature = new byte[] {0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00};
-            FileInputStream fisFileInputStream = new FileInputStream(filFile);
-
-            byte[] bytHeader = new byte[20];
-            fisFileInputStream.read(bytHeader);
-
-            Short shoFlags = (short) (((bytHeader[10]&0xFF)<<8) | (bytHeader[11]&0xFF));
-
-            //Check if is an archive
-            if (Arrays.equals(Arrays.copyOfRange(bytHeader, 0, 7), bytSignature)) {
-                //Check if is a spanned archive
-                if ((shoFlags & 0x0100) != 0) {
-                    //Check if it the first part of a spanned archive
-                    if ((shoFlags & 0x0001) != 0) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return true;
-                }
-            } else {
-                return true;
-            }
-
-        } catch (Exception e) {
-            return false;
         }
 
     }
