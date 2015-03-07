@@ -12,7 +12,8 @@ import com.comicviewer.cedric.comicviewer.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.squareup.picasso.Picasso;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
@@ -112,11 +113,17 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             {
                 comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).getComicColor());
             }
-            
+            if (!ImageLoader.getInstance().isInited()) {
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
+                ImageLoader.getInstance().init(config);
+            }
+            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture);
+            /*
             Picasso.with(mContext)
                     .load(mComicList.get(i).getCoverImage())
                     .fit().centerCrop()
                     .into(comicItemViewHolder.mCoverPicture);
+                    */
         }
         
     }
@@ -157,18 +164,32 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         if (mComicList.get(i).getCoverImage()==null)
         {
+            if (!ImageLoader.getInstance().isInited()) {
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
+                ImageLoader.getInstance().init(config);
+            }
+            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.comicplaceholder,comicItemViewHolder.mCoverPicture);
+            /*
             Picasso.with(mContext)
                     .load(R.drawable.comicplaceholder)
                     .fit().centerCrop()
                     .into(comicItemViewHolder.mCoverPicture);
+                    */
         }
         else
         {
+            if (!ImageLoader.getInstance().isInited()) {
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
+                ImageLoader.getInstance().init(config);
+            }
+            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture);
+            /*
             Picasso.with(mContext)
                     .load(mComicList.get(i).getCoverImage())
                     .placeholder(R.drawable.comicplaceholder)
                     .fit().centerCrop()
                     .into(comicItemViewHolder.mCoverPicture);
+                    */
         }
         
     }

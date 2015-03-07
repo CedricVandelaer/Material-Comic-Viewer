@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.comicviewer.cedric.comicviewer.AboutActivity;
+import com.comicviewer.cedric.comicviewer.AboutFragment;
 import com.comicviewer.cedric.comicviewer.Comic;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -34,7 +34,9 @@ import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
 import com.github.junrar.Archive;
 
 import com.melnykov.fab.FloatingActionButton;
-import com.squareup.picasso.Picasso;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import net.lingala.zip4j.core.ZipFile;
 
@@ -69,7 +71,6 @@ public class ComicListFragment extends Fragment {
     private FloatingActionButton mFab;
     private String mCardColorSetting;
     private ArrayList<String> mFilePaths;
-    private PreferenceSetter mPrefSetter;
     private boolean mUseRecents;
     private int mProgress;
     private int mTotalComicCount;
@@ -102,8 +103,6 @@ public class ComicListFragment extends Fragment {
         mFirstLoad = true;
         
         PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
-
-        mPrefSetter = new PreferenceSetter();
 
         createRecyclerView(v);
         createFab(v);
@@ -187,11 +186,11 @@ public class ComicListFragment extends Fragment {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mCardColorSetting = prefs.getString("cardColor", getString(R.string.card_color_setting_1));
 
-        mPrefSetter.setBackgroundColorPreference(getActivity());
+        PreferenceSetter.setBackgroundColorPreference(getActivity());
 
         mUseRecents = prefs.getBoolean("useRecents",true);
 
-        mFilePaths = mPrefSetter.getFilePathsFromPreferences(getActivity());
+        mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
     }
 
     private void searchComics() {
@@ -502,7 +501,7 @@ public class ComicListFragment extends Fragment {
                     zipFile.extractFile(pages.get(0), getActivity().getFilesDir().getAbsolutePath());
                 }
 
-                String coverImage = "file:" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
+                String coverImage = "file:///" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
 
                 if (newComic.getCoverImage()==null) {
                     newComic.setCoverImage(coverImage);
@@ -529,12 +528,14 @@ public class ComicListFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer itempos) {
             super.onPostExecute(itempos);
-
-            if (itempos!=null) {
-                mAdapter.notifyItemChanged(itempos);
+            
+            if (isAdded()) {
+                if (itempos != null) {
+                    mAdapter.notifyItemChanged(itempos);
+                }
+                mProgress++;
+                showProgressDialog(mProgress, mTotalComicCount);
             }
-            mProgress++;
-            showProgressDialog(mProgress,mTotalComicCount);
         }
     }
 
@@ -599,7 +600,7 @@ public class ComicListFragment extends Fragment {
                     arch.extractFile(pages.get(0), os);
                 }
 
-                String coverImage = "file:" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
+                String coverImage = "file:///" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
 
                 if (newComic.getCoverImage()==null) {
                     newComic.setCoverImage(coverImage);
@@ -626,32 +627,42 @@ public class ComicListFragment extends Fragment {
         protected void onPostExecute(Integer itempos) {
             super.onPostExecute(itempos);
 
-            //mAdapter.notifyDataSetChanged();
-            if (itempos!=null) {
-                mAdapter.notifyItemChanged(itempos);
+            if (isAdded()) {
+                if (itempos != null) {
+                    mAdapter.notifyItemChanged(itempos);
+                }
+                mProgress++;
+                showProgressDialog(mProgress, mTotalComicCount);
             }
-            mProgress++;
-            showProgressDialog(mProgress,mTotalComicCount);
         }
     }
 
 
     private void setComicColor(Comic comic)
     {
+        if (!ImageLoader.getInstance().isInited()) {
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
+            ImageLoader.getInstance().init(config);
+        }
+        
         try {
             int color;
             int primaryTextColor;
             int secondaryTextColor;
 
             if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                ImageSize imageSize = new ImageSize(1000,1000);
+                Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
+                //Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                 Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
                 color = mutedSwatch.getRgb();
                 primaryTextColor = mutedSwatch.getTitleTextColor();
                 secondaryTextColor = mutedSwatch.getBodyTextColor();
             }
             else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                ImageSize imageSize = new ImageSize(1000,1000);
+                Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
+                //Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                 Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
                 color = lightVibrantSwatch.getRgb();
                 primaryTextColor = lightVibrantSwatch.getTitleTextColor();
@@ -708,14 +719,14 @@ public class ComicListFragment extends Fragment {
     public void onPause()
     {
         super.onPause();
-        mPrefSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
+        PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
     }
 
     @Override
     public void onStop()
     {
         super.onStop();
-        mPrefSetter.saveFilePaths(getActivity(), mFilePaths, mExcludedPaths);
+        PreferenceSetter.saveFilePaths(getActivity(), mFilePaths, mExcludedPaths);
     }
 
 
@@ -741,6 +752,12 @@ public class ComicListFragment extends Fragment {
     {
         @Override
         protected Object doInBackground(Object... params) {
+
+            if (!ImageLoader.getInstance().isInited()) {
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
+                ImageLoader.getInstance().init(config);
+            }
+            
             Comic comic = (Comic)params[0];
             int i = (Integer)params[1];
 
@@ -750,14 +767,18 @@ public class ComicListFragment extends Fragment {
                 int secondaryTextColor;
 
                 if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                    Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                    ImageSize imageSize = new ImageSize(1000,1000);
+                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
+                    //Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                     Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
                     color = mutedSwatch.getRgb();
                     primaryTextColor = mutedSwatch.getTitleTextColor();
                     secondaryTextColor = mutedSwatch.getBodyTextColor();
                 }
                 else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                    Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
+                    ImageSize imageSize = new ImageSize(1000,1000);
+                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
+                    //Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                     Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
                     color = lightVibrantSwatch.getRgb();
                     primaryTextColor = lightVibrantSwatch.getTitleTextColor();
@@ -798,7 +819,7 @@ public class ComicListFragment extends Fragment {
         @Override
         protected void onPostExecute(Object param)
         {
-            if (param!=null)
+            if (param!=null && isAdded())
             {
                 mAdapter.notifyItemChanged(((int)param));
             }
@@ -823,14 +844,14 @@ public class ComicListFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             // Display the fragment as the main content.
-            mPrefSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
+            PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
             Intent intent = new Intent(getActivity(), SettingsActivity.class);
             startActivity(intent);
             return true;
         }
         else if (id==R.id.action_about)
         {
-            Intent intent = new Intent(getActivity(), AboutActivity.class);
+            Intent intent = new Intent(getActivity(), AboutFragment.class);
             startActivity(intent);
         }
 
@@ -889,8 +910,8 @@ public class ComicListFragment extends Fragment {
     private void initialiseAdapter(Bundle savedInstanceState)
     {
 
-        mExcludedPaths = mPrefSetter.getExcludedPaths(getActivity());
-        mFilePaths = mPrefSetter.getFilePathsFromPreferences(getActivity());
+        mExcludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
+        mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 
         if (savedInstanceState==null) {
 

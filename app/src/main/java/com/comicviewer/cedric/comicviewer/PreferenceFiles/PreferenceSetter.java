@@ -1,11 +1,9 @@
 package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 
 import com.comicviewer.cedric.comicviewer.R;
@@ -14,46 +12,56 @@ import java.util.ArrayList;
 
 /**
  * Created by Cédric on 8/02/2015.
+ * Helper class for some preferences*
  */
 public class PreferenceSetter {
 
-    public void setBackgroundColorPreference(Activity activity)
+    public static void setBackgroundColorPreference(Activity activity)
     {
         View layout = activity.getWindow().getDecorView().getRootView();
-        String cardColorSetting=null;
+        
+        int color = getBackgroundColorPreference(activity);
+        
+        
+        layout.setBackgroundColor(color);
+        if (color!= activity.getResources().getColor(R.color.WhiteBG))
+            activity.getWindow().setNavigationBarColor(getBackgroundColorPreference(activity));
+        else
+            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Black));
+        
+    }
 
+    public static int getBackgroundColorPreference(Activity activity)
+    {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        cardColorSetting = prefs.getString("cardColor", activity.getString(R.string.card_color_setting_1));
         String bgcolor = prefs.getString("backgroundColor", activity.getString(R.string.backgroundcolor_setting2));
-
+        int color;
+        
         if (bgcolor.equals(activity.getString(R.string.backgroundcolor_setting1)))
         {
-            layout.setBackgroundColor(activity.getResources().getColor(R.color.BlueGrey));
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.BlueGrey));
+            color = activity.getResources().getColor(R.color.BlueGrey);
         }
         else if (bgcolor.equals(activity.getString(R.string.backgroundcolor_setting2)))
         {
-            layout.setBackgroundColor(activity.getResources().getColor(R.color.Black));
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Black));
+            color = activity.getResources().getColor(R.color.Black);
         }
         else if(bgcolor.equals(activity.getString(R.string.backgroundcolor_setting4)))
         {
-            layout.setBackgroundColor(activity.getResources().getColor(R.color.Brown));
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Brown));
+            color = activity.getResources().getColor(R.color.Brown);
         }
         else if(bgcolor.equals(activity.getString(R.string.backgroundcolor_setting5)))
         {
-            layout.setBackgroundColor(activity.getResources().getColor(R.color.Grey));
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Grey));
+            color = activity.getResources().getColor(R.color.Grey);
         }
         else
         {
-            layout.setBackgroundColor(activity.getResources().getColor(R.color.WhiteBG));
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Black));
+            color = activity.getResources().getColor(R.color.WhiteBG);
         }
+        
+        return color;
     }
 
-    public ArrayList<String> getFilePathsFromPreferences(Activity activity) {
+    public static ArrayList<String> getFilePathsFromPreferences(Activity activity) {
         ArrayList<String> paths = new ArrayList<>();
 
         
@@ -84,7 +92,7 @@ public class PreferenceSetter {
         return paths;
     }
 
-    public ArrayList getExcludedPaths(Activity activity)
+    public static ArrayList getExcludedPaths(Activity activity)
     {
         ArrayList<String> paths = new ArrayList<>();
 
@@ -111,7 +119,7 @@ public class PreferenceSetter {
         
     }
     
-    public void saveFilePaths(Activity activity, ArrayList<String> filepaths, ArrayList<String> excludedpaths)
+    public static void saveFilePaths(Activity activity, ArrayList<String> filepaths, ArrayList<String> excludedpaths)
     {
         StringBuilder csvList = new StringBuilder();
         for(int i=0;i<filepaths.size();i++){

@@ -27,6 +27,7 @@
         <item name="colorPrimary">@color/Teal</item>
         <item name="colorPrimaryDark">@color/TealDark</item>
         <item name="colorAccent">@color/Teal</item>
+        <item name="drawerType">@integer/DRAWERTYPE_IMAGE</item>
     </style>
 
 </resources>

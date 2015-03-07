@@ -13,19 +13,6 @@
         android:maxRecents="4"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".RecyclerViewListFiles.ListActivity"
-            android:label="@string/app_name" >
-            <!--
-            <intent-filter>
-
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-
-            </intent-filter>
-            -->
-        </activity>
-        <activity
             android:name=".ViewPagerFiles.DisplayComicActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_display_comic"
@@ -34,10 +21,6 @@
         <activity
             android:name=".PreferenceFiles.SettingsActivity"
             android:label="@string/title_activity_settings" >
-        </activity>
-        <activity
-            android:name=".AboutActivity"
-            android:label="@string/title_activity_about" >
         </activity>
         <activity android:name=".DrawerActivity" 
             android:theme="@style/NavigationDrawerTheme" >

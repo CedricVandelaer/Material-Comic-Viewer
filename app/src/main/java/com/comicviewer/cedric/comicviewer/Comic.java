@@ -1,14 +1,9 @@
 package com.comicviewer.cedric.comicviewer;
 
-import android.content.Context;
-import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.github.junrar.Archive;
-
-import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +11,8 @@ import java.util.regex.Pattern;
  * Created by Cédric on 23/01/2015.
  * Base class to represent the information of a comic
  */
-public class Comic implements Parcelable {
+public class Comic implements Parcelable 
+{
     //The title of the comic series
     String mTitle;
 
@@ -79,19 +75,26 @@ public class Comic implements Parcelable {
         
         try {
             int i = 0;
-            while (!Character.isDigit(filename.charAt(i))) 
+            String filenameAfterTitle = filename;
+
+            if (filename.contains(mTitle))
+                filenameAfterTitle = filename.substring(filename.indexOf(mTitle));
+
+            while (!Character.isDigit(filenameAfterTitle.charAt(i))) 
                 i++;
+            
             int j = i;
-            while (Character.isDigit(filename.charAt(j))) 
+            
+            while (Character.isDigit(filenameAfterTitle.charAt(j))) 
                 j++;
-            mIssueNumber = Integer.parseInt(filename.substring(i, j));
+            
+            mIssueNumber = Integer.parseInt(filenameAfterTitle.substring(i, j));
         }
         catch (Exception e)
         {
             mIssueNumber = -1;
             Log.e("IssueNumber", e.getMessage());
         }
-
 
         mCoverImage = null;
     }
@@ -107,7 +110,7 @@ public class Comic implements Parcelable {
         String delimiter = "COMICVIEWERDELIM";
         
         if (filename.contains("("))
-            mTitle = filename.substring(0,filename.indexOf('('));
+            mTitle = filename.substring(0, filename.indexOf('('));
         else
             mTitle = filename;
         
@@ -117,8 +120,16 @@ public class Comic implements Parcelable {
         
         mTitle = mTitle.replaceAll("\\d+", delimiter);
         
-        if (mTitle.contains(delimiter)) {
-            mTitle = mTitle.substring(0, mTitle.indexOf(delimiter));
+        if (mTitle.contains(delimiter)) 
+        {
+            if (mTitle.indexOf(delimiter)>0)
+                mTitle = mTitle.substring(0, mTitle.indexOf(delimiter));
+            else
+            {
+                mTitle = mTitle.replace(delimiter,"");
+                if (mTitle.contains(delimiter))
+                    mTitle = mTitle.substring(0, mTitle.indexOf(delimiter));
+            }
         }
         
         mTitle = mTitle.trim();

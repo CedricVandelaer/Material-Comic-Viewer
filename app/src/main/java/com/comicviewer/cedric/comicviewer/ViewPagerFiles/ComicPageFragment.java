@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -14,7 +13,8 @@ import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
-import com.squareup.picasso.Picasso;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import net.lingala.zip4j.core.ZipFile;
 
@@ -22,12 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
-
-import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
 
 /**
@@ -36,7 +31,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 public class ComicPageFragment extends Fragment {
 
     // The imageview for the comic
-    private ImageViewTouch mFullscreenComicView;
+    private TouchImageView mFullscreenComicView;
 
     // The path to the .cbr file (Directory + filename)
     private String mComicArchivePath;
@@ -48,8 +43,7 @@ public class ComicPageFragment extends Fragment {
     // int to keep track of the number of the page in the comic
     private int mPageNumber;
 
-
-    public static final ComicPageFragment newInstance(String comicPath, String pageFileName, int page)
+    public static ComicPageFragment newInstance(String comicPath, String pageFileName, int page)
     {
         ComicPageFragment fragment = new ComicPageFragment();
         Bundle args = new Bundle();
@@ -68,12 +62,17 @@ public class ComicPageFragment extends Fragment {
     //Function to load an image, gets called after extracting the image
     public void loadImage(String filename)
     {
+        if (!ImageLoader.getInstance().isInited()) {
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
+            ImageLoader.getInstance().init(config);
+        }
         mFullscreenComicView.setImageBitmap(null);
         if (filename!=null) {
             if (getActivity()!=null) {
-                String imagePath = "file:" + getActivity().getFilesDir().getPath() + "/" + filename;
+                String imagePath = "file:///" + getActivity().getFilesDir().getPath() + "/" + filename;
                 Log.d("loadImage", imagePath);
-                Picasso.with(getActivity()).load(imagePath).fit().centerInside().into(mFullscreenComicView);
+                ImageLoader.getInstance().displayImage(imagePath,mFullscreenComicView);
+
             }
         }
 
@@ -89,8 +88,9 @@ public class ComicPageFragment extends Fragment {
         mComicArchivePath = args.getString("ComicArchive");
         mImageFileName = args.getString("Page");
         mPageNumber = args.getInt("PageNumber");
-        mFullscreenComicView = (ImageViewTouch) rootView.findViewById(R.id.fullscreen_comic);
+        mFullscreenComicView = (TouchImageView) rootView.findViewById(R.id.fullscreen_comic);
 
+        /*
         mFullscreenComicView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -105,6 +105,7 @@ public class ComicPageFragment extends Fragment {
 
 
         });
+        */
 
         return rootView;
     }
@@ -184,7 +185,7 @@ public class ComicPageFragment extends Fragment {
                 
                 for (int i=0;i<fileHeaders.size();i++)
                 {
-                    String extractedImageFile = null;
+                    String extractedImageFile;
                     if (fileHeaders.get(i).getFileName().contains("\\"))
                     {
                         extractedImageFile = fileHeaders.get(i).getFileName().substring(fileHeaders.get(i).getFileName().lastIndexOf("\\")+1);

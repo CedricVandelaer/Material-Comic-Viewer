@@ -20,9 +20,10 @@ import com.comicviewer.cedric.comicviewer.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.R;
 import com.devspark.robototextview.widget.RobotoTextView;
-import com.squareup.picasso.Picasso;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -54,13 +55,14 @@ public class DisplayComicActivity extends FragmentActivity {
         setContentView(R.layout.activity_display_comic);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+
         Intent intent = getIntent();
 
         mCurrentComic = intent.getParcelableExtra("Comic");
 
         mPageCount = mCurrentComic.getPageCount();
 
-        mPages = new ArrayList<String>();
+        mPages = new ArrayList<>();
 
         mPageIndicator = (RobotoTextView) findViewById(R.id.page_indicator);
 
@@ -74,16 +76,18 @@ public class DisplayComicActivity extends FragmentActivity {
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
         if (showInRecentsPref) {
-            new SetTaskDescritionTask().execute();
+            new SetTaskDescriptionTask().execute();
         }
 
 
     }
 
+    /*
     public void enablePaging(boolean toggle)
     {
         this.mPager.setPagingEnabled(toggle);
     }
+    */
 
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
         @Override
@@ -105,18 +109,24 @@ public class DisplayComicActivity extends FragmentActivity {
         }
     }
 
-    private class SetTaskDescritionTask extends AsyncTask
+    private class SetTaskDescriptionTask extends AsyncTask
     {
 
         @Override
         protected Object doInBackground(Object[] params) {
 
+            if (!ImageLoader.getInstance().isInited()) {
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(DisplayComicActivity.this).build();
+                ImageLoader.getInstance().init(config);
+            }
+            
             ActivityManager.TaskDescription tdscr = null;
             try {
+                ImageSize size = new ImageSize(64,64);
                 tdscr = new ActivityManager.TaskDescription(mCurrentComic.getTitle(),
-                        Picasso.with(getApplicationContext()).load(mCurrentComic.getCoverImage()).resize(85,50).get(),
+                        ImageLoader.getInstance().loadImageSync(mCurrentComic.getCoverImage(),size),
                         mCurrentComic.getComicColor());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
