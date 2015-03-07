@@ -37,6 +37,8 @@ public class SettingsFragment extends PreferenceFragment{
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
+        
+        
 
         ArrayList<CharSequence> paths = new ArrayList<>();
         ArrayList<CharSequence> excludedPaths = new ArrayList<>();

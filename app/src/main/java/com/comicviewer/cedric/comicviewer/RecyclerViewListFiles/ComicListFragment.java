@@ -16,18 +16,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.comicviewer.cedric.comicviewer.AboutFragment;
 import com.comicviewer.cedric.comicviewer.Comic;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsActivity;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
@@ -194,9 +189,6 @@ public class ComicListFragment extends Fragment {
     }
 
     private void searchComics() {
-
-
-
 
         mFilePaths = searchSubFolders(mFilePaths);
 
@@ -638,7 +630,12 @@ public class ComicListFragment extends Fragment {
     }
 
 
-    private void setComicColor(Comic comic)
+    /**
+     * Function to change the colortheme of a comic* 
+     * @param comic the comic for which the color should be calculated
+     * @return true if the color has changed, false if otherwise
+     */
+    private boolean setComicColor(Comic comic)
     {
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
@@ -653,7 +650,6 @@ public class ComicListFragment extends Fragment {
             if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
                 ImageSize imageSize = new ImageSize(1000,1000);
                 Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
-                //Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                 Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
                 color = mutedSwatch.getRgb();
                 primaryTextColor = mutedSwatch.getTitleTextColor();
@@ -662,7 +658,6 @@ public class ComicListFragment extends Fragment {
             else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
                 ImageSize imageSize = new ImageSize(1000,1000);
                 Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
-                //Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
                 Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
                 color = lightVibrantSwatch.getRgb();
                 primaryTextColor = lightVibrantSwatch.getTitleTextColor();
@@ -683,12 +678,22 @@ public class ComicListFragment extends Fragment {
                 primaryTextColor = getResources().getColor(R.color.White);
                 secondaryTextColor = getResources().getColor(R.color.WhiteBG);
             }
-            comic.setComicColor(color);
-            comic.setPrimaryTextColor(primaryTextColor);
-            comic.setSecondaryTextColor(secondaryTextColor);
+            if (comic.getComicColor()!=color
+                    && comic.getPrimaryTextColor()!=primaryTextColor
+                    && comic.getSecondaryTextColor()!=secondaryTextColor) {
+                comic.setComicColor(color);
+                comic.setPrimaryTextColor(primaryTextColor);
+                comic.setSecondaryTextColor(secondaryTextColor);
+            }
+            else
+            {
+                return false;
+            }
         } catch (Exception e) {
             Log.e("Palette", e.getMessage());
         }
+        
+        return true;
     }
 
 
@@ -753,68 +758,13 @@ public class ComicListFragment extends Fragment {
         @Override
         protected Object doInBackground(Object... params) {
 
-            if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
-                ImageLoader.getInstance().init(config);
-            }
-            
             Comic comic = (Comic)params[0];
             int i = (Integer)params[1];
-
-            try {
-                int color;
-                int primaryTextColor;
-                int secondaryTextColor;
-
-                if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                    ImageSize imageSize = new ImageSize(1000,1000);
-                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
-                    //Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
-                    Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
-                    color = mutedSwatch.getRgb();
-                    primaryTextColor = mutedSwatch.getTitleTextColor();
-                    secondaryTextColor = mutedSwatch.getBodyTextColor();
-                }
-                else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                    ImageSize imageSize = new ImageSize(1000,1000);
-                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
-                    //Bitmap thumbnail = Picasso.with(getActivity().getApplicationContext()).load(comic.getCoverImage()).resize(1000, 1000).centerInside().get();
-                    Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
-                    color = lightVibrantSwatch.getRgb();
-                    primaryTextColor = lightVibrantSwatch.getTitleTextColor();
-                    secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
-                }
-                else if(mCardColorSetting.equals(getString(R.string.card_color_setting_3))) {
-                    color = getResources().getColor(R.color.WhiteBG);
-                    primaryTextColor = getResources().getColor(R.color.Black);
-                    secondaryTextColor = getResources().getColor(R.color.BlueGrey);
-                }
-                else if(mCardColorSetting.equals(getString(R.string.card_color_setting_4))) {
-                    color = getResources().getColor(R.color.BlueGrey);
-                    primaryTextColor = getResources().getColor(R.color.White);
-                    secondaryTextColor = getResources().getColor(R.color.WhiteBG);
-                }
-                else {
-                    color = getResources().getColor(R.color.Black);
-                    primaryTextColor = getResources().getColor(R.color.White);
-                    secondaryTextColor = getResources().getColor(R.color.WhiteBG);
-                }
-                if (comic.getComicColor()!=color 
-                        && comic.getPrimaryTextColor()!=primaryTextColor 
-                        && comic.getSecondaryTextColor()!=secondaryTextColor) {
-                    comic.setComicColor(color);
-                    comic.setPrimaryTextColor(primaryTextColor);
-                    comic.setSecondaryTextColor(secondaryTextColor);
-                }
-                else
-                {
-                    return null;
-                }
-            } catch (Exception e) {
-                Log.e("Palette", e.getMessage());
-            }
-
-            return i;
+            
+            if (setComicColor(comic))
+                return i;
+            else
+                return null;
         }
         @Override
         protected void onPostExecute(Object param)
@@ -824,38 +774,6 @@ public class ComicListFragment extends Fragment {
                 mAdapter.notifyItemChanged(((int)param));
             }
         }
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_list, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            // Display the fragment as the main content.
-            PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
-            Intent intent = new Intent(getActivity(), SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        else if (id==R.id.action_about)
-        {
-            Intent intent = new Intent(getActivity(), AboutFragment.class);
-            startActivity(intent);
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void createRecyclerView(View v)

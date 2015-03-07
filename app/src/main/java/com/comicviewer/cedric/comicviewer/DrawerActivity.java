@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.ComicListFragment;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
@@ -22,6 +24,8 @@ AboutFragment.OnFragmentInteractionListener{
     @Override
     public void init(Bundle savedInstanceState) {
 
+        this.disableLearningPattern();
+        this.setBackPattern(BACKPATTERN_BACK_TO_FIRST);
         this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
         this.setDrawerHeaderImage(R.drawable.tealtrainglebg);
         
@@ -30,11 +34,9 @@ AboutFragment.OnFragmentInteractionListener{
 
         MaterialSection settingsSection = newSection("Settings", SettingsFragment.newInstance());    
         addBottomSection(settingsSection);
-        //settingsSection.setIcon(getDrawable(R.drawable.ic_settings_white_48dp));
         
         MaterialSection aboutSection = newSection("About", AboutFragment.newInstance());
         addBottomSection(aboutSection);
-        //aboutSection.setIcon(getDrawable(R.drawable.ic_help_white_48dp));
     }
 
 

@@ -88,6 +88,7 @@ public class Comic implements Parcelable
             while (Character.isDigit(filenameAfterTitle.charAt(j))) 
                 j++;
             
+
             mIssueNumber = Integer.parseInt(filenameAfterTitle.substring(i, j));
         }
         catch (Exception e)

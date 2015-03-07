@@ -39,21 +39,14 @@ public class AboutFragment extends Fragment {
         ImageView logoview = (ImageView)v.findViewById(R.id.logo);
         ImageView meview = (ImageView)v.findViewById(R.id.me_drawable);
 
-        ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(getActivity());
-        if (!ImageLoader.getInstance().isInited())
+        
+        if (!ImageLoader.getInstance().isInited()) {
+            ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(getActivity());
             ImageLoader.getInstance().init(config);
+        }
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logo_highres,logoview);
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.me,meview);
         
-        /*
-        Picasso.with(getActivity())
-                .load(R.drawable.logo_highres)
-                .into(logoview);
-        
-        Picasso.with(getActivity())
-                .load(R.drawable.me)
-                .into(meview);
-                */
         
         return v;
     }
