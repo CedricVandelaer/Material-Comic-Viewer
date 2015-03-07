@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,13 +9,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
+import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import net.lingala.zip4j.core.ZipFile;
 
@@ -42,6 +47,9 @@ public class ComicPageFragment extends Fragment {
 
     // int to keep track of the number of the page in the comic
     private int mPageNumber;
+    
+    // The spinner to show when an image is loading
+    ProgressBarCircularIndeterminate mSpinner;
 
     public static ComicPageFragment newInstance(String comicPath, String pageFileName, int page)
     {
@@ -62,6 +70,7 @@ public class ComicPageFragment extends Fragment {
     //Function to load an image, gets called after extracting the image
     public void loadImage(String filename)
     {
+        
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
             ImageLoader.getInstance().init(config);
@@ -71,7 +80,28 @@ public class ComicPageFragment extends Fragment {
             if (getActivity()!=null) {
                 String imagePath = "file:///" + getActivity().getFilesDir().getPath() + "/" + filename;
                 Log.d("loadImage", imagePath);
-                ImageLoader.getInstance().displayImage(imagePath,mFullscreenComicView);
+                ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, new SimpleImageLoadingListener(){
+                    @Override
+                    public void onLoadingStarted(String imageUri, View view) {
+                        if (mSpinner!=null)
+                            mSpinner.setVisibility(View.VISIBLE);
+                        mFullscreenComicView.setZoom(1);
+                    }
+
+                    @Override
+                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                        if (mSpinner!=null)
+                            mSpinner.setVisibility(View.GONE);
+                        mFullscreenComicView.setZoom(1);
+                    }
+
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        if (mSpinner!=null)
+                            mSpinner.setVisibility(View.GONE);
+                        mFullscreenComicView.setZoom(1);
+                    }
+                });
 
             }
         }
@@ -85,27 +115,11 @@ public class ComicPageFragment extends Fragment {
 
         Bundle args = getArguments();
 
+        mSpinner = (ProgressBarCircularIndeterminate) rootView.findViewById(R.id.spinner);
         mComicArchivePath = args.getString("ComicArchive");
         mImageFileName = args.getString("Page");
         mPageNumber = args.getInt("PageNumber");
         mFullscreenComicView = (TouchImageView) rootView.findViewById(R.id.fullscreen_comic);
-
-        /*
-        mFullscreenComicView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                if (mFullscreenComicView.getScale() > 1f) {
-                    ((DisplayComicActivity)getActivity()).enablePaging(false);
-                } else {
-                    ((DisplayComicActivity)getActivity()).enablePaging(true);
-                }
-                return false;
-            }
-
-
-        });
-        */
 
         return rootView;
     }
@@ -225,68 +239,7 @@ public class ComicPageFragment extends Fragment {
             {
                 e.printStackTrace();
             }
-            
-            /*
-            File comic = new File(mComicArchivePath);
 
-            String filename = null;
-            InputStream is;
-            ZipInputStream zis;
-            try
-            {
-                is = new FileInputStream(comic);
-                zis = new ZipInputStream(new BufferedInputStream(is));
-                ZipEntry ze;
-                byte[] buffer = new byte[1024];
-                int count;
-                boolean pageFound=false;
-
-                while ((ze = zis.getNextEntry()) != null && !pageFound)
-                {
-                    filename = ze.getName();
-
-                    //Ignore directories
-                    if (ze.isDirectory())
-                    {
-                        continue;
-                    }
-
-                    if (filename.contains("/"))
-                        filename = filename.substring(filename.lastIndexOf("/")+1);
-
-                    // get rid of special chars
-                    if (filename.contains("#"))
-                        filename = filename.replaceAll("#","");
-
-                    File output = new File(getActivity().getFilesDir(), filename);
-
-                    if (filename.equals(mImageFileName))
-                    {
-                        
-                        if (!output.exists()) {
-                            FileOutputStream fout = new FileOutputStream(output);
-
-                            while ((count = zis.read(buffer)) != -1) {
-                                fout.write(buffer, 0, count);
-                            }
-                            fout.close();
-                        }
-                        pageFound=true;
-
-                    }
-                    zis.closeEntry();
-                }
-
-                zis.close();
-
-                return filename;
-
-            }
-            catch (Exception e)
-            {
-                Log.e("ExtractZipTask", e.getMessage());
-            }
-            */
 
             return null;
         }
