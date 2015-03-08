@@ -1,5 +1,6 @@
 package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
+import android.animation.LayoutTransition;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -21,6 +22,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -760,19 +763,14 @@ public class ComicListFragment extends Fragment {
         if (enabled) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             mSearchView = new ComicSearchView(getActivity());
-            toolbar.setTitle("All comics");
-
-            final Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.TOP | Gravity.RIGHT);
+            //toolbar.setTitle("All comics");
+            
+            
+            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
 
             mSearchView.setOnSearchClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toolbar bar = ((DrawerActivity) getActivity()).getToolbar();
-                    bar.setTitle("");
-                    //mSearchView.getLayoutParams().width = Toolbar.LayoutParams.MATCH_PARENT;
                 }
             });
             
@@ -780,10 +778,6 @@ public class ComicListFragment extends Fragment {
                 @Override
                 public boolean onClose() {
                     filterList("");
-                    Toolbar bar = ((DrawerActivity) getActivity()).getToolbar();
-                    bar.setTitle("All comics");
-                    
-                    //mSearchView.getLayoutParams().width = layoutParams.width;
                     return false;
                 }
             });
@@ -804,7 +798,7 @@ public class ComicListFragment extends Fragment {
             });
             
             
-            toolbar.addView(mSearchView,layoutParams);
+            toolbar.addView(mSearchView, layoutParamsCollapsed);
         }
         else
         {
@@ -949,11 +943,12 @@ public class ComicListFragment extends Fragment {
             for (int i = 0; i < mComicList.size(); i++) {
                 
                 boolean found = false;
+                
 
-                if (mComicList.get(i).getFileName().contains(query)) {
+                if (mComicList.get(i).getFileName().toLowerCase().contains(query.toLowerCase())) {
                     found = true;
                 }
-                else if ((mComicList.get(i).getTitle()+" "+mComicList.get(i).getIssueNumber()).contains(query))
+                else if ((mComicList.get(i).getTitle().toLowerCase()+" "+mComicList.get(i).getIssueNumber()).contains(query.toLowerCase()))
                 {
                     found=true;
                 }
