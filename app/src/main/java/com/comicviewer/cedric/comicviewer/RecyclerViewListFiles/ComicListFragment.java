@@ -291,8 +291,23 @@ public class ComicListFragment extends Fragment {
 
         //Check for doubles
         removeDoubleComics();
+        
+        //Remove comics with 0 pages
+        removeEmptyComics();
 
 
+    }
+
+    private void removeEmptyComics() {
+        
+        for (int i=0;i<mComicList.size();i++)
+        {
+            if (mComicList.get(i).getPageCount()<1)
+            {
+                mComicList.remove(i);
+                mAdapter.notifyItemRemoved(i);
+            }
+        }
     }
 
     private Map findFilesInPaths()
@@ -498,7 +513,10 @@ public class ComicListFragment extends Fragment {
 
                 // if file!=extracted -> extract
                 if (!(isAlreadyExtracted=output.exists())) {
-                    zipFile.extractFile(pages.get(0), getActivity().getFilesDir().getAbsolutePath());
+                    if (pages.size()>0)
+                        zipFile.extractFile(pages.get(0), getActivity().getFilesDir().getAbsolutePath());
+                    else
+                        return null;
                 }
 
                 String coverImage = "file:///" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
@@ -597,7 +615,10 @@ public class ComicListFragment extends Fragment {
                 // if file!=extracted -> extract
                 if (!(isAlreadyExtracted=output.exists())) {
                     FileOutputStream os = new FileOutputStream(output);
-                    arch.extractFile(pages.get(0), os);
+                    if (pages.size()>0)
+                        arch.extractFile(pages.get(0), os);
+                    else 
+                        return null;
                 }
 
                 String coverImage = "file:///" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
