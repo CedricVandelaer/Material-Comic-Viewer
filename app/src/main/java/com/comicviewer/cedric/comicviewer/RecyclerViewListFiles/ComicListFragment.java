@@ -502,10 +502,11 @@ public class ComicListFragment extends Fragment {
                 });
 
                 // the outputfilename
-                extractedImageFile = pages.get(0).getFileName().substring(pages.get(0).getFileName().lastIndexOf("\\") + 1);
+                if (pages.size()>0)
+                    extractedImageFile = pages.get(0).getFileName().substring(pages.get(0).getFileName().lastIndexOf("\\") + 1);
                 
                 // get rid of special chars causing problems
-                if (extractedImageFile.contains("#"))
+                if (extractedImageFile!=null && extractedImageFile.contains("#"))
                     extractedImageFile = extractedImageFile.replaceAll("#","");
 
                 // the output file
@@ -603,10 +604,11 @@ public class ComicListFragment extends Fragment {
                 });
 
                 // the outputfilename
-                extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\") + 1);
+                if (pages.size()>0)
+                    extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\") + 1);
 
                 // get rid of special chars causing problems
-                if (extractedImageFile.contains("#"))
+                if (extractedImageFile!=null && extractedImageFile.contains("#"))
                     extractedImageFile = extractedImageFile.replaceAll("#","");
 
                 // the output file
@@ -774,9 +776,10 @@ public class ComicListFragment extends Fragment {
         calcComicColorsAsync();
         addOnRecyclerViewClickListener();
     
-        addRemoveSearchBar(true);  
-        filterList("");
+        addRemoveSearchBar(true);
 
+        if (isFiltered)
+            filterList("");
     }
     
     private void addRemoveSearchBar(boolean enabled)
