@@ -18,6 +18,7 @@ import android.view.View;
 
 import com.comicviewer.cedric.comicviewer.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -57,6 +58,8 @@ public class DisplayComicActivity extends FragmentActivity {
 
 
         Intent intent = getIntent();
+        
+        int lastReadPage;
 
         mCurrentComic = intent.getParcelableExtra("Comic");
 
@@ -72,6 +75,15 @@ public class DisplayComicActivity extends FragmentActivity {
         mPager.setOffscreenPageLimit(2);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+        
+        if (PreferenceSetter.getLastReadFilename(this)!=null && 
+                PreferenceSetter.getLastReadFilename(this).equals(mCurrentComic.getFileName()))
+        {
+            lastReadPage = PreferenceSetter.getLastReadPagenumber(this);
+            mPager.setCurrentItem(lastReadPage);            
+        }
+        
+        
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
@@ -82,12 +94,6 @@ public class DisplayComicActivity extends FragmentActivity {
 
     }
 
-    /*
-    public void enablePaging(boolean toggle)
-    {
-        this.mPager.setPagingEnabled(toggle);
-    }
-    */
 
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
         @Override
@@ -202,6 +208,14 @@ public class DisplayComicActivity extends FragmentActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         //getMenuInflater().inflate(R.menu.menu_display_comic, menu);
         return false;
+    }
+    
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        PreferenceSetter.setLastRead(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
+        
     }
 
 

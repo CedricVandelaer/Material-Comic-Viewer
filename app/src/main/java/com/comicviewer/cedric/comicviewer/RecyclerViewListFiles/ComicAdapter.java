@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.comicviewer.cedric.comicviewer.Comic;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
@@ -118,12 +119,16 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                 ImageLoader.getInstance().init(config);
             }
             ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture);
-            /*
-            Picasso.with(mContext)
-                    .load(mComicList.get(i).getCoverImage())
-                    .fit().centerCrop()
-                    .into(comicItemViewHolder.mCoverPicture);
-                    */
+        }
+
+        String lastRead = PreferenceSetter.getLastReadFilename(mContext);
+        if (lastRead!= null && lastRead.equals(mComicList.get(i).getFileName()))
+        {
+            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.last_read,comicItemViewHolder.mLastReadIcon);
+        }
+        else
+        {
+            comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
         }
         
     }
@@ -161,6 +166,15 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).getComicColor());
         }
 
+        String lastRead = PreferenceSetter.getLastReadFilename(mContext);
+        if (lastRead!= null && lastRead.equals(mComicList.get(i).getFileName()))
+        {
+            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.last_read,comicItemViewHolder.mLastReadIcon);
+        }
+        else
+        {
+            comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
+        }
 
         if (mComicList.get(i).getCoverImage()==null)
         {
@@ -169,12 +183,6 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                 ImageLoader.getInstance().init(config);
             }
             ImageLoader.getInstance().displayImage("drawable://"+R.drawable.comicplaceholder,comicItemViewHolder.mCoverPicture);
-            /*
-            Picasso.with(mContext)
-                    .load(R.drawable.comicplaceholder)
-                    .fit().centerCrop()
-                    .into(comicItemViewHolder.mCoverPicture);
-                    */
         }
         else
         {
@@ -183,13 +191,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                 ImageLoader.getInstance().init(config);
             }
             ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture);
-            /*
-            Picasso.with(mContext)
-                    .load(mComicList.get(i).getCoverImage())
-                    .placeholder(R.drawable.comicplaceholder)
-                    .fit().centerCrop()
-                    .into(comicItemViewHolder.mCoverPicture);
-                    */
+
         }
         
     }
@@ -214,6 +216,15 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         setAnimation(comicItemViewHolder.mCardView,i);
 
+        String lastRead = PreferenceSetter.getLastReadFilename(mContext);
+        if (lastRead!= null && lastRead.equals(mComicList.get(i).getFileName()))
+        {
+            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.last_read,comicItemViewHolder.mLastReadIcon);
+        }
+        else
+        {
+            comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
+        }
 
         if (mComicList.get(i).getComicColor()!=-1)
         {

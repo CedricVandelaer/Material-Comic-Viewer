@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -117,6 +118,33 @@ public class PreferenceSetter {
         }
         return paths;
         
+    }
+    
+    public static void setLastRead(Context context, String filename, int pagenumber)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
+        sharedPreferencesEditor.putString("lastReadFilename", filename);
+
+        sharedPreferencesEditor.apply();
+
+        sharedPreferencesEditor = prefs.edit();
+        sharedPreferencesEditor.putInt("lastReadPagenumber", pagenumber);
+
+        sharedPreferencesEditor.apply();
+        
+    }
+    
+    public static String getLastReadFilename(Context context )
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString("lastReadFilename",null);
+    }
+    
+    public static int getLastReadPagenumber(Context context )
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt("lastReadPagenumber", -1);
     }
     
     public static void saveFilePaths(Activity activity, ArrayList<String> filepaths, ArrayList<String> excludedpaths)

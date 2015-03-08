@@ -27,6 +27,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected TextView mIssueNumber;
     protected TextView mPageCount;
     protected TextView mYear;
+    protected ImageView mLastReadIcon;
 
     public ComicItemViewHolder(View itemView) {
         super(itemView);
@@ -47,6 +48,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         mCoverPicture = (ImageView) itemView.findViewById(R.id.card_bg_image);
         mCardView = (CardView) itemView.findViewById(R.id.card_bg);
         mTitle = (TextView) itemView.findViewById(R.id.replacement_title);
+        mLastReadIcon = (ImageView) itemView.findViewById(R.id.large_read_indicator);
     }
     
     private void initialiseNormalCard(View itemView)
@@ -57,7 +59,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         mPageCount = (TextView) itemView.findViewById(R.id.page_count);
         mCardView = (CardView) itemView.findViewById(R.id.card);
         mYear = (TextView) itemView.findViewById(R.id.year);
-        
+        mLastReadIcon = (ImageView) itemView.findViewById(R.id.last_read_indicator);
     }
 
     private void initialiseSmallCard(View itemView)
@@ -67,7 +69,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         mPageCount = (TextView) itemView.findViewById(R.id.small_page_count);
         mCardView = (CardView) itemView.findViewById(R.id.small_card);
         mYear = (TextView) itemView.findViewById(R.id.small_year);
-
+        mLastReadIcon = (ImageView) itemView.findViewById(R.id.small_read_indicator);
     }
 
 
