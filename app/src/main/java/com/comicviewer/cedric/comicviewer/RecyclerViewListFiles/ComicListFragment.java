@@ -203,10 +203,9 @@ public class ComicListFragment extends Fragment {
 
     private void searchComics() {
 
-        mFilePaths = searchSubFolders(mFilePaths);
+        ArrayList<String> subFolders = searchSubFolders(mFilePaths);
 
-
-        Map<String,String> map = findFilesInPaths();
+        Map<String,String> map = findFilesInPaths(subFolders);
 
         //create treemap to sort the filenames
         Map<String,String> treemap = new TreeMap(map);
@@ -214,23 +213,13 @@ public class ComicListFragment extends Fragment {
         mTotalComicCount = countComics(treemap);
         mProgress = 0;
 
+        updateProgressDialog(mProgress, mTotalComicCount);
+   
+
         int i=0;
-
-        if (mFirstLoad) {
-            mSwipeRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(true);
-                }
-            });
-            mFirstLoad = false;
-        }
-        else
-        {
-            mSwipeRefreshLayout.setRefreshing(true);
-        }
-
+        
         // create array for the zips to extract after the rars
+        Hashtable<Integer, Comic> rarsToExtract = new Hashtable<>();
         Hashtable<Integer, Comic> zipsToExtract = new Hashtable<>();
 
         for (String str:treemap.keySet())
@@ -238,47 +227,54 @@ public class ComicListFragment extends Fragment {
 
             File file = new File(map.get(str)+"/"+str);
 
-            if (!file.isDirectory()) {
+            if (getComicPositionInList(str)==-1) {
                 if (Utilities.checkExtension(str)) {
-                    if (!comicFileInList(str)) {
+                    boolean isZip = Utilities.isZipArchive(file);
+                    boolean isRar = false;
+                    if (!isZip)
+                        isRar = Utilities.isRarArchive(file);
 
-                        boolean isZip = Utilities.isZipArchive(file);
-                        boolean isRar = false;
-                        if (!isZip)
-                            isRar = Utilities.isRarArchive(file);
-
-                        if (isRar || isZip) {
-                            Comic newComic = new Comic(str, map.get(str));
-                            mComicList.add(i, newComic);
-                            mAdapter.notifyItemInserted(i);
-                            if (isZip) {
-                                zipsToExtract.put(i, newComic);
-                            } else {
-                                new ExtractRarTask().execute(newComic, i);
-                            }
-                            i++;
+                    if (isRar || isZip) {
+                        Comic newComic = new Comic(str, map.get(str));
+                        mComicList.add(i, newComic);
+                        mAdapter.notifyItemInserted(i);
+                        if (isZip) {
+                            zipsToExtract.put(i, newComic);
                         } else {
-                            mProgress++;
-                            showProgressDialog(mProgress, mTotalComicCount);
+                            rarsToExtract.put(i, newComic);
                         }
-                    } else {
                         i++;
+                    } else {
                         mProgress++;
-                        showProgressDialog(mProgress, mTotalComicCount);
+                        updateProgressDialog(mProgress, mTotalComicCount);
                     }
-                }else
+                }
+                else
                 {
                     mProgress++;
-                    showProgressDialog(mProgress, mTotalComicCount);
+                    updateProgressDialog(mProgress, mTotalComicCount);
                 }
-
+            }
+            else
+            {
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
 
-        showProgressDialog(mProgress,mTotalComicCount);
 
+        // extract found rars
+        Enumeration e = rarsToExtract.keys();
+
+        while (e.hasMoreElements())
+        {
+            Integer key = (Integer) e.nextElement();
+            new ExtractRarTask().execute(rarsToExtract.get(key),key);
+        }
+        
+        
         // extract found zips
-        Enumeration e = zipsToExtract.keys();
+        e = zipsToExtract.keys();
 
         while (e.hasMoreElements())
         {
@@ -286,31 +282,36 @@ public class ComicListFragment extends Fragment {
             new ExtractZipTask().execute(zipsToExtract.get(key),key);
         }
 
-        //Check to remove removed items
-        removeOldComics(treemap);
-
-        //Check for doubles
-        removeDoubleComics();
-        
-        //Remove comics with 0 pages
-        removeEmptyComics();
-
-
     }
-
-    private void removeEmptyComics() {
-        
+    
+    private void removeDoubleComics()
+    {
         for (int i=0;i<mComicList.size();i++)
         {
-            if (mComicList.get(i).getPageCount()<1)
+            for (int j=i+1;j<mComicList.size()-1;j++)
             {
-                mComicList.remove(i);
-                mAdapter.notifyItemRemoved(i);
+                if (mComicList.get(i).getFileName().equals(mComicList.get(j).getFileName()))
+                {
+                    mComicList.remove(j);
+                    mAdapter.notifyItemRemoved(j);
+                }
             }
         }
+        
+    }
+    
+    private int getComicPositionInList(String filename)
+    {
+        for (int pos=0;pos<mComicList.size();pos++)
+        {
+            if (mComicList.get(pos).getFileName().equals(filename))
+                return pos;
+        }
+        return -1;
     }
 
-    private Map findFilesInPaths()
+
+    private Map findFilesInPaths(ArrayList<String> pathsToSearch)
     {
         // list of filenames
         ArrayList<String> files = new ArrayList<>();
@@ -321,9 +322,9 @@ public class ComicListFragment extends Fragment {
         Map<String,String> map = new HashMap<>();
 
         // search for all files in all paths
-        for (int i=0;i<mFilePaths.size();i++)
+        for (int i=0;i<pathsToSearch.size();i++)
         {
-            String path = mFilePaths.get(i);
+            String path = pathsToSearch.get(i);
             File f = new File(path);
             f.mkdirs();
 
@@ -333,6 +334,7 @@ public class ComicListFragment extends Fragment {
             {
                 for (int j=0;j<fileList.length;j++)
                 {
+                    
                     if (!fileList[j].isDirectory())
                     {
                         files.add(fileList[j].getName());
@@ -378,11 +380,36 @@ public class ComicListFragment extends Fragment {
         return allFoldersInPaths;
     }
 
-    private void showProgressDialog(int progress, int total)
+    private void updateProgressDialog(int progress, int total)
     {
-        if (progress>=total) {
-            mSwipeRefreshLayout.setRefreshing(false);
+        if (mProgress==0)
+        {
+            if (mFirstLoad) {
+                mSwipeRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwipeRefreshLayout.setRefreshing(true);
+                    }
+                });
+                mFirstLoad = false;
+            }
+            else
+            {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
         }
+        
+        if (progress>=total) {
+            onLoadingFinished();
+        }
+    }
+    
+    private void onLoadingFinished()
+    {
+        mSwipeRefreshLayout.setRefreshing(false);
+        removeDoubleComics();
+        removeOldComics();
+        calcComicColorsAsync();        
     }
 
     private int countComics(Map treemap)
@@ -396,8 +423,15 @@ public class ComicListFragment extends Fragment {
         return count;
     }
 
-    private void removeOldComics(Map treemap)
+    private void removeOldComics()
     {
+        ArrayList<String> subFolders = searchSubFolders(mFilePaths);
+
+        Map<String,String> map = findFilesInPaths(subFolders);
+
+        //create treemap to sort the filenames
+        Map<String,String> treemap = new TreeMap(map);
+        
         for (int j=0;j<mComicList.size();j++)
         {
             Comic comicToRemove = mComicList.get(j);
@@ -419,45 +453,6 @@ public class ComicListFragment extends Fragment {
 
     }
 
-    private void removeDoubleComics()
-    {
-        for (int j=0;j<mComicList.size();j++)
-        {
-            Comic currentComic = mComicList.get(j);
-            boolean isDouble = false;
-            for (int k=0;k<mComicList.size();k++)
-            {
-                if (j!=k)
-                {
-                    if(currentComic.getFileName().equals(mComicList.get(k).getFileName()))
-                    {
-                        isDouble = true;
-                    }
-                }
-
-            }
-            if (isDouble) {
-                mComicList.remove(j);
-                mAdapter.notifyItemRemoved(j);
-            }
-        }
-    }
-
-    private boolean comicFileInList(String filename)
-    {
-        if (mComicList!=null)
-        {
-            for (int i=0;i<mComicList.size();i++)
-            {
-                if (mComicList.get(i).getFileName().trim().equals(filename.trim()))
-                {
-                    return true;
-                }
-
-            }
-        }
-        return false;
-    }
 
     private class ExtractZipTask extends AsyncTask<Object, Void, Integer>
     {
@@ -525,8 +520,6 @@ public class ComicListFragment extends Fragment {
                 if (newComic.getCoverImage()==null) {
                     newComic.setCoverImage(coverImage);
                     newComic.setPageCount(pageCount);
-
-                    setComicColor(newComic);
                 }
                 else
                 {
@@ -553,7 +546,7 @@ public class ComicListFragment extends Fragment {
                     mAdapter.notifyItemChanged(itempos);
                 }
                 mProgress++;
-                showProgressDialog(mProgress, mTotalComicCount);
+                updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
     }
@@ -629,7 +622,6 @@ public class ComicListFragment extends Fragment {
                     newComic.setCoverImage(coverImage);
                     newComic.setPageCount(pageCount);
 
-                    setComicColor(newComic);
                 }
                 else
                 {
@@ -641,7 +633,6 @@ public class ComicListFragment extends Fragment {
             } catch (Exception e) {
                 Log.d("ExtractRarTask",e.getMessage());
             }
-
 
             return null;
         }
@@ -655,7 +646,7 @@ public class ComicListFragment extends Fragment {
                     mAdapter.notifyItemChanged(itempos);
                 }
                 mProgress++;
-                showProgressDialog(mProgress, mTotalComicCount);
+                updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
     }
@@ -709,9 +700,10 @@ public class ComicListFragment extends Fragment {
                 primaryTextColor = getResources().getColor(R.color.White);
                 secondaryTextColor = getResources().getColor(R.color.WhiteBG);
             }
+            
             if (comic.getComicColor()!=color
-                    && comic.getPrimaryTextColor()!=primaryTextColor
-                    && comic.getSecondaryTextColor()!=secondaryTextColor) {
+                    || comic.getPrimaryTextColor()!=primaryTextColor
+                    || comic.getSecondaryTextColor()!=secondaryTextColor) {
                 comic.setComicColor(color);
                 comic.setPrimaryTextColor(primaryTextColor);
                 comic.setSecondaryTextColor(secondaryTextColor);
@@ -756,7 +748,7 @@ public class ComicListFragment extends Fragment {
     {
         super.onPause();
         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
-        addRemoveSearchBar(false);
+        enableSearchBar(false);
     }
 
     @Override
@@ -773,21 +765,19 @@ public class ComicListFragment extends Fragment {
         super.onResume();
         setPreferences();
         searchComics();
-        calcComicColorsAsync();
         addOnRecyclerViewClickListener();
     
-        addRemoveSearchBar(true);
+        enableSearchBar(true);
 
         if (isFiltered)
             filterList("");
     }
     
-    private void addRemoveSearchBar(boolean enabled)
+    private void enableSearchBar(boolean enabled)
     {
         if (enabled) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             mSearchView = new ComicSearchView(getActivity());
-            //toolbar.setTitle("All comics");
             
             
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
