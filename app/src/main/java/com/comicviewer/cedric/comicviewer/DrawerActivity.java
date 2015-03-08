@@ -23,7 +23,7 @@ AboutFragment.OnFragmentInteractionListener{
     private ArrayList<Comic> mComicList;
     @Override
     public void init(Bundle savedInstanceState) {
-
+        
         this.disableLearningPattern();
         this.setBackPattern(BACKPATTERN_BACK_TO_FIRST);
         this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
@@ -37,6 +37,7 @@ AboutFragment.OnFragmentInteractionListener{
         
         MaterialSection aboutSection = newSection("About", AboutFragment.newInstance());
         addBottomSection(aboutSection);
+
     }
 
 

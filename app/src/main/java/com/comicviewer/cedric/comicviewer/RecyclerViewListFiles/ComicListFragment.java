@@ -1,5 +1,6 @@
 package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,13 +15,18 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Comic;
+import com.comicviewer.cedric.comicviewer.ComicSearchView;
+import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
@@ -72,6 +78,9 @@ public class ComicListFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private boolean mFirstLoad;
     private ArrayList<String> mExcludedPaths;
+    private ComicSearchView mSearchView;
+    private ArrayList<Comic> filteredList;
+    private boolean isFiltered;
 
     public static ComicListFragment newInstance() {
         ComicListFragment fragment = new ComicListFragment();
@@ -96,6 +105,7 @@ public class ComicListFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
 
         mFirstLoad = true;
+        isFiltered = false;
         
         PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
@@ -475,11 +485,6 @@ public class ComicListFragment extends Fragment {
 
                 // the outputfilename
                 extractedImageFile = pages.get(0).getFileName().substring(pages.get(0).getFileName().lastIndexOf("\\") + 1);
-
-                /*
-                if (extractedImageFile.contains("/"))
-                    extractedImageFile = extractedImageFile.substring(extractedImageFile.lastIndexOf("/")+1);
-                */
                 
                 // get rid of special chars causing problems
                 if (extractedImageFile.contains("#"))
@@ -648,7 +653,7 @@ public class ComicListFragment extends Fragment {
             int secondaryTextColor;
 
             if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                ImageSize imageSize = new ImageSize(1000,1000);
+                ImageSize imageSize = new ImageSize(850,500);
                 Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
                 Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
                 color = mutedSwatch.getRgb();
@@ -656,7 +661,7 @@ public class ComicListFragment extends Fragment {
                 secondaryTextColor = mutedSwatch.getBodyTextColor();
             }
             else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                ImageSize imageSize = new ImageSize(1000,1000);
+                ImageSize imageSize = new ImageSize(850,500);
                 Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
                 Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
                 color = lightVibrantSwatch.getRgb();
@@ -725,6 +730,7 @@ public class ComicListFragment extends Fragment {
     {
         super.onPause();
         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
+        addRemoveSearchBar(false);
     }
 
     @Override
@@ -743,7 +749,68 @@ public class ComicListFragment extends Fragment {
         searchComics();
         calcComicColorsAsync();
         addOnRecyclerViewClickListener();
+    
+        addRemoveSearchBar(true);  
+        filterList("");
 
+    }
+    
+    private void addRemoveSearchBar(boolean enabled)
+    {
+        if (enabled) {
+            final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+            mSearchView = new ComicSearchView(getActivity());
+            toolbar.setTitle("All comics");
+
+            final Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.TOP | Gravity.RIGHT);
+
+            mSearchView.setOnSearchClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toolbar bar = ((DrawerActivity) getActivity()).getToolbar();
+                    bar.setTitle("");
+                    //mSearchView.getLayoutParams().width = Toolbar.LayoutParams.MATCH_PARENT;
+                }
+            });
+            
+            mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                @Override
+                public boolean onClose() {
+                    filterList("");
+                    Toolbar bar = ((DrawerActivity) getActivity()).getToolbar();
+                    bar.setTitle("All comics");
+                    
+                    //mSearchView.getLayoutParams().width = layoutParams.width;
+                    return false;
+                }
+            });
+            
+            mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    filterList(query);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    
+                    filterList(newText);
+                    return false;
+                }
+            });
+            
+            
+            toolbar.addView(mSearchView,layoutParams);
+        }
+        else
+        {
+            Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+            toolbar.removeView(mSearchView);
+        }
     }
 
     private void calcComicColorsAsync() {
@@ -803,17 +870,33 @@ public class ComicListFragment extends Fragment {
             public void onItemClick(View view, int position) {
 
                 if (!mSwipeRefreshLayout.isRefreshing()) {
-                    if (position < mComicList.size()) {
-                        Log.d("ItemClick", mComicList.get(position).getTitle());
-                        Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
-                        intent.putExtra("Comic", mComicList.get(position));
+                    
+                    if (!isFiltered) {
+                        if (position < mComicList.size()) {
+                            Log.d("ItemClick", mComicList.get(position).getTitle());
+                            Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
+                            intent.putExtra("Comic", mComicList.get(position));
 
-                        if (mUseRecents) {
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                            if (mUseRecents) {
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                            }
+                            startActivity(intent);
                         }
-                        startActivity(intent);
+                    }
+                    else
+                    {
+                        if (position < filteredList.size()) {
+                            Log.d("ItemClick", filteredList.get(position).getTitle());
+                            Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
+                            intent.putExtra("Comic", filteredList.get(position));
 
+                            if (mUseRecents) {
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                            }
+                            startActivity(intent);
+                        }
                     }
                 }
                 else
@@ -854,6 +937,38 @@ public class ComicListFragment extends Fragment {
             mFirstLoad = savedInstanceState.getBoolean("Loaded");
 
         }
+    }
+    
+    private void filterList(String query)
+    {
+        if (query!="") {
+            isFiltered = true;
+            
+            filteredList = new ArrayList<>();
+            
+            for (int i = 0; i < mComicList.size(); i++) {
+                
+                boolean found = false;
+
+                if (mComicList.get(i).getFileName().contains(query)) {
+                    found = true;
+                }
+                else if ((mComicList.get(i).getTitle()+" "+mComicList.get(i).getIssueNumber()).contains(query))
+                {
+                    found=true;
+                }
+                if (found)
+                    filteredList.add(mComicList.get(i));
+            }
+            RecyclerView.Adapter tempAdapter = new ComicAdapter(getActivity(), filteredList);
+            mRecyclerView.swapAdapter(tempAdapter,false);
+        }
+        else
+        {
+            mRecyclerView.setAdapter(mAdapter);
+            isFiltered = false;
+        }
+        
     }
 
 }
