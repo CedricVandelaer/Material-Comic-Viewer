@@ -28,7 +28,6 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Comic;
-import com.comicviewer.cedric.comicviewer.ComicSearchView;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -81,7 +80,7 @@ public class ComicListFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private boolean mFirstLoad;
     private ArrayList<String> mExcludedPaths;
-    private ComicSearchView mSearchView;
+    private SearchView mSearchView;
     private ArrayList<Comic> filteredList;
     private boolean isFiltered;
 
@@ -777,7 +776,7 @@ public class ComicListFragment extends Fragment {
     {
         if (enabled) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
-            mSearchView = new ComicSearchView(getActivity());
+            mSearchView = new SearchView(getActivity());
             
             
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);

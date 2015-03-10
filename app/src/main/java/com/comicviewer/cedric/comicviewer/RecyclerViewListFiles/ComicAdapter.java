@@ -101,12 +101,10 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     private void initialiseCardBg(final ComicItemViewHolder comicItemViewHolder, int i)
     {
         comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle()+" "+mComicList.get(i).getIssueNumber());
-        if (mComicList.get(i).getCoverImage()==null)
-        {
-            comicItemViewHolder.mCoverPicture.setImageBitmap(null);
 
-        }
-        else
+        comicItemViewHolder.mCoverPicture.setImageBitmap(null);
+        
+        if (mComicList.get(i).getCoverImage()!=null)
         {
             
 
@@ -122,9 +120,20 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         }
 
         String lastRead = PreferenceSetter.getLastReadFilename(mContext);
+        int lastReadPage = PreferenceSetter.getLastReadPagenumber(mContext);
         if (lastRead!= null && lastRead.equals(mComicList.get(i).getFileName()))
         {
-            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.last_read,comicItemViewHolder.mLastReadIcon);
+            if (lastReadPage!=-1 && mComicList.get(i).getPageCount()!=-1) {
+
+                if (lastReadPage+1==mComicList.get(i).getPageCount())
+                {
+                    ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check_black_48dp,comicItemViewHolder.mLastReadIcon);
+                }
+                else
+                {
+                    ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
+                }
+            }
         }
         else
         {
@@ -136,6 +145,9 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     private void initialiseNormalCard(final ComicItemViewHolder comicItemViewHolder, int i)
     {
         comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle());
+        
+        comicItemViewHolder.mCoverPicture.setImageBitmap(null);
+        
         if (mComicList.get(i).getIssueNumber()!=-1)
             comicItemViewHolder.mIssueNumber.setText("Issue number: "+mComicList.get(i).getIssueNumber());
         else
@@ -167,29 +179,37 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         }
 
         String lastRead = PreferenceSetter.getLastReadFilename(mContext);
+        int lastReadPage = PreferenceSetter.getLastReadPagenumber(mContext);
         if (lastRead!= null && lastRead.equals(mComicList.get(i).getFileName()))
         {
-            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.last_read,comicItemViewHolder.mLastReadIcon);
+            if (lastReadPage!=-1 && mComicList.get(i).getPageCount()!=-1) {
+
+                if (lastReadPage+1==mComicList.get(i).getPageCount())
+                {
+                    ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check_black_48dp,comicItemViewHolder.mLastReadIcon);
+                }
+                else
+                {
+                    ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
+                }
+            }
         }
         else
         {
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
         }
 
+        if (!ImageLoader.getInstance().isInited()) {
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
+            ImageLoader.getInstance().init(config);
+        }
+        
         if (mComicList.get(i).getCoverImage()==null)
         {
-            if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
-                ImageLoader.getInstance().init(config);
-            }
             ImageLoader.getInstance().displayImage("drawable://"+R.drawable.comicplaceholder,comicItemViewHolder.mCoverPicture);
         }
         else
         {
-            if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
-                ImageLoader.getInstance().init(config);
-            }
             ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture);
 
         }
@@ -217,9 +237,20 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         setAnimation(comicItemViewHolder.mCardView,i);
 
         String lastRead = PreferenceSetter.getLastReadFilename(mContext);
+        int lastReadPage = PreferenceSetter.getLastReadPagenumber(mContext);
         if (lastRead!= null && lastRead.equals(mComicList.get(i).getFileName()))
         {
-            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.last_read,comicItemViewHolder.mLastReadIcon);
+            if (lastReadPage!=-1 && mComicList.get(i).getPageCount()!=-1) {
+                
+                if (lastReadPage+1==mComicList.get(i).getPageCount()) 
+                {
+                    ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check_black_48dp,comicItemViewHolder.mLastReadIcon);
+                }
+                else
+                {
+                    ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
+                }
+            }
         }
         else
         {
