@@ -100,16 +100,6 @@ public class Utilities {
             e.printStackTrace();
             return false;
         }
-        /*
-        try {
-            InputStream is = new FileInputStream(file);
-            boolean isZipped = new ZipInputStream(is).getNextEntry() != null;
-            return isZipped;
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-        */
+
     }
 }
