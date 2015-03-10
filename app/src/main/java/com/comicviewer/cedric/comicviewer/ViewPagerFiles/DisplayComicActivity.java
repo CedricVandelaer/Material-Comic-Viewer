@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -215,7 +217,28 @@ public class DisplayComicActivity extends FragmentActivity {
     {
         super.onStop();
         PreferenceSetter.setLastRead(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
+        removeExtractedFiles();
+    }
+
+    private void removeExtractedFiles() {
         
+        for (int i=0;i<mPages.size();i++)
+        {
+            if (i!=0) {
+                try {
+                    String filename = mPages.get(i);
+                    if (filename.contains("#"))
+                        filename = filename.replaceAll("#","");
+                    File file = new File(getFilesDir().getPath() + "/" + filename);
+                    if (file.delete())
+                        Log.d("DisplayComic Onstop", "Deleted file " +filename);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 
