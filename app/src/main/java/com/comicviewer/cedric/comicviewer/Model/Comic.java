@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer;
+package com.comicviewer.cedric.comicviewer.Model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

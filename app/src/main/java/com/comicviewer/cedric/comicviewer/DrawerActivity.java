@@ -3,6 +3,7 @@ package com.comicviewer.cedric.comicviewer;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.ComicListFragment;
 import com.nostra13.universalimageloader.core.ImageLoader;

@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.util.Log;
 
+import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 
