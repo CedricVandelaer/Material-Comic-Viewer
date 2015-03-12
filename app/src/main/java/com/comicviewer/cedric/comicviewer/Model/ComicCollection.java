@@ -15,4 +15,16 @@ public class ComicCollection {
         mName = name;
         mComicList = list;
     }
+    
+    public ArrayList<Comic> getComicList()
+    {
+        return mComicList;
+        
+    }
+    
+    public String getName()
+    {
+        return mName;
+        
+    }
 }
