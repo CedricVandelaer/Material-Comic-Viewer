@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -23,15 +22,13 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import net.lingala.zip4j.core.ZipFile;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.List;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple {@link android.support.v4.app.Fragment} subclass.
  */
 public class ComicPageFragment extends Fragment {
 
