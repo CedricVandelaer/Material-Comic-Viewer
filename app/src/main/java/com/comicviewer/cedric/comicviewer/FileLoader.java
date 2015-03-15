@@ -1,6 +1,9 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.content.Context;
+
 import com.comicviewer.cedric.comicviewer.Model.Comic;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.ComicAdapter;
 
 import java.io.File;
@@ -13,9 +16,13 @@ import java.util.TreeMap;
 
 /**
  * Created by Cédric on 11/03/2015.
+ * Class to create the list of comics without actually loading them
  */
 public class FileLoader {
-    public static ArrayList<Comic> searchComics(ArrayList<String> filepaths, ArrayList<String> excludedPaths) {
+    public static Map<String, String> searchComics(Context context) {
+
+        ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(context);
+        ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
 
         ArrayList<Comic> newComicList = new ArrayList<>();
         
@@ -23,31 +30,8 @@ public class FileLoader {
 
         Map<String,String> map = findFilesInPaths(subFolders);
 
-        //create treemap to sort the filenames
-        Map<String,String> treemap = new TreeMap(map);
 
-        int i=0;
-
-        for (String str:treemap.keySet())
-        {
-            File file = new File(map.get(str)+"/"+str);
-
-            if (getComicPositionInList(str, newComicList)==-1) {
-                if (Utilities.checkExtension(str)) {
-                    boolean isZip = Utilities.isZipArchive(file);
-                    boolean isRar = false;
-                    if (!isZip)
-                        isRar = Utilities.isRarArchive(file);
-                    if (isRar || isZip) {
-                        Comic newComic = new Comic(str, map.get(str));
-                        newComicList.add(i, newComic);
-                        i++;
-                    }
-                }
-            }
-        }
-        
-        return newComicList;
+        return map;
 
     }
 
@@ -131,8 +115,12 @@ public class FileLoader {
         return allFoldersInPaths;
     }
 
-    public static void removeOldComics(ArrayList<String> filepaths, ArrayList<String> excludedpaths, ArrayList<Comic> comicList)
+    public static void removeOldComics(Context context, ArrayList<Comic> comicList)
     {
+
+        ArrayList<String> excludedpaths = PreferenceSetter.getExcludedPaths(context);
+        ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
+
         ArrayList<String> subFolders = searchSubFolders(filepaths, excludedpaths);
 
         Map<String,String> map = findFilesInPaths(subFolders);

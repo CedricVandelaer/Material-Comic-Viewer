@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
@@ -119,12 +120,6 @@ public class ComicListFragment extends Fragment {
 
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -198,9 +193,9 @@ public class ComicListFragment extends Fragment {
 
     private void searchComics() {
 
-        ArrayList<String> subFolders = searchSubFolders(mFilePaths);
 
-        Map<String,String> map = findFilesInPaths(subFolders);
+        Map<String,String> map = FileLoader.searchComics(getActivity());
+
 
         //create treemap to sort the filenames
         Map<String,String> treemap = new TreeMap(map);
@@ -209,7 +204,6 @@ public class ComicListFragment extends Fragment {
         mProgress = 0;
 
         updateProgressDialog(mProgress, mTotalComicCount);
-   
 
         int i=0;
         
@@ -292,7 +286,7 @@ public class ComicListFragment extends Fragment {
                 }
             }
         }
-        
+
     }
     
     private int getComicPositionInList(String filename)
@@ -305,75 +299,6 @@ public class ComicListFragment extends Fragment {
         return -1;
     }
 
-
-    private Map findFilesInPaths(ArrayList<String> pathsToSearch)
-    {
-        // list of filenames
-        ArrayList<String> files = new ArrayList<>();
-        // list of directories to search from
-        ArrayList<String> paths = new ArrayList<>();
-
-        // map to map the filenames to their directories
-        Map<String,String> map = new HashMap<>();
-
-        // search for all files in all paths
-        for (int i=0;i<pathsToSearch.size();i++)
-        {
-            String path = pathsToSearch.get(i);
-            File f = new File(path);
-            f.mkdirs();
-
-            File fileList[] = f.listFiles();
-
-            if (fileList!=null)
-            {
-                for (int j=0;j<fileList.length;j++)
-                {
-                    
-                    if (!fileList[j].isDirectory())
-                    {
-                        files.add(fileList[j].getName());
-                        paths.add(path);
-                    }
-                }
-            }
-        }
-
-        // map the filenames to their directories
-        for (int i=0;i<files.size();i++) {
-            map.put(files.get(i),paths.get(i));
-        }
-
-        return map;
-    }
-
-    private ArrayList<String> searchSubFolders(ArrayList<String> paths)
-    {
-        ArrayList<String> allFoldersInPaths = new ArrayList<>();
-
-        for (int i=0;i<paths.size();i++)
-        {
-            File root = new File(paths.get(i));
-
-            if (!mExcludedPaths.contains(paths.get(i))) {
-
-                if (root.isDirectory()) {
-
-                    allFoldersInPaths.add(paths.get(i));
-                    File[] subFiles = root.listFiles();
-                    ArrayList<String> subFolders = new ArrayList<>();
-
-                    for (int j = 0; j < subFiles.length; j++) {
-                        subFolders.add(subFiles[j].toString());
-                    }
-                    allFoldersInPaths.addAll(searchSubFolders(subFolders));
-                }
-            }
-
-        }
-
-        return allFoldersInPaths;
-    }
 
     private void updateProgressDialog(int progress, int total)
     {
@@ -403,7 +328,7 @@ public class ComicListFragment extends Fragment {
     {
         mSwipeRefreshLayout.setRefreshing(false);
         removeDoubleComics();
-        removeOldComics();
+        FileLoader.removeOldComics(getActivity(), mComicList);
         calcComicColorsAsync();        
     }
 
@@ -413,40 +338,10 @@ public class ComicListFragment extends Fragment {
         for (Object str:treemap.keySet())
         {
             count++;
-
         }
         return count;
     }
 
-    private void removeOldComics()
-    {
-        ArrayList<String> subFolders = searchSubFolders(mFilePaths);
-
-        Map<String,String> map = findFilesInPaths(subFolders);
-
-        //create treemap to sort the filenames
-        Map<String,String> treemap = new TreeMap(map);
-        
-        for (int j=0;j<mComicList.size();j++)
-        {
-            Comic comicToRemove = mComicList.get(j);
-            boolean isInList = false;
-
-            for (int k=0;k<treemap.keySet().size();k++)
-            {
-                if (treemap.containsKey(comicToRemove.getFileName()))
-                {
-                    isInList=true;
-                }
-            }
-            if (!isInList)
-            {
-                mComicList.remove(j);
-                mAdapter.notifyItemRemoved(j);
-            }
-        }
-
-    }
 
 
     private class ExtractZipTask extends AsyncTask<Object, Void, Integer>
@@ -664,41 +559,43 @@ public class ComicListFragment extends Fragment {
             int primaryTextColor;
             int secondaryTextColor;
 
-            if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                ImageSize imageSize = new ImageSize(850,500);
-                Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
-                Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
-                color = mutedSwatch.getRgb();
-                primaryTextColor = mutedSwatch.getTitleTextColor();
-                secondaryTextColor = mutedSwatch.getBodyTextColor();
+            if (isAdded()) {
+                if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
+                    ImageSize imageSize = new ImageSize(850, 500);
+                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
+                    Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
+                    color = mutedSwatch.getRgb();
+                    primaryTextColor = mutedSwatch.getTitleTextColor();
+                    secondaryTextColor = mutedSwatch.getBodyTextColor();
+                } else if (mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
+                    ImageSize imageSize = new ImageSize(850, 500);
+                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
+                    Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
+                    color = lightVibrantSwatch.getRgb();
+                    primaryTextColor = lightVibrantSwatch.getTitleTextColor();
+                    secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
+                } else if (mCardColorSetting.equals(getString(R.string.card_color_setting_3))) {
+                    color = getResources().getColor(R.color.WhiteBG);
+                    primaryTextColor = getResources().getColor(R.color.Black);
+                    secondaryTextColor = getResources().getColor(R.color.BlueGrey);
+                } else if (mCardColorSetting.equals(getString(R.string.card_color_setting_4))) {
+                    color = getResources().getColor(R.color.BlueGrey);
+                    primaryTextColor = getResources().getColor(R.color.White);
+                    secondaryTextColor = getResources().getColor(R.color.WhiteBG);
+                } else {
+                    color = getResources().getColor(R.color.Black);
+                    primaryTextColor = getResources().getColor(R.color.White);
+                    secondaryTextColor = getResources().getColor(R.color.WhiteBG);
+                }
             }
-            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                ImageSize imageSize = new ImageSize(850,500);
-                Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(),imageSize);
-                Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
-                color = lightVibrantSwatch.getRgb();
-                primaryTextColor = lightVibrantSwatch.getTitleTextColor();
-                secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
-            }
-            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_3))) {
-                color = getResources().getColor(R.color.WhiteBG);
-                primaryTextColor = getResources().getColor(R.color.Black);
-                secondaryTextColor = getResources().getColor(R.color.BlueGrey);
-            }
-            else if(mCardColorSetting.equals(getString(R.string.card_color_setting_4))) {
-                color = getResources().getColor(R.color.BlueGrey);
-                primaryTextColor = getResources().getColor(R.color.White);
-                secondaryTextColor = getResources().getColor(R.color.WhiteBG);
-            }
-            else {
-                color = getResources().getColor(R.color.Black);
-                primaryTextColor = getResources().getColor(R.color.White);
-                secondaryTextColor = getResources().getColor(R.color.WhiteBG);
+            else
+            {
+                return false;
             }
             
-            if (comic.getComicColor()!=color
+            if (isAdded() && (comic.getComicColor()!=color
                     || comic.getPrimaryTextColor()!=primaryTextColor
-                    || comic.getSecondaryTextColor()!=secondaryTextColor) {
+                    || comic.getSecondaryTextColor()!=secondaryTextColor)) {
                 comic.setComicColor(color);
                 comic.setPrimaryTextColor(primaryTextColor);
                 comic.setSecondaryTextColor(secondaryTextColor);
@@ -841,7 +738,7 @@ public class ComicListFragment extends Fragment {
         {
             if (param!=null && isAdded())
             {
-                mAdapter.notifyItemChanged(((int)param));
+                mAdapter.notifyItemChanged(((int) param));
             }
         }
     }

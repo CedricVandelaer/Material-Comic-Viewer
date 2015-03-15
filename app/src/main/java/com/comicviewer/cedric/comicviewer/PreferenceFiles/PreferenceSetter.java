@@ -62,12 +62,12 @@ public class PreferenceSetter {
         return color;
     }
 
-    public static ArrayList<String> getFilePathsFromPreferences(Activity activity) {
+    public static ArrayList<String> getFilePathsFromPreferences(Context context) {
         ArrayList<String> paths = new ArrayList<>();
 
         
         String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String csvList = prefs.getString("Filepaths", defaultPath);
         
         String[] items = csvList.split(",");
@@ -93,11 +93,11 @@ public class PreferenceSetter {
         return paths;
     }
 
-    public static ArrayList getExcludedPaths(Activity activity)
+    public static ArrayList getExcludedPaths(Context context)
     {
         ArrayList<String> paths = new ArrayList<>();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String csvList = prefs.getString("Excludedpaths", null);
 
         if (csvList!=null) {
