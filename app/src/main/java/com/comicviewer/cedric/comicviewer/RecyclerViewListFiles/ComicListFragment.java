@@ -9,6 +9,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.graphics.Palette;
@@ -149,9 +151,13 @@ public class ComicListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mComicList.clear();
-                mAdapter.notifyDataSetChanged();
-                searchComics();
+                for (int i=mComicList.size()-1;i>=0;i--)
+                {
+                    mComicList.remove(i);
+                    mAdapter.notifyItemRemoved(i);
+                }
+
+                new searchComicsTask().execute();
             }
         });
 
@@ -193,6 +199,16 @@ public class ComicListFragment extends Fragment {
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
     }
 
+    private class searchComicsTask extends AsyncTask<Void, Void, Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            searchComics();
+            return null;
+        }
+    }
+
     private void searchComics() {
 
 
@@ -229,6 +245,7 @@ public class ComicListFragment extends Fragment {
                         Comic newComic = new Comic(str, map.get(str));
                         mComicList.add(i, newComic);
                         mAdapter.notifyItemInserted(i);
+
                         if (isZip) {
                             zipsToExtract.put(i, newComic);
                         } else {
