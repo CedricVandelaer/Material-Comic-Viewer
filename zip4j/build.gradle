@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('zip4j_1.3.2.jar'))
