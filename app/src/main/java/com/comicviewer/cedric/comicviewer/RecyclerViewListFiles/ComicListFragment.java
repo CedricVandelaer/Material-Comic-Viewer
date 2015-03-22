@@ -151,16 +151,21 @@ public class ComicListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                for (int i=mComicList.size()-1;i>=0;i--)
-                {
-                    mComicList.remove(i);
-                    mAdapter.notifyItemRemoved(i);
-                }
-
-                new searchComicsTask().execute();
+                refresh();
             }
         });
 
+    }
+
+    private void refresh()
+    {
+        for (int i=mComicList.size()-1;i>=0;i--)
+        {
+            mComicList.remove(i);
+            mAdapter.notifyItemRemoved(i);
+        }
+
+        new searchComicsTask().execute();
     }
 
     private void createFab(View v) {
@@ -177,6 +182,12 @@ public class ComicListFragment extends Fragment {
                         mFilePaths.add(directory.toString());
                         if (mExcludedPaths.contains(directory.toString()))
                             mExcludedPaths.remove(directory.toString());
+                        PreferenceSetter.saveFilePaths(getActivity(),mFilePaths,mExcludedPaths);
+                        for (int i=mComicList.size()-1;i>=0;i--)
+                        {
+                            mComicList.remove(i);
+                            mAdapter.notifyItemRemoved(i);
+                        }
                         searchComics();
                     }
                 });
@@ -214,6 +225,8 @@ public class ComicListFragment extends Fragment {
 
         Map<String,String> map = FileLoader.searchComics(getActivity());
 
+        long startTime = System.currentTimeMillis();
+
         //create treemap to sort the filenames
         Map<String,String> treemap = new TreeMap(map);
 
@@ -231,7 +244,7 @@ public class ComicListFragment extends Fragment {
         for (String str:treemap.keySet())
         {
 
-            Log.d("SearchComics",str+" "+i);
+            //Log.d("SearchComics",str+" "+i);
             File file = new File(map.get(str)+"/"+str);
 
             if (getComicPositionInList(str)==-1) {
@@ -290,6 +303,10 @@ public class ComicListFragment extends Fragment {
             Integer key = (Integer) e.nextElement();
             new ExtractZipTask().execute(zipsToExtract.get(key),key);
         }
+
+        long endTime = System.currentTimeMillis();
+
+        Log.d("search comics in list", "time: "+(endTime-startTime));
 
     }
     

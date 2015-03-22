@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -21,6 +22,8 @@ import java.util.TreeMap;
 public class FileLoader {
     public static Map<String, String> searchComics(Context context) {
 
+        long startTime = System.currentTimeMillis();
+
         ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(context);
         ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
 
@@ -28,7 +31,12 @@ public class FileLoader {
 
         Map<String,String> map = findFilesInPaths(subFolders);
 
+        long endTime = System.currentTimeMillis();
+
+        Log.d("File loader", "time: "+(endTime-startTime));
+
         return map;
+
     }
 
     private static int getComicPositionInList(String filename, ArrayList<Comic> list)
