@@ -149,6 +149,8 @@ public class ComicListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mComicList.clear();
+                mAdapter.notifyDataSetChanged();
                 searchComics();
             }
         });
@@ -196,7 +198,6 @@ public class ComicListFragment extends Fragment {
 
         Map<String,String> map = FileLoader.searchComics(getActivity());
 
-
         //create treemap to sort the filenames
         Map<String,String> treemap = new TreeMap(map);
 
@@ -214,6 +215,7 @@ public class ComicListFragment extends Fragment {
         for (String str:treemap.keySet())
         {
 
+            Log.d("SearchComics",str+" "+i);
             File file = new File(map.get(str)+"/"+str);
 
             if (getComicPositionInList(str)==-1) {
@@ -246,6 +248,7 @@ public class ComicListFragment extends Fragment {
             }
             else
             {
+                i++;
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
             }

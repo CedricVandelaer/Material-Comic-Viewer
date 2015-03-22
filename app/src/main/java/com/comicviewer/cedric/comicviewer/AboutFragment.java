@@ -44,7 +44,7 @@ public class AboutFragment extends Fragment {
             ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(getActivity());
             ImageLoader.getInstance().init(config);
         }
-        ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logo_highres,logoview);
+        ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logohighres,logoview);
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.me,meview);
         
         

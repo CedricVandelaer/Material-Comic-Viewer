@@ -24,15 +24,11 @@ public class FileLoader {
         ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(context);
         ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
 
-        ArrayList<Comic> newComicList = new ArrayList<>();
-        
         ArrayList<String> subFolders = searchSubFolders(filepaths, excludedPaths);
 
         Map<String,String> map = findFilesInPaths(subFolders);
 
-
         return map;
-
     }
 
     private static int getComicPositionInList(String filename, ArrayList<Comic> list)
