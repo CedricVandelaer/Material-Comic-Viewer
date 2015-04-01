@@ -3,17 +3,13 @@ package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
@@ -33,24 +30,13 @@ import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
-import com.github.junrar.Archive;
+
 
 import com.melnykov.fab.FloatingActionButton;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
 
-import net.lingala.zip4j.core.ZipFile;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -71,7 +57,6 @@ public class ComicListFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFab;
-    private String mCardColorSetting;
     private ArrayList<String> mFilePaths;
     private boolean mUseRecents;
     private int mProgress;
@@ -122,6 +107,17 @@ public class ComicListFragment extends Fragment {
 
     }
 
+    private class SearchComicsTask extends AsyncTask{
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            searchComics();
+
+            return null;
+        }
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -151,10 +147,10 @@ public class ComicListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refresh();
+                if (!isFiltered)
+                    refresh();
             }
         });
-
     }
 
     private void refresh()
@@ -165,7 +161,7 @@ public class ComicListFragment extends Fragment {
             mAdapter.notifyItemRemoved(i);
         }
 
-        new searchComicsTask().execute();
+        new SearchComicsTask().execute();
     }
 
     private void createFab(View v) {
@@ -179,16 +175,12 @@ public class ComicListFragment extends Fragment {
                 dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
                     public void directorySelected(File directory) {
                         Log.d(getClass().getName(), "selected dir " + directory.toString());
-                        mFilePaths.add(directory.toString());
+                        if (!mFilePaths.contains(directory.toString()))
+                            mFilePaths.add(directory.toString());
                         if (mExcludedPaths.contains(directory.toString()))
                             mExcludedPaths.remove(directory.toString());
                         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths,mExcludedPaths);
-                        for (int i=mComicList.size()-1;i>=0;i--)
-                        {
-                            mComicList.remove(i);
-                            mAdapter.notifyItemRemoved(i);
-                        }
-                        searchComics();
+                        refresh();
                     }
                 });
                 dialog.setSelectDirectoryOption(true);
@@ -201,7 +193,6 @@ public class ComicListFragment extends Fragment {
     private void setPreferences() {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mCardColorSetting = prefs.getString("cardColor", getString(R.string.card_color_setting_1));
 
         PreferenceSetter.setBackgroundColorPreference(getActivity());
 
@@ -210,18 +201,8 @@ public class ComicListFragment extends Fragment {
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
     }
 
-    private class searchComicsTask extends AsyncTask<Void, Void, Void>
-    {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            searchComics();
-            return null;
-        }
-    }
 
     private void searchComics() {
-
 
         Map<String,String> map = FileLoader.searchComics(getActivity());
 
@@ -230,100 +211,62 @@ public class ComicListFragment extends Fragment {
         //create treemap to sort the filenames
         Map<String,String> treemap = new TreeMap(map);
 
-        mTotalComicCount = countComics(treemap);
+        mTotalComicCount = treemap.size();
         mProgress = 0;
 
         updateProgressDialog(mProgress, mTotalComicCount);
 
-        int i=0;
-        
-        // create array for the zips to extract after the rars
-        Hashtable<Integer, Comic> rarsToExtract = new Hashtable<>();
-        Hashtable<Integer, Comic> zipsToExtract = new Hashtable<>();
-
         for (String str:treemap.keySet())
         {
-
-            //Log.d("SearchComics",str+" "+i);
             File file = new File(map.get(str)+"/"+str);
 
-            if (getComicPositionInList(str)==-1) {
-                if (Utilities.checkExtension(str)) {
-                    boolean isZip = Utilities.isZipArchive(file);
-                    boolean isRar = false;
-                    if (!isZip)
-                        isRar = Utilities.isRarArchive(file);
+            if (getComicPositionInList(str)==-1
+                    && Utilities.checkExtension(str)
+                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
 
-                    if (isRar || isZip) {
-                        Comic newComic = new Comic(str, map.get(str));
-                        mComicList.add(i, newComic);
-                        mAdapter.notifyItemInserted(i);
-
-                        if (isZip) {
-                            zipsToExtract.put(i, newComic);
-                        } else {
-                            rarsToExtract.put(i, newComic);
-                        }
-                        i++;
-                    } else {
-                        mProgress++;
-                        updateProgressDialog(mProgress, mTotalComicCount);
-                    }
-                }
-                else
-                {
-                    mProgress++;
-                    updateProgressDialog(mProgress, mTotalComicCount);
-                }
+                Comic newComic = new Comic(str, map.get(str));
+                new LoadComicTask().execute(newComic);
             }
             else
             {
-                i++;
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
 
-
-        // extract found rars
-        Enumeration e = rarsToExtract.keys();
-
-        while (e.hasMoreElements())
-        {
-            Integer key = (Integer) e.nextElement();
-            new ExtractRarTask().execute(rarsToExtract.get(key),key);
-        }
-        
-        
-        // extract found zips
-        e = zipsToExtract.keys();
-
-        while (e.hasMoreElements())
-        {
-            Integer key = (Integer) e.nextElement();
-            new ExtractZipTask().execute(zipsToExtract.get(key),key);
-        }
-
         long endTime = System.currentTimeMillis();
 
         Log.d("search comics in list", "time: "+(endTime-startTime));
-
     }
-    
-    private void removeDoubleComics()
+
+    private class LoadComicTask extends AsyncTask
     {
-        for (int i=0;i<mComicList.size();i++)
-        {
-            for (int j=i+1;j<mComicList.size()-1;j++)
-            {
-                if (mComicList.get(i).getFileName().equals(mComicList.get(j).getFileName()))
-                {
-                    mComicList.remove(j);
-                    mAdapter.notifyItemRemoved(j);
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            Comic comic =(Comic) params[0];
+
+            ComicLoader.loadComicSync( getActivity(), comic);
+
+            mComicList.add(comic);
+
+            mRecyclerView.post(new Runnable() {
+                @Override
+                public void run() {
+                    mAdapter.notifyItemInserted(mComicList.size());
                 }
-            }
+            });
+
+            return null;
         }
 
+        @Override
+        protected void onPostExecute(Object params)
+        {
+            mProgress++;
+            updateProgressDialog(mProgress, mTotalComicCount);
+        }
     }
     
     private int getComicPositionInList(String filename)
@@ -336,24 +279,16 @@ public class ComicListFragment extends Fragment {
         return -1;
     }
 
-
     private void updateProgressDialog(int progress, int total)
     {
         if (mProgress==0)
         {
-            if (mFirstLoad) {
-                mSwipeRefreshLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mSwipeRefreshLayout.setRefreshing(true);
-                    }
-                });
-                mFirstLoad = false;
-            }
-            else
-            {
-                mSwipeRefreshLayout.setRefreshing(true);
-            }
+            mSwipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            });
         }
         
         if (progress>=total) {
@@ -363,291 +298,13 @@ public class ComicListFragment extends Fragment {
     
     private void onLoadingFinished()
     {
-        mSwipeRefreshLayout.setRefreshing(false);
-        removeDoubleComics();
-        FileLoader.removeOldComics(getActivity(), mComicList);
-        calcComicColorsAsync();        
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
-
-    private int countComics(Map treemap)
-    {
-        int count = 0;
-        for (Object str:treemap.keySet())
-        {
-            count++;
-        }
-        return count;
-    }
-
-
-
-    private class ExtractZipTask extends AsyncTask<Object, Void, Integer>
-    {
-        @Override
-        protected Integer doInBackground(Object... comicVar) {
-
-            Comic newComic= (Comic)comicVar[0];
-            int itemPosition = (Integer) comicVar[1];
-            String archivefilename = newComic.getFileName();
-            String path = newComic.getFilePath();
-            String extractedImageFile = null;
-            int pageCount = 0;
-            boolean isAlreadyExtracted = false;
-
-            ArrayList<net.lingala.zip4j.model.FileHeader> pages = new ArrayList<net.lingala.zip4j.model.FileHeader>();
-
-            try {
-                ZipFile zipFile = new ZipFile(path + "/" + archivefilename);
-                List<net.lingala.zip4j.model.FileHeader> fileheaders = zipFile.getFileHeaders();
-
-                // search for comic pages in the archive
-                for (int j = 0; j < fileheaders.size(); j++) {
-
-                    if (Utilities.isPicture(fileheaders.get(j).getFileName())) {
-                        if (!fileheaders.get(j).isDirectory()) {
-                            pages.add(fileheaders.get(j));
-                            pageCount++;
-                        }
-                    }
-                }
-                
-                // sort the pages
-                Collections.sort(pages, new Comparator<net.lingala.zip4j.model.FileHeader>() {
-                    @Override
-                    public int compare(net.lingala.zip4j.model.FileHeader lhs, net.lingala.zip4j.model.FileHeader rhs) {
-                        int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getFileName(), rhs.getFileName());
-                        if (res == 0) {
-                            res = lhs.getFileName().compareTo(rhs.getFileName());
-                        }
-                        return res;
-                    }
-                });
-
-                // the outputfilename
-                if (pages.size()>0)
-                    extractedImageFile = pages.get(0).getFileName().substring(pages.get(0).getFileName().lastIndexOf("\\") + 1);
-                
-                // get rid of special chars causing problems
-                if (extractedImageFile!=null && extractedImageFile.contains("#"))
-                    extractedImageFile = extractedImageFile.replaceAll("#","");
-
-                // the output file
-                File output = new File(getActivity().getFilesDir(), extractedImageFile);
-
-                // if file!=extracted -> extract
-                if (!(isAlreadyExtracted=output.exists())) {
-                    if (pages.size()>0)
-                        zipFile.extractFile(pages.get(0), getActivity().getFilesDir().getAbsolutePath());
-                    else
-                        return null;
-                }
-
-                String coverImage = "file:///" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
-
-                if (newComic.getCoverImage()==null) {
-                    newComic.setCoverImage(coverImage);
-                    newComic.setPageCount(pageCount);
-                }
-                else
-                {
-                    return null;
-                }
-
-                return itemPosition;
-                
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Integer itempos) {
-            super.onPostExecute(itempos);
-            
-            if (isAdded()) {
-                if (itempos != null) {
-                    mAdapter.notifyItemChanged(itempos);
-                }
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-            }
-        }
-    }
-
-    public class ExtractRarTask extends AsyncTask<Object, Void, Integer>
-    {
-        @Override
-        protected Integer doInBackground(Object... comicVar) {
-
-            Comic newComic= (Comic)comicVar[0];
-            int itemPosition = (Integer) comicVar[1];
-            String filename = newComic.getFileName();
-            ArrayList<com.github.junrar.rarfile.FileHeader> pages= new ArrayList<com.github.junrar.rarfile.FileHeader>();
-            boolean isAlreadyExtracted=false;
-
-            String path = newComic.getFilePath()+ "/" + filename;
-
-            File comic = new File(path);
-
-            try {
-                Archive arch = new Archive(comic);
-                List<com.github.junrar.rarfile.FileHeader> fileheaders = arch.getFileHeaders();
-                String extractedImageFile = null;
-
-                int pageCount = 0;
-
-                // search for comic pages in the archive
-                for (int j = 0; j < fileheaders.size(); j++) {
-
-                    if (Utilities.isPicture(fileheaders.get(j).getFileNameString())) {
-                        if (!fileheaders.get(j).isDirectory()) {
-                            pages.add(fileheaders.get(j));
-                            pageCount++;
-                        }
-                    }
-                }
-
-                // sort the pages
-                Collections.sort(pages, new Comparator<com.github.junrar.rarfile.FileHeader>() {
-                    @Override
-                    public int compare(com.github.junrar.rarfile.FileHeader lhs, com.github.junrar.rarfile.FileHeader rhs) {
-                        int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getFileNameString(), rhs.getFileNameString());
-                        if (res == 0) {
-                            res = lhs.getFileNameString().compareTo(rhs.getFileNameString());
-                        }
-                        return res;
-                    }
-                });
-
-                // the outputfilename
-                if (pages.size()>0)
-                    extractedImageFile = pages.get(0).getFileNameString().substring(pages.get(0).getFileNameString().lastIndexOf("\\") + 1);
-
-                // get rid of special chars causing problems
-                if (extractedImageFile!=null && extractedImageFile.contains("#"))
-                    extractedImageFile = extractedImageFile.replaceAll("#","");
-
-                // the output file
-                File output = new File(getActivity().getFilesDir(), extractedImageFile);
-
-                // if file!=extracted -> extract
-                if (!(isAlreadyExtracted=output.exists())) {
-                    FileOutputStream os = new FileOutputStream(output);
-                    if (pages.size()>0)
-                        arch.extractFile(pages.get(0), os);
-                    else 
-                        return null;
-                }
-
-                String coverImage = "file:///" + getActivity().getFilesDir().toString() + "/" + extractedImageFile;
-
-                if (newComic.getCoverImage()==null) {
-                    newComic.setCoverImage(coverImage);
-                    newComic.setPageCount(pageCount);
-
-                }
-                else
-                {
-                    return null;
-                }
-
-                return itemPosition;
-
-            } catch (Exception e) {
-                Log.d("ExtractRarTask",e.getMessage());
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Integer itempos) {
-            super.onPostExecute(itempos);
-
-            if (isAdded()) {
-                if (itempos != null) {
-                    mAdapter.notifyItemChanged(itempos);
-                }
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-            }
-        }
-    }
-
-
-    /**
-     * Function to change the colortheme of a comic* 
-     * @param comic the comic for which the color should be calculated
-     * @return true if the color has changed, false if otherwise
-     */
-    private boolean setComicColor(Comic comic)
-    {
-        if (!ImageLoader.getInstance().isInited()) {
-            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
-            ImageLoader.getInstance().init(config);
-        }
-        
-        try {
-            int color;
-            int primaryTextColor;
-            int secondaryTextColor;
-
-            if (isAdded()) {
-                if (mCardColorSetting.equals(getString(R.string.card_color_setting_1))) {
-                    ImageSize imageSize = new ImageSize(850, 500);
-                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
-                    Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
-                    color = mutedSwatch.getRgb();
-                    primaryTextColor = mutedSwatch.getTitleTextColor();
-                    secondaryTextColor = mutedSwatch.getBodyTextColor();
-                } else if (mCardColorSetting.equals(getString(R.string.card_color_setting_2))) {
-                    ImageSize imageSize = new ImageSize(850, 500);
-                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
-                    Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
-                    color = lightVibrantSwatch.getRgb();
-                    primaryTextColor = lightVibrantSwatch.getTitleTextColor();
-                    secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
-                } else if (mCardColorSetting.equals(getString(R.string.card_color_setting_3))) {
-                    color = getResources().getColor(R.color.WhiteBG);
-                    primaryTextColor = getResources().getColor(R.color.Black);
-                    secondaryTextColor = getResources().getColor(R.color.BlueGrey);
-                } else if (mCardColorSetting.equals(getString(R.string.card_color_setting_4))) {
-                    color = getResources().getColor(R.color.BlueGrey);
-                    primaryTextColor = getResources().getColor(R.color.White);
-                    secondaryTextColor = getResources().getColor(R.color.WhiteBG);
-                } else {
-                    color = getResources().getColor(R.color.Black);
-                    primaryTextColor = getResources().getColor(R.color.White);
-                    secondaryTextColor = getResources().getColor(R.color.WhiteBG);
-                }
-            }
-            else
-            {
-                return false;
-            }
-            
-            if (isAdded() && (comic.getComicColor()!=color
-                    || comic.getPrimaryTextColor()!=primaryTextColor
-                    || comic.getSecondaryTextColor()!=secondaryTextColor)) {
-                comic.setComicColor(color);
-                comic.setPrimaryTextColor(primaryTextColor);
-                comic.setSecondaryTextColor(secondaryTextColor);
-            }
-            else
-            {
-                return false;
-            }
-        } catch (Exception e) {
-            Log.e("Palette", e.getMessage());
-        }
-        
-        return true;
-    }
-
 
     @Override
     public void onSaveInstanceState(Bundle savedState)
@@ -671,7 +328,6 @@ public class ComicListFragment extends Fragment {
     }
 
 
-
     @Override
     public void onPause()
     {
@@ -693,13 +349,14 @@ public class ComicListFragment extends Fragment {
     {
         super.onResume();
         setPreferences();
-        searchComics();
         addOnRecyclerViewClickListener();
     
         enableSearchBar(true);
 
         if (isFiltered)
             filterList("");
+
+        new SearchComicsTask().execute();
     }
     
     private void enableSearchBar(boolean enabled)
@@ -747,36 +404,6 @@ public class ComicListFragment extends Fragment {
         {
             Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             toolbar.removeView(mSearchView);
-        }
-    }
-
-    private void calcComicColorsAsync() {
-        for (int i=0;i<mComicList.size();i++)
-        {
-            new SetColorTask().execute(mComicList.get(i),i);
-        }
-    }
-
-    private class SetColorTask extends AsyncTask<Object,Void,Object>
-    {
-        @Override
-        protected Object doInBackground(Object... params) {
-
-            Comic comic = (Comic)params[0];
-            int i = (Integer)params[1];
-            
-            if (setComicColor(comic))
-                return i;
-            else
-                return null;
-        }
-        @Override
-        protected void onPostExecute(Object param)
-        {
-            if (param!=null && isAdded())
-            {
-                mAdapter.notifyItemChanged(((int) param));
-            }
         }
     }
 
@@ -878,7 +505,7 @@ public class ComicListFragment extends Fragment {
     
     private void filterList(String query)
     {
-        if (query!="") {
+        if (!query.equals("")) {
             isFiltered = true;
             
             filteredList = new ArrayList<>();
@@ -886,7 +513,6 @@ public class ComicListFragment extends Fragment {
             for (int i = 0; i < mComicList.size(); i++) {
                 
                 boolean found = false;
-                
 
                 if (mComicList.get(i).getFileName().toLowerCase().contains(query.toLowerCase())) {
                     found = true;
