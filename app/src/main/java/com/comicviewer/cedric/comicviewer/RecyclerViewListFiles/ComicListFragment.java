@@ -31,9 +31,7 @@ import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
 
-
 import com.melnykov.fab.FloatingActionButton;
-
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,7 +60,6 @@ public class ComicListFragment extends Fragment {
     private int mProgress;
     private int mTotalComicCount;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private boolean mFirstLoad;
     private ArrayList<String> mExcludedPaths;
     private SearchView mSearchView;
     private ArrayList<Comic> filteredList;
@@ -90,9 +87,8 @@ public class ComicListFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
 
-        mFirstLoad = true;
         isFiltered = false;
-        
+
         PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
         createRecyclerView(v);
@@ -101,7 +97,7 @@ public class ComicListFragment extends Fragment {
         initialiseAdapter(savedInstanceState);
 
         initialiseRefresh(v);
-        
+
         // Inflate the layout for this fragment
         return v;
 
@@ -268,7 +264,7 @@ public class ComicListFragment extends Fragment {
             updateProgressDialog(mProgress, mTotalComicCount);
         }
     }
-    
+
     private int getComicPositionInList(String filename)
     {
         for (int pos=0;pos<mComicList.size();pos++)
@@ -290,12 +286,12 @@ public class ComicListFragment extends Fragment {
                 }
             });
         }
-        
+
         if (progress>=total) {
             onLoadingFinished();
         }
     }
-    
+
     private void onLoadingFinished()
     {
         mSwipeRefreshLayout.post(new Runnable() {
@@ -323,10 +319,8 @@ public class ComicListFragment extends Fragment {
         }
 
         savedState.putString("Filepaths",csvList.toString());
-        
-        savedState.putBoolean("Loaded",mFirstLoad);
-    }
 
+    }
 
     @Override
     public void onPause()
@@ -349,8 +343,7 @@ public class ComicListFragment extends Fragment {
     {
         super.onResume();
         setPreferences();
-        addOnRecyclerViewClickListener();
-    
+
         enableSearchBar(true);
 
         if (isFiltered)
@@ -358,14 +351,14 @@ public class ComicListFragment extends Fragment {
 
         new SearchComicsTask().execute();
     }
-    
+
     private void enableSearchBar(boolean enabled)
     {
         if (enabled) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             mSearchView = new SearchView(getActivity());
-            
-            
+
+
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
 
             mSearchView.setOnSearchClickListener(new View.OnClickListener() {
@@ -373,7 +366,7 @@ public class ComicListFragment extends Fragment {
                 public void onClick(View v) {
                 }
             });
-            
+
             mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
                 @Override
                 public boolean onClose() {
@@ -381,7 +374,7 @@ public class ComicListFragment extends Fragment {
                     return false;
                 }
             });
-            
+
             mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -391,13 +384,13 @@ public class ComicListFragment extends Fragment {
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    
+
                     filterList(newText);
                     return false;
                 }
             });
-            
-            
+
+
             toolbar.addView(mSearchView, layoutParamsCollapsed);
         }
         else
@@ -424,7 +417,7 @@ public class ComicListFragment extends Fragment {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(120));
         mRecyclerView.setItemAnimator(new SlideInOutLeftItemAnimator(mRecyclerView));
 
-
+        addOnRecyclerViewClickListener();
     }
 
     private void addOnRecyclerViewClickListener()
@@ -434,34 +427,24 @@ public class ComicListFragment extends Fragment {
             public void onItemClick(View view, int position) {
 
                 if (!mSwipeRefreshLayout.isRefreshing()) {
-                    
-                    if (!isFiltered) {
-                        if (position < mComicList.size()) {
-                            Log.d("ItemClick", mComicList.get(position).getTitle());
-                            Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
-                            intent.putExtra("Comic", mComicList.get(position));
+                    Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
 
-                            if (mUseRecents) {
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                            }
-                            startActivity(intent);
-                        }
+                    if (!isFiltered)
+                    {
+                        Log.d("ItemClick", mComicList.get(position).getTitle());
+                        intent.putExtra("Comic", mComicList.get(position));
                     }
                     else
                     {
-                        if (position < filteredList.size()) {
-                            Log.d("ItemClick", filteredList.get(position).getTitle());
-                            Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
-                            intent.putExtra("Comic", filteredList.get(position));
-
-                            if (mUseRecents) {
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                            }
-                            startActivity(intent);
-                        }
+                        Log.d("ItemClick", filteredList.get(position).getTitle());
+                        intent.putExtra("Comic", filteredList.get(position));
                     }
+                    if (mUseRecents)
+                    {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                    }
+                    startActivity(intent);
                 }
                 else
                 {
@@ -497,21 +480,18 @@ public class ComicListFragment extends Fragment {
                 mAdapter = new ComicAdapter(getActivity(), mComicList);
                 mRecyclerView.setAdapter(mAdapter);
             }
-            
-            mFirstLoad = savedInstanceState.getBoolean("Loaded");
-
         }
     }
-    
+
     private void filterList(String query)
     {
         if (!query.equals("")) {
             isFiltered = true;
-            
+
             filteredList = new ArrayList<>();
-            
+
             for (int i = 0; i < mComicList.size(); i++) {
-                
+
                 boolean found = false;
 
                 if (mComicList.get(i).getFileName().toLowerCase().contains(query.toLowerCase())) {
@@ -532,7 +512,7 @@ public class ComicListFragment extends Fragment {
             mRecyclerView.setAdapter(mAdapter);
             isFiltered = false;
         }
-        
+
     }
 
 }

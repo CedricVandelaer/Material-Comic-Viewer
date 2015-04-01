@@ -21,6 +21,8 @@ import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.devspark.robototextview.widget.RobotoTextView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
@@ -49,6 +51,8 @@ public class DisplayComicActivity extends FragmentActivity {
     private RobotoTextView mPageIndicator;
 
     private boolean mShowPageNumbers;
+
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +87,8 @@ public class DisplayComicActivity extends FragmentActivity {
             lastReadPage = PreferenceSetter.getLastReadPagenumber(this);
             mPager.setCurrentItem(lastReadPage);            
         }
-        
-        
+
+        mAdView = (AdView) findViewById(R.id.adView);
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
@@ -104,6 +108,18 @@ public class DisplayComicActivity extends FragmentActivity {
 
         @Override
         public void onPageSelected(int position) {
+
+            if (position%4 == 0) {
+                AdRequest adRequest = new AdRequest.Builder().build();
+                mAdView.loadAd(adRequest);
+                mAdView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                mAdView.destroy();
+                mAdView.setVisibility(View.GONE);
+            }
+
             if (mShowPageNumbers)
                 mPageIndicator.setText("" + (position+1)+" of "+ mPageCount);
             else
