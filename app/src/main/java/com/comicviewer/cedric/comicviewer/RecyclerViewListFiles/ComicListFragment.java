@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -32,6 +33,7 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
 
 import com.melnykov.fab.FloatingActionButton;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,6 +66,15 @@ public class ComicListFragment extends Fragment {
     private SearchView mSearchView;
     private ArrayList<Comic> filteredList;
     private boolean isFiltered;
+    private static ComicListFragment mSingleton = null;
+    private Context mApplicationContext;
+
+    public static ComicListFragment getInstance() {
+        if(mSingleton == null) {
+            mSingleton = newInstance();
+        }
+        return mSingleton;
+    }
 
     public static ComicListFragment newInstance() {
         ComicListFragment fragment = new ComicListFragment();
@@ -94,13 +105,20 @@ public class ComicListFragment extends Fragment {
         createRecyclerView(v);
         createFab(v);
 
-        initialiseAdapter(savedInstanceState);
-
         initialiseRefresh(v);
+
+        initialiseAdapter(savedInstanceState);
 
         // Inflate the layout for this fragment
         return v;
 
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        mApplicationContext = getActivity().getApplicationContext();
     }
 
     private class SearchComicsTask extends AsyncTask{
@@ -195,6 +213,11 @@ public class ComicListFragment extends Fragment {
         mUseRecents = prefs.getBoolean("useRecents",true);
 
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+
+        if (prefs.getString("cardSize", "Normal cards").equals(getString(R.string.card_size_setting_3)))
+        {
+            mRecyclerView.setItemViewCacheSize(10);
+        }
     }
 
 
@@ -243,7 +266,7 @@ public class ComicListFragment extends Fragment {
 
             Comic comic =(Comic) params[0];
 
-            ComicLoader.loadComicSync( getActivity(), comic);
+            ComicLoader.loadComicSync( mApplicationContext, comic);
 
             mComicList.add(comic);
 
@@ -320,6 +343,7 @@ public class ComicListFragment extends Fragment {
 
         savedState.putString("Filepaths",csvList.toString());
 
+        savedState.putBoolean("isRefreshing", mSwipeRefreshLayout.isRefreshing());
     }
 
     @Override
@@ -411,11 +435,16 @@ public class ComicListFragment extends Fragment {
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(getActivity());
 
-
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(120));
         mRecyclerView.setItemAnimator(new SlideInOutLeftItemAnimator(mRecyclerView));
+
+        PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
+
+        mRecyclerView.setOnScrollListener(scrollListener);
+
+
 
         addOnRecyclerViewClickListener();
     }
@@ -472,6 +501,15 @@ public class ComicListFragment extends Fragment {
         else
         {
             mComicList = new ArrayList<>();
+
+            final boolean isRefreshing = savedInstanceState.getBoolean("isRefreshing", false);
+
+            mSwipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(isRefreshing);
+                }
+            });
 
             for (int i=0;i<savedInstanceState.size();i++)
             {

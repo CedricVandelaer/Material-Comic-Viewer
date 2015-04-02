@@ -26,21 +26,22 @@ AboutFragment.OnFragmentInteractionListener{
         this.disableLearningPattern();
         this.setBackPattern(BACKPATTERN_BACK_TO_FIRST);
         this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
+        enableToolbarElevation();
 
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
             ImageLoader.getInstance().init(config);
         }
-        
+
         this.setDrawerHeaderImage(ImageLoader.getInstance().loadImageSync("drawable://"+R.drawable.tealtrainglebg));
         
-        MaterialSection allComicsSection = newSection("All comics", ComicListFragment.newInstance());
+        MaterialSection allComicsSection = newSection("All comics", R.drawable.book, ComicListFragment.getInstance());
         addSection(allComicsSection);
 
-        MaterialSection settingsSection = newSection("Settings", SettingsFragment.newInstance());    
+        MaterialSection settingsSection = newSection("Settings", R.drawable.settings, SettingsFragment.newInstance());
         addBottomSection(settingsSection);
         
-        MaterialSection aboutSection = newSection("About", AboutFragment.newInstance());
+        MaterialSection aboutSection = newSection("About", R.drawable.about, AboutFragment.newInstance());
         addBottomSection(aboutSection);
 
     }

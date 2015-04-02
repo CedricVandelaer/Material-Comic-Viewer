@@ -2,7 +2,11 @@ package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +17,10 @@ import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.util.ArrayList;
 
@@ -28,11 +34,18 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     private Context mContext;
     private LayoutInflater mInflater;
     private int lastPosition=-1;
+    private DisplayImageOptions mImageOptions;
 
     public ComicAdapter(Context context, ArrayList<Comic> comics)
     {
         mComicList=comics;
         mContext=context;
+        mImageOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
+                .considerExifParams(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
 
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -102,12 +115,18 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     {
         comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle()+" "+mComicList.get(i).getIssueNumber());
 
+        int color = mComicList.get(i).getComicColor();
+        int transparentColor = Color.argb(235,
+                Color.red(color),
+                Color.green(color),
+                Color.blue(color));
+        comicItemViewHolder.mTitle.setBackgroundColor(transparentColor);
+        comicItemViewHolder.mTitle.setTextColor(mComicList.get(i).getPrimaryTextColor());
+
         comicItemViewHolder.mCoverPicture.setImageBitmap(null);
         
         if (mComicList.get(i).getCoverImage()!=null)
         {
-            
-
             if (mComicList.get(i).getComicColor()!=-1)
             {
                 comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).getComicColor());
@@ -116,7 +135,10 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                 ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
                 ImageLoader.getInstance().init(config);
             }
-            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture);
+
+
+
+            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(), comicItemViewHolder.mCoverPicture, mImageOptions);
         }
 
         String lastRead = PreferenceSetter.getLastReadFilename(mContext);
@@ -210,7 +232,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         }
         else
         {
-            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture);
+            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture, mImageOptions);
 
         }
         

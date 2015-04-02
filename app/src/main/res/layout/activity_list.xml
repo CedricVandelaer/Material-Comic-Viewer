@@ -1,4 +1,4 @@
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
@@ -9,6 +9,7 @@
     <!-- A RecyclerView with some commonly used attributes -->
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
+        android:layout_gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -36,4 +37,4 @@
         fab:fab_colorPressed="@color/TealDark"
         fab:fab_colorRipple="@color/TealLight" />
 
-</RelativeLayout>
+</LinearLayout>
