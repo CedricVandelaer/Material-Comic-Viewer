@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -49,7 +50,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
-    
+
     @Override
     public int getItemViewType(int position)
     {
@@ -73,7 +74,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     @Override
     public ComicItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View v;
-        
+
         if (viewType == 0) {
             v = mInflater.inflate(R.layout.comic_card, null);
         }
@@ -110,7 +111,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         }
 
     }
-    
+
     private void initialiseCardBg(final ComicItemViewHolder comicItemViewHolder, int i)
     {
         comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle()+" "+mComicList.get(i).getIssueNumber());
@@ -124,7 +125,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         comicItemViewHolder.mTitle.setTextColor(mComicList.get(i).getPrimaryTextColor());
 
         comicItemViewHolder.mCoverPicture.setImageBitmap(null);
-        
+
         if (mComicList.get(i).getCoverImage()!=null)
         {
             if (mComicList.get(i).getComicColor()!=-1)
@@ -144,6 +145,11 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         if (PreferenceSetter.getReadComics(mContext).containsKey(mComicList.get(i).getFileName()))
         {
             comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
+            Drawable circle = mContext.getDrawable(R.drawable.dark_circle);
+            circle.setAlpha(255);
+            circle.setTintMode(PorterDuff.Mode.SRC);
+            circle.setTint(mComicList.get(i).getComicColor());
+            comicItemViewHolder.mLastReadIcon.setBackground(circle);
 
             if (PreferenceSetter.getReadComics(mContext).get(mComicList.get(i).getFileName())+1==mComicList.get(i).getPageCount())
             {
@@ -157,16 +163,17 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         else
         {
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
+            comicItemViewHolder.mLastReadIcon.setBackground(null);
         }
-        
+
     }
-    
+
     private void initialiseNormalCard(final ComicItemViewHolder comicItemViewHolder, int i)
     {
         comicItemViewHolder.mTitle.setText(mComicList.get(i).getTitle());
-        
+
         comicItemViewHolder.mCoverPicture.setImageBitmap(null);
-        
+
         if (mComicList.get(i).getIssueNumber()!=-1)
             comicItemViewHolder.mIssueNumber.setText("Issue number: "+mComicList.get(i).getIssueNumber());
         else
@@ -200,7 +207,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         if (PreferenceSetter.getReadComics(mContext).containsKey((mComicList.get(i).getFileName())))
         {
             comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
-
+            comicItemViewHolder.mLastReadIcon.setBackground(mContext.getDrawable(R.drawable.dark_circle));
             if (PreferenceSetter.getReadComics(mContext).get((mComicList.get(i).getFileName()))+1==mComicList.get(i).getPageCount())
             {
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check_black_48dp,comicItemViewHolder.mLastReadIcon);
@@ -214,13 +221,14 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         else
         {
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
+            comicItemViewHolder.mLastReadIcon.setBackground(null);
         }
 
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
             ImageLoader.getInstance().init(config);
         }
-        
+
         if (mComicList.get(i).getCoverImage()==null)
         {
             ImageLoader.getInstance().displayImage("drawable://"+R.drawable.comicplaceholder,comicItemViewHolder.mCoverPicture);
@@ -230,7 +238,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture, mImageOptions);
 
         }
-        
+
     }
 
     private void initialiseSmallCard(final ComicItemViewHolder comicItemViewHolder, int i)
@@ -256,6 +264,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         if (PreferenceSetter.getReadComics(mContext).containsKey((mComicList.get(i).getFileName())))
         {
             comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
+            comicItemViewHolder.mLastReadIcon.setBackground(mContext.getDrawable(R.drawable.dark_circle));
 
             if (PreferenceSetter.getReadComics(mContext).get((mComicList.get(i).getFileName()))+1==mComicList.get(i).getPageCount())
             {
@@ -270,6 +279,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         else
         {
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
+            comicItemViewHolder.mLastReadIcon.setBackground(null);
         }
 
         if (mComicList.get(i).getComicColor()!=-1)
@@ -290,7 +300,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         String scrollAnimPref = prefs.getString("scrollAnimation", mContext.getString(R.string.scroll_animation_setting_2));
-        
+
         if (scrollAnimPref.equals(mContext.getString(R.string.scroll_animation_setting_1)))
         {
             //No animation
