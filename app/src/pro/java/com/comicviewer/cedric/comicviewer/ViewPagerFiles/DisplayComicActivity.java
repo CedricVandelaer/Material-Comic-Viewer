@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.ComicListFragment;
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -81,10 +83,9 @@ public class DisplayComicActivity extends FragmentActivity {
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         
-        if (PreferenceSetter.getLastReadFilename(this)!=null && 
-                PreferenceSetter.getLastReadFilename(this).equals(mCurrentComic.getFileName()))
+        if (PreferenceSetter.getReadComics(this).containsKey(mCurrentComic.getFileName()))
         {
-            lastReadPage = PreferenceSetter.getLastReadPagenumber(this);
+            lastReadPage = PreferenceSetter.getReadComics(this).get(mCurrentComic.getFileName());
             mPager.setCurrentItem(lastReadPage);            
         }
 
@@ -97,6 +98,9 @@ public class DisplayComicActivity extends FragmentActivity {
             new SetTaskDescriptionTask().execute();
         }
 
+        intent.putExtra("comicName", mCurrentComic.getFileName());
+
+        setResult(Activity.RESULT_OK, intent);
 
     }
 
@@ -221,9 +225,10 @@ public class DisplayComicActivity extends FragmentActivity {
     public void onStop()
     {
         super.onStop();
-        PreferenceSetter.setLastRead(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
-        removeExtractedFiles();
+
     }
+
+
 
     private void removeExtractedFiles() {
         
@@ -250,6 +255,8 @@ public class DisplayComicActivity extends FragmentActivity {
     @Override
     public void onBackPressed()
     {
+        PreferenceSetter.saveLastReadComic(this, mCurrentComic.getFileName(), mPager.getCurrentItem());
+        removeExtractedFiles();
         finishAfterTransition();
     }
 

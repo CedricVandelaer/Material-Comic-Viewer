@@ -10,12 +10,58 @@ import android.view.View;
 import com.comicviewer.cedric.comicviewer.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Cédric on 8/02/2015.
  * Helper class for some preferences*
  */
 public class PreferenceSetter {
+
+    public static void saveLastReadComic(Context context, String comicName, int pageNumber)
+    {
+        Map<String, Integer> lastReadMap = getReadComics(context);
+
+        lastReadMap.put(comicName, pageNumber);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        StringBuilder csvList = new StringBuilder();
+
+        for (String key:lastReadMap.keySet())
+        {
+            csvList.append(key+":"+lastReadMap.get(key)+",");
+        }
+
+        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
+        sharedPreferencesEditor.putString("lastReadComicList", csvList.toString());
+
+        sharedPreferencesEditor.apply();
+
+    }
+
+    public static Map<String, Integer> getReadComics(Context context)
+    {
+        Map<String, Integer> lastReadMap = new HashMap<String, Integer>();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        //List of format "comicname:comicpage,comicname:comicpage,..."
+        String lastReadComics = prefs.getString("lastReadComicList", "");
+
+        String[] lastReadPairs = lastReadComics.split(",");
+
+        for (String pair:lastReadPairs)
+        {
+            if (!pair.isEmpty()) {
+                int splitPosition = pair.lastIndexOf(":");
+                lastReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
+            }
+        }
+
+        return lastReadMap;
+    }
+
 
     public static void setBackgroundColorPreference(Activity activity)
     {
@@ -32,31 +78,31 @@ public class PreferenceSetter {
         
     }
 
-    public static int getBackgroundColorPreference(Activity activity)
+    public static int getBackgroundColorPreference(Context context)
     {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        String bgcolor = prefs.getString("backgroundColor", activity.getString(R.string.backgroundcolor_setting2));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String bgcolor = prefs.getString("backgroundColor", context.getString(R.string.backgroundcolor_setting2));
         int color;
         
-        if (bgcolor.equals(activity.getString(R.string.backgroundcolor_setting1)))
+        if (bgcolor.equals(context.getString(R.string.backgroundcolor_setting1)))
         {
-            color = activity.getResources().getColor(R.color.BlueGrey);
+            color = context.getResources().getColor(R.color.BlueGrey);
         }
-        else if (bgcolor.equals(activity.getString(R.string.backgroundcolor_setting2)))
+        else if (bgcolor.equals(context.getString(R.string.backgroundcolor_setting2)))
         {
-            color = activity.getResources().getColor(R.color.Black);
+            color = context.getResources().getColor(R.color.Black);
         }
-        else if(bgcolor.equals(activity.getString(R.string.backgroundcolor_setting4)))
+        else if(bgcolor.equals(context.getString(R.string.backgroundcolor_setting4)))
         {
-            color = activity.getResources().getColor(R.color.Brown);
+            color = context.getResources().getColor(R.color.Brown);
         }
-        else if(bgcolor.equals(activity.getString(R.string.backgroundcolor_setting5)))
+        else if(bgcolor.equals(context.getString(R.string.backgroundcolor_setting5)))
         {
-            color = activity.getResources().getColor(R.color.Grey);
+            color = context.getResources().getColor(R.color.Grey);
         }
         else
         {
-            color = activity.getResources().getColor(R.color.WhiteBG);
+            color = context.getResources().getColor(R.color.WhiteBG);
         }
         
         return color;
@@ -119,33 +165,7 @@ public class PreferenceSetter {
         return paths;
         
     }
-    
-    public static void setLastRead(Context context, String filename, int pagenumber)
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putString("lastReadFilename", filename);
 
-        sharedPreferencesEditor.apply();
-
-        sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putInt("lastReadPagenumber", pagenumber);
-
-        sharedPreferencesEditor.apply();
-        
-    }
-    
-    public static String getLastReadFilename(Context context )
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString("lastReadFilename",null);
-    }
-    
-    public static int getLastReadPagenumber(Context context )
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getInt("lastReadPagenumber", -1);
-    }
     
     public static void saveFilePaths(Activity activity, ArrayList<String> filepaths, ArrayList<String> excludedpaths)
     {

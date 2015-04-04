@@ -51,6 +51,7 @@ import java.util.TreeMap;
  */
 public class ComicListFragment extends Fragment {
 
+    public static final int ACTIVITY_RESULT_CODE = 5;
     private OnFragmentInteractionListener mListener;
     ArrayList<Comic> mComicList;
     private RecyclerView mRecyclerView;
@@ -473,7 +474,7 @@ public class ComicListFragment extends Fragment {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                         intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                     }
-                    startActivity(intent);
+                    startActivityForResult(intent, ACTIVITY_RESULT_CODE);
                 }
                 else
                 {
@@ -551,6 +552,31 @@ public class ComicListFragment extends Fragment {
             isFiltered = false;
         }
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        switch(requestCode) {
+            case (ACTIVITY_RESULT_CODE) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    String comicName = data.getStringExtra("comicName");
+
+                    int i=0;
+                    for (Comic comic:mComicList)
+                    {
+                        if (comic.getFileName().equals(comicName))
+                        {
+                            mAdapter.notifyItemChanged(i);
+                        }
+                        i++;
+                    }
+                }
+                break;
+            }
+        }
     }
 
 }

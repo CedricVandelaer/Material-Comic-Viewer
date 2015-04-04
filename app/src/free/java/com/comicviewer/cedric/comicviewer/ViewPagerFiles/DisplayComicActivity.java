@@ -80,12 +80,11 @@ public class DisplayComicActivity extends FragmentActivity {
         mPager.setOffscreenPageLimit(2);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
-        
-        if (PreferenceSetter.getLastReadFilename(this)!=null && 
-                PreferenceSetter.getLastReadFilename(this).equals(mCurrentComic.getFileName()))
+
+        if (PreferenceSetter.getReadComics(this).containsKey(mCurrentComic.getFileName()))
         {
-            lastReadPage = PreferenceSetter.getLastReadPagenumber(this);
-            mPager.setCurrentItem(lastReadPage);            
+            lastReadPage = PreferenceSetter.getReadComics(this).get(mCurrentComic.getFileName());
+            mPager.setCurrentItem(lastReadPage);
         }
 
         mAdView = (AdView) findViewById(R.id.adView);
@@ -231,7 +230,7 @@ public class DisplayComicActivity extends FragmentActivity {
     public void onStop()
     {
         super.onStop();
-        PreferenceSetter.setLastRead(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
+        PreferenceSetter.saveLastReadComic(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
         removeExtractedFiles();
     }
 
