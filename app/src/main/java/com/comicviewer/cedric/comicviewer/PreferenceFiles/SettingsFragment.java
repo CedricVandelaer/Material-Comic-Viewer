@@ -31,6 +31,7 @@ public class SettingsFragment extends PreferenceFragment{
         return settings;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +85,8 @@ public class SettingsFragment extends PreferenceFragment{
         CustomMultiSelectListPreference multiListPref = createListPreference(paths,paths);
         
         targetCategory.addPreference(multiListPref);
-        
+
+        getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
 
     }
 

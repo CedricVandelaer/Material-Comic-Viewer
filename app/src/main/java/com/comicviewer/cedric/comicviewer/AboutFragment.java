@@ -47,7 +47,8 @@ public class AboutFragment extends Fragment {
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logohighres,logoview);
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.me,meview);
         
-        
+        getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
+
         return v;
     }
 
