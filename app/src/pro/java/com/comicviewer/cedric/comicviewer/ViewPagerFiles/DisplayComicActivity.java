@@ -98,10 +98,6 @@ public class DisplayComicActivity extends FragmentActivity {
             new SetTaskDescriptionTask().execute();
         }
 
-        intent.putExtra("comicName", mCurrentComic.getFileName());
-
-        setResult(Activity.RESULT_OK, intent);
-
     }
 
 

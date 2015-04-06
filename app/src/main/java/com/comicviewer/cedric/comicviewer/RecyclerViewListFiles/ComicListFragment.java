@@ -371,8 +371,11 @@ public class ComicListFragment extends Fragment {
 
         enableSearchBar(true);
 
+
         if (isFiltered)
             filterList("");
+
+        mAdapter.notifyDataSetChanged();
 
         new SearchComicsTask().execute();
     }
@@ -458,23 +461,26 @@ public class ComicListFragment extends Fragment {
 
                 if (!mSwipeRefreshLayout.isRefreshing()) {
                     Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
+                    Comic clickedComic;
 
                     if (!isFiltered)
                     {
-                        Log.d("ItemClick", mComicList.get(position).getTitle());
-                        intent.putExtra("Comic", mComicList.get(position));
+                        clickedComic = mComicList.get(position);
                     }
                     else
                     {
-                        Log.d("ItemClick", filteredList.get(position).getTitle());
-                        intent.putExtra("Comic", filteredList.get(position));
+                        clickedComic = filteredList.get(position);
                     }
+
+                    Log.d("ItemClick", clickedComic.getTitle());
+                    intent.putExtra("Comic", clickedComic);
+
                     if (mUseRecents)
                     {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                         intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                     }
-                    startActivityForResult(intent, ACTIVITY_RESULT_CODE);
+                    startActivity(intent);
                 }
                 else
                 {
@@ -552,31 +558,6 @@ public class ComicListFragment extends Fragment {
             isFiltered = false;
         }
 
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-
-        switch(requestCode) {
-            case (ACTIVITY_RESULT_CODE) : {
-                if (resultCode == Activity.RESULT_OK) {
-                    String comicName = data.getStringExtra("comicName");
-
-                    int i=0;
-                    for (Comic comic:mComicList)
-                    {
-                        if (comic.getFileName().equals(comicName))
-                        {
-                            mAdapter.notifyItemChanged(i);
-                        }
-                        i++;
-                    }
-                }
-                break;
-            }
-        }
     }
 
 }

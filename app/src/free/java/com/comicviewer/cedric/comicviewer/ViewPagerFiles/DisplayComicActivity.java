@@ -230,8 +230,7 @@ public class DisplayComicActivity extends FragmentActivity {
     public void onStop()
     {
         super.onStop();
-        PreferenceSetter.saveLastReadComic(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
-        removeExtractedFiles();
+
     }
 
     private void removeExtractedFiles() {
@@ -259,6 +258,8 @@ public class DisplayComicActivity extends FragmentActivity {
     @Override
     public void onBackPressed()
     {
+        PreferenceSetter.saveLastReadComic(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
+        removeExtractedFiles();
         finishAfterTransition();
     }
 
