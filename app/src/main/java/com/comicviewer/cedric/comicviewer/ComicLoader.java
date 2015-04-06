@@ -188,72 +188,60 @@ public class ComicLoader {
     }
 
 
-    public static boolean setComicColor(Context context,Comic comic)
+    public static void setComicColor(Context context,Comic comic)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String cardColorSetting = prefs.getString("cardColor", context.getString(R.string.card_color_setting_1));
 
-        if (!ImageLoader.getInstance().isInited()) {
-            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).build();
-            ImageLoader.getInstance().init(config);
-        }
+        if (!cardColorSetting.equals(comic.getColorSetting())) {
+            comic.setColorSetting(cardColorSetting);
 
-        try {
-            int color;
-            int primaryTextColor;
-            int secondaryTextColor;
-
-            if (cardColorSetting.equals(context.getString(R.string.card_color_setting_1)))
-            {
-                ImageSize imageSize = new ImageSize(850, 500);
-                Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
-                Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
-                color = mutedSwatch.getRgb();
-                primaryTextColor = mutedSwatch.getTitleTextColor();
-                secondaryTextColor = mutedSwatch.getBodyTextColor();
-            }
-            else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_2)))
-            {
-                ImageSize imageSize = new ImageSize(850, 500);
-                Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
-                Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
-                color = lightVibrantSwatch.getRgb();
-                primaryTextColor = lightVibrantSwatch.getTitleTextColor();
-                secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
-            }
-            else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_3)))
-            {
-                color = context.getResources().getColor(R.color.WhiteBG);
-                primaryTextColor = context.getResources().getColor(R.color.Black);
-                secondaryTextColor = context.getResources().getColor(R.color.BlueGrey);
-            }
-            else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_4)))
-            {
-                color = context.getResources().getColor(R.color.BlueGrey);
-                primaryTextColor = context.getResources().getColor(R.color.White);
-                secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
-            }
-            else
-            {
-                color = context.getResources().getColor(R.color.Black);
-                primaryTextColor = context.getResources().getColor(R.color.White);
-                secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
+            if (!ImageLoader.getInstance().isInited()) {
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).build();
+                ImageLoader.getInstance().init(config);
             }
 
+            try {
+                int color;
+                int primaryTextColor;
+                int secondaryTextColor;
 
-            if (comic.getComicColor()!=color
-                    || comic.getPrimaryTextColor()!=primaryTextColor
-                    || comic.getSecondaryTextColor()!=secondaryTextColor) {
+                if (cardColorSetting.equals(context.getString(R.string.card_color_setting_1))) {
+                    ImageSize imageSize = new ImageSize(850, 500);
+                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
+                    Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
+                    color = mutedSwatch.getRgb();
+                    primaryTextColor = mutedSwatch.getTitleTextColor();
+                    secondaryTextColor = mutedSwatch.getBodyTextColor();
+                } else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_2))) {
+                    ImageSize imageSize = new ImageSize(850, 500);
+                    Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
+                    Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
+                    color = lightVibrantSwatch.getRgb();
+                    primaryTextColor = lightVibrantSwatch.getTitleTextColor();
+                    secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
+                } else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_3))) {
+                    color = context.getResources().getColor(R.color.WhiteBG);
+                    primaryTextColor = context.getResources().getColor(R.color.Black);
+                    secondaryTextColor = context.getResources().getColor(R.color.BlueGrey);
+                } else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_4))) {
+                    color = context.getResources().getColor(R.color.BlueGrey);
+                    primaryTextColor = context.getResources().getColor(R.color.White);
+                    secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
+                } else {
+                    color = context.getResources().getColor(R.color.Black);
+                    primaryTextColor = context.getResources().getColor(R.color.White);
+                    secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
+                }
+
                 comic.setComicColor(color);
                 comic.setPrimaryTextColor(primaryTextColor);
                 comic.setSecondaryTextColor(secondaryTextColor);
 
-                return true;
-            }
 
-        } catch (Exception e) {
-            Log.e("Palette", e.getMessage());
+            } catch (Exception e) {
+                Log.e("Palette", e.getMessage());
+            }
         }
-        return false;
     }
 }

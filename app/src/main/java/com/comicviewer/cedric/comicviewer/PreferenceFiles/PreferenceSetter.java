@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
 
+import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 
 import java.util.ArrayList;
@@ -18,6 +19,46 @@ import java.util.Map;
  * Helper class for some preferences*
  */
 public class PreferenceSetter {
+
+    public static void saveComicList(Context context, ArrayList<Comic> comicList)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
+
+        int i=0;
+
+        while (prefs.getString("Comic "+i, null)!=null)
+        {
+            sharedPreferencesEditor.remove("Comic "+i);
+            i++;
+        }
+
+        for (i=0;i<comicList.size();i++)
+        {
+            String serializedComic = comicList.get(i).serialize();
+            sharedPreferencesEditor.putString("Comic "+i, serializedComic);
+        }
+
+        sharedPreferencesEditor.apply();
+
+    }
+
+    public static ArrayList<Comic> getSavedComics(Context context)
+    {
+        ArrayList<Comic> comicList = new ArrayList<>();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        int i=0;
+
+        while (prefs.getString("Comic "+i, null)!=null)
+        {
+            comicList.add(Comic.create(prefs.getString("Comic "+i,null)));
+            i++;
+        }
+
+        return comicList;
+    }
 
     public static void saveLastReadComic(Context context, String comicName, int pageNumber)
     {

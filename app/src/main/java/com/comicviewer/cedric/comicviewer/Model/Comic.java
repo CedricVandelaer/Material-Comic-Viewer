@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +33,9 @@ public class Comic implements Parcelable
     //The page count of the comic
     int mPageCount;
 
+    //The colorsetting that the comic has currently loaded
+    String mColorSetting;
+
     //The color of the card displaying the comic
     int mCoverColor;
     
@@ -54,6 +59,7 @@ public class Comic implements Parcelable
         mPrimaryTextColor=-1;
         mSecondaryTextColor=-1;
         mPageCount = -1;
+        mColorSetting = null;
         
         try {
             Pattern pattern = Pattern.compile("\\d\\d\\d\\d");
@@ -100,6 +106,33 @@ public class Comic implements Parcelable
         mCoverImage = null;
     }
 
+    public Comic(String title, String coverImage, String filePath, String fileName, int issueNumber,
+                 int pageCount, String colorSetting, int coverColor, int primaryTextColor, int secondaryTextColor, int year)
+    {
+        mTitle = title;
+        mCoverImage = coverImage;
+        mFilePath = filePath;
+        mFileName = fileName;
+        mIssueNumber = issueNumber;
+        mPageCount = pageCount;
+        mColorSetting = colorSetting;
+        mCoverColor = coverColor;
+        mPrimaryTextColor = primaryTextColor;
+        mSecondaryTextColor = secondaryTextColor;
+        mYear = year;
+    }
+
+    public String serialize()
+    {
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
+
+    static public Comic create(String serializedData) {
+        // Use GSON to instantiate this class using the JSON representation of the state
+        Gson gson = new Gson();
+        return gson.fromJson(serializedData, Comic.class);
+    }
 
     public Comic(Parcel in)
     {
@@ -144,6 +177,7 @@ public class Comic implements Parcelable
         mFileName = in.readString();
         mIssueNumber = in.readInt();
         mPageCount = in.readInt();
+        mColorSetting = in.readString();
         mCoverColor = in.readInt();
         mPrimaryTextColor = in.readInt();
         mSecondaryTextColor = in.readInt();
@@ -206,6 +240,16 @@ public class Comic implements Parcelable
         return mCoverImage;
     }
 
+    public String getColorSetting()
+    {
+        return mColorSetting;
+    }
+
+    public void setColorSetting(String colorSetting)
+    {
+        mColorSetting = colorSetting;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -222,6 +266,7 @@ public class Comic implements Parcelable
         dest.writeString(mFileName);
         dest.writeInt(mIssueNumber);
         dest.writeInt(mPageCount);
+        dest.writeString(mColorSetting);
         dest.writeInt(mCoverColor);
         dest.writeInt(mPrimaryTextColor);
         dest.writeInt(mSecondaryTextColor);

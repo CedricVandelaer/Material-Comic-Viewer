@@ -37,6 +37,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -224,12 +225,31 @@ public class ComicListFragment extends Fragment {
 
     private void searchComics() {
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String cardColorSetting = prefs.getString("cardColor", getActivity().getString(R.string.card_color_setting_1));
+
         Map<String,String> map = FileLoader.searchComics(getActivity());
 
         long startTime = System.currentTimeMillis();
 
         //create treemap to sort the filenames
         Map<String,String> treemap = new TreeMap(map);
+
+        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
+        List<String> savedComicsFileNames = new ArrayList<>();
+
+        for (int i=0;i<savedComics.size();i++)
+        {
+            savedComicsFileNames.add(savedComics.get(i).getFilePath()+"/"+savedComics.get(i).getFileName());
+        }
+
+        List<String> currentComicsFileNames = new ArrayList<>();
+
+        for (int i=0;i<mComicList.size();i++)
+        {
+            currentComicsFileNames.add(mComicList.get(i).getFilePath()+"/"+mComicList.get(i).getFileName());
+        }
+
 
         mTotalComicCount = treemap.size();
         mProgress = 0;
@@ -238,9 +258,30 @@ public class ComicListFragment extends Fragment {
 
         for (String str:treemap.keySet())
         {
-            File file = new File(map.get(str)+"/"+str);
+            String comicPath = map.get(str)+"/"+str;
+            File file = new File(comicPath);
 
-            if (getComicPositionInList(str)==-1
+            if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
+            {
+                int pos = savedComicsFileNames.indexOf(comicPath);
+
+                Comic comic = savedComics.get(pos);
+
+                ComicLoader.setComicColor(getActivity(), comic);
+
+                mComicList.add(savedComics.get(pos));
+
+                mRecyclerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.notifyItemInserted(mComicList.size());
+                    }
+                });
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
+            }
+            else if (getComicPositionInList(str)==-1
                     && Utilities.checkExtension(str)
                     && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
 
@@ -298,6 +339,8 @@ public class ComicListFragment extends Fragment {
         }
         return -1;
     }
+
+
 
     private void updateProgressDialog(int progress, int total)
     {
@@ -360,6 +403,7 @@ public class ComicListFragment extends Fragment {
     {
         super.onStop();
         PreferenceSetter.saveFilePaths(getActivity(), mFilePaths, mExcludedPaths);
+        PreferenceSetter.saveComicList(getActivity(),mComicList);
     }
 
 
