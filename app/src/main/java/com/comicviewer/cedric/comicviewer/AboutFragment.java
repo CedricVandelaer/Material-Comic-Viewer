@@ -48,6 +48,7 @@ public class AboutFragment extends Fragment {
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.me,meview);
         
         getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
+        getActivity().getWindow().setNavigationBarColor(getActivity().getResources().getColor(R.color.BlueGrey));
 
         return v;
     }

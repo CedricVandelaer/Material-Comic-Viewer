@@ -16,6 +16,7 @@ public class SettingsActivity extends Activity {
 
         getActionBar().setTitle("Settings");
         getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.TealDark));
+        getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
 
     }
 
