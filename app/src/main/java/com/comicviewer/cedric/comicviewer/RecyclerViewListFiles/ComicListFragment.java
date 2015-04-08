@@ -484,11 +484,19 @@ public class ComicListFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int height = size.y;
-        Log.d("Layoutmanager", "Extra height: "+height);
+        int height;
+
+        if (PreferenceSetter.getCardAppearanceSetting(getActivity()).equals(getActivity().getString(R.string.card_size_setting_3))) {
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            height = size.y;
+            Log.d("Layoutmanager", "Extra height: " + height);
+        }
+        else
+        {
+            height = 0;
+        }
         mLayoutManager = new PreCachingLayoutManager(getActivity(), height);
 
         mRecyclerView.setLayoutManager(mLayoutManager);

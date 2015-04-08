@@ -20,6 +20,14 @@ import java.util.Map;
  */
 public class PreferenceSetter {
 
+
+    public static String getCardAppearanceSetting(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return prefs.getString("cardSize", context.getString(R.string.card_size_setting_2));
+    }
+
     public static void saveComicList(Context context, ArrayList<Comic> comicList)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
