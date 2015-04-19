@@ -27,6 +27,7 @@ AboutFragment.OnFragmentInteractionListener{
         this.setBackPattern(BACKPATTERN_BACK_TO_FIRST);
         this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
         enableToolbarElevation();
+        allowArrowAnimation();
 
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
