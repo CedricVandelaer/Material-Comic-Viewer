@@ -15,6 +15,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
@@ -52,7 +53,9 @@ public class DisplayComicActivity extends FragmentActivity {
 
     private boolean mShowPageNumbers;
 
+    //ads
     private AdView mAdView;
+    private Button mCloseAdButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +91,7 @@ public class DisplayComicActivity extends FragmentActivity {
         }
 
         mAdView = (AdView) findViewById(R.id.adView);
+        mCloseAdButton = (Button) findViewById(R.id.close_ad_button);
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
@@ -95,6 +99,14 @@ public class DisplayComicActivity extends FragmentActivity {
             new SetTaskDescriptionTask().execute();
         }
 
+        mCloseAdButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdView.destroy();
+                mAdView.setVisibility(View.GONE);
+                mCloseAdButton.setVisibility(View.GONE);
+            }
+        });
 
     }
 
@@ -108,13 +120,15 @@ public class DisplayComicActivity extends FragmentActivity {
         @Override
         public void onPageSelected(int position) {
 
-            if (position%4 == 0) {
+            if (position%5 == 0) {
                 AdRequest adRequest = new AdRequest.Builder().build();
                 mAdView.loadAd(adRequest);
                 mAdView.setVisibility(View.VISIBLE);
+                mCloseAdButton.setVisibility(View.VISIBLE);
             }
             else
             {
+                mCloseAdButton.setVisibility(View.GONE);
                 mAdView.destroy();
                 mAdView.setVisibility(View.GONE);
             }

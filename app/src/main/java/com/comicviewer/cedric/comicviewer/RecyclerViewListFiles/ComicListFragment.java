@@ -272,14 +272,8 @@ public class ComicListFragment extends Fragment {
 
                 ComicLoader.setComicColor(getActivity(), comic);
 
-                mComicList.add(savedComics.get(pos));
+                sortedInsert(comic);
 
-                mRecyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.notifyItemInserted(mComicList.size());
-                    }
-                });
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
 
@@ -313,14 +307,7 @@ public class ComicListFragment extends Fragment {
 
             ComicLoader.loadComicSync( mApplicationContext, comic);
 
-            mComicList.add(comic);
-
-            mRecyclerView.post(new Runnable() {
-                @Override
-                public void run() {
-                    mAdapter.notifyItemInserted(mComicList.size());
-                }
-            });
+            sortedInsert(comic);
 
             return null;
         }
@@ -331,6 +318,56 @@ public class ComicListFragment extends Fragment {
             mProgress++;
             updateProgressDialog(mProgress, mTotalComicCount);
         }
+    }
+
+    private void sortedInsert(Comic comic)
+    {
+        boolean isInserted = false;
+        if (mComicList.size()==0)
+        {
+            mComicList.add(comic);
+            mRecyclerView.post(new Runnable() {
+                @Override
+                public void run() {
+                    mAdapter.notifyItemInserted(0);
+                }
+            });
+        }
+        else
+        {
+            for (int i=0;i<mComicList.size() && !isInserted;i++)
+            {
+                //titels zijn hetzelfde
+                if (mComicList.get(i).getTitle().compareToIgnoreCase(comic.getTitle()) == 0)
+                {
+                    if (mComicList.get(i).getIssueNumber() > comic.getIssueNumber())
+                    {
+                        final int pos = i+1;
+                        mComicList.add(i+1,comic);
+                        isInserted = true;
+                        mRecyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAdapter.notifyItemInserted(pos);
+                            }
+                        });
+                    }
+                }
+                else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) > 0)
+                {
+                    final int pos = i;
+                    mComicList.add(i,comic);
+                    isInserted = true;
+                    mRecyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.notifyItemInserted(pos);
+                        }
+                    });
+                }
+            }
+        }
+
     }
 
     private int getComicPositionInList(String filename)
