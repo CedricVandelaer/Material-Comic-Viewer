@@ -322,49 +322,74 @@ public class ComicListFragment extends Fragment {
 
     private void sortedInsert(Comic comic)
     {
-        boolean isInserted = false;
+
         if (mComicList.size()==0)
         {
-            mComicList.add(comic);
+            final Comic comicToAdd = comic;
             mRecyclerView.post(new Runnable() {
                 @Override
                 public void run() {
-                    mAdapter.notifyItemInserted(0);
-                }
-            });
-        }
-        else
-        {
-            for (int i=0;i<mComicList.size() && !isInserted;i++)
-            {
-                //titels zijn hetzelfde
-                if (mComicList.get(i).getTitle().compareToIgnoreCase(comic.getTitle()) == 0)
-                {
-                    if (mComicList.get(i).getIssueNumber() > comic.getIssueNumber())
-                    {
-                        final int pos = i+1;
-                        mComicList.add(i+1,comic);
-                        isInserted = true;
-                        mRecyclerView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAdapter.notifyItemInserted(pos);
-                            }
-                        });
-                    }
-                }
-                else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) > 0)
-                {
-                    final int pos = i;
-                    mComicList.add(i,comic);
-                    isInserted = true;
+                    mComicList.add(0, comicToAdd);
                     mRecyclerView.post(new Runnable() {
                         @Override
                         public void run() {
-                            mAdapter.notifyItemInserted(pos);
+                            mAdapter.notifyDataSetChanged();
                         }
                     });
                 }
+            });
+
+        }
+        else
+        {
+            for (int i=mComicList.size()-1;i>=0;i--)
+            {
+                if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) > 0)
+                {
+                    final int pos = i+1;
+                    final Comic comicToAdd = comic;
+                    mRecyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mComicList.add(pos,comicToAdd);
+                            mAdapter.notifyItemInserted(pos);
+                        }
+                    });
+                    return;
+
+                }
+                else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) == 0)
+                {
+                    if (comic.getIssueNumber() > mComicList.get(i).getIssueNumber())
+                    {
+                        final int pos = i+1;
+                        final Comic comicToAdd = comic;
+                        mRecyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mComicList.add(pos,comicToAdd);
+                                mAdapter.notifyItemInserted(pos);
+                            }
+                        });
+                        return;
+                    }
+                }
+                else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) < 0)
+                {
+                    if (i == 0) {
+                        final int pos = i;
+                        final Comic comicToAdd = comic;
+                        mRecyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mComicList.add(pos, comicToAdd);
+                                mAdapter.notifyItemInserted(pos);
+                            }
+                        });
+                        return;
+                    }
+                }
+
             }
         }
 

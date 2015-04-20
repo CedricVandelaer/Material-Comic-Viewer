@@ -167,6 +167,12 @@ public class Comic implements Parcelable
         }
         
         mTitle = mTitle.trim();
+
+        if (mTitle.startsWith("-"))
+        {
+            mTitle = mTitle.substring(1,mTitle.length());
+        }
+        mTitle = mTitle.trim();
     }
 
     private void readFromParcel(Parcel in)
