@@ -49,7 +49,7 @@ public class AboutFragment extends Fragment {
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.me,meview);
         
         getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
-        if (Build.VERSION.SDK_INT>17)
+        if (Build.VERSION.SDK_INT>20)
             getActivity().getWindow().setNavigationBarColor(getActivity().getResources().getColor(R.color.BlueGrey));
 
         return v;

@@ -243,6 +243,13 @@ public class ComicListFragment extends Fragment {
             savedComicsFileNames.add(savedComics.get(i).getFilePath()+"/"+savedComics.get(i).getFileName());
         }
 
+        List<String> currentComicsFileNames = new ArrayList<>();
+
+        for (int i=0;i<currentComics.size();i++)
+        {
+            currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
+        }
+
         mTotalComicCount = map.size();
         mProgress = 0;
 
@@ -255,7 +262,7 @@ public class ComicListFragment extends Fragment {
             File file = new File(comicPath);
 
             //check if comic is one of the saved comic files and add
-            if (savedComicsFileNames.contains(comicPath))
+            if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
             {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 

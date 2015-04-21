@@ -172,7 +172,9 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             }
             else
             {
-                comicItemViewHolder.mLastReadIcon.setBackground(mContext.getResources().getDrawable(R.drawable.dark_circle));
+                Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+                circle.setAlpha(255);
+                comicItemViewHolder.mLastReadIcon.setBackground(circle);
             }
 
 
@@ -334,10 +336,6 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
     public void addComic(Comic comic)
     {
-        if (comic.getIssueNumber()==2)
-        {
-            Log.d("Adapter","Issue 2 found");
-        }
         if (mComicList.size()==0)
         {
             mComicList.add(0, comic);
@@ -359,6 +357,12 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                     if (comic.getIssueNumber() > mComicList.get(i).getIssueNumber())
                     {
                         mComicList.add(i + 1, comic);
+                        notifyItemInserted(i+1);
+                        return;
+                    }
+                    else if(comic.getIssueNumber() == mComicList.get(i).getIssueNumber())
+                    {
+                        mComicList.add(i+1, comic);
                         notifyItemInserted(i+1);
                         return;
                     }
