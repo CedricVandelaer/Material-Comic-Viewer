@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
@@ -55,6 +56,7 @@ public class DisplayComicActivity extends FragmentActivity {
     private boolean mShowPageNumbers;
 
     private AdView mAdView;
+    private Button mCloseAdButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,8 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mAdView = (AdView) findViewById(R.id.adView);
         mAdView.destroy();
+        mCloseAdButton = (Button) findViewById(R.id.close_ad_button);
+        mCloseAdButton.setVisibility(View.GONE);
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 

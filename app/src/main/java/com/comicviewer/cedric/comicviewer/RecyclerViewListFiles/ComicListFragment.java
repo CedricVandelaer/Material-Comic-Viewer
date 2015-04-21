@@ -406,12 +406,14 @@ public class ComicListFragment extends Fragment {
 
     private void onLoadingFinished()
     {
+
         mSwipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
+        PreferenceSetter.saveComicList(getActivity(), mComicList);
     }
 
     @Override
