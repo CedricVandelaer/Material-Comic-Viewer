@@ -5,11 +5,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="400dp"
     android:layout_width="400dp"
-    card_view:cardElevation="8dp"
     android:layout_centerInParent="true"
     android:id="@+id/card_bg"
     android:clickable="true"
-    android:foreground="@drawable/ripple"
     >
     <RelativeLayout
         android:layout_width="fill_parent"

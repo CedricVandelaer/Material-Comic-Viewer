@@ -5,10 +5,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    card_view:cardElevation="8dp"
     android:id="@+id/card"
     android:clickable="true"
-    android:foreground="@drawable/ripple"
     >
 
     <RelativeLayout android:layout_width="match_parent"

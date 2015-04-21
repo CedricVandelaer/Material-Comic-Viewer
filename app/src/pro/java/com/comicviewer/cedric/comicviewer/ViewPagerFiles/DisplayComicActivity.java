@@ -137,19 +137,21 @@ public class DisplayComicActivity extends FragmentActivity {
                 ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(DisplayComicActivity.this).build();
                 ImageLoader.getInstance().init(config);
             }
-            
-            ActivityManager.TaskDescription tdscr = null;
-            try {
-                ImageSize size = new ImageSize(64,64);
-                tdscr = new ActivityManager.TaskDescription(mCurrentComic.getTitle(),
-                        ImageLoader.getInstance().loadImageSync(mCurrentComic.getCoverImage(),size),
-                        mCurrentComic.getComicColor());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
-            if (tdscr!=null)
-                setTaskDescription(tdscr);
+            if (Build.VERSION.SDK_INT>20) {
+                ActivityManager.TaskDescription tdscr = null;
+                try {
+                    ImageSize size = new ImageSize(64, 64);
+                    tdscr = new ActivityManager.TaskDescription(mCurrentComic.getTitle(),
+                            ImageLoader.getInstance().loadImageSync(mCurrentComic.getCoverImage(), size),
+                            mCurrentComic.getComicColor());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (tdscr != null)
+                    setTaskDescription(tdscr);
+            }
 
             return null;
         }
@@ -258,7 +260,10 @@ public class DisplayComicActivity extends FragmentActivity {
     {
         PreferenceSetter.saveLastReadComic(this, mCurrentComic.getFileName(), mPager.getCurrentItem());
         removeExtractedFiles();
-        finishAfterTransition();
+        if (Build.VERSION.SDK_INT>20)
+            finishAfterTransition();
+        else
+            finish();
     }
 
 }

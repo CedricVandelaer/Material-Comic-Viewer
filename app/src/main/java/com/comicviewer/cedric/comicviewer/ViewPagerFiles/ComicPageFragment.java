@@ -172,7 +172,7 @@ public class ComicPageFragment extends Fragment {
             }
             catch (Exception e)
             {
-                Log.e("ExtractRarTask", e.getMessage());
+                e.printStackTrace();
             }
 
             return null;

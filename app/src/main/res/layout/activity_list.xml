@@ -25,7 +25,7 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_note_add_black_48dp"
+        android:src="@drawable/folder_plus"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         android:layout_alignParentEnd="true"

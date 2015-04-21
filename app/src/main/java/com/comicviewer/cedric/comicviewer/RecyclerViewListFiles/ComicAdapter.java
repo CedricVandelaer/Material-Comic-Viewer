@@ -10,6 +10,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -333,6 +334,10 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
     public void addComic(Comic comic)
     {
+        if (comic.getIssueNumber()==2)
+        {
+            Log.d("Adapter","Issue 2 found");
+        }
         if (mComicList.size()==0)
         {
             mComicList.add(0, comic);
@@ -355,6 +360,12 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                     {
                         mComicList.add(i + 1, comic);
                         notifyItemInserted(i+1);
+                        return;
+                    }
+                    else if (i==0)
+                    {
+                        mComicList.add(i, comic);
+                        notifyItemInserted(i);
                         return;
                     }
                 }
