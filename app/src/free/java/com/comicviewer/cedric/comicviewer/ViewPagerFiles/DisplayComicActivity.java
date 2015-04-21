@@ -22,6 +22,7 @@ import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.devspark.robototextview.widget.RobotoTextView;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -92,6 +93,24 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mAdView = (AdView) findViewById(R.id.adView);
         mCloseAdButton = (Button) findViewById(R.id.close_ad_button);
+        mCloseAdButton.setVisibility(View.GONE);
+
+        mCloseAdButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdView.setVisibility(View.GONE);
+                mCloseAdButton.setVisibility(View.GONE);
+            }
+        });
+
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                mAdView.setVisibility(View.VISIBLE);
+                mCloseAdButton.setVisibility(View.VISIBLE);
+            }
+        });
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
@@ -99,21 +118,16 @@ public class DisplayComicActivity extends FragmentActivity {
             new SetTaskDescriptionTask().execute();
         }
 
-        mCloseAdButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAdView.destroy();
-                mAdView.setVisibility(View.GONE);
-                mCloseAdButton.setVisibility(View.GONE);
-            }
-        });
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
     }
 
 
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
+
         @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        public void onPageScrolled(int i, float v, int i2) {
 
         }
 
@@ -123,14 +137,6 @@ public class DisplayComicActivity extends FragmentActivity {
             if (position%5 == 0) {
                 AdRequest adRequest = new AdRequest.Builder().build();
                 mAdView.loadAd(adRequest);
-                mAdView.setVisibility(View.VISIBLE);
-                mCloseAdButton.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                mCloseAdButton.setVisibility(View.GONE);
-                mAdView.destroy();
-                mAdView.setVisibility(View.GONE);
             }
 
             if (mShowPageNumbers)

@@ -24,6 +24,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Cédric on 23/01/2015.
@@ -31,13 +32,13 @@ import java.util.ArrayList;
  */
 public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
-    private ArrayList<Comic> mComicList;
+    private List<Comic> mComicList;
     private Context mContext;
     private LayoutInflater mInflater;
     private int lastPosition=-1;
     private DisplayImageOptions mImageOptions;
 
-    public ComicAdapter(Context context, ArrayList<Comic> comics)
+    public ComicAdapter(Context context, List<Comic> comics)
     {
         mComicList=comics;
         mContext=context;

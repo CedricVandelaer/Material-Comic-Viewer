@@ -40,6 +40,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -55,9 +57,8 @@ import java.util.TreeMap;
  */
 public class ComicListFragment extends Fragment {
 
-    public static final int ACTIVITY_RESULT_CODE = 5;
     private OnFragmentInteractionListener mListener;
-    ArrayList<Comic> mComicList;
+    List<Comic> mComicList;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -174,11 +175,8 @@ public class ComicListFragment extends Fragment {
 
     private void refresh()
     {
-        for (int i=mComicList.size()-1;i>=0;i--)
-        {
-            mComicList.remove(i);
-            mAdapter.notifyItemRemoved(i);
-        }
+        mComicList.clear();
+        mAdapter.notifyDataSetChanged();
 
         new SearchComicsTask().execute();
     }
@@ -225,18 +223,12 @@ public class ComicListFragment extends Fragment {
         }
     }
 
-
     private void searchComics() {
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String cardColorSetting = prefs.getString("cardColor", getActivity().getString(R.string.card_color_setting_1));
-
+        //map of <filename, filepath>
         Map<String,String> map = FileLoader.searchComics(getActivity());
 
         long startTime = System.currentTimeMillis();
-
-        //create treemap to sort the filenames
-        Map<String,String> treemap = new TreeMap(map);
 
         ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
         List<String> savedComicsFileNames = new ArrayList<>();
@@ -253,20 +245,29 @@ public class ComicListFragment extends Fragment {
             currentComicsFileNames.add(mComicList.get(i).getFilePath()+"/"+mComicList.get(i).getFileName());
         }
 
-
-        mTotalComicCount = treemap.size();
+        mTotalComicCount = map.size();
         mProgress = 0;
 
         updateProgressDialog(mProgress, mTotalComicCount);
 
-        for (String str:treemap.keySet())
+        for (String str:map.keySet())
         {
-            String comicPath = map.get(str)+"/"+str;
+            //open the new found file
+            final String comicPath = map.get(str)+"/"+str;
             File file = new File(comicPath);
 
+            //check if comic is one of the saved comic files and add
             if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
             {
                 int pos = savedComicsFileNames.indexOf(comicPath);
+
+                try {
+                    Thread.sleep(10, 0);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
 
                 Comic comic = savedComics.get(pos);
 
@@ -277,15 +278,20 @@ public class ComicListFragment extends Fragment {
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
 
-            }
+            }//if it is a newly added comic
             else if (getComicPositionInList(str)==-1
                     && Utilities.checkExtension(str)
                     && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
 
                 Comic newComic = new Comic(str, map.get(str));
-                new LoadComicTask().execute(newComic);
+
+                ComicLoader.loadComicSync( mApplicationContext, newComic);
+                sortedInsert(newComic);
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
             }
-            else
+            else // if it's not a valid comic file
             {
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
@@ -297,32 +303,9 @@ public class ComicListFragment extends Fragment {
         Log.d("search comics in list", "time: "+(endTime-startTime));
     }
 
-    private class LoadComicTask extends AsyncTask
+
+    private synchronized void sortedInsert(Comic comic)
     {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            Comic comic =(Comic) params[0];
-
-            ComicLoader.loadComicSync( mApplicationContext, comic);
-
-            sortedInsert(comic);
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Object params)
-        {
-            mProgress++;
-            updateProgressDialog(mProgress, mTotalComicCount);
-        }
-    }
-
-    private void sortedInsert(Comic comic)
-    {
-
         if (mComicList.size()==0)
         {
             final Comic comicToAdd = comic;
@@ -347,11 +330,10 @@ public class ComicListFragment extends Fragment {
                 if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) > 0)
                 {
                     final int pos = i+1;
-                    final Comic comicToAdd = comic;
+                    mComicList.add(pos,comic);
                     mRecyclerView.post(new Runnable() {
                         @Override
                         public void run() {
-                            mComicList.add(pos,comicToAdd);
                             mAdapter.notifyItemInserted(pos);
                         }
                     });
@@ -363,11 +345,10 @@ public class ComicListFragment extends Fragment {
                     if (comic.getIssueNumber() > mComicList.get(i).getIssueNumber())
                     {
                         final int pos = i+1;
-                        final Comic comicToAdd = comic;
+                        mComicList.add(pos,comic);
                         mRecyclerView.post(new Runnable() {
                             @Override
                             public void run() {
-                                mComicList.add(pos,comicToAdd);
                                 mAdapter.notifyItemInserted(pos);
                             }
                         });
@@ -378,11 +359,10 @@ public class ComicListFragment extends Fragment {
                 {
                     if (i == 0) {
                         final int pos = i;
-                        final Comic comicToAdd = comic;
+                        mComicList.add(pos, comic);
                         mRecyclerView.post(new Runnable() {
                             @Override
                             public void run() {
-                                mComicList.add(pos, comicToAdd);
                                 mAdapter.notifyItemInserted(pos);
                             }
                         });
@@ -468,7 +448,7 @@ public class ComicListFragment extends Fragment {
     {
         super.onStop();
         PreferenceSetter.saveFilePaths(getActivity(), mFilePaths, mExcludedPaths);
-        PreferenceSetter.saveComicList(getActivity(),mComicList);
+        PreferenceSetter.saveComicList(getActivity(), mComicList);
     }
 
 
@@ -486,6 +466,7 @@ public class ComicListFragment extends Fragment {
 
         mAdapter.notifyDataSetChanged();
 
+
         new SearchComicsTask().execute();
     }
 
@@ -495,14 +476,7 @@ public class ComicListFragment extends Fragment {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             mSearchView = new SearchView(getActivity());
 
-
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
-
-            mSearchView.setOnSearchClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                }
-            });
 
             mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
                 @Override
@@ -526,7 +500,6 @@ public class ComicListFragment extends Fragment {
                     return false;
                 }
             });
-
 
             toolbar.addView(mSearchView, layoutParamsCollapsed);
         }
@@ -569,7 +542,6 @@ public class ComicListFragment extends Fragment {
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
 
         mRecyclerView.setOnScrollListener(scrollListener);
-
 
 
         addOnRecyclerViewClickListener();
@@ -615,22 +587,17 @@ public class ComicListFragment extends Fragment {
 
     private void initialiseAdapter(Bundle savedInstanceState)
     {
-
         mExcludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+        mComicList = Collections.synchronizedList(new ArrayList<Comic>());
 
-        if (savedInstanceState==null) {
-
-            mComicList = new ArrayList<>();
-
+        if (savedInstanceState==null)
+        {
             mAdapter = new ComicAdapter(getActivity(), mComicList);
             mRecyclerView.setAdapter(mAdapter);
-
         }
         else
         {
-            mComicList = new ArrayList<>();
-
             final boolean isRefreshing = savedInstanceState.getBoolean("isRefreshing", false);
 
             mSwipeRefreshLayout.post(new Runnable() {

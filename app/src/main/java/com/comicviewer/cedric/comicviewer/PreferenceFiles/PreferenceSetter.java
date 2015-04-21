@@ -12,6 +12,7 @@ import com.comicviewer.cedric.comicviewer.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,7 +29,7 @@ public class PreferenceSetter {
         return prefs.getString("cardSize", context.getString(R.string.card_size_setting_2));
     }
 
-    public static void saveComicList(Context context, ArrayList<Comic> comicList)
+    public static void saveComicList(Context context, List<Comic> comicList)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
