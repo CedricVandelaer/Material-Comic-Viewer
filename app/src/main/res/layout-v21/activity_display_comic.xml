@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    tools:context="com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity">
+
+
+    <com.comicviewer.cedric.comicviewer.ViewPagerFiles.ComicViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:transitionName="cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/comicpager"/>
+    <com.devspark.robototextview.widget.RobotoTextView
+        android:id="@+id/page_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:typeface="roboto_slab_regular"
+        android:textSize="20sp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        ads:adSize="MEDIUM_RECTANGLE"
+        ads:adUnitId="@string/banner_ad_unit_id">
+    </com.google.android.gms.ads.AdView>
+    <Button
+        android:id="@+id/close_ad_button"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:background="@drawable/teal_bg_shape"
+        android:padding="6dp"
+        android:textSize="14sp"
+        android:textColor="#FFFFFF"
+        android:text="Close ad"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/adView">
+
+    </Button>
+
+</RelativeLayout>

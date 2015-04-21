@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
@@ -161,11 +162,18 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         if (PreferenceSetter.getReadComics(mContext).containsKey(mComicList.get(i).getFileName()))
         {
             comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
-            Drawable circle = mContext.getDrawable(R.drawable.dark_circle);
-            circle.setAlpha(255);
-            circle.setTintMode(PorterDuff.Mode.SRC);
-            circle.setTint(mComicList.get(i).getComicColor());
-            comicItemViewHolder.mLastReadIcon.setBackground(circle);
+            if (Build.VERSION.SDK_INT>20) {
+                Drawable circle = mContext.getDrawable(R.drawable.dark_circle);
+                circle.setAlpha(255);
+                circle.setTintMode(PorterDuff.Mode.SRC);
+                circle.setTint(mComicList.get(i).getComicColor());
+                comicItemViewHolder.mLastReadIcon.setBackground(circle);
+            }
+            else
+            {
+                comicItemViewHolder.mLastReadIcon.setBackground(mContext.getResources().getDrawable(R.drawable.dark_circle));
+            }
+
 
             if (PreferenceSetter.getReadComics(mContext).get(mComicList.get(i).getFileName())+1==mComicList.get(i).getPageCount())
             {
@@ -223,7 +231,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         if (PreferenceSetter.getReadComics(mContext).containsKey((mComicList.get(i).getFileName())))
         {
             comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
-            comicItemViewHolder.mLastReadIcon.setBackground(mContext.getDrawable(R.drawable.dark_circle));
+            comicItemViewHolder.mLastReadIcon.setBackground(mContext.getResources().getDrawable(R.drawable.dark_circle));
             if (PreferenceSetter.getReadComics(mContext).get((mComicList.get(i).getFileName()))+1==mComicList.get(i).getPageCount())
             {
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check_black_48dp,comicItemViewHolder.mLastReadIcon);
@@ -280,7 +288,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         if (PreferenceSetter.getReadComics(mContext).containsKey((mComicList.get(i).getFileName())))
         {
             comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
-            comicItemViewHolder.mLastReadIcon.setBackground(mContext.getDrawable(R.drawable.dark_circle));
+            comicItemViewHolder.mLastReadIcon.setBackground(mContext.getResources().getDrawable(R.drawable.dark_circle));
 
             if (PreferenceSetter.getReadComics(mContext).get((mComicList.get(i).getFileName()))+1==mComicList.get(i).getPageCount())
             {
@@ -338,7 +346,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
                 if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) > 0)
                 {
                     mComicList.add(i + 1, comic);
-                    notifyItemInserted(i+1);
+                    notifyItemInserted(i + 1);
                     return;
                 }
                 else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) == 0)

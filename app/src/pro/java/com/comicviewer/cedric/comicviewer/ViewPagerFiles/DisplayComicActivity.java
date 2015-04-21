@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -98,7 +99,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
-        if (showInRecentsPref) {
+        if (showInRecentsPref && Build.VERSION.SDK_INT>20) {
             new SetTaskDescriptionTask().execute();
         }
 

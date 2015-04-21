@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -48,7 +49,8 @@ public class AboutFragment extends Fragment {
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.me,meview);
         
         getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
-        getActivity().getWindow().setNavigationBarColor(getActivity().getResources().getColor(R.color.BlueGrey));
+        if (Build.VERSION.SDK_INT>17)
+            getActivity().getWindow().setNavigationBarColor(getActivity().getResources().getColor(R.color.BlueGrey));
 
         return v;
     }

@@ -3,6 +3,7 @@ package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -122,10 +123,12 @@ public class PreferenceSetter {
         
         
         layout.setBackgroundColor(color);
-        if (color!= activity.getResources().getColor(R.color.WhiteBG))
-            activity.getWindow().setNavigationBarColor(getBackgroundColorPreference(activity));
-        else
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Black));
+        if (Build.VERSION.SDK_INT>20) {
+            if (color != activity.getResources().getColor(R.color.WhiteBG))
+                activity.getWindow().setNavigationBarColor(getBackgroundColorPreference(activity));
+            else
+                activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Black));
+        }
         
     }
 

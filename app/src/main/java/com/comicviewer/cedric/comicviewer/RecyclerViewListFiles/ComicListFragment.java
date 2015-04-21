@@ -1,23 +1,24 @@
 package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.ChangeImageTransform;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -25,6 +26,7 @@ import android.view.InputDevice;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -52,14 +54,6 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ComicListFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ComicListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ComicListFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
@@ -100,6 +94,7 @@ public class ComicListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setHasOptionsMenu(false);
     }
 
@@ -108,6 +103,7 @@ public class ComicListFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
+
 
         isFiltered = false;
         mHandler = new Handler();
@@ -549,7 +545,27 @@ public class ComicListFragment extends Fragment {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                         intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                     }
-                    startActivity(intent);
+
+                    if (Build.VERSION.SDK_INT>20 &&
+                            PreferenceSetter.getCardAppearanceSetting(getActivity()).equals(getString(R.string.card_size_setting_2))) {
+                        View cover = view.findViewById(R.id.cover);
+                        ActivityOptionsCompat options = ActivityOptionsCompat.
+                                makeSceneTransitionAnimation(getActivity(), cover , "cover");
+
+                        startActivity(intent, options.toBundle());
+                    }
+                    else if (Build.VERSION.SDK_INT>20 &&
+                            PreferenceSetter.getCardAppearanceSetting(getActivity()).equals(getString(R.string.card_color_setting_3))) {
+                        View cover = view.findViewById(R.id.card_bg_image);
+
+                        ActivityOptionsCompat options = ActivityOptionsCompat.
+                                makeSceneTransitionAnimation(getActivity(), cover , "cover");
+
+                        startActivity(intent, options.toBundle());
+                    }
+                    else {
+                        startActivity(intent);
+                    }
                 }
                 else
                 {
@@ -564,7 +580,6 @@ public class ComicListFragment extends Fragment {
     {
         mExcludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
-        //mComicList = Collections.synchronizedList(new ArrayList<Comic>());
 
         if (savedInstanceState==null)
         {
