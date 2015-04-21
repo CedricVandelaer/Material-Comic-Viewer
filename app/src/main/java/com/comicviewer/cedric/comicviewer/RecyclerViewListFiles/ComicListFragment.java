@@ -10,8 +10,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -44,6 +47,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
 
 
@@ -58,9 +63,8 @@ import java.util.TreeMap;
 public class ComicListFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    List<Comic> mComicList;
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private ComicAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFab;
     private ArrayList<String> mFilePaths;
@@ -74,6 +78,7 @@ public class ComicListFragment extends Fragment {
     private boolean isFiltered;
     private static ComicListFragment mSingleton = null;
     private Context mApplicationContext;
+    private Handler mHandler;
 
     public static ComicListFragment getInstance() {
         if(mSingleton == null) {
@@ -105,6 +110,7 @@ public class ComicListFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
 
         isFiltered = false;
+        mHandler = new Handler();
 
         PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
@@ -175,7 +181,8 @@ public class ComicListFragment extends Fragment {
 
     private void refresh()
     {
-        mComicList.clear();
+        mAdapter.clearComicList();
+
         mAdapter.notifyDataSetChanged();
 
         new SearchComicsTask().execute();
@@ -225,11 +232,13 @@ public class ComicListFragment extends Fragment {
 
     private void searchComics() {
 
+
         //map of <filename, filepath>
         Map<String,String> map = FileLoader.searchComics(getActivity());
 
         long startTime = System.currentTimeMillis();
 
+        List<Comic> currentComics = mAdapter.getComics();
         ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
         List<String> savedComicsFileNames = new ArrayList<>();
 
@@ -240,9 +249,9 @@ public class ComicListFragment extends Fragment {
 
         List<String> currentComicsFileNames = new ArrayList<>();
 
-        for (int i=0;i<mComicList.size();i++)
+        for (int i=0;i<currentComics.size();i++)
         {
-            currentComicsFileNames.add(mComicList.get(i).getFilePath()+"/"+mComicList.get(i).getFileName());
+            currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
         }
 
         mTotalComicCount = map.size();
@@ -273,7 +282,13 @@ public class ComicListFragment extends Fragment {
 
                 ComicLoader.setComicColor(getActivity(), comic);
 
-                sortedInsert(comic);
+                final Comic finalComic = comic;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addComic(finalComic);
+                    }
+                });
 
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
@@ -283,10 +298,18 @@ public class ComicListFragment extends Fragment {
                     && Utilities.checkExtension(str)
                     && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
 
-                Comic newComic = new Comic(str, map.get(str));
+                Comic comic = new Comic(str, map.get(str));
 
-                ComicLoader.loadComicSync( mApplicationContext, newComic);
-                sortedInsert(newComic);
+                ComicLoader.loadComicSync( mApplicationContext, comic);
+
+                final Comic finalComic = comic;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addComic(finalComic);
+                    }
+                });
+
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
 
@@ -298,88 +321,39 @@ public class ComicListFragment extends Fragment {
             }
         }
 
+        updateLastReadComics();
+
         long endTime = System.currentTimeMillis();
 
         Log.d("search comics in list", "time: "+(endTime-startTime));
     }
 
-
-    private synchronized void sortedInsert(Comic comic)
+    private void updateLastReadComics()
     {
-        if (mComicList.size()==0)
-        {
-            final Comic comicToAdd = comic;
-            mRecyclerView.post(new Runnable() {
-                @Override
-                public void run() {
-                    mComicList.add(0, comicToAdd);
-                    mRecyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.notifyDataSetChanged();
-                        }
-                    });
-                }
-            });
 
-        }
-        else
+        Map readComics = PreferenceSetter.getReadComics(getActivity());
+
+        for (int i=0;i<mAdapter.getComics().size();i++)
         {
-            for (int i=mComicList.size()-1;i>=0;i--)
+            if (readComics.containsKey(mAdapter.getComics().get(i).getFileName()))
             {
-                if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) > 0)
-                {
-                    final int pos = i+1;
-                    mComicList.add(pos,comic);
-                    mRecyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.notifyItemInserted(pos);
-                        }
-                    });
-                    return;
-
-                }
-                else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) == 0)
-                {
-                    if (comic.getIssueNumber() > mComicList.get(i).getIssueNumber())
-                    {
-                        final int pos = i+1;
-                        mComicList.add(pos,comic);
-                        mRecyclerView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAdapter.notifyItemInserted(pos);
-                            }
-                        });
-                        return;
+                final int pos = i;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.notifyItemChanged(pos);
                     }
-                }
-                else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) < 0)
-                {
-                    if (i == 0) {
-                        final int pos = i;
-                        mComicList.add(pos, comic);
-                        mRecyclerView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAdapter.notifyItemInserted(pos);
-                            }
-                        });
-                        return;
-                    }
-                }
-
+                });
             }
         }
-
     }
 
     private int getComicPositionInList(String filename)
     {
-        for (int pos=0;pos<mComicList.size();pos++)
+        List<Comic> currentComics = mAdapter.getComics();
+        for (int pos=0;pos<currentComics.size();pos++)
         {
-            if (mComicList.get(pos).getFileName().equals(filename))
+            if (currentComics.get(pos).getFileName().equals(filename))
                 return pos;
         }
         return -1;
@@ -413,7 +387,7 @@ public class ComicListFragment extends Fragment {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
-        PreferenceSetter.saveComicList(getActivity(), mComicList);
+        PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
     }
 
     @Override
@@ -421,9 +395,11 @@ public class ComicListFragment extends Fragment {
     {
         super.onSaveInstanceState(savedState);
 
-        for (int i=0;i<mComicList.size();i++)
+        List<Comic> currentComics = mAdapter.getComics();
+
+        for (int i=0;i<currentComics.size();i++)
         {
-            savedState.putParcelable("Comic "+ (i+1), mComicList.get(i));
+            savedState.putParcelable("Comic "+ (i+1), currentComics.get(i));
         }
 
         StringBuilder csvList = new StringBuilder();
@@ -450,7 +426,7 @@ public class ComicListFragment extends Fragment {
     {
         super.onStop();
         PreferenceSetter.saveFilePaths(getActivity(), mFilePaths, mExcludedPaths);
-        PreferenceSetter.saveComicList(getActivity(), mComicList);
+        PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
     }
 
 
@@ -465,9 +441,6 @@ public class ComicListFragment extends Fragment {
 
         if (isFiltered)
             filterList("");
-
-        mAdapter.notifyDataSetChanged();
-
 
         new SearchComicsTask().execute();
     }
@@ -539,7 +512,7 @@ public class ComicListFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(120));
-        mRecyclerView.setItemAnimator(new SlideInOutLeftItemAnimator(mRecyclerView));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
 
@@ -561,7 +534,7 @@ public class ComicListFragment extends Fragment {
 
                     if (!isFiltered)
                     {
-                        clickedComic = mComicList.get(position);
+                        clickedComic = mAdapter.getComics().get(position);
                     }
                     else
                     {
@@ -591,11 +564,11 @@ public class ComicListFragment extends Fragment {
     {
         mExcludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
-        mComicList = Collections.synchronizedList(new ArrayList<Comic>());
+        //mComicList = Collections.synchronizedList(new ArrayList<Comic>());
 
         if (savedInstanceState==null)
         {
-            mAdapter = new ComicAdapter(getActivity(), mComicList);
+            mAdapter = new ComicAdapter(getActivity());
             mRecyclerView.setAdapter(mAdapter);
         }
         else
@@ -611,9 +584,9 @@ public class ComicListFragment extends Fragment {
 
             for (int i=0;i<savedInstanceState.size();i++)
             {
+                mAdapter = new ComicAdapter(getActivity());
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
-                    mComicList.add((Comic)savedInstanceState.getParcelable("Comic "+ (i+1)));
-                mAdapter = new ComicAdapter(getActivity(), mComicList);
+                    mAdapter.addComic((Comic) savedInstanceState.getParcelable("Comic " + (i + 1)));
                 mRecyclerView.setAdapter(mAdapter);
             }
         }
@@ -625,20 +598,21 @@ public class ComicListFragment extends Fragment {
             isFiltered = true;
 
             filteredList = new ArrayList<>();
+            List<Comic> currentComics = mAdapter.getComics();
 
-            for (int i = 0; i < mComicList.size(); i++) {
+            for (int i = 0; i < currentComics.size(); i++) {
 
                 boolean found = false;
 
-                if (mComicList.get(i).getFileName().toLowerCase().contains(query.toLowerCase())) {
+                if (currentComics.get(i).getFileName().toLowerCase().contains(query.toLowerCase())) {
                     found = true;
                 }
-                else if ((mComicList.get(i).getTitle().toLowerCase()+" "+mComicList.get(i).getIssueNumber()).contains(query.toLowerCase()))
+                else if ((currentComics.get(i).getTitle().toLowerCase()+" "+currentComics.get(i).getIssueNumber()).contains(query.toLowerCase()))
                 {
                     found=true;
                 }
                 if (found)
-                    filteredList.add(mComicList.get(i));
+                    filteredList.add(currentComics.get(i));
             }
             RecyclerView.Adapter tempAdapter = new ComicAdapter(getActivity(), filteredList);
             mRecyclerView.swapAdapter(tempAdapter,false);

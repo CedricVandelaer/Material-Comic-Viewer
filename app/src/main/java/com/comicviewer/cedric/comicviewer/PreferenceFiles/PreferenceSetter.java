@@ -69,6 +69,7 @@ public class PreferenceSetter {
         return comicList;
     }
 
+    //saves comic filename and pagenumber
     public static void saveLastReadComic(Context context, String comicName, int pageNumber)
     {
         Map<String, Integer> lastReadMap = getReadComics(context);

@@ -24,6 +24,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,6 +42,20 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     public ComicAdapter(Context context, List<Comic> comics)
     {
         mComicList=comics;
+        mContext=context;
+        mImageOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
+                .considerExifParams(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
+
+        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public ComicAdapter(Context context)
+    {
+        mComicList= Collections.synchronizedList(new ArrayList<Comic>());
         mContext=context;
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
@@ -293,6 +308,58 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             comicItemViewHolder.mYear.setTextColor(mComicList.get(i).getPrimaryTextColor());
 
             comicItemViewHolder.mCardView.setCardBackgroundColor(mComicList.get(i).getComicColor());
+        }
+
+    }
+
+    public List<Comic> getComics()
+    {
+        return mComicList;
+    }
+
+    public void clearComicList()
+    {
+        mComicList.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addComic(Comic comic)
+    {
+        if (mComicList.size()==0)
+        {
+            mComicList.add(0, comic);
+            notifyItemInserted(0);
+
+        }
+        else
+        {
+            for (int i=mComicList.size()-1;i>=0;i--)
+            {
+                if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) > 0)
+                {
+                    mComicList.add(i + 1, comic);
+                    notifyItemInserted(i+1);
+                    return;
+                }
+                else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) == 0)
+                {
+                    if (comic.getIssueNumber() > mComicList.get(i).getIssueNumber())
+                    {
+                        mComicList.add(i + 1, comic);
+                        notifyItemInserted(i+1);
+                        return;
+                    }
+                }
+                else if (comic.getTitle().compareToIgnoreCase(mComicList.get(i).getTitle()) < 0)
+                {
+                    if (i == 0) {
+                        mComicList.add(i, comic);
+                        notifyItemInserted(i);
+                        return;
+                    }
+                }
+
+            }
         }
 
     }
