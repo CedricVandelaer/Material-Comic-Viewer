@@ -390,7 +390,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     private void setAnimation(View viewToAnimate, int position)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String scrollAnimPref = prefs.getString("scrollAnimation", mContext.getString(R.string.scroll_animation_setting_2));
+        String scrollAnimPref = prefs.getString("scrollAnimation", mContext.getString(R.string.scroll_animation_setting_1));
 
         if (scrollAnimPref.equals(mContext.getString(R.string.scroll_animation_setting_1)))
         {
