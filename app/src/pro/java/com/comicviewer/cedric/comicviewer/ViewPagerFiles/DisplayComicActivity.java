@@ -24,6 +24,7 @@ import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.ComicListFragment;
+import com.comicviewer.cedric.comicviewer.Utilities;
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -242,7 +243,7 @@ public class DisplayComicActivity extends FragmentActivity {
                     String filename = mPages.get(i);
                     if (filename.contains("#"))
                         filename = filename.replaceAll("#","");
-                    File file = new File(getFilesDir().getPath() + "/" + filename);
+                    File file = new File(getFilesDir().getPath()+"/" + Utilities.removeExtension(mCurrentComic.getFileName()) + "/" + filename);
                     if (file.delete())
                         Log.d("DisplayComic Onstop", "Deleted file " +filename);
                 }

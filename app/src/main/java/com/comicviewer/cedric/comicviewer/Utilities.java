@@ -14,13 +14,23 @@ import net.lingala.zip4j.core.ZipFile;
  * Utilities for extension checking or filetype checking
  */
 public class Utilities {
-    
+
+    public static String removeExtension(String filename)
+    {
+        if (filename.contains("."))
+            return filename.substring(0, filename.lastIndexOf("."));
+        return filename;
+    }
+
     public static boolean checkExtension(String filename)
     {
         try {
             String extension = filename.substring(filename.lastIndexOf(".") + 1, filename.length());
             
-            if (extension.equals("rar") || extension.equals("cbr") || extension.equals("cbz") || extension.equals("zip"))
+            if (extension.equalsIgnoreCase("rar")
+                    || extension.equalsIgnoreCase("cbr")
+                    || extension.equalsIgnoreCase("cbz")
+                    || extension.equalsIgnoreCase("zip"))
             {
                 return true;
             }
@@ -81,8 +91,8 @@ public class Utilities {
             e.printStackTrace();
         }
 
-        if (extension.equals("jpg") || extension.equals("jpeg")
-                || extension.equals("png"))
+        if (extension.equalsIgnoreCase("jpg") || extension.equalsIgnoreCase("jpeg")
+                || extension.equalsIgnoreCase("png"))
         {
             return true;
         }

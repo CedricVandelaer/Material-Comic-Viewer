@@ -27,7 +27,7 @@
             android:key="scrollAnimation"
             android:title="Scroll animation"
             android:summary="Note: only for small and normal sized cards"
-            android:defaultValue="@string/scroll_animation_setting_2"
+            android:defaultValue="@string/scroll_animation_setting_1"
             android:entries="@array/Scroll_animations"
             android:entryValues="@array/Scroll_animations_values"/>
         

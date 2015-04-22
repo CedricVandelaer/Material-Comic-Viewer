@@ -93,7 +93,9 @@ public class ComicLoader {
                 extractedImageFile = extractedImageFile.replaceAll("#", "");
 
             // the output file
-            File output = new File(context.getFilesDir(), extractedImageFile);
+            File directory = new File(context.getFilesDir()+"/"+Utilities.removeExtension(archivefilename));
+            directory.mkdir();
+            File output = new File(directory.getPath(), extractedImageFile);
 
             // if file!=extracted -> extract
             if (!(output.exists())) {
@@ -103,7 +105,7 @@ public class ComicLoader {
                     return;
             }
 
-            String coverImage = "file:///" + context.getFilesDir().toString() + "/" + extractedImageFile;
+            String coverImage = "file:///" + context.getFilesDir().toString() + "/"+ Utilities.removeExtension(archivefilename) + "/" + extractedImageFile;
 
             if (comic.getCoverImage() == null) {
                 comic.setCoverImage(coverImage);
@@ -162,7 +164,9 @@ public class ComicLoader {
                 extractedImageFile = extractedImageFile.replaceAll("#", "");
 
             // the output file
-            File output = new File(context.getFilesDir(), extractedImageFile);
+            File directory = new File(context.getFilesDir() + "/" + Utilities.removeExtension(filename));
+            directory.mkdir();
+            File output = new File(directory.getPath(), extractedImageFile);
 
             // if file!=extracted -> extract
             if (!(output.exists())) {
@@ -173,7 +177,7 @@ public class ComicLoader {
                     return;
             }
 
-            String coverImage = "file:///" + context.getFilesDir().toString() + "/" + extractedImageFile;
+            String coverImage = "file:///" + context.getFilesDir().toString() +"/" + Utilities.removeExtension(filename) + "/" + extractedImageFile;
 
             if (comic.getCoverImage() == null) {
                 comic.setCoverImage(coverImage);
@@ -245,3 +249,5 @@ public class ComicLoader {
         }
     }
 }
+
+

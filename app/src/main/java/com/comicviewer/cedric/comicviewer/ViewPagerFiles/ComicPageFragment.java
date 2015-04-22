@@ -40,6 +40,9 @@ public class ComicPageFragment extends Fragment {
     // The path to the .cbr file (Directory + filename)
     private String mComicArchivePath;
 
+    // the name of the archive file of the comic, used to store the image files in a separate folder name to avoid collisions
+    private String mFolderName;
+
     // The filename of the file in the archive according to JUnrar
     // (Notice that the filename also contains folders in the archive delimited by '\' instead of '/' )
     private String mImageFileName;
@@ -77,7 +80,8 @@ public class ComicPageFragment extends Fragment {
         mFullscreenComicView.setImageBitmap(null);
         if (filename!=null) {
             if (getActivity()!=null) {
-                String imagePath = "file:///" + getActivity().getFilesDir().getPath() + "/" + filename;
+
+                String imagePath = "file:///" + getActivity().getFilesDir().getPath()+"/" + mFolderName + "/" + filename;
                 Log.d("loadImage", imagePath);
                 ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, new SimpleImageLoadingListener(){
                     @Override
@@ -116,6 +120,10 @@ public class ComicPageFragment extends Fragment {
 
         mSpinner = (ProgressBarCircularIndeterminate) rootView.findViewById(R.id.spinner);
         mComicArchivePath = args.getString("ComicArchive");
+        if (mComicArchivePath.contains("/"))
+            mFolderName = Utilities.removeExtension(mComicArchivePath.substring(mComicArchivePath.lastIndexOf("/")+1));
+        else
+            mFolderName = Utilities.removeExtension(mComicArchivePath);
         mImageFileName = args.getString("Page");
         mPageNumber = args.getInt("PageNumber");
         mFullscreenComicView = (TouchImageView) rootView.findViewById(R.id.fullscreen_comic);
@@ -156,8 +164,10 @@ public class ComicPageFragment extends Fragment {
                         // get rid of special chars
                         if (extractedImageFile.contains("#"))
                             extractedImageFile = extractedImageFile.replaceAll("#","");
-                        
-                        File outputPage = new File(getActivity().getFilesDir(), extractedImageFile);
+
+                        File directory = new File(getActivity().getFilesDir().getPath()+"/"+mFolderName);
+                        directory.mkdir();
+                        File outputPage = new File(directory.getPath(), extractedImageFile);
                         
                         if (!outputPage.exists()) {
                             FileOutputStream osPage = new FileOutputStream(outputPage);
@@ -221,7 +231,9 @@ public class ComicPageFragment extends Fragment {
                         if (extractedImageFile.contains("#"))
                             extractedImageFile = extractedImageFile.replaceAll("#","");
 
-                        File outputPage = new File(getActivity().getFilesDir(), fileHeaders.get(i).getFileName());
+                        File directory = new File(getActivity().getFilesDir().getPath()+"/"+mFolderName);
+                        directory.mkdir();
+                        File outputPage = new File( directory.getPath(), fileHeaders.get(i).getFileName());
 
                         if (!outputPage.exists()) {
                             //FileOutputStream osPage = new FileOutputStream(outputPage);

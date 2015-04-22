@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.Utilities;
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -161,19 +163,21 @@ public class DisplayComicActivity extends FragmentActivity {
                 ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(DisplayComicActivity.this).build();
                 ImageLoader.getInstance().init(config);
             }
-            
-            ActivityManager.TaskDescription tdscr = null;
-            try {
-                ImageSize size = new ImageSize(64,64);
-                tdscr = new ActivityManager.TaskDescription(mCurrentComic.getTitle(),
-                        ImageLoader.getInstance().loadImageSync(mCurrentComic.getCoverImage(),size),
-                        mCurrentComic.getComicColor());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
-            if (tdscr!=null)
-                setTaskDescription(tdscr);
+            if (Build.VERSION.SDK_INT>20) {
+                ActivityManager.TaskDescription tdscr = null;
+                try {
+                    ImageSize size = new ImageSize(64, 64);
+                    tdscr = new ActivityManager.TaskDescription(mCurrentComic.getTitle(),
+                            ImageLoader.getInstance().loadImageSync(mCurrentComic.getCoverImage(), size),
+                            mCurrentComic.getComicColor());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (tdscr != null)
+                    setTaskDescription(tdscr);
+            }
 
             return null;
         }
@@ -262,7 +266,7 @@ public class DisplayComicActivity extends FragmentActivity {
                     String filename = mPages.get(i);
                     if (filename.contains("#"))
                         filename = filename.replaceAll("#","");
-                    File file = new File(getFilesDir().getPath() + "/" + filename);
+                    File file = new File(getFilesDir().getPath()+"/"+ Utilities.removeExtension(mCurrentComic.getFileName()) + "/" + filename);
                     if (file.delete())
                         Log.d("DisplayComic Onstop", "Deleted file " +filename);
                 }
@@ -280,7 +284,11 @@ public class DisplayComicActivity extends FragmentActivity {
     {
         PreferenceSetter.saveLastReadComic(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
         removeExtractedFiles();
-        finishAfterTransition();
+        if (Build.VERSION.SDK_INT>20) {
+            finishAfterTransition();
+        }
+        else
+            finish();
     }
 
 }
