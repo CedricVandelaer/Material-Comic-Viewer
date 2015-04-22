@@ -336,6 +336,13 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
     public void addComic(Comic comic)
     {
+        int pos = mComicList.size();
+        mComicList.add(pos,comic);
+        notifyItemInserted(pos);
+    }
+
+    public void addComicSorted(Comic comic)
+    {
         if (mComicList.size()==0)
         {
             mComicList.add(0, comic);

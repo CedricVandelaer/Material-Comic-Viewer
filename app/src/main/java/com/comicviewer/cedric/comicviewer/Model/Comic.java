@@ -103,6 +103,11 @@ public class Comic implements Parcelable
             Log.e("IssueNumber", e.getMessage());
         }
 
+        if (mIssueNumber == mYear)
+        {
+            mIssueNumber = -1;
+        }
+
         mCoverImage = null;
     }
 
@@ -149,6 +154,8 @@ public class Comic implements Parcelable
             mTitle = filename;
         
         mTitle = mTitle.replaceAll("_"," ");
+
+        mTitle = mTitle.replaceAll("#","");
         
         mTitle = mTitle.trim();
         
@@ -172,7 +179,14 @@ public class Comic implements Parcelable
         {
             mTitle = mTitle.substring(1,mTitle.length());
         }
+
+        if (mTitle.endsWith("-"))
+        {
+            mTitle = mTitle.substring(0,mTitle.length()-1);
+        }
+
         mTitle = mTitle.trim();
+
     }
 
     private void readFromParcel(Parcel in)

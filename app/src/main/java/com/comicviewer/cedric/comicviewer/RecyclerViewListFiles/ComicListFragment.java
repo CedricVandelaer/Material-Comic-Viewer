@@ -282,7 +282,7 @@ public class ComicListFragment extends Fragment {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mAdapter.addComic(finalComic);
+                        mAdapter.addComicSorted(finalComic);
                     }
                 });
 
@@ -302,7 +302,7 @@ public class ComicListFragment extends Fragment {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mAdapter.addComic(finalComic);
+                        mAdapter.addComicSorted(finalComic);
                     }
                 });
 
@@ -361,7 +361,7 @@ public class ComicListFragment extends Fragment {
     {
         if (mProgress==0)
         {
-            mSwipeRefreshLayout.post(new Runnable() {
+            mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     mSwipeRefreshLayout.setRefreshing(true);
@@ -377,7 +377,7 @@ public class ComicListFragment extends Fragment {
     private void onLoadingFinished()
     {
 
-        mSwipeRefreshLayout.post(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
                 mSwipeRefreshLayout.setRefreshing(false);

@@ -237,9 +237,9 @@ public class ComicPageFragment extends Fragment {
 
                         if (!outputPage.exists()) {
                             //FileOutputStream osPage = new FileOutputStream(outputPage);
-                            String extractPath = getActivity().getFilesDir().getAbsolutePath();
-                            Log.d("Extractpath",extractPath);
-                            zipFile.extractFile(fileHeaders.get(i), extractPath);
+                            String extractPath = directory.getPath();
+                            Log.d("Extractpath",directory.getPath());
+                            zipFile.extractFile(fileHeaders.get(i), directory.getPath());
                         }
 
                         return fileHeaders.get(i).getFileName();

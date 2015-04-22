@@ -93,19 +93,19 @@ public class ComicLoader {
                 extractedImageFile = extractedImageFile.replaceAll("#", "");
 
             // the output file
-            File directory = new File(context.getFilesDir()+"/"+Utilities.removeExtension(archivefilename));
+            File directory = new File(context.getFilesDir().getPath()+"/"+Utilities.removeExtension(archivefilename));
             directory.mkdir();
             File output = new File(directory.getPath(), extractedImageFile);
 
             // if file!=extracted -> extract
             if (!(output.exists())) {
                 if (pages.size() > 0)
-                    zipFile.extractFile(pages.get(0), context.getFilesDir().getAbsolutePath());
+                    zipFile.extractFile(pages.get(0), directory.getPath());
                 else
                     return;
             }
 
-            String coverImage = "file:///" + context.getFilesDir().toString() + "/"+ Utilities.removeExtension(archivefilename) + "/" + extractedImageFile;
+            String coverImage = "file:///" + directory + "/" + extractedImageFile;
 
             if (comic.getCoverImage() == null) {
                 comic.setCoverImage(coverImage);
