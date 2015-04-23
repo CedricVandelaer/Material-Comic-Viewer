@@ -11,7 +11,8 @@
     android:foreground="@drawable/ripple"
     >
 
-    <RelativeLayout android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="220dp">
         <ImageView
             android:transitionName="cover"
@@ -65,12 +66,24 @@
             android:layout_marginStart="10dp"
             android:paddingBottom="6dp"/>
         <ImageView
-            android:id="@+id/last_read_indicator"
+            android:id="@+id/normal_favorite_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="8dp"
             android:layout_alignParentEnd="true"
             android:layout_margin="20dp"
+            android:src="@drawable/star_outline"
+            android:layout_alignParentBottom="true"/>
+        <ImageView
+            android:id="@+id/last_read_indicator"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="64dp"
             android:layout_alignParentBottom="true"/>
     </RelativeLayout>
 

@@ -22,12 +22,75 @@ import java.util.Map;
  */
 public class PreferenceSetter {
 
+    private static final String FAVORITE_COMIC_LIST="favoriteComicList";
 
     public static String getCardAppearanceSetting(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         return prefs.getString("cardSize", context.getString(R.string.card_size_setting_2));
+    }
+
+    public static void saveFavoriteComic(Context context, String comicFileName)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String favoritesString = prefs.getString(FAVORITE_COMIC_LIST, "");
+
+        favoritesString += (","+comicFileName);
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(FAVORITE_COMIC_LIST,favoritesString);
+        editor.apply();
+
+    }
+
+    public static void saveFavoriteComicList(Context context, List<String> favoritesList)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        SharedPreferences.Editor editor = prefs.edit();
+
+        String favoriteString = "";
+
+        for (String favorite:favoritesList)
+        {
+            favoriteString+= (favorite+",");
+        }
+        editor.putString(FAVORITE_COMIC_LIST, favoriteString);
+        editor.apply();
+    }
+
+    public static boolean usesRecents(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return prefs.getBoolean("useRecents",true);
+    }
+
+    public static List<String> getFavoriteComics(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        ArrayList<String> favoriteArrayList = new ArrayList<>();
+
+        String favoritesString = prefs.getString(FAVORITE_COMIC_LIST, "");
+
+        String[] favorites = favoritesString.split(",");
+
+        for (String comic:favorites)
+        {
+            favoriteArrayList.add(comic);
+        }
+        return favoriteArrayList;
+    }
+
+    public static void removeFavoriteComic(Context context, String comicFileName)
+    {
+        List<String> favorites = getFavoriteComics(context);
+        favorites.remove(comicFileName);
+
+        saveFavoriteComicList(context, favorites);
     }
 
     public static void saveComicList(Context context, List<Comic> comicList)

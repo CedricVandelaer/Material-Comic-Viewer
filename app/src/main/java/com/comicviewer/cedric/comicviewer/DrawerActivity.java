@@ -5,10 +5,9 @@ import android.os.Bundle;
 
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.ComicListFragment;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.FavoritesListFragment;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-
-import java.util.ArrayList;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
@@ -18,7 +17,7 @@ import it.neokree.materialnavigationdrawer.elements.MaterialSection;
  * The drawer activity*
  */
 public class DrawerActivity extends MaterialNavigationDrawer implements ComicListFragment.OnFragmentInteractionListener,
-AboutFragment.OnFragmentInteractionListener{
+AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInteractionListener{
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -34,10 +33,13 @@ AboutFragment.OnFragmentInteractionListener{
             ImageLoader.getInstance().init(config);
         }
 
-        this.setDrawerHeaderImage(ImageLoader.getInstance().loadImageSync("drawable://"+R.drawable.tealtrainglebg));
+        this.setDrawerHeaderImage(ImageLoader.getInstance().loadImageSync("drawable://"+R.drawable.tealtrianglebg));
         
         MaterialSection allComicsSection = newSection("All comics", R.drawable.book, ComicListFragment.getInstance());
         addSection(allComicsSection);
+
+        MaterialSection favoritesSection = newSection("Favorites", R.drawable.star, FavoritesListFragment.getInstance());
+        addSection(favoritesSection);
 
         MaterialSection settingsSection = newSection("Settings", R.drawable.settings, SettingsFragment.newInstance());
         addBottomSection(settingsSection);

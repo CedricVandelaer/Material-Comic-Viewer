@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected TextView mPageCount;
     protected TextView mYear;
     protected ImageView mLastReadIcon;
+    protected ImageView mFavoriteButton;
 
     public ComicItemViewHolder(View itemView) {
         super(itemView);
@@ -49,6 +51,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         mCardView = (CardView) itemView.findViewById(R.id.card_bg);
         mTitle = (TextView) itemView.findViewById(R.id.replacement_title);
         mLastReadIcon = (ImageView) itemView.findViewById(R.id.large_read_indicator);
+        mFavoriteButton = (ImageView) itemView.findViewById(R.id.large_favorite_button);
     }
     
     private void initialiseNormalCard(View itemView)
@@ -60,6 +63,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         mCardView = (CardView) itemView.findViewById(R.id.card);
         mYear = (TextView) itemView.findViewById(R.id.year);
         mLastReadIcon = (ImageView) itemView.findViewById(R.id.last_read_indicator);
+        mFavoriteButton = (ImageView) itemView.findViewById(R.id.normal_favorite_button);
     }
 
     private void initialiseSmallCard(View itemView)
@@ -70,6 +74,8 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         mCardView = (CardView) itemView.findViewById(R.id.small_card);
         mYear = (TextView) itemView.findViewById(R.id.small_year);
         mLastReadIcon = (ImageView) itemView.findViewById(R.id.small_read_indicator);
+        mFavoriteButton = (ImageView) itemView.findViewById(R.id.small_favorite_button);
+
     }
 
 

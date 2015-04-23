@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-public class ComicListFragment extends Fragment {
+public class FavoritesListFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
@@ -63,24 +63,24 @@ public class ComicListFragment extends Fragment {
     private SearchView mSearchView;
     private ArrayList<Comic> filteredList;
     private boolean isFiltered;
-    private static ComicListFragment mSingleton = null;
+    private static FavoritesListFragment mSingleton = null;
     private Context mApplicationContext;
     private Handler mHandler;
 
-    public static ComicListFragment getInstance() {
+    public static FavoritesListFragment getInstance() {
         if(mSingleton == null) {
             mSingleton = newInstance();
         }
         return mSingleton;
     }
 
-    public static ComicListFragment newInstance() {
-        ComicListFragment fragment = new ComicListFragment();
+    public static FavoritesListFragment newInstance() {
+        FavoritesListFragment fragment = new FavoritesListFragment();
 
         return fragment;
     }
 
-    public ComicListFragment() {
+    public FavoritesListFragment() {
         // Required empty public constructor
     }
 
@@ -246,6 +246,8 @@ public class ComicListFragment extends Fragment {
             currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
         }
 
+        List<String> favorites = PreferenceSetter.getFavoriteComics(getActivity());
+
         mTotalComicCount = map.size();
         mProgress = 0;
 
@@ -258,7 +260,9 @@ public class ComicListFragment extends Fragment {
             File file = new File(comicPath);
 
             //check if comic is one of the saved comic files and add
-            if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
+            if (savedComicsFileNames.contains(comicPath)
+                    && !(currentComicsFileNames.contains(comicPath))
+                    && favorites.contains(str))
             {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
@@ -287,9 +291,11 @@ public class ComicListFragment extends Fragment {
                 updateProgressDialog(mProgress, mTotalComicCount);
 
             }//if it is a newly added comic
-            else if (getComicPositionInList(str)==-1
+            else if (favorites.contains(str)
+                    && getComicPositionInList(str)==-1
                     && Utilities.checkExtension(str)
-                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
+                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file)) )
+            {
 
                 Comic comic = new Comic(str, map.get(str));
 
@@ -374,14 +380,13 @@ public class ComicListFragment extends Fragment {
 
     private void onLoadingFinished()
     {
-
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
-        PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
+        //PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
     }
 
     @Override
@@ -412,7 +417,6 @@ public class ComicListFragment extends Fragment {
     {
         super.onPause();
         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
-        PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
         enableSearchBar(false);
     }
 
@@ -421,7 +425,7 @@ public class ComicListFragment extends Fragment {
     {
         super.onStop();
         PreferenceSetter.saveFilePaths(getActivity(), mFilePaths, mExcludedPaths);
-        PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
+        //PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
     }
 
 
