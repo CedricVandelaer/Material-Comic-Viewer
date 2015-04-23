@@ -5,8 +5,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
+    card_view:cardElevation="8dp"
     android:id="@+id/small_card"
     android:clickable="true"
+    android:foreground="@drawable/ripple"
     >
 
     <RelativeLayout android:layout_width="match_parent"
@@ -61,9 +63,9 @@
                 android:textAlignment="center"
                 android:textColor="#000000"
                 android:padding="6dp"/>
-            
+
         </LinearLayout>
-        
+
     </RelativeLayout>
 
     <ImageView

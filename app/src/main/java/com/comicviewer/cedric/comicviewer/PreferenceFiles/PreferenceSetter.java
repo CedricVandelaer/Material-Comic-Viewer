@@ -89,7 +89,16 @@ public class PreferenceSetter {
         SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
         sharedPreferencesEditor.putString("lastReadComicList", csvList.toString());
 
+        sharedPreferencesEditor.putString("lastReadComic", comicName);
+
         sharedPreferencesEditor.apply();
+
+    }
+
+    public static String getLastReadComic(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString("lastReadComic", "none");
 
     }
 

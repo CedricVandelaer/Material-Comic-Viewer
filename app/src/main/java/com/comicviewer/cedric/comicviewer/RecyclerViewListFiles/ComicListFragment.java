@@ -168,6 +168,7 @@ public class ComicListFragment extends Fragment {
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
+
             public void onRefresh() {
                 if (!isFiltered)
                     refresh();
@@ -232,6 +233,8 @@ public class ComicListFragment extends Fragment {
         //map of <filename, filepath>
         Map<String,String> map = FileLoader.searchComics(getActivity());
 
+        TreeMap<String, String> treemap = new TreeMap<>(map);
+
         long startTime = System.currentTimeMillis();
 
         List<Comic> currentComics = mAdapter.getComics();
@@ -255,7 +258,7 @@ public class ComicListFragment extends Fragment {
 
         updateProgressDialog(mProgress, mTotalComicCount);
 
-        for (String str:map.keySet())
+        for (String str:treemap.keySet())
         {
             //open the new found file
             final String comicPath = map.get(str)+"/"+str;
@@ -327,11 +330,11 @@ public class ComicListFragment extends Fragment {
     private void updateLastReadComics()
     {
 
-        Map readComics = PreferenceSetter.getReadComics(getActivity());
+        String lastReadComic = PreferenceSetter.getLastReadComic(getActivity());
 
         for (int i=0;i<mAdapter.getComics().size();i++)
         {
-            if (readComics.containsKey(mAdapter.getComics().get(i).getFileName()))
+            if (mAdapter.getComics().get(i).getFileName().equals(lastReadComic))
             {
                 final int pos = i;
                 mHandler.post(new Runnable() {
@@ -539,6 +542,7 @@ public class ComicListFragment extends Fragment {
 
                     Log.d("ItemClick", clickedComic.getTitle());
                     intent.putExtra("Comic", clickedComic);
+
 
                     if (mUseRecents)
                     {

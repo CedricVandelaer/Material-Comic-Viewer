@@ -3,6 +3,7 @@ package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -10,7 +11,9 @@ import android.view.View;
  * Custom viewpager to manage zooming behaviour
  */
 public class ComicViewPager extends ViewPager {
-    
+
+    private boolean canSwipe=true;
+
     public ComicViewPager(Context context) {
         super(context);
     }
@@ -19,8 +22,23 @@ public class ComicViewPager extends ViewPager {
         super(context, attrs);
     }
 
+    public void setSwipingEnabled(boolean enabled)
+    {
+        canSwipe = enabled;
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (this.canSwipe) {
+            return super.onInterceptTouchEvent(event);
+        }
+
+        return false;
+    }
+
     @Override
     protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
+
         if (v instanceof TouchImageView) {
             //
             // canScrollHorizontally is not supported for Api < 14. To get around this issue,
@@ -32,5 +50,6 @@ public class ComicViewPager extends ViewPager {
         } else {
             return super.canScroll(v, checkV, dx, x, y);
         }
+
     }
 }
