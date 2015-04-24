@@ -113,15 +113,16 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         return vh;
     }
 
-    private void addClickListener(View v, int position) {
+    private void addClickListener(ComicItemViewHolder vh) {
 
-        final int i = position;
+        View v = vh.mCardView;
+        final int pos = vh.getPosition();
 
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, DisplayComicActivity.class);
-                Comic clickedComic = mComicList.get(i);
+                Comic clickedComic = mComicList.get(pos);
 
                 InputMethodManager imm = (InputMethodManager)mContext.getSystemService(
                         Context.INPUT_METHOD_SERVICE);
@@ -160,14 +161,16 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
             initialiseCardBg(comicItemViewHolder, position);
         }
 
-
-        addFavoriteClickListener(comicItemViewHolder.mFavoriteButton, position);
-        addClickListener(comicItemViewHolder.mCardView,position);
+        addFavoriteClickListener(comicItemViewHolder);
+        addClickListener(comicItemViewHolder);
 
     }
 
-    private void addFavoriteClickListener(View v, final int position)
+    private void addFavoriteClickListener(ComicItemViewHolder vh)
     {
+        View v = vh.mFavoriteButton;
+        final int position = vh.getPosition();
+
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

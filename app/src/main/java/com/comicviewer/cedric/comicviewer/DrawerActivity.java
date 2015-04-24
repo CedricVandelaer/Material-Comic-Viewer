@@ -17,7 +17,8 @@ import it.neokree.materialnavigationdrawer.elements.MaterialSection;
  * The drawer activity*
  */
 public class DrawerActivity extends MaterialNavigationDrawer implements ComicListFragment.OnFragmentInteractionListener,
-AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInteractionListener{
+AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInteractionListener, StatisticsFragment.OnFragmentInteractionListener
+{
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -40,6 +41,9 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
 
         MaterialSection favoritesSection = newSection("Favorites", R.drawable.star, FavoritesListFragment.getInstance());
         addSection(favoritesSection);
+
+        MaterialSection statsSection = newSection("Statistics", R.drawable.stats, StatisticsFragment.newInstance());
+        addSection(statsSection);
 
         MaterialSection settingsSection = newSection("Settings", R.drawable.settings, SettingsFragment.newInstance());
         addBottomSection(settingsSection);

@@ -43,6 +43,7 @@
         <CheckBoxPreference
             android:key="useRecents"
             android:title="Show comics in recents screen"
+            android:summary="Note: Only works on lollipop devices"
             android:defaultValue="true"/>
         
     </PreferenceCategory>

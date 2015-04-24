@@ -22,13 +22,257 @@ import java.util.Map;
  */
 public class PreferenceSetter {
 
-    private static final String FAVORITE_COMIC_LIST="favoriteComicList";
+    private static final String FAVORITE_COMIC_LIST = "favoriteComicList";
+    private static final String NUMBER_OF_COMICS_READ = "numberOfComicsRead";
+    private static final String NUMBER_OF_COMICS_STARTED = "numberOfComicsStarted";
+    private static final String PAGES_READ_LIST = "pagesReadMap";
+    private static final String SERIES_PAGES_READ_LIST =  "seriesPagesReadMap";
+    private static final String USES_RECENTS = "useRecents";
+    private static final String READ_COMIC_LIST = "lastReadComicList";
+    private static final String LAST_READ_COMIC = "lastReadComic";
+    private static final String FILEPATHS = "Filepaths";
+    private static final String EXCLUDED_FILEPATHS = "Excludedpaths";
+    private static final String CARD_SIZE = "cardSize";
+    private static final String BACKGROUND_COLOR = "backgroundColor";
+    private static final String COMICS_ADDED_LIST = "addedComicsList";
+    private static final String LONGEST_READ_COMIC = "longestReadComic";
+
+    public static void resetStats(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(LONGEST_READ_COMIC, "comicFileName,0, comicTitle, -1");
+        editor.putString(COMICS_ADDED_LIST,"");
+        editor.putString(SERIES_PAGES_READ_LIST,"");
+        editor.putString(PAGES_READ_LIST,"");
+        editor.putInt(NUMBER_OF_COMICS_READ,0);
+        editor.putInt(NUMBER_OF_COMICS_STARTED,0);
+        editor.apply();
+    }
+
+    public static int getLongestReadComicPages(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String longestReadString = prefs.getString(LONGEST_READ_COMIC,"comicFileName,0,comicTitle,comicIssueNumber");
+
+        return Integer.parseInt(longestReadString.split(",")[1]);
+    }
+
+    public static String getLongestReadComicTitle(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String longestReadString = prefs.getString(LONGEST_READ_COMIC,"comicFileName,0,comicTitle,-1");
+
+        String pieces[] = longestReadString.split(",");
+        if (Integer.parseInt(pieces[1])!=0)
+        {
+            if (Integer.parseInt(pieces[3])!= -1)
+            {
+                return pieces[2]+" "+Integer.parseInt(pieces[3]);
+            }
+            else
+            {
+                return pieces[2];
+            }
+        }
+        else
+        {
+            return "None";
+        }
+    }
+
+    public static void saveLongestReadComic(Context context, String filename, int pageCount, String title, int issueNumber)
+    {
+
+        if (pageCount > getLongestReadComicPages(context))
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(LONGEST_READ_COMIC, filename+","+pageCount+","+title+","+issueNumber);
+            editor.apply();
+        }
+    }
+
+
+    public static List<String> getComicsAdded(Context context)
+    {
+        ArrayList<String> addedComics = new ArrayList<>();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String comicListString = prefs.getString(COMICS_ADDED_LIST, "");
+
+        String[] comicList = comicListString.split(",");
+        for (String comic:comicList)
+        {
+            addedComics.add(comic);
+        }
+
+        return addedComics;
+    }
+
+    public static void addAddedComic(Context context, String filename)
+    {
+        List<String> addedComics = getComicsAdded(context);
+
+        if (addedComics.contains(filename))
+            return;
+        else
+        {
+            addedComics.add(filename);
+            String stringToSave = "";
+
+            for (String comic:addedComics)
+            {
+                stringToSave+= comic+ ",";
+            }
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(COMICS_ADDED_LIST, stringToSave);
+            editor.apply();
+        }
+
+    }
+
+    public static int getPagesReadForComic(Context context, String filename)
+    {
+        Map<String, Integer> pagesReadMap = getPagesReadMap(context);
+
+        if (pagesReadMap.containsKey(filename))
+            return pagesReadMap.get(filename);
+        else
+            return 0;
+    }
+
+    public static int getPagesReadForSeries(Context context, String seriesName)
+    {
+        Map<String, Integer> pagesReadMap = getSeriesPagesReadMap(context);
+
+        if (pagesReadMap.containsKey(seriesName))
+            return pagesReadMap.get(seriesName);
+        else
+            return 0;
+    }
+
+    public static void savePagesForComic(Context context, String filename, int pages)
+    {
+        Map<String, Integer> pagesReadMap = getPagesReadMap(context);
+
+        if (pagesReadMap.containsKey(filename))
+        {
+            if (pages>pagesReadMap.get(filename))
+            {
+                pagesReadMap.put(filename, pages);
+
+                String stringToSave = "";
+
+                for (String key:pagesReadMap.keySet())
+                {
+                    stringToSave += key+":"+pagesReadMap.get(key)+",";
+                }
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences.Editor editor = prefs.edit();
+
+                editor.putString(PAGES_READ_LIST, stringToSave);
+
+                editor.apply();
+            }
+        }
+        else
+        {
+            pagesReadMap.put(filename, pages);
+
+            String stringToSave = "";
+
+            for (String key:pagesReadMap.keySet())
+            {
+                stringToSave += key+":"+pagesReadMap.get(key)+",";
+            }
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            editor.putString(PAGES_READ_LIST, stringToSave);
+
+            editor.apply();
+        }
+    }
+
+    public static void incrementPagesForSeries(Context context, String title, int increment)
+    {
+
+        Map<String, Integer> pagesReadMap = getSeriesPagesReadMap(context);
+
+        int pages = 0;
+        if (pagesReadMap.containsKey(title))
+            pages = pagesReadMap.get(title);
+
+        pages+=increment;
+
+        pagesReadMap.put(title, pages);
+
+        String stringToSave = "";
+
+        for (String key:pagesReadMap.keySet())
+        {
+            stringToSave += key+":"+pagesReadMap.get(key)+",";
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putString(SERIES_PAGES_READ_LIST, stringToSave);
+
+        editor.apply();
+
+    }
+
+    public static Map<String, Integer> getPagesReadMap(Context context)
+    {
+        Map<String, Integer> pagesReadMap = new HashMap<String, Integer>();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        //List of format "comicname:comicpage,comicname:comicpage,..."
+        String pagesReadString = prefs.getString(PAGES_READ_LIST, "");
+
+        String[] pagesReadPairs = pagesReadString.split(",");
+
+        for (String pair:pagesReadPairs)
+        {
+            if (!pair.isEmpty()) {
+                int splitPosition = pair.lastIndexOf(":");
+                pagesReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
+            }
+        }
+        return pagesReadMap;
+    }
+
+    public static Map<String, Integer> getSeriesPagesReadMap(Context context)
+    {
+        Map<String, Integer> pagesReadMap = new HashMap<String, Integer>();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String pagesReadString = prefs.getString(SERIES_PAGES_READ_LIST, "");
+
+        String[] pagesReadPairs = pagesReadString.split(",");
+
+        for (String pair:pagesReadPairs)
+        {
+            if (!pair.isEmpty()) {
+                int splitPosition = pair.lastIndexOf(":");
+                pagesReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
+            }
+        }
+        return pagesReadMap;
+    }
+
 
     public static String getCardAppearanceSetting(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return prefs.getString("cardSize", context.getString(R.string.card_size_setting_2));
+        return prefs.getString(CARD_SIZE, context.getString(R.string.card_size_setting_2));
     }
 
     public static void saveFavoriteComic(Context context, String comicFileName)
@@ -61,11 +305,45 @@ public class PreferenceSetter {
         editor.apply();
     }
 
+
+    public static void incrementNumberOfComicsRead(Context context, int increment)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int currentReadComics = getNumberOfComicsRead(context);
+        currentReadComics += increment;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(NUMBER_OF_COMICS_READ, currentReadComics);
+        editor.apply();
+    }
+
+    public static void incrementNumberOfComicsStarted(Context context, int increment)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int currentStartedComics = getNumberOfComicsStarted(context);
+        currentStartedComics += increment;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(NUMBER_OF_COMICS_STARTED, currentStartedComics);
+        editor.apply();
+    }
+
+
+    public static int getNumberOfComicsStarted(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(NUMBER_OF_COMICS_STARTED, 0);
+    }
+
+    public static int getNumberOfComicsRead(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(NUMBER_OF_COMICS_READ,0);
+    }
+
     public static boolean usesRecents(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return prefs.getBoolean("useRecents",true);
+        return prefs.getBoolean(USES_RECENTS,true);
     }
 
     public static List<String> getFavoriteComics(Context context)
@@ -150,9 +428,9 @@ public class PreferenceSetter {
         }
 
         SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putString("lastReadComicList", csvList.toString());
+        sharedPreferencesEditor.putString(READ_COMIC_LIST, csvList.toString());
 
-        sharedPreferencesEditor.putString("lastReadComic", comicName);
+        sharedPreferencesEditor.putString(LAST_READ_COMIC, comicName);
 
         sharedPreferencesEditor.apply();
 
@@ -161,7 +439,7 @@ public class PreferenceSetter {
     public static String getLastReadComic(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString("lastReadComic", "none");
+        return prefs.getString(LAST_READ_COMIC, "none");
 
     }
 
@@ -171,7 +449,7 @@ public class PreferenceSetter {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         //List of format "comicname:comicpage,comicname:comicpage,..."
-        String lastReadComics = prefs.getString("lastReadComicList", "");
+        String lastReadComics = prefs.getString(READ_COMIC_LIST, "");
 
         String[] lastReadPairs = lastReadComics.split(",");
 
@@ -207,7 +485,7 @@ public class PreferenceSetter {
     public static int getBackgroundColorPreference(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String bgcolor = prefs.getString("backgroundColor", context.getString(R.string.backgroundcolor_setting2));
+        String bgcolor = prefs.getString(BACKGROUND_COLOR, context.getString(R.string.backgroundcolor_setting2));
         int color;
         
         if (bgcolor.equals(context.getString(R.string.backgroundcolor_setting1)))
@@ -240,7 +518,7 @@ public class PreferenceSetter {
         
         String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String csvList = prefs.getString("Filepaths", defaultPath);
+        String csvList = prefs.getString(FILEPATHS, defaultPath);
         
         String[] items = csvList.split(",");
         for(int i=0; i < items.length; i++){
@@ -270,7 +548,7 @@ public class PreferenceSetter {
         ArrayList<String> paths = new ArrayList<>();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String csvList = prefs.getString("Excludedpaths", null);
+        String csvList = prefs.getString(EXCLUDED_FILEPATHS, null);
 
         if (csvList!=null) {
             String[] items = csvList.split(",");
@@ -302,7 +580,7 @@ public class PreferenceSetter {
         }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putString("Filepaths", csvList.toString());
+        sharedPreferencesEditor.putString(FILEPATHS, csvList.toString());
 
         sharedPreferencesEditor.apply();
 
@@ -313,7 +591,7 @@ public class PreferenceSetter {
         }
 
         sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putString("Excludedpaths", csvList.toString());
+        sharedPreferencesEditor.putString(EXCLUDED_FILEPATHS, csvList.toString());
 
         sharedPreferencesEditor.apply();
     }

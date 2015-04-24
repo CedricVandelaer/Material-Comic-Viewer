@@ -68,7 +68,6 @@ public class DisplayComicActivity extends FragmentActivity {
         setContentView(R.layout.activity_display_comic);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-
         Intent intent = getIntent();
         
         int lastReadPage;
@@ -121,6 +120,29 @@ public class DisplayComicActivity extends FragmentActivity {
                 mPageIndicator.setText("" + (position+1)+" of "+ mPageCount);
             else
                 mPageIndicator.setText("");
+
+            int pagesRead = PreferenceSetter.getPagesReadForComic(DisplayComicActivity.this, mCurrentComic.getFileName());
+
+            if (pagesRead==0)
+            {
+                PreferenceSetter.incrementNumberOfComicsStarted(DisplayComicActivity.this, 1);
+            }
+
+            if (position+1> pagesRead)
+            {
+                PreferenceSetter.savePagesForComic(DisplayComicActivity.this, mCurrentComic.getFileName(), position+1);
+                if (position+1 >= mCurrentComic.getPageCount())
+                {
+                    PreferenceSetter.incrementNumberOfComicsRead(DisplayComicActivity.this, 1);
+                    PreferenceSetter.saveLongestReadComic(DisplayComicActivity.this,
+                            mCurrentComic.getFileName(),
+                            mCurrentComic.getPageCount(),
+                            mCurrentComic.getTitle(),
+                            mCurrentComic.getIssueNumber());
+                }
+            }
+
+            PreferenceSetter.incrementPagesForSeries(DisplayComicActivity.this, mCurrentComic.getTitle(), 1);
         }
 
         @Override

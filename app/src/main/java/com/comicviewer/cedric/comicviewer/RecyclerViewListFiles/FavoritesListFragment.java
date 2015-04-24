@@ -267,7 +267,7 @@ public class FavoritesListFragment extends Fragment {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
                 try {
-                    Thread.sleep(10, 0);
+                    Thread.sleep(2, 0);
                 }
                 catch (Exception e)
                 {
@@ -331,21 +331,12 @@ public class FavoritesListFragment extends Fragment {
     private void updateLastReadComics()
     {
 
-        String lastReadComic = PreferenceSetter.getLastReadComic(getActivity());
-
-        for (int i=0;i<mAdapter.getComics().size();i++)
-        {
-            if (mAdapter.getComics().get(i).getFileName().equals(lastReadComic))
-            {
-                final int pos = i;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.notifyItemChanged(pos);
-                    }
-                });
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.notifyDataSetChanged();
             }
-        }
+        });
     }
 
     private int getComicPositionInList(String filename)

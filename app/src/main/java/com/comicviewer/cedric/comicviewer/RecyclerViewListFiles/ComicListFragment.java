@@ -263,7 +263,7 @@ public class ComicListFragment extends Fragment {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
                 try {
-                    Thread.sleep(10, 0);
+                    Thread.sleep(2, 0);
                 }
                 catch (Exception e)
                 {
@@ -294,6 +294,11 @@ public class ComicListFragment extends Fragment {
                 Comic comic = new Comic(str, map.get(str));
 
                 ComicLoader.loadComicSync( mApplicationContext, comic);
+
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
