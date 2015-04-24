@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.daimajia.swipe.SwipeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <!-- Bottom View Start-->
+    <LinearLayout
+        xmlns:fab="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/bottom_wrapper"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_height="match_parent">
+        <!--What you want to show-->
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/delete_low_res"
+            android:adjustViewBounds="true"
+            android:layout_margin="16dp"
+            android:layout_weight="1"
+            fab:fab_type="normal"
+            fab:fab_shadow="true"
+            fab:fab_colorNormal="@color/Red"
+            fab:fab_colorPressed="@color/RedDark"
+            fab:fab_colorRipple="@color/RedLight" />
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/mark_read_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/check_low_res"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:layout_margin="16dp"
+            fab:fab_type="normal"
+            fab:fab_shadow="true"
+            fab:fab_colorNormal="@color/Teal"
+            fab:fab_colorPressed="@color/TealDark"
+            fab:fab_colorRipple="@color/TealLight" />
+    </LinearLayout>
+    <!-- Bottom View End-->
+
+    <!-- Surface View Start -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <!--What you want to show in SurfaceView-->
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="400dp"
+            android:layout_width="400dp"
+            card_view:cardElevation="4dp"
+            card_view:cardUseCompatPadding="true"
+            android:layout_centerInParent="true"
+            android:id="@+id/card_bg"
+            android:clickable="true"
+            android:foreground="@drawable/ripple"
+            >
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:id="@+id/card_bg_image"
+                    android:layout_height="400dp"
+                    android:layout_width="400dp"
+                    android:transitionName="cover"
+                    android:scaleType="centerCrop"
+                    android:layout_centerInParent="true"/>
+                <TextView
+                    android:id="@+id/replacement_title"
+                    android:layout_width="fill_parent"
+                    android:layout_height="80dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:textAlignment="center"
+                    android:layout_alignBottom="@id/card_bg_image"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:gravity="center"
+                    android:textSize="24sp"
+                    />
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/large_favorite_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/star_outline"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="30dp"
+                android:layout_gravity="end"/>
+
+            <ImageView
+                android:id="@+id/large_read_indicator"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="74dp"
+                android:layout_marginEnd="30dp"
+                android:layout_gravity="end"/>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+    <!-- Surface View End -->
+</com.daimajia.swipe.SwipeLayout>

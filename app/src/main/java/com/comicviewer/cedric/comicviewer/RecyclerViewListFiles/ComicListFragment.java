@@ -511,7 +511,7 @@ public class ComicListFragment extends Fragment {
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(120));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(80,30));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);

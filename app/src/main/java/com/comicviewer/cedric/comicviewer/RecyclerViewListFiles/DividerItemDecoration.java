@@ -11,20 +11,24 @@ import android.view.View;
 
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
-    private int space;
+    private int mVerticalSpace;
+    private int mHorizontalSpace;
 
-    public DividerItemDecoration(int space) {
-        this.space = space;
+
+    public DividerItemDecoration(int vspace, int hspace) {
+        this.mVerticalSpace = vspace;
+        this.mHorizontalSpace = hspace;
+
     }
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-        outRect.left = space/2;
-        outRect.right = space/2;
-        outRect.bottom = space;
+        outRect.left = mHorizontalSpace;
+        outRect.right = mHorizontalSpace;
+        outRect.bottom = mVerticalSpace;
 
         // Add top margin only for the first item to avoid double space between items
         if(parent.getChildPosition(view) == 0)
-            outRect.top = space;
+            outRect.top = mVerticalSpace;
     }
 }

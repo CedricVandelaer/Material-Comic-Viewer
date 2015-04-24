@@ -16,8 +16,7 @@ public class SettingsActivity extends Activity {
                 .replace(android.R.id.content, SettingsFragment.newInstance()).commit();
 
         getActionBar().setTitle("Settings");
-        if (Build.VERSION.SDK_INT>20)
-            getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
+
 
     }
 

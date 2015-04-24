@@ -24,6 +24,10 @@ import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.daimajia.swipe.SimpleSwipeListener;
+import com.daimajia.swipe.SwipeLayout;
+import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
+import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -37,7 +41,7 @@ import java.util.List;
  * Created by Cédric on 23/01/2015.
  * Class to show a comic in the comiclist
  */
-public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
+public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
 
     private List<Comic> mComicList;
     private Context mContext;
@@ -97,15 +101,15 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         View v;
 
         if (viewType == 0) {
-            v = mInflater.inflate(R.layout.comic_card, null);
+            v = mInflater.inflate(R.layout.comic_card_swipe, null);
         }
         else if (viewType == 1)
         {
-            v = mInflater.inflate(R.layout.small_comic_card, null);
+            v = mInflater.inflate(R.layout.small_comic_card_swipe, null);
         }
         else
         {
-            v = mInflater.inflate(R.layout.comic_card_image_bg, null);
+            v = mInflater.inflate(R.layout.comic_card_image_bg_swipe, null);
         }
 
         ComicItemViewHolder vh = new ComicItemViewHolder(v);
@@ -149,6 +153,9 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         String cardSize = prefs.getString("cardSize",mContext.getString(R.string.card_size_setting_2));
 
+        comicItemViewHolder.mSwipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
+        comicItemViewHolder.mSwipeLayout.addSwipeListener(new SimpleSwipeListener());
+
         if (cardSize.equals(mContext.getString(R.string.card_size_setting_2))) {
             initialiseNormalCard(comicItemViewHolder,position);
         }
@@ -163,7 +170,31 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         addFavoriteClickListener(comicItemViewHolder);
         addClickListener(comicItemViewHolder);
+        addDeleteButtonClickListener(comicItemViewHolder);
+        addMarkReadClickListener(comicItemViewHolder);
+    }
 
+    private void addDeleteButtonClickListener(ComicItemViewHolder vh)
+    {
+        FloatingActionButton button = vh.mDeleteButton;
+        final int position = vh.getPosition();
+    }
+
+    private void addMarkReadClickListener(ComicItemViewHolder vh)
+    {
+        FloatingActionButton button = vh.mMarkReadButton;
+        final int position = vh.getPosition();
+
+        /*
+        if (PreferenceSetter.getReadComics(mContext).containsKey((mComicList.get(position).getFileName())))
+        {
+            button.setImageBitmap(ImageLoader.getInstance().loadImageSync("drawable://"+R.drawable.close_low_res));
+        }
+        else
+        {
+            button.setImageBitmap(ImageLoader.getInstance().loadImageSync("drawable://"+R.drawable.check_low_res));
+        }
+        */
     }
 
     private void addFavoriteClickListener(ComicItemViewHolder vh)
@@ -370,7 +401,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
 
         if (PreferenceSetter.getReadComics(mContext).containsKey((mComicList.get(i).getFileName())))
         {
-            //comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
+            comicItemViewHolder.mLastReadIcon.setVisibility(View.VISIBLE);
             comicItemViewHolder.mLastReadIcon.setBackground(circle);
 
             if (PreferenceSetter.getReadComics(mContext).get((mComicList.get(i).getFileName()))+1==mComicList.get(i).getPageCount())
@@ -385,6 +416,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
         }
         else
         {
+            comicItemViewHolder.mLastReadIcon.setVisibility(View.GONE);
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
             comicItemViewHolder.mLastReadIcon.setBackground(null);
         }
@@ -514,5 +546,10 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicItemViewHolder>{
     @Override
     public int getItemCount() {
         return mComicList.size();
+    }
+
+    @Override
+    public int getSwipeLayoutResourceId(int i) {
+        return R.id.swipe_layout;
     }
 }

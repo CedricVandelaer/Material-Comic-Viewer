@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.R;
+import com.daimajia.swipe.SwipeLayout;
+import com.melnykov.fab.FloatingActionButton;
 
 import org.w3c.dom.Text;
 
@@ -30,6 +32,9 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected TextView mYear;
     protected ImageView mLastReadIcon;
     protected ImageView mFavoriteButton;
+    protected SwipeLayout mSwipeLayout;
+    protected FloatingActionButton mDeleteButton;
+    protected FloatingActionButton mMarkReadButton;
 
     public ComicItemViewHolder(View itemView) {
         super(itemView);
@@ -47,6 +52,9 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     
     private void initialiseCardComicBg(View itemView)
     {
+        mDeleteButton = (FloatingActionButton) itemView.findViewById(R.id.delete_button);
+        mMarkReadButton = (FloatingActionButton) itemView.findViewById(R.id.mark_read_button);
+        mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
         mCoverPicture = (ImageView) itemView.findViewById(R.id.card_bg_image);
         mCardView = (CardView) itemView.findViewById(R.id.card_bg);
         mTitle = (TextView) itemView.findViewById(R.id.replacement_title);
@@ -56,6 +64,9 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     
     private void initialiseNormalCard(View itemView)
     {
+        mDeleteButton = (FloatingActionButton) itemView.findViewById(R.id.delete_button);
+        mMarkReadButton = (FloatingActionButton) itemView.findViewById(R.id.mark_read_button);
+        mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
         mIssueNumber = (TextView) itemView.findViewById(R.id.issue_number);
         mCoverPicture = (ImageView) itemView.findViewById(R.id.cover);
         mTitle = (TextView) itemView.findViewById(R.id.title);
@@ -68,6 +79,9 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
 
     private void initialiseSmallCard(View itemView)
     {
+        mDeleteButton = (FloatingActionButton) itemView.findViewById(R.id.delete_button);
+        mMarkReadButton = (FloatingActionButton) itemView.findViewById(R.id.mark_read_button);
+        mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
         mIssueNumber = (TextView) itemView.findViewById(R.id.small_issue_number);
         mTitle = (TextView) itemView.findViewById(R.id.small_title);
         mPageCount = (TextView) itemView.findViewById(R.id.small_page_count);

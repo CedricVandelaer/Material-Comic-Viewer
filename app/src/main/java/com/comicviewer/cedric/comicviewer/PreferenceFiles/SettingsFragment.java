@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Environment;
@@ -87,6 +88,8 @@ public class SettingsFragment extends PreferenceFragment{
         targetCategory.addPreference(multiListPref);
 
         getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
+        if (Build.VERSION.SDK_INT>20)
+            getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
 
     }
 
