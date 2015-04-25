@@ -1,6 +1,8 @@
 package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -33,6 +36,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +52,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
     private LayoutInflater mInflater;
     private int lastPosition=-1;
     private DisplayImageOptions mImageOptions;
+    private ComicAdapter mRootAdapterReference = null;
 
     public ComicAdapter(Context context, List<Comic> comics)
     {
@@ -75,6 +80,11 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
                 .build();
 
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public void setRootAdapter(ComicAdapter comicAdapter)
+    {
+        mRootAdapterReference = comicAdapter;
     }
 
     @Override
@@ -168,33 +178,154 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
             initialiseCardBg(comicItemViewHolder, position);
         }
 
+        if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+        {
+            comicItemViewHolder.mMarkUnreadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            comicItemViewHolder.mMarkReadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            comicItemViewHolder.mDeleteTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+        }
+
         addFavoriteClickListener(comicItemViewHolder);
         addClickListener(comicItemViewHolder);
         addDeleteButtonClickListener(comicItemViewHolder);
         addMarkReadClickListener(comicItemViewHolder);
+        addMarkUnreadClickListener(comicItemViewHolder);
     }
 
-    private void addDeleteButtonClickListener(ComicItemViewHolder vh)
-    {
-        FloatingActionButton button = vh.mDeleteButton;
+    private void addMarkUnreadClickListener(ComicItemViewHolder vh) {
         final int position = vh.getPosition();
+
+        vh.mMarkUnreadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PreferenceSetter.getReadComics(mContext).containsKey(mComicList.get(position).getFileName())) {
+
+                    PreferenceSetter.removeReadComic(mContext, mComicList.get(position).getFileName());
+
+                    int pagesRead = PreferenceSetter.getPagesReadForComic(mContext, mComicList.get(position).getFileName());
+
+                    PreferenceSetter.resetSavedPagesForComic(mContext, mComicList.get(position).getFileName());
+
+                    if (pagesRead > 0) {
+                        PreferenceSetter.decrementNumberOfComicsStarted(mContext, 1);
+                    }
+
+                    if (pagesRead >= mComicList.get(position).getPageCount()) {
+                        PreferenceSetter.decrementNumberOfComicsRead(mContext, 1);
+                    }
+
+                    PreferenceSetter.decrementPagesForSeries(mContext, mComicList.get(position).getTitle(), pagesRead);
+
+                    notifyItemChanged(position);
+                }
+                else
+                {
+                    //Do nothing, already marked as unread
+                    Toast message = Toast.makeText(mContext, "You haven't started this comic yet!", Toast.LENGTH_SHORT);
+                    message.show();
+                }
+            }
+        });
+    }
+
+    private void addDeleteButtonClickListener(final ComicItemViewHolder vh)
+    {
+        final int position = vh.getPosition();
+        String message ="";
+        if (mComicList.get(position).getIssueNumber()!=-1) {
+            message = mComicList.get(position).getTitle() + " "+mComicList.get(position).getIssueNumber();
+        }
+        else
+        {
+            message = mComicList.get(position).getTitle();
+        }
+
+        final String finalMessage = message;
+        final String fileName = mComicList.get(position).getFileName();
+
+        vh.mDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(mContext)
+                        .setTitle("Confirm delete")
+                        .setMessage("Are you sure you wish to delete "+finalMessage+"?\n" +
+                                "This will also remove the file \""+fileName+"\".")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                removeItem(mComicList.get(position));
+                            }
+
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+            }
+        });
     }
 
     private void addMarkReadClickListener(ComicItemViewHolder vh)
     {
-        FloatingActionButton button = vh.mMarkReadButton;
         final int position = vh.getPosition();
 
-        /*
-        if (PreferenceSetter.getReadComics(mContext).containsKey((mComicList.get(position).getFileName())))
-        {
-            button.setImageBitmap(ImageLoader.getInstance().loadImageSync("drawable://"+R.drawable.close_low_res));
-        }
-        else
-        {
-            button.setImageBitmap(ImageLoader.getInstance().loadImageSync("drawable://"+R.drawable.check_low_res));
-        }
-        */
+        vh.mMarkReadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PreferenceSetter.getReadComics(mContext).containsKey(mComicList.get(position).getFileName())) {
+
+                    if (PreferenceSetter.getReadComics(mContext).get(mComicList.get(position).getFileName())+1>= mComicList.get(position).getPageCount())
+                    {
+                        //Do nothing, already marked as read
+                        Toast message = Toast.makeText(mContext, "You have already read this comic!", Toast.LENGTH_SHORT);
+                        message.show();
+                    }
+                    else
+                    {
+                        //Comic was opened but not yet fully read
+                        PreferenceSetter.saveLastReadComic(mContext,mComicList.get(position).getFileName(),mComicList.get(position).getPageCount()-1);
+
+                        int pagesRead = PreferenceSetter.getPagesReadForComic(mContext, mComicList.get(position).getFileName());
+
+                        PreferenceSetter.savePagesForComic(mContext, mComicList.get(position).getFileName(), mComicList.get(position).getPageCount());
+
+                        if (pagesRead == 0) {
+                            PreferenceSetter.incrementNumberOfComicsStarted(mContext, 1);
+                        }
+
+                        if (pagesRead < mComicList.get(position).getPageCount()) {
+                            PreferenceSetter.incrementNumberOfComicsRead(mContext, 1);
+                        }
+
+                        int extraPagesRead = mComicList.get(position).getPageCount() - pagesRead;
+                        PreferenceSetter.incrementPagesForSeries(mContext, mComicList.get(position).getTitle(), extraPagesRead);
+
+                        PreferenceSetter.saveLongestReadComic(mContext,
+                                mComicList.get(position).getFileName(),
+                                mComicList.get(position).getPageCount(),
+                                mComicList.get(position).getTitle(),
+                                mComicList.get(position).getIssueNumber());
+
+                        notifyItemChanged(position);
+                    }
+                }
+                else {
+                    PreferenceSetter.saveLongestReadComic(mContext,
+                            mComicList.get(position).getFileName(),
+                            mComicList.get(position).getPageCount(),
+                            mComicList.get(position).getTitle(),
+                            mComicList.get(position).getIssueNumber());
+
+                    //Comic wasn't opened yet
+                    PreferenceSetter.saveLastReadComic(mContext,mComicList.get(position).getFileName(),mComicList.get(position).getPageCount()-1);
+                    PreferenceSetter.savePagesForComic(mContext, mComicList.get(position).getFileName(), mComicList.get(position).getPageCount());
+                    PreferenceSetter.incrementNumberOfComicsStarted(mContext, 1);
+                    PreferenceSetter.incrementNumberOfComicsRead(mContext, 1);
+                    PreferenceSetter.incrementPagesForSeries(mContext, mComicList.get(position).getTitle(), mComicList.get(position).getPageCount());
+                    notifyItemChanged(position);
+                }
+            }
+        });
+
     }
 
     private void addFavoriteClickListener(ComicItemViewHolder vh)
@@ -301,7 +432,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
         else
             comicItemViewHolder.mPageCount.setText("");
 
-        setAnimation(comicItemViewHolder.mCardView,i);
+        setAnimation(comicItemViewHolder.mCardView, i);
 
 
         if (mComicList.get(i).getComicColor()!=-1)
@@ -340,8 +471,6 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
             {
                 ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
             }
-
-
         }
         else
         {
@@ -356,11 +485,11 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
 
         if (mComicList.get(i).getCoverImage()==null)
         {
-            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.comicplaceholder,comicItemViewHolder.mCoverPicture);
+            ImageLoader.getInstance().displayImage("drawable://" + R.drawable.comicplaceholder, comicItemViewHolder.mCoverPicture);
         }
         else
         {
-            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(),comicItemViewHolder.mCoverPicture, mImageOptions);
+            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(), comicItemViewHolder.mCoverPicture, mImageOptions);
 
         }
 
@@ -449,7 +578,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
     public void addComic(Comic comic)
     {
         int pos = mComicList.size();
-        mComicList.add(pos,comic);
+        mComicList.add(pos, comic);
         notifyItemInserted(pos);
     }
 
@@ -541,6 +670,41 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
         }
 
         lastPosition = position;
+    }
+
+    public void removeItem(Comic comic)
+    {
+        if (mComicList.contains(comic)) {
+
+            if (mRootAdapterReference!=null)
+            {
+                mRootAdapterReference.removeItem(comic);
+            }
+
+            String coverImageFileName = comic.getCoverImage();
+            if (coverImageFileName.startsWith("file:///"))
+            {
+                coverImageFileName = coverImageFileName.replace("file:///","");
+            }
+            File coverImageFile = new File(coverImageFileName);
+            File archiveFile = new File(comic.getFilePath()+"/"+comic.getFileName());
+
+            try
+            {
+                if (coverImageFile.exists())
+                    coverImageFile.delete();
+                if (archiveFile.exists())
+                    archiveFile.delete();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+            PreferenceSetter.removeSavedComic(mContext, comic);
+            int pos = mComicList.indexOf(comic);
+            mComicList.remove(comic);
+            notifyItemRemoved(pos);
+        }
     }
 
     @Override

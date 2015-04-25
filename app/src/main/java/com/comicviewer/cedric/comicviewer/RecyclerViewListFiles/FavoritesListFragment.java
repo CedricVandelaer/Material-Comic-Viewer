@@ -564,6 +564,7 @@ public class FavoritesListFragment extends Fragment {
                     filteredList.add(currentComics.get(i));
             }
             ComicAdapter tempAdapter = new ComicAdapter(getActivity(), filteredList);
+            tempAdapter.setRootAdapter(mAdapter);
             mRecyclerView.swapAdapter(tempAdapter,false);
         }
         else

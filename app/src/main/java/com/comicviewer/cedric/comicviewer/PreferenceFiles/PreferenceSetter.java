@@ -13,6 +13,7 @@ import com.comicviewer.cedric.comicviewer.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -104,7 +105,8 @@ public class PreferenceSetter {
         String[] comicList = comicListString.split(",");
         for (String comic:comicList)
         {
-            addedComics.add(comic);
+            if (!comic.trim().equals(""))
+                addedComics.add(comic);
         }
 
         return addedComics;
@@ -123,7 +125,8 @@ public class PreferenceSetter {
 
             for (String comic:addedComics)
             {
-                stringToSave+= comic+ ",";
+                if (!comic.trim().equals(""))
+                    stringToSave+= comic+ ",";
             }
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -152,6 +155,31 @@ public class PreferenceSetter {
             return pagesReadMap.get(seriesName);
         else
             return 0;
+    }
+
+    public static void resetSavedPagesForComic(Context context, String filename)
+    {
+        Map<String, Integer> pagesReadMap = getPagesReadMap(context);
+
+        if (pagesReadMap.containsKey(filename)) {
+
+            pagesReadMap.remove(filename);
+
+            String stringToSave = "";
+
+            for (String key:pagesReadMap.keySet())
+            {
+                stringToSave += key+":"+pagesReadMap.get(key)+",";
+            }
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            editor.putString(PAGES_READ_LIST, stringToSave);
+
+            editor.apply();
+        }
+
     }
 
     public static void savePagesForComic(Context context, String filename, int pages)
@@ -209,6 +237,35 @@ public class PreferenceSetter {
             pages = pagesReadMap.get(title);
 
         pages+=increment;
+
+        pagesReadMap.put(title, pages);
+
+        String stringToSave = "";
+
+        for (String key:pagesReadMap.keySet())
+        {
+            stringToSave += key+":"+pagesReadMap.get(key)+",";
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putString(SERIES_PAGES_READ_LIST, stringToSave);
+
+        editor.apply();
+
+    }
+
+    public static void decrementPagesForSeries(Context context, String title, int decrement)
+    {
+
+        Map<String, Integer> pagesReadMap = getSeriesPagesReadMap(context);
+
+        int pages = 0;
+        if (pagesReadMap.containsKey(title))
+            pages = pagesReadMap.get(title);
+
+        pages-=decrement;
 
         pagesReadMap.put(title, pages);
 
@@ -316,6 +373,16 @@ public class PreferenceSetter {
         editor.apply();
     }
 
+    public static void decrementNumberOfComicsRead(Context context, int decrement)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int currentReadComics = getNumberOfComicsRead(context);
+        currentReadComics -= decrement;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(NUMBER_OF_COMICS_READ, currentReadComics);
+        editor.apply();
+    }
+
     public static void incrementNumberOfComicsStarted(Context context, int increment)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -326,6 +393,15 @@ public class PreferenceSetter {
         editor.apply();
     }
 
+    public static void decrementNumberOfComicsStarted(Context context, int decrement)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int currentStartedComics = getNumberOfComicsStarted(context);
+        currentStartedComics -= decrement;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(NUMBER_OF_COMICS_STARTED, currentStartedComics);
+        editor.apply();
+    }
 
     public static int getNumberOfComicsStarted(Context context)
     {
@@ -411,6 +487,22 @@ public class PreferenceSetter {
         return comicList;
     }
 
+    public static void removeSavedComic(Context context, Comic comicToRemove)
+    {
+        List<Comic> currentComicList = getSavedComics(context);
+        List<Comic> comicsToKeep = new ArrayList<>();
+
+        for (Comic comic:currentComicList)
+        {
+            if (!(comic.getFileName().equals(comicToRemove.getFileName())
+                    && comic.getFilePath().equals(comicToRemove.getFilePath())))
+            {
+                comicsToKeep.add(comic);
+            }
+        }
+        saveComicList(context, comicsToKeep);
+    }
+
     //saves comic filename and pagenumber
     public static void saveLastReadComic(Context context, String comicName, int pageNumber)
     {
@@ -464,6 +556,28 @@ public class PreferenceSetter {
         return lastReadMap;
     }
 
+    public static void removeReadComic(Context context, String filename)
+    {
+        Map<String, Integer> readMap = getReadComics(context);
+        readMap.remove(filename);
+        saveReadComicMap(context, readMap);
+    }
+
+    public static void saveReadComicMap(Context context, Map<String, Integer> readMap)
+    {
+        String lastReadComicsString = "";
+
+        for (String key:readMap.keySet())
+        {
+            lastReadComicsString+= key+":"+readMap.get(key)+",";
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putString(READ_COMIC_LIST, lastReadComicsString);
+        editor.apply();
+    }
 
     public static void setBackgroundColorPreference(Activity activity)
     {

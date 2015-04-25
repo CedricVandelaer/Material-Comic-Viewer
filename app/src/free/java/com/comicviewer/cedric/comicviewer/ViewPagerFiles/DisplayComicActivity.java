@@ -174,9 +174,9 @@ public class DisplayComicActivity extends FragmentActivity {
                         mCurrentComic.getPageCount(),
                         mCurrentComic.getTitle(),
                         mCurrentComic.getIssueNumber());
+                PreferenceSetter.incrementPagesForSeries(DisplayComicActivity.this, mCurrentComic.getTitle(), 1);
             }
 
-            PreferenceSetter.incrementPagesForSeries(DisplayComicActivity.this, mCurrentComic.getTitle(), 1);
         }
 
         @Override

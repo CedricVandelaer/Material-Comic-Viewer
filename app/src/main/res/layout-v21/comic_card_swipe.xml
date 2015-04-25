@@ -13,32 +13,85 @@
         android:gravity="center"
         android:layout_height="match_parent">
         <!--What you want to show-->
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/delete_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/delete_low_res"
-            android:adjustViewBounds="true"
-            android:layout_margin="16dp"
+        <LinearLayout
+            android:id="@+id/delete_button_layout"
+            android:orientation="vertical"
             android:layout_weight="1"
-            fab:fab_type="normal"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Red"
-            fab:fab_colorPressed="@color/RedDark"
-            fab:fab_colorRipple="@color/RedLight" />
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/mark_read_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/check_low_res"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="match_parent">
+            <com.melnykov.fab.FloatingActionButton
+                android:id="@+id/delete_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/delete_low_res"
+                android:adjustViewBounds="true"
+                android:layout_margin="16dp"
+                fab:fab_type="normal"
+                fab:fab_shadow="true"
+                fab:fab_colorNormal="@color/Red"
+                fab:fab_colorPressed="@color/RedDark"
+                fab:fab_colorRipple="@color/RedLight" />
+            <TextView
+                android:id="@+id/delete_text"
+                android:text="Delete"
+                android:textAllCaps="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/mark_read_layout"
+            android:orientation="vertical"
             android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:layout_margin="16dp"
-            fab:fab_type="normal"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Teal"
-            fab:fab_colorPressed="@color/TealDark"
-            fab:fab_colorRipple="@color/TealLight" />
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="match_parent">
+            <com.melnykov.fab.FloatingActionButton
+                android:id="@+id/mark_read_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/check_low_res"
+                android:adjustViewBounds="true"
+                android:layout_margin="16dp"
+                fab:fab_type="normal"
+                fab:fab_shadow="true"
+                fab:fab_colorNormal="@color/Teal"
+                fab:fab_colorPressed="@color/TealDark"
+                fab:fab_colorRipple="@color/TealLight" />
+            <TextView
+                android:id="@+id/mark_read_text"
+                android:text="Mark as read"
+                android:textAllCaps="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/mark_unread_layout"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="match_parent">
+            <com.melnykov.fab.FloatingActionButton
+                android:id="@+id/mark_unread_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/close_low_res"
+                android:adjustViewBounds="true"
+                android:layout_margin="16dp"
+                fab:fab_type="normal"
+                fab:fab_shadow="true"
+                fab:fab_colorNormal="@color/Cyan"
+                fab:fab_colorPressed="@color/CyanDark"
+                fab:fab_colorRipple="@color/CyanLight" />
+            <TextView
+                android:id="@+id/mark_unread_text"
+                android:text="Mark as unread"
+                android:textAllCaps="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
     </LinearLayout>
     <!-- Bottom View End-->
 

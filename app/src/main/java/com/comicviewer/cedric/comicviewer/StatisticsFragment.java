@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -74,8 +75,7 @@ public class StatisticsFragment extends Fragment {
         mResetStatsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PreferenceSetter.resetStats(getActivity());
-                updateTextViews();
+                new ResetStatsTask().execute();
             }
         });
 
@@ -83,6 +83,21 @@ public class StatisticsFragment extends Fragment {
         return v;
     }
 
+    private class ResetStatsTask extends AsyncTask
+    {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            PreferenceSetter.resetStats(getActivity());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object object)
+        {
+            updateTextViews();
+        }
+    }
 
     private void updateTextViews()
     {
