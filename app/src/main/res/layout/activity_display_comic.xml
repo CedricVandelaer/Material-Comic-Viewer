@@ -21,26 +21,5 @@
         android:textSize="20sp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        ads:adSize="MEDIUM_RECTANGLE"
-        ads:adUnitId="@string/banner_ad_unit_id">
-    </com.google.android.gms.ads.AdView>
-    <Button
-        android:id="@+id/close_ad_button"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:background="@drawable/teal_bg_shape"
-        android:padding="6dp"
-        android:textSize="14sp"
-        android:textColor="#FFFFFF"
-        android:text="Close ad"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/adView">
-
-    </Button>
 
 </RelativeLayout>

@@ -275,6 +275,11 @@ public class ComicListFragment extends Fragment {
 
                 Comic comic = savedComics.get(pos);
 
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
                 ComicLoader.setComicColor(getActivity(), comic);
 
                 final Comic finalComic = comic;
@@ -308,7 +313,6 @@ public class ComicListFragment extends Fragment {
                     @Override
                     public void run() {
                         mAdapter.addComicSorted(finalComic);
-                        mRecyclerView.scrollToPosition(0);
                     }
                 });
 

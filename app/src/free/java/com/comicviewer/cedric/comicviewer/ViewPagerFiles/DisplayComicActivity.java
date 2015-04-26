@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
@@ -28,6 +29,7 @@ import com.devspark.robototextview.widget.RobotoTextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
@@ -58,8 +60,9 @@ public class DisplayComicActivity extends FragmentActivity {
     private boolean mShowPageNumbers;
 
     //ads
-    private AdView mAdView;
-    private Button mCloseAdButton;
+    private InterstitialAd mInterstitialAd;
+
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,34 +97,6 @@ public class DisplayComicActivity extends FragmentActivity {
             mPager.setCurrentItem(lastReadPage);
         }
 
-        mAdView = (AdView) findViewById(R.id.adView);
-        mCloseAdButton = (Button) findViewById(R.id.close_ad_button);
-        mCloseAdButton.setVisibility(View.GONE);
-
-        mCloseAdButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAdView.setVisibility(View.GONE);
-                mCloseAdButton.setVisibility(View.GONE);
-                mPager.setSwipingEnabled(true);
-            }
-        });
-
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                mAdView.setVisibility(View.VISIBLE);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mCloseAdButton.setVisibility(View.VISIBLE);
-                    }
-                }, 2000);
-            }
-        });
-
-
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
@@ -129,10 +104,25 @@ public class DisplayComicActivity extends FragmentActivity {
             new SetTaskDescriptionTask().execute();
         }
 
+        mInterstitialAd= new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-1913373193124965/9353062734");
+        requestNewInterstitial();
 
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+            }
+        });
 
+        mHandler = new Handler();
     }
 
+    private void requestNewInterstitial()
+    {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mInterstitialAd.loadAd(adRequest);
+    }
 
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
 
@@ -144,10 +134,20 @@ public class DisplayComicActivity extends FragmentActivity {
         @Override
         public void onPageSelected(int position) {
 
-            if (position%4 == 0) {
-                AdRequest adRequest = new AdRequest.Builder().build();
-                mAdView.loadAd(adRequest);
-                mPager.setSwipingEnabled(false);
+            if (position%7 == 0) {
+                if (mInterstitialAd.isLoaded())
+                    mInterstitialAd.show();
+                else {
+                    requestNewInterstitial();
+                    mPager.setVisibility(View.INVISIBLE);
+                    Toast.makeText(DisplayComicActivity.this,"Ad failed to load, please wait",Toast.LENGTH_LONG).show();
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mPager.setVisibility(View.VISIBLE);
+                        }
+                    }, 4000);
+                }
             }
 
             if (mShowPageNumbers)

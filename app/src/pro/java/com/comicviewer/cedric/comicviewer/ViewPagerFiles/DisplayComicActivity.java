@@ -58,8 +58,6 @@ public class DisplayComicActivity extends FragmentActivity {
 
     private boolean mShowPageNumbers;
 
-    private AdView mAdView;
-    private Button mCloseAdButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,11 +90,6 @@ public class DisplayComicActivity extends FragmentActivity {
             lastReadPage = PreferenceSetter.getReadComics(this).get(mCurrentComic.getFileName());
             mPager.setCurrentItem(lastReadPage);            
         }
-
-        mAdView = (AdView) findViewById(R.id.adView);
-        mAdView.destroy();
-        mCloseAdButton = (Button) findViewById(R.id.close_ad_button);
-        mCloseAdButton.setVisibility(View.GONE);
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 

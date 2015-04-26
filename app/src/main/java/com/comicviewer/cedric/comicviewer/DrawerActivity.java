@@ -22,7 +22,9 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
 
     @Override
     public void init(Bundle savedInstanceState) {
-        
+
+        new SimpleEula(this).show();
+
         this.disableLearningPattern();
         this.setBackPattern(BACKPATTERN_BACK_TO_FIRST);
         this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));

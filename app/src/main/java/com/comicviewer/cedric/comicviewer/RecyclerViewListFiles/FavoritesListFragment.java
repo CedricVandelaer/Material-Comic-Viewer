@@ -281,6 +281,11 @@ public class FavoritesListFragment extends Fragment {
 
                 ComicLoader.setComicColor(getActivity(), comic);
 
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
                     @Override
@@ -309,7 +314,6 @@ public class FavoritesListFragment extends Fragment {
                     @Override
                     public void run() {
                         mAdapter.addComicSorted(finalComic);
-                        mRecyclerView.scrollToPosition(0);
                     }
                 });
 
