@@ -105,7 +105,7 @@
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_height="wrap_content"
-            android:layout_width="400dp"
+            android:layout_width="@dimen/small_card_width"
             card_view:cardElevation="4dp"
             card_view:cardUseCompatPadding="true"
             android:id="@+id/small_card"

@@ -13,12 +13,18 @@ import android.view.View;
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
     private int mVerticalSpace;
     private int mHorizontalSpace;
+    private int mColumnCount = 1;
 
 
     public DividerItemDecoration(int vspace, int hspace) {
         this.mVerticalSpace = vspace;
         this.mHorizontalSpace = hspace;
+    }
 
+    public DividerItemDecoration(int vspace, int hspace, int columns) {
+        this.mVerticalSpace = vspace;
+        this.mHorizontalSpace = hspace;
+        mColumnCount = columns;
     }
 
     @Override
@@ -28,7 +34,10 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         outRect.bottom = mVerticalSpace;
 
         // Add top margin only for the first item to avoid double space between items
-        if(parent.getChildPosition(view) == 0)
+
+        if (parent.getChildPosition(view) < mColumnCount) {
             outRect.top = mVerticalSpace;
+        }
     }
+
 }

@@ -214,6 +214,10 @@ public class ComicLoader {
                     ImageSize imageSize = new ImageSize(850, 500);
                     Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
                     Palette.Swatch mutedSwatch = Palette.generate(thumbnail).getMutedSwatch();
+                    if (mutedSwatch == null)
+                    {
+                        mutedSwatch = Palette.generate(thumbnail).getDarkMutedSwatch();
+                    }
                     color = mutedSwatch.getRgb();
                     primaryTextColor = mutedSwatch.getTitleTextColor();
                     secondaryTextColor = mutedSwatch.getBodyTextColor();
@@ -221,6 +225,10 @@ public class ComicLoader {
                     ImageSize imageSize = new ImageSize(850, 500);
                     Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
                     Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
+                    if (lightVibrantSwatch==null)
+                    {
+                        lightVibrantSwatch = Palette.generate(thumbnail).getVibrantSwatch();
+                    }
                     color = lightVibrantSwatch.getRgb();
                     primaryTextColor = lightVibrantSwatch.getTitleTextColor();
                     secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
@@ -244,7 +252,7 @@ public class ComicLoader {
 
 
             } catch (Exception e) {
-                Log.e("Palette", e.getMessage());
+                e.printStackTrace();
             }
         }
     }

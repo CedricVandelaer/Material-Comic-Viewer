@@ -16,9 +16,12 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -507,11 +510,38 @@ public class ComicListFragment extends Fragment {
         {
             height = 0;
         }
-        mLayoutManager = new PreCachingLayoutManager(getActivity(), height);
+
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        float density  = getResources().getDisplayMetrics().density;
+        float dpHeight = outMetrics.heightPixels / density;
+        float dpWidth  = outMetrics.widthPixels / density;
+
+        //in pixels
+        float cardWidthPixels = getActivity().getResources().getDimension(R.dimen.list_width);
+        float dpWidthPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpWidth, outMetrics);
+        int columnCount = 1;
+
+        //in pixels
+        int hSpace = (int) Math.abs((dpWidthPixels-cardWidthPixels)/2);
+
+        //14 dp in pixels
+        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
+
+        if (dpWidth>=800)
+        {
+            columnCount = 2;
+            mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
+        }
+        else
+        {
+            mLayoutManager = new PreCachingLayoutManager(getActivity(), height);
+        }
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(80,30));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace, columnCount));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
