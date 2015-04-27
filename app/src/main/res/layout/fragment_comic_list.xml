@@ -24,7 +24,7 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/folder_plus"
+        android:src="@drawable/ic_folder_plus"
         android:adjustViewBounds="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"

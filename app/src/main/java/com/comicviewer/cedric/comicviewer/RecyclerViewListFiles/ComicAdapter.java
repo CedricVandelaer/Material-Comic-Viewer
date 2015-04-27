@@ -387,7 +387,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
 
             if (PreferenceSetter.getReadComics(mContext).get(mComicList.get(i).getFileName())+1==mComicList.get(i).getPageCount())
             {
-                ImageLoader.getInstance().displayImage("drawable://"+R.drawable.check,comicItemViewHolder.mLastReadIcon);
+                ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
             else
             {
@@ -465,7 +465,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
             comicItemViewHolder.mLastReadIcon.setBackground(circle);
             if (PreferenceSetter.getReadComics(mContext).get((mComicList.get(i).getFileName()))+1==mComicList.get(i).getPageCount())
             {
-                ImageLoader.getInstance().displayImage("drawable://"+R.drawable.check,comicItemViewHolder.mLastReadIcon);
+                ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
             else
             {
@@ -535,7 +535,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
 
             if (PreferenceSetter.getReadComics(mContext).get((mComicList.get(i).getFileName()))+1==mComicList.get(i).getPageCount())
             {
-                ImageLoader.getInstance().displayImage("drawable://"+R.drawable.check,comicItemViewHolder.mLastReadIcon);
+                ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
             else
             {
