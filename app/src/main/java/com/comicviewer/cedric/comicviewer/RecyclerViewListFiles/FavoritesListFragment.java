@@ -69,6 +69,7 @@ public class FavoritesListFragment extends Fragment {
     private static FavoritesListFragment mSingleton = null;
     private Context mApplicationContext;
     private Handler mHandler;
+    private SearchComicsTask mSearchComicsTask=null;
 
     public static FavoritesListFragment getInstance() {
         if(mSingleton == null) {
@@ -131,6 +132,7 @@ public class FavoritesListFragment extends Fragment {
         protected Object doInBackground(Object[] params) {
 
             searchComics();
+            mSearchComicsTask = null;
 
             return null;
         }
@@ -178,7 +180,11 @@ public class FavoritesListFragment extends Fragment {
 
         mAdapter.notifyDataSetChanged();
 
-        new SearchComicsTask().execute();
+        if (mSearchComicsTask == null)
+        {
+            mSearchComicsTask = new SearchComicsTask();
+            mSearchComicsTask.execute();
+        }
     }
 
     private void createFab(View v) {
@@ -258,6 +264,9 @@ public class FavoritesListFragment extends Fragment {
 
         for (String str:treemap.keySet())
         {
+            if (mSearchComicsTask.isCancelled())
+                break;
+
             //open the new found file
             final String comicPath = map.get(str)+"/"+str;
             File file = new File(comicPath);
@@ -304,7 +313,6 @@ public class FavoritesListFragment extends Fragment {
                     && Utilities.checkExtension(str)
                     && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file)) )
             {
-
                 Comic comic = new Comic(str, map.get(str));
 
                 ComicLoader.loadComicSync( mApplicationContext, comic);
@@ -337,7 +345,6 @@ public class FavoritesListFragment extends Fragment {
 
     private void updateLastReadComics()
     {
-
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -416,6 +423,11 @@ public class FavoritesListFragment extends Fragment {
         super.onPause();
         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
         enableSearchBar(false);
+
+        if (mSearchComicsTask != null)
+        {
+            mSearchComicsTask.cancel(true);
+        }
     }
 
     @Override
@@ -439,7 +451,11 @@ public class FavoritesListFragment extends Fragment {
         if (isFiltered)
             filterList("");
 
-        new SearchComicsTask().execute();
+        if (mSearchComicsTask == null)
+        {
+            mSearchComicsTask = new SearchComicsTask();
+            mSearchComicsTask.execute();
+        }
     }
 
     private void enableSearchBar(boolean enabled)

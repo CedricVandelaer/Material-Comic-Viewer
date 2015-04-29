@@ -91,7 +91,7 @@ public class FileLoader {
         return map;
     }
 
-    private static ArrayList<String> searchSubFolders(ArrayList<String> paths, ArrayList<String> excludedPaths)
+    public static ArrayList<String> searchSubFolders(ArrayList<String> paths, ArrayList<String> excludedPaths)
     {
         ArrayList<String> allFoldersInPaths = new ArrayList<>();
 

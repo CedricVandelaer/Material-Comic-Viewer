@@ -69,6 +69,7 @@ public class ComicListFragment extends Fragment {
     private static ComicListFragment mSingleton = null;
     private Context mApplicationContext;
     private Handler mHandler;
+    private SearchComicsTask mSearchComicsTask=null;
 
     public static ComicListFragment getInstance() {
         if(mSingleton == null) {
@@ -131,9 +132,11 @@ public class ComicListFragment extends Fragment {
         protected Object doInBackground(Object[] params) {
 
             searchComics();
+            mSearchComicsTask = null;
 
             return null;
         }
+
     }
 
     @Override
@@ -178,7 +181,10 @@ public class ComicListFragment extends Fragment {
 
         mAdapter.notifyDataSetChanged();
 
-        new SearchComicsTask().execute();
+        if (mSearchComicsTask == null) {
+            mSearchComicsTask = new SearchComicsTask();
+            mSearchComicsTask.execute();
+        }
     }
 
     private void createFab(View v) {
@@ -224,8 +230,6 @@ public class ComicListFragment extends Fragment {
     }
 
     private void searchComics() {
-
-
         //map of <filename, filepath>
         Map<String,String> map = FileLoader.searchComics(getActivity());
 
@@ -256,6 +260,9 @@ public class ComicListFragment extends Fragment {
 
         for (String str:treemap.keySet())
         {
+            if (mSearchComicsTask.isCancelled())
+                break;
+
             //open the new found file
             final String comicPath = map.get(str)+"/"+str;
             File file = new File(comicPath);
@@ -423,6 +430,12 @@ public class ComicListFragment extends Fragment {
     public void onPause()
     {
         super.onPause();
+
+        if (mSearchComicsTask != null)
+        {
+            mSearchComicsTask.cancel(true);
+        }
+
         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
         PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
         enableSearchBar(false);
@@ -449,7 +462,10 @@ public class ComicListFragment extends Fragment {
         if (isFiltered)
             filterList("");
 
-        new SearchComicsTask().execute();
+        if (mSearchComicsTask == null) {
+            mSearchComicsTask= new SearchComicsTask();
+            mSearchComicsTask.execute();
+        }
     }
 
     private void enableSearchBar(boolean enabled)
@@ -491,6 +507,8 @@ public class ComicListFragment extends Fragment {
             toolbar.removeView(mSearchView);
         }
     }
+
+
 
     private void createRecyclerView(View v)
     {

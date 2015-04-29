@@ -50,7 +50,7 @@ public class CustomMultiSelectListPreference extends ListPreference {
         separator = DEFAULT_SEPARATOR;
     }
 
-    public CustomMultiSelectListPreference(Context context, ArrayList<CharSequence> keys, ArrayList<CharSequence> values, String dialogtitle) {
+    public CustomMultiSelectListPreference(Context context, ArrayList<String> keys, ArrayList<String> values, String dialogtitle) {
         super(context, null);
 
         CharSequence[] charSqKeys = new CharSequence[keys.size()];
@@ -155,6 +155,7 @@ public class CustomMultiSelectListPreference extends ListPreference {
         /////////////////////////////////////////////////////
         if (positiveResult && entryValues!=null)
         {
+
             List<CharSequence> newItemList = new ArrayList<CharSequence>();
             for (int i=0;i<entryValues.length;i++)
             {
@@ -170,7 +171,7 @@ public class CustomMultiSelectListPreference extends ListPreference {
                 if (!isRemoved)
                     newItemList.add(entry);
             }
-            
+
 
             StringBuilder csvList = new StringBuilder();
             String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
@@ -184,7 +185,7 @@ public class CustomMultiSelectListPreference extends ListPreference {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
             sharedPreferencesEditor.putString("Filepaths", csvList.toString());
-            
+
             CharSequence[] charSqNewList = new CharSequence[newItemList.size()];
             setEntries(newItemList.toArray(charSqNewList));
             setEntryValues(charSqNewList);
@@ -200,7 +201,7 @@ public class CustomMultiSelectListPreference extends ListPreference {
             }
             sharedPreferencesEditor.putString("Excludedpaths", csvList.toString());
             sharedPreferencesEditor.apply();
-            
+
         }
         /////////////////////////////////////////////////////
     }
@@ -211,22 +212,6 @@ public class CustomMultiSelectListPreference extends ListPreference {
             setValue(value);
         }
     }
-
-    /*
-    private CharSequence prepareSummary(List<CharSequence> joined) {
-        List<String> titles = new ArrayList<String>();
-        CharSequence[] entryTitle = getEntries();
-        CharSequence[] entryValues = getEntryValues();
-        int ix = 0;
-        for (CharSequence value : entryValues) {
-            if (joined.contains(value)) {
-                titles.add((String) entryTitle[ix]);
-            }
-            ix += 1;
-        }
-        return join(titles, ", ");
-    }
-    */
 
     @Override
     protected Object onGetDefaultValue(TypedArray typedArray, int index) {

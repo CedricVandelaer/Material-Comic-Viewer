@@ -10,6 +10,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
+import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.R;
 
 import java.util.ArrayList;
@@ -19,8 +20,6 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class SettingsFragment extends PreferenceFragment{
-
-    private CharSequence[] mPathListing;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -39,51 +38,28 @@ public class SettingsFragment extends PreferenceFragment{
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
-        
-        
 
         ArrayList<CharSequence> paths = new ArrayList<>();
         ArrayList<CharSequence> excludedPaths = new ArrayList<>();
 
         String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String csvList = prefs.getString("Filepaths", defaultPath);
-        
-        String[] items = csvList.split(",");
-        for(int i=0; i < items.length; i++){
-            paths.add(items[i]);
-        }
 
-        csvList = prefs.getString("Excludedpaths", null);
 
-        //remove excluded paths
-        if (csvList!=null) {
-            items = csvList.split(",");
-            for (int i = 0; i < items.length; i++) {
-                if (paths.contains(items[i]))
-                    paths.remove(items[i]);
-            }
-        }
-        //remove duplicates
-        for (int i=0;i<paths.size();i++)
+        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+        ArrayList<String> excludedFilePaths = PreferenceSetter.getExcludedPaths(getActivity());
+
+        for (int i=0;i<filePaths.size();i++)
         {
-            for (int j=i+1;j<paths.size()-1;j++)
-            {
-                if (i!=j)
-                {
-                    if (paths.get(i).equals(paths.get(j)))
-                    {
-                        paths.remove(j);
-                    }
-                }
-            }
+            if (excludedFilePaths.contains(filePaths.get(i)))
+                filePaths.remove(i);
         }
+        if (!filePaths.contains(defaultPath))
+            filePaths.add(defaultPath);
 
-        mPathListing = paths.toArray(new CharSequence[paths.size()]);
 
         PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
         
-        CustomMultiSelectListPreference multiListPref = createListPreference(paths,paths);
+        CustomMultiSelectListPreference multiListPref = createListPreference(filePaths,filePaths);
         
         targetCategory.addPreference(multiListPref);
 
@@ -93,7 +69,7 @@ public class SettingsFragment extends PreferenceFragment{
 
     }
 
-    private CustomMultiSelectListPreference createListPreference(ArrayList<CharSequence> keys, ArrayList<CharSequence> values)
+    private CustomMultiSelectListPreference createListPreference(ArrayList<String> keys, ArrayList<String> values)
     {
         CustomMultiSelectListPreference listPref = new CustomMultiSelectListPreference(getActivity(),keys,values, "Choose paths to remove");
         
