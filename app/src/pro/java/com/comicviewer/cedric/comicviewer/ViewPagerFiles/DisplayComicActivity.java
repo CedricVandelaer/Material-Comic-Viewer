@@ -3,7 +3,9 @@ package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -97,6 +99,24 @@ public class DisplayComicActivity extends FragmentActivity {
             new SetTaskDescriptionTask().execute();
         }
 
+        if (mPageCount<1)
+        {
+            new AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage("This comic can not be opened by comic viewer...")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //Stop the activity
+                        DisplayComicActivity.this.finish();
+                    }
+
+                })
+                .show();
+        }
+
     }
 
 
@@ -109,7 +129,7 @@ public class DisplayComicActivity extends FragmentActivity {
         @Override
         public void onPageSelected(int position) {
 
-            if (mShowPageNumbers)
+            if (mShowPageNumbers && mPageCount>0)
                 mPageIndicator.setText("" + (position+1)+" of "+ mPageCount);
             else
                 mPageIndicator.setText("");
@@ -233,7 +253,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mShowPageNumbers = prefs.getBoolean("showPageNumber",true);
 
-        if (mShowPageNumbers)
+        if (mShowPageNumbers && mPageCount>0)
             mPageIndicator.setText(""+(mPager.getCurrentItem()+1)+" of "+mPageCount);
         mPager.setOnPageChangeListener(new ComicPageChangeListener());
     }

@@ -310,7 +310,7 @@ public class ComicListFragment extends Fragment {
 
                 ComicLoader.loadComicSync( mApplicationContext, comic);
 
-                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()) && comic.getPageCount()>0)
                 {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }

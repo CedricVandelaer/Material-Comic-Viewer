@@ -28,7 +28,11 @@
     <string name="card_size_setting_3">Comic cover cards</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
-    <string name="updates">v1.0.1 - fixed bug with comics opening slow when loading\nv1 - initial release.</string>
+    <string name="updates">
+        v1.0.2 - fixed a bug where unrecognized files could not be deleted\n
+        v1.0.1 - fixed bug with comics opening slow when loading\n
+        v1 - initial release
+    </string>
     <string name="eula">
         The product is protected by Federal Copyright Law. Material Comic Viewer retains the title to and ownership of the Product. You are licensed to use this Product on the following terms and conditions:
         \n\nLICENSE - The licensee is defined as the individual or company utilizing the Software Product. Material Comic Viewer hereby grants the licensee a license authorizing the licensee to use the enclosed product exclusively on devices in possession of the licensee. Use of this product by more than one individual or by anyone other than the licensee terminates, without notification, this license and the right to use this product.

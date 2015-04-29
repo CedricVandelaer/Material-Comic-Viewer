@@ -682,17 +682,20 @@ public class ComicAdapter extends RecyclerSwipeAdapter<ComicItemViewHolder> {
             }
 
             String coverImageFileName = comic.getCoverImage();
-            if (coverImageFileName.startsWith("file:///"))
+            if (coverImageFileName!=null && coverImageFileName.startsWith("file:///"))
             {
                 coverImageFileName = coverImageFileName.replace("file:///","");
             }
-            File coverImageFile = new File(coverImageFileName);
-            File archiveFile = new File(comic.getFilePath()+"/"+comic.getFileName());
 
             try
             {
-                if (coverImageFile.exists())
-                    coverImageFile.delete();
+                if (coverImageFileName!=null) {
+                    File coverImageFile = new File(coverImageFileName);
+                    if (coverImageFile.exists())
+                        coverImageFile.delete();
+                }
+
+                File archiveFile = new File(comic.getFilePath()+"/"+comic.getFileName());
                 if (archiveFile.exists())
                     archiveFile.delete();
             }
