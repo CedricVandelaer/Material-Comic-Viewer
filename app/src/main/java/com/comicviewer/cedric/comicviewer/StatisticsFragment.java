@@ -72,6 +72,8 @@ public class StatisticsFragment extends Fragment {
 
         mResetStatsButton = (ButtonFlat) v.findViewById(R.id.reset_statistics_button);
 
+        mResetStatsButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+
         mResetStatsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

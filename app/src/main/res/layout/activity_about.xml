@@ -40,12 +40,19 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             >
-
+            <TextView
+                android:layout_centerHorizontal="true"
+                android:id="@+id/version_textview"
+                android:text="@string/app_name"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/about_text"
+                android:layout_below="@id/version_textview"
                 android:layout_margin="5dp"
                 android:text="@string/about_text"/>
 
@@ -54,7 +61,7 @@
                 android:background="@drawable/image_view_border"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_margin="5dp"
+                android:layout_margin="20dp"
                 android:layout_below="@id/about_text"
                 android:layout_centerHorizontal="true"/>
         </RelativeLayout>

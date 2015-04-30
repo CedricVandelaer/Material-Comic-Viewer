@@ -1,6 +1,8 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -16,6 +19,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 public class AboutFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private TextView mVersionTextView;
 
 
     public static AboutFragment newInstance() {
@@ -32,6 +36,16 @@ public class AboutFragment extends Fragment {
 
     }
 
+    private PackageInfo getPackageInfo() {
+        PackageInfo pi = null;
+        try {
+            pi = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), PackageManager.GET_ACTIVITIES);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return pi;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -40,6 +54,8 @@ public class AboutFragment extends Fragment {
         ImageView logoview = (ImageView)v.findViewById(R.id.logo);
         ImageView meview = (ImageView)v.findViewById(R.id.me_drawable);
 
+        mVersionTextView = (TextView) v.findViewById(R.id.version_textview);
+        mVersionTextView.setText(getActivity().getResources().getString(R.string.app_name)+" v"+ getPackageInfo().versionName);
         
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(getActivity());

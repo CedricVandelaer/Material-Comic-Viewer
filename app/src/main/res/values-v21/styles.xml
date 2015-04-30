@@ -27,9 +27,9 @@
     <style name="ButtonBarButton" />
 
     <style name="NavigationDrawerTheme" parent="MaterialNavigationDrawerTheme">
-        <item name="colorPrimary">@color/Teal</item>
-        <item name="colorPrimaryDark">@color/TealDark</item>
-        <item name="colorAccent">@color/Teal</item>
+        <item name="colorPrimary">@color/White</item>
+        <item name="colorPrimaryDark">@color/White</item>
+        <item name="colorAccent">@color/White</item>
         <item name="drawerType">@integer/DRAWERTYPE_IMAGE</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowSharedElementExitTransition">

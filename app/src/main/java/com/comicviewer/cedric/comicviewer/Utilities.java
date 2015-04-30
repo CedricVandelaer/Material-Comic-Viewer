@@ -1,5 +1,6 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.graphics.Color;
 import android.util.Log;
 
 import java.io.File;
@@ -14,6 +15,24 @@ import net.lingala.zip4j.core.ZipFile;
  * Utilities for extension checking or filetype checking
  */
 public class Utilities {
+
+    public static int darkenColor(int color)
+    {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.8f; // value component
+        color = Color.HSVToColor(hsv);
+        return color;
+    }
+
+    public static int lightenColor(int color)
+    {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] = 1.0f - 0.8f * (1.0f - hsv[2]);// value component
+        color = Color.HSVToColor(hsv);
+        return color;
+    }
 
     public static String removeExtension(String filename)
     {

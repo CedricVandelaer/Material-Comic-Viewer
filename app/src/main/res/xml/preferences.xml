@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
+    <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory
         android:key="LayoutCategory"
         android:title="Layout settings">
         <ListPreference
@@ -31,22 +31,23 @@
             android:entries="@array/Scroll_animations"
             android:entryValues="@array/Scroll_animations_values"/>
         
-    </PreferenceCategory>
+    </com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory>
 
-    <PreferenceCategory
+    <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory
         android:key="FunctionalityCategory"
         android:title="Functions">
-        <CheckBoxPreference
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+
             android:key="showPageNumber"
             android:title="Show page number"
             android:defaultValue="true"/>
-        <CheckBoxPreference
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
             android:key="useRecents"
             android:title="Show comics in recents screen"
-            android:summary="Note: Only works on lollipop devices"
+            android:summary="Note: only works on lollipop devices"
             android:defaultValue="true"/>
         
-    </PreferenceCategory>
+    </com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory>
 
 
 </PreferenceScreen>

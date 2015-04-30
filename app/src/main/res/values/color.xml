@@ -7,6 +7,7 @@
     <color name="BlueGrey">#263238</color>
     <color name="Black">#000000</color>
     <color name="WhiteBG">#fff3f3f3</color>
+    <color name="Blue">#2196F3</color>
     <color name="Cyan">#00BCD4</color>
     <color name="CyanDark">#0097A7</color>
     <color name="CyanLight">#4DD0E1</color>
@@ -19,4 +20,10 @@
     <color name="Brown">#5D4037</color>
     <color name="Grey">#616161</color>
     <color name="White">#FFFFFF</color>
+    <color name="Pink">#E91E63</color>
+    <color name="Purple">#9C27B0</color>
+    <color name="DeepPurple">#673AB7</color>
+    <color name="Green">#4CAF50</color>
+    <color name="Yellow">#FFEB3B</color>
+
 </resources>

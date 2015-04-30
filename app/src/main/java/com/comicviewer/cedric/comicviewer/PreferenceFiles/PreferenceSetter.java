@@ -37,6 +37,23 @@ public class PreferenceSetter {
     private static final String BACKGROUND_COLOR = "backgroundColor";
     private static final String COMICS_ADDED_LIST = "addedComicsList";
     private static final String LONGEST_READ_COMIC = "longestReadComic";
+    public static final String APP_THEME_COLOR = "appThemeColor";
+
+    public static int getAppThemeColor(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String color = prefs.getString(APP_THEME_COLOR,""+context.getResources().getColor(R.color.Teal));
+        return Integer.parseInt(color);
+    }
+
+    public static void saveAppThemeColor(Context context, CharSequence color)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putString(APP_THEME_COLOR, color.toString());
+        editor.apply();
+    }
 
     public static void resetStats(Context context)
     {
