@@ -29,7 +29,8 @@
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="updates">
-        v1.1.1\n- added the option to show page numbers for a short time on page change\n\n
+        v1.1.1\n- added the option to show page numbers for a short time on page change\n
+        - bugfixes\n\n
         v1.1\n- added additional styling options for the pro version\n
         - changed the app drawer image\n
         - bugfixes\n\n

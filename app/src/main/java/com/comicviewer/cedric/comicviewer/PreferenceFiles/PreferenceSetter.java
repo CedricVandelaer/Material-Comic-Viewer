@@ -322,9 +322,15 @@ public class PreferenceSetter {
 
         for (String pair:pagesReadPairs)
         {
-            if (!pair.isEmpty()) {
-                int splitPosition = pair.lastIndexOf(":");
-                pagesReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
+            try {
+                if (!pair.isEmpty() && pair.contains(":")) {
+                    int splitPosition = pair.lastIndexOf(":");
+                    pagesReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
         return pagesReadMap;

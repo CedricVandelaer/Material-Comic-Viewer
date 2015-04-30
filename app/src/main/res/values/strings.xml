@@ -42,7 +42,8 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
-        v1.1.1\n- added the option to show page numbers for a short time on page change\n\n
+        v1.1.1\n- added the option to show page numbers for a short time on page change\n
+        - bugfixes\n\n
         v1.1\n- added additional styling options for the pro version\n
         - changed the app drawer image\n
         - bugfixes\n\n
