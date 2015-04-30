@@ -38,6 +38,13 @@ public class PreferenceSetter {
     private static final String COMICS_ADDED_LIST = "addedComicsList";
     private static final String LONGEST_READ_COMIC = "longestReadComic";
     public static final String APP_THEME_COLOR = "appThemeColor";
+    private static final String PAGE_NUMBER_SETTING="pageNumberSetting";
+
+    public static String getPageNumberSetting(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(PAGE_NUMBER_SETTING, context.getString(R.string.page_number_setting_1));
+    }
 
     public static int getAppThemeColor(Context context)
     {

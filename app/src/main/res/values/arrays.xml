@@ -52,4 +52,9 @@
         <item>@string/card_size_setting_2</item>
         <item>@string/card_size_setting_3</item>
     </string-array>
+    <string-array name="Page_number_settings">
+        <item>@string/page_number_setting_1</item>
+        <item>@string/page_number_setting_2</item>
+        <item>@string/page_number_setting_3</item>
+    </string-array>
 </resources>

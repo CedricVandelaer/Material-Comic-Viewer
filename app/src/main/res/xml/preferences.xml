@@ -36,11 +36,12 @@
     <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory
         android:key="FunctionalityCategory"
         android:title="Functions">
-        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
-
-            android:key="showPageNumber"
+        <ListPreference
+            android:key="pageNumberSetting"
             android:title="Show page number"
-            android:defaultValue="true"/>
+            android:defaultValue="@string/page_number_setting_1"
+            android:entries="@array/Page_number_settings"
+            android:entryValues="@array/Page_number_settings"/>
         <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
             android:key="useRecents"
             android:title="Show comics in recents screen"

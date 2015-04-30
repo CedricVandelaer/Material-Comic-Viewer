@@ -19,6 +19,9 @@
     <string name="card_color_setting_3">White</string>
     <string name="card_color_setting_4">Blue grey</string>
     <string name="card_color_setting_5">Real black</string>
+    <string name="page_number_setting_1">Always</string>
+    <string name="page_number_setting_2">On page change</string>
+    <string name="page_number_setting_3">Never</string>
     <string name="scroll_animation_setting_1">None</string>
     <string name="scroll_animation_setting_2">Bounce In</string>
     <string name="scroll_animation_setting_3">Stand up</string>
@@ -39,6 +42,7 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
+        v1.1.1\n- added the option to show page numbers for a short time on page change\n\n
         v1.1\n- added additional styling options for the pro version\n
         - changed the app drawer image\n
         - bugfixes\n\n

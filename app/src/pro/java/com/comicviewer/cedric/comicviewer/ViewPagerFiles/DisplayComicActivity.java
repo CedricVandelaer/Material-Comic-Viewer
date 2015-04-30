@@ -60,7 +60,9 @@ public class DisplayComicActivity extends FragmentActivity {
 
     private RobotoTextView mPageIndicator;
 
-    private boolean mShowPageNumbers;
+    private String mPageNumberSetting;
+
+    private Handler mHandler;
 
 
     @Override
@@ -74,6 +76,8 @@ public class DisplayComicActivity extends FragmentActivity {
         
         int lastReadPage;
 
+        mHandler = new Handler();
+
         mCurrentComic = intent.getParcelableExtra("Comic");
 
         mPageCount = mCurrentComic.getPageCount();
@@ -83,6 +87,8 @@ public class DisplayComicActivity extends FragmentActivity {
         mPageIndicator = (RobotoTextView) findViewById(R.id.page_indicator);
 
         loadImageNames();
+
+        mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
 
         mPager =  (ComicViewPager) findViewById(R.id.comicpager);
         mPager.setOffscreenPageLimit(2);
@@ -129,10 +135,7 @@ public class DisplayComicActivity extends FragmentActivity {
         @Override
         public void onPageSelected(int position) {
 
-            if (mShowPageNumbers && mPageCount>0)
-                mPageIndicator.setText("" + (position+1)+" of "+ mPageCount);
-            else
-                mPageIndicator.setText("");
+            setPageNumber();
 
             int pagesRead = PreferenceSetter.getPagesReadForComic(DisplayComicActivity.this, mCurrentComic.getFileName());
 
@@ -161,6 +164,32 @@ public class DisplayComicActivity extends FragmentActivity {
         @Override
         public void onPageScrollStateChanged(int state) {
 
+        }
+    }
+
+    private void setPageNumber()
+    {
+        if (mPageNumberSetting.equals(getString(R.string.page_number_setting_1)) && mPageCount>0)
+        {
+            mPageIndicator.setText(""+(mPager.getCurrentItem()+1)+" of "+mPageCount);
+        }
+        else if (mPageNumberSetting.equals(getString(R.string.page_number_setting_2)) && mPageCount>0)
+        {
+            final String currentPageText = ""+(mPager.getCurrentItem()+1)+" of "+mPageCount;
+            mPageIndicator.setText(currentPageText);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mPageIndicator.getText().equals(currentPageText))
+                    {
+                        mPageIndicator.setText("");
+                    }
+                }
+            },3000);
+        }
+        else
+        {
+            mPageIndicator.setText("");
         }
     }
 
@@ -249,12 +278,10 @@ public class DisplayComicActivity extends FragmentActivity {
     public void onResume()
     {
         super.onResume();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        mShowPageNumbers = prefs.getBoolean("showPageNumber",true);
+        mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
+        setPageNumber();
 
-        if (mShowPageNumbers && mPageCount>0)
-            mPageIndicator.setText(""+(mPager.getCurrentItem()+1)+" of "+mPageCount);
         mPager.setOnPageChangeListener(new ComicPageChangeListener());
     }
 

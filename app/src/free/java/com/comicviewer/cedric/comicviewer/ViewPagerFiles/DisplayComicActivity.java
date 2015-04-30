@@ -61,12 +61,12 @@ public class DisplayComicActivity extends FragmentActivity {
 
     private RobotoTextView mPageIndicator;
 
-    private boolean mShowPageNumbers;
-
     //ads
     private InterstitialAd mInterstitialAd;
 
     private Handler mHandler;
+
+    private String mPageNumberSetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +101,7 @@ public class DisplayComicActivity extends FragmentActivity {
             mPager.setCurrentItem(lastReadPage);
         }
 
+        mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
@@ -169,10 +170,7 @@ public class DisplayComicActivity extends FragmentActivity {
                 }
             }
 
-            if (mShowPageNumbers && mPageCount>0)
-                mPageIndicator.setText("" + (position+1)+" of "+ mPageCount);
-            else
-                mPageIndicator.setText("");
+            setPageNumber();
 
             int pagesRead = PreferenceSetter.getPagesReadForComic(DisplayComicActivity.this, mCurrentComic.getFileName());
 
@@ -287,13 +285,38 @@ public class DisplayComicActivity extends FragmentActivity {
     public void onResume()
     {
         super.onResume();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        mShowPageNumbers = prefs.getBoolean("showPageNumber",true);
+        mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
 
-        if (mShowPageNumbers && mPageCount>0)
-            mPageIndicator.setText(""+(mPager.getCurrentItem()+1)+" of "+mPageCount);
+        setPageNumber();
+
         mPager.setOnPageChangeListener(new ComicPageChangeListener());
+    }
+
+    private void setPageNumber()
+    {
+        if (mPageNumberSetting.equals(getString(R.string.page_number_setting_1)) && mPageCount>0)
+        {
+            mPageIndicator.setText(""+(mPager.getCurrentItem()+1)+" of "+mPageCount);
+        }
+        else if (mPageNumberSetting.equals(getString(R.string.page_number_setting_2)) && mPageCount>0)
+        {
+            final String currentPageText = ""+(mPager.getCurrentItem()+1)+" of "+mPageCount;
+            mPageIndicator.setText(currentPageText);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mPageIndicator.getText().equals(currentPageText))
+                    {
+                        mPageIndicator.setText("");
+                    }
+                }
+            },3000);
+        }
+        else
+        {
+            mPageIndicator.setText("");
+        }
     }
 
 
