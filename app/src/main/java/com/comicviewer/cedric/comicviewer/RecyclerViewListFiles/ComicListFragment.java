@@ -568,13 +568,14 @@ public class ComicListFragment extends Fragment {
 
         //in pixels
         float dpWidthPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpWidth, outMetrics);
-        float cardWidthPixels = dpWidthPixels - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, outMetrics);
+        float cardWidthPixels = getResources().getDimension(R.dimen.list_width);
         int columnCount = 1;
 
         //14 dp in pixels
         int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
 
         Log.d("List fragment:","Device width dp:"+dpWidth);
+
 
         if (dpWidth>=1280)
         {

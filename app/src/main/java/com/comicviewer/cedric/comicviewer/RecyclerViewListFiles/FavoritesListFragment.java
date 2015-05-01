@@ -554,13 +554,14 @@ public class FavoritesListFragment extends Fragment {
 
         //in pixels
         float dpWidthPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpWidth, outMetrics);
-        float cardWidthPixels = dpWidthPixels - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, outMetrics);
+        float cardWidthPixels = getResources().getDimension(R.dimen.list_width);
         int columnCount = 1;
 
         //14 dp in pixels
         int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
 
         Log.d("List fragment:","Device width dp:"+dpWidth);
+
 
         if (dpWidth>=1280)
         {
@@ -581,6 +582,9 @@ public class FavoritesListFragment extends Fragment {
         int hSpace = (int) Math.abs((dpWidthPixels-cardWidthPixels)/(columnCount+1));
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace, columnCount));
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);

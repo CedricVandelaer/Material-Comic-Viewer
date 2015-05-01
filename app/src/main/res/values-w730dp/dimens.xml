@@ -8,4 +8,5 @@
     <dimen name="large_card_width">355dp</dimen>
     <dimen name="large_card_height">355dp</dimen>
     <dimen name="small_card_width">355dp</dimen>
+    <dimen name="list_width">710dp</dimen>
 </resources>
