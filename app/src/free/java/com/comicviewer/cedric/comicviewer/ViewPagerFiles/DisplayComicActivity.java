@@ -116,9 +116,17 @@ public class DisplayComicActivity extends FragmentActivity {
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
-                requestNewInterstitial();
+                //requestNewInterstitial();
+            }
+
+            @Override
+            public void onAdLoaded()
+            {
+                showAd();
             }
         });
+
+
 
         mHandler = new Handler();
 
@@ -144,6 +152,23 @@ public class DisplayComicActivity extends FragmentActivity {
         mInterstitialAd.loadAd(adRequest);
     }
 
+    private void showAd()
+    {
+        if (mInterstitialAd.isLoaded())
+            mInterstitialAd.show();
+        else {
+            requestNewInterstitial();
+            mPager.setVisibility(View.INVISIBLE);
+            Toast.makeText(DisplayComicActivity.this, "Ad failed to load, please wait", Toast.LENGTH_LONG).show();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mPager.setVisibility(View.VISIBLE);
+                }
+            }, 4000);
+        }
+    }
+
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
 
         @Override
@@ -154,22 +179,6 @@ public class DisplayComicActivity extends FragmentActivity {
         @Override
         public void onPageSelected(int position) {
 
-            if (position%7 == 0) {
-                if (mInterstitialAd.isLoaded())
-                    mInterstitialAd.show();
-                else {
-                    requestNewInterstitial();
-                    mPager.setVisibility(View.INVISIBLE);
-                    Toast.makeText(DisplayComicActivity.this,"Ad failed to load, please wait",Toast.LENGTH_LONG).show();
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mPager.setVisibility(View.VISIBLE);
-                        }
-                    }, 4000);
-                }
-            }
-
             setPageNumber();
 
             int pagesRead = PreferenceSetter.getPagesReadForComic(DisplayComicActivity.this, mCurrentComic.getFileName());
@@ -177,6 +186,11 @@ public class DisplayComicActivity extends FragmentActivity {
             if (pagesRead==0)
             {
                 PreferenceSetter.incrementNumberOfComicsStarted(DisplayComicActivity.this, 1);
+            }
+
+            if (position+1==mPageCount)
+            {
+                requestNewInterstitial();
             }
 
             if (position+1> pagesRead)

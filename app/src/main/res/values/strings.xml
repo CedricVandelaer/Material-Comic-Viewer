@@ -42,10 +42,11 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
-        v1.1.2\n
+        v1.2\n
         - landscape mode\n
         - bugfixes\n
-        - navigation drawer image loading improvements\n\n
+        - navigation drawer image loading improvements\n
+        - ads now only show at the start and the end of a comic\n\n
         v1.1.1\n
         - added the option to show page numbers for a short time on page change\n
         - bugfixes\n\n

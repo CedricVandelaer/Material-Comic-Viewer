@@ -29,7 +29,7 @@
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="updates">
-        v1.1.2\n
+        v1.2\n
         - landscape mode\n
         - bugfixes\n
         - navigation drawer image loading improvements\n\n
