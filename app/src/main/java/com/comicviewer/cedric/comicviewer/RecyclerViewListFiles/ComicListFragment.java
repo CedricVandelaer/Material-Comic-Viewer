@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -70,6 +71,9 @@ public class ComicListFragment extends Fragment {
     private Context mApplicationContext;
     private Handler mHandler;
     private SearchComicsTask mSearchComicsTask=null;
+    private PowerManager.WakeLock mWakeLock=null;
+
+    private static final String WAKE_LOCK="SearchTaskWakeLock";
 
     public static ComicListFragment getInstance() {
         if(mSingleton == null) {
@@ -129,12 +133,26 @@ public class ComicListFragment extends Fragment {
     private class SearchComicsTask extends AsyncTask{
 
         @Override
+        protected void onPreExecute()
+        {
+            PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK);
+            mWakeLock.acquire();
+        }
+
+        @Override
         protected Object doInBackground(Object[] params) {
 
             searchComics();
             mSearchComicsTask = null;
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object object)
+        {
+            mWakeLock.release();
         }
 
     }
@@ -326,6 +344,8 @@ public class ComicListFragment extends Fragment {
                     }
                 });
 
+                PreferenceSetter.saveComic(getActivity(), comic);
+
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
 
@@ -397,13 +417,16 @@ public class ComicListFragment extends Fragment {
     private void onLoadingFinished()
     {
 
+        if (mSearchComicsTask != null && !mSearchComicsTask.isCancelled()) {
+            PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
+        }
+
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
-        PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
     }
 
     @Override
@@ -440,7 +463,8 @@ public class ComicListFragment extends Fragment {
         }
 
         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
-        PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
+        if (mAdapter.getComics().size()>0)
+            PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
         enableSearchBar(false);
     }
 
@@ -449,7 +473,6 @@ public class ComicListFragment extends Fragment {
     {
         super.onStop();
         PreferenceSetter.saveFilePaths(getActivity(), mFilePaths, mExcludedPaths);
-        PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
     }
 
 
@@ -544,17 +567,21 @@ public class ComicListFragment extends Fragment {
         float dpWidth  = outMetrics.widthPixels / density;
 
         //in pixels
-        float cardWidthPixels = getActivity().getResources().getDimension(R.dimen.list_width);
         float dpWidthPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpWidth, outMetrics);
+        float cardWidthPixels = dpWidthPixels - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, outMetrics);
         int columnCount = 1;
-
-        //in pixels
-        int hSpace = (int) Math.abs((dpWidthPixels-cardWidthPixels)/2);
 
         //14 dp in pixels
         int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
 
-        if (dpWidth>=800)
+        Log.d("List fragment:","Device width dp:"+dpWidth);
+
+        if (dpWidth>=1280)
+        {
+            columnCount = 3;
+            mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
+        }
+        else if (dpWidth>=598)
         {
             columnCount = 2;
             mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
@@ -564,9 +591,13 @@ public class ComicListFragment extends Fragment {
             mLayoutManager = new PreCachingLayoutManager(getActivity(), height);
         }
 
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        //in pixels
+        int hSpace = (int) Math.abs((dpWidthPixels-cardWidthPixels)/(columnCount+1));
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace, columnCount));
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
@@ -587,15 +618,6 @@ public class ComicListFragment extends Fragment {
         }
         else
         {
-            final boolean isRefreshing = savedInstanceState.getBoolean("isRefreshing", false);
-
-            mSwipeRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(isRefreshing);
-                }
-            });
-
             for (int i=0;i<savedInstanceState.size();i++)
             {
                 mAdapter = new ComicAdapter(getActivity());

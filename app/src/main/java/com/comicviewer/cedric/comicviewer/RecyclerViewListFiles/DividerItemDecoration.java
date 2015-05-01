@@ -29,15 +29,29 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-        outRect.left = mHorizontalSpace;
-        outRect.right = mHorizontalSpace;
+
         outRect.bottom = mVerticalSpace;
+
+        if ((parent.getChildPosition(view) % mColumnCount) == 0) {
+            outRect.left = mHorizontalSpace;
+        } else {
+            outRect.left = mHorizontalSpace / 2;
+        }
+
+        if (((parent.getChildPosition(view)+1) % mColumnCount) == 0) {
+            outRect.right = mHorizontalSpace;
+        }
+        else
+        {
+            outRect.right = mHorizontalSpace/2;
+        }
 
         // Add top margin only for the first item to avoid double space between items
 
         if (parent.getChildPosition(view) < mColumnCount) {
             outRect.top = mVerticalSpace;
         }
+
     }
 
 }

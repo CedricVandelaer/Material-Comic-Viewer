@@ -1,6 +1,9 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.app.ActivityManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -8,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
@@ -49,13 +53,8 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
             ImageLoader.getInstance().init(config);
         }
 
-        Drawable[] layers = new Drawable[2];
-        layers[0] = new ColorDrawable(PreferenceSetter.getAppThemeColor(this));
-        layers[1] = getResources().getDrawable(R.drawable.comic_viewer_drawer_header_text);
 
-        LayerDrawable layerDrawable = new LayerDrawable(layers);
-
-        this.setDrawerHeaderImage(layerDrawable);
+        setDrawerHeaderImage();
 
         MaterialSection allComicsSection = newSection("All comics", R.drawable.book, ComicListFragment.getInstance());
         mSectionsArray[0] = allComicsSection;
@@ -89,6 +88,17 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
     {
         super.onResume();
         changeToolbarColor(PreferenceSetter.getAppThemeColor(this),darkenColor(PreferenceSetter.getAppThemeColor(this)));
+    }
+
+    private void setDrawerHeaderImage()
+    {
+        Drawable[] layers = new Drawable[2];
+        layers[0] = new ColorDrawable(PreferenceSetter.getAppThemeColor(this));
+        layers[1] = getResources().getDrawable(R.drawable.comic_viewer_drawer_header_text);
+        LayerDrawable layerDrawable = new LayerDrawable(layers);
+
+        this.setDrawerHeaderImage(layerDrawable);
+
     }
 
     private class SetTaskDescriptionTask extends AsyncTask
