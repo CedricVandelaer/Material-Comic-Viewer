@@ -39,6 +39,13 @@ public class PreferenceSetter {
     private static final String LONGEST_READ_COMIC = "longestReadComic";
     public static final String APP_THEME_COLOR = "appThemeColor";
     private static final String PAGE_NUMBER_SETTING="pageNumberSetting";
+    private static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
+
+    public static boolean getAutoFitSetting(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(WIDTH_AUTO_FIT_SETTING, true);
+    }
 
     public static String getPageNumberSetting(Context context)
     {

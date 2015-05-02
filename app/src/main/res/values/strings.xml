@@ -43,23 +43,24 @@
 
     <string name="updates">
         v1.2\n
-        - landscape mode\n
-        - bugfixes\n
-        - navigation drawer image loading improvements\n
-        - ads now only show at the start and the end of a comic\n\n
+        - Landscape mode\n
+        - Option to auto fit pages in landscape mode\n
+        - Bugfixes\n
+        - Navigation drawer image loading improvements\n
+        - Ads now only show at the start and the end of a comic\n\n
         v1.1.1\n
-        - added the option to show page numbers for a short time on page change\n
-        - bugfixes\n\n
+        - Added the option to show page numbers for a short time on page change\n
+        - Bugfixes\n\n
         v1.1\n
-        - added additional styling options for the pro version\n
-        - changed the app drawer image\n
-        - bugfixes\n\n
+        - Added additional styling options for the pro version\n
+        - Changed the app drawer image\n
+        - Bugfixes\n\n
         v1.0.2\n
-        - fixed a bug where unrecognized files could not be deleted\n\n
+        - Fixed a bug where unrecognized files could not be deleted\n\n
         v1.0.1\n
-        - fixed bug with comics opening slow when loading\n\n
+        - Fixed bug with comics opening slow when loading\n\n
         v1\n
-        - initial release\n\n
+        - Initial release\n\n
     </string>
     <string name="eula">
         The product is protected by Federal Copyright Law. Material Comic Viewer retains the title to and ownership of the Product. You are licensed to use this Product on the following terms and conditions:

@@ -36,6 +36,10 @@
     <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory
         android:key="FunctionalityCategory"
         android:title="Functions">
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="widthAutoFit"
+            android:title="Auto fit screen in landscape"
+            android:defaultValue="true"/>
         <ListPreference
             android:key="pageNumberSetting"
             android:title="Show page number"

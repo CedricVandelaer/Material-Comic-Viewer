@@ -1,15 +1,26 @@
 package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.graphics.Point;
+import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ImageView;
 
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
@@ -59,7 +70,7 @@ public class ComicPageFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString("ComicArchive", comicPath);
         args.putString("Page", pageFileName);
-        args.putInt("PageNumber",page);
+        args.putInt("PageNumber", page);
         fragment.setArguments(args);
         return fragment;
     }
@@ -84,25 +95,33 @@ public class ComicPageFragment extends Fragment {
                 String imagePath = "file:///" + getActivity().getFilesDir().getPath()+"/" + mFolderName + "/" + filename;
                 Log.d("loadImage", imagePath);
                 ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, new SimpleImageLoadingListener(){
+
+                    @Override
+                    public void onLoadingCancelled(String imageUri, View view)
+                    {
+                        zoomImageView();
+                    }
+
                     @Override
                     public void onLoadingStarted(String imageUri, View view) {
                         if (mSpinner!=null)
                             mSpinner.setVisibility(View.VISIBLE);
-                        mFullscreenComicView.setZoom(1);
+                        mFullscreenComicView.setZoom(1.0f);
+
                     }
 
                     @Override
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                         if (mSpinner!=null)
                             mSpinner.setVisibility(View.GONE);
-                        mFullscreenComicView.setZoom(1);
+                        mFullscreenComicView.setZoom(1.0f);
                     }
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         if (mSpinner!=null)
                             mSpinner.setVisibility(View.GONE);
-                        mFullscreenComicView.setZoom(1);
+                        zoomImageView();
                     }
                 });
 
@@ -110,6 +129,7 @@ public class ComicPageFragment extends Fragment {
         }
 
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -128,6 +148,7 @@ public class ComicPageFragment extends Fragment {
         mPageNumber = args.getInt("PageNumber");
         mFullscreenComicView = (TouchImageView) rootView.findViewById(R.id.fullscreen_comic);
 
+
         return rootView;
     }
 
@@ -143,6 +164,39 @@ public class ComicPageFragment extends Fragment {
         else
             new ExtractRarTask().execute();
     }
+
+
+    @Override
+    public void onConfigurationChanged(Configuration config)
+    {
+        super.onConfigurationChanged(config);
+        zoomImageView();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+    }
+
+    public void zoomImageView()
+    {
+        if (PreferenceSetter.getAutoFitSetting(getActivity())
+                && getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mFullscreenComicView.setScrollPosition(0.5f,0.0f);
+                }
+            },100);
+        }
+        else
+        {
+            mFullscreenComicView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        }
+    }
+
 
 
     private class ExtractRarTask extends AsyncTask<Void, Void, String>
@@ -195,6 +249,7 @@ public class ComicPageFragment extends Fragment {
         }
 
     }
+
 
     private class ExtractZipTask extends AsyncTask<Void, Void, String>
     {

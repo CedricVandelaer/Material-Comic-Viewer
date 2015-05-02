@@ -105,7 +105,6 @@ public class ComicListFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
 
-
         isFiltered = false;
         mHandler = new Handler();
 
@@ -463,8 +462,6 @@ public class ComicListFragment extends Fragment {
         }
 
         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
-        if (mAdapter.getComics().size()>0)
-            PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
         enableSearchBar(false);
     }
 

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,10 +17,16 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
@@ -39,6 +46,7 @@ import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The activity to display a fullscreen comic
@@ -53,7 +61,7 @@ public class DisplayComicActivity extends FragmentActivity {
     private int mPageCount;
 
     private ComicViewPager mPager;
-    private SmartFragmentStatePagerAdapter mPagerAdapter;
+    private ComicStatePagerAdapter mPagerAdapter;
 
     //Arraylist containing the filenamestrings of the fileheaders of the pages
     private ArrayList<String> mPages;
@@ -63,6 +71,7 @@ public class DisplayComicActivity extends FragmentActivity {
     private String mPageNumberSetting;
 
     private Handler mHandler;
+
 
 
     @Override
@@ -123,8 +132,8 @@ public class DisplayComicActivity extends FragmentActivity {
             });
         }
 
-    }
 
+    }
 
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
         @Override
@@ -253,10 +262,13 @@ public class DisplayComicActivity extends FragmentActivity {
     }
 
 
-    private class ComicStatePagerAdapter extends SmartFragmentStatePagerAdapter
+    private class ComicStatePagerAdapter extends FragmentStatePagerAdapter
     {
+        FragmentManager mFragmentManager;
+
         public ComicStatePagerAdapter(FragmentManager fm) {
             super(fm);
+            mFragmentManager = fm;
         }
 
         @Override
@@ -264,7 +276,8 @@ public class DisplayComicActivity extends FragmentActivity {
 
             String filename = mCurrentComic.getFileName();
             String comicPath = mCurrentComic.getFilePath()+ "/" + filename;
-            return ComicPageFragment.newInstance(comicPath, mPages.get(position), position);
+            ComicPageFragment fragment = ComicPageFragment.newInstance(comicPath, mPages.get(position), position);
+            return fragment;
         }
 
         @Override
@@ -272,7 +285,6 @@ public class DisplayComicActivity extends FragmentActivity {
             return mPageCount;
         }
     }
-
 
     @Override
     public void onResume()
@@ -284,22 +296,6 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mPager.setOnPageChangeListener(new ComicPageChangeListener());
     }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_display_comic, menu);
-        return false;
-    }
-    
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-
-    }
-
 
 
     private void removeExtractedFiles() {
