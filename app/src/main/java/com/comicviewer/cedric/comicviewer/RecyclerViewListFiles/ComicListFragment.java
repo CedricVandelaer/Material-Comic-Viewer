@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -19,6 +21,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -28,6 +31,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -65,13 +69,14 @@ public class ComicListFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ArrayList<String> mExcludedPaths;
     private SearchView mSearchView;
-    private ArrayList<Comic> filteredList;
+    private ArrayList<Object> filteredList;
     private boolean isFiltered;
     private static ComicListFragment mSingleton = null;
     private Context mApplicationContext;
     private Handler mHandler;
     private SearchComicsTask mSearchComicsTask=null;
     private PowerManager.WakeLock mWakeLock=null;
+    private ImageButton mFolderViewToggleButton;
 
     private static final String WAKE_LOCK="SearchTaskWakeLock";
 
@@ -137,12 +142,21 @@ public class ComicListFragment extends Fragment {
             PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK);
             mWakeLock.acquire();
+
+            enableSearchBar(false);
+            addShowFolderViewButton(false);
         }
 
         @Override
         protected Object doInBackground(Object[] params) {
 
-            searchComics();
+            if (PreferenceSetter.getFolderEnabledSetting(getActivity())) {
+                searchComicsAndFolders();
+            }
+            else
+            {
+                searchComics();
+            }
             mSearchComicsTask = null;
 
             return null;
@@ -151,6 +165,8 @@ public class ComicListFragment extends Fragment {
         @Override
         protected void onPostExecute(Object object)
         {
+            addShowFolderViewButton(true);
+            enableSearchBar(true);
             mWakeLock.release();
         }
 
@@ -194,14 +210,25 @@ public class ComicListFragment extends Fragment {
 
     private void refresh()
     {
+        if (mSearchComicsTask!=null) {
+            mSearchComicsTask.cancel(true);
+            try
+            {
+                Thread.sleep(50,0);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
         mAdapter.clearComicList();
 
-        mAdapter.notifyDataSetChanged();
 
-        if (mSearchComicsTask == null) {
-            mSearchComicsTask = new SearchComicsTask();
-            mSearchComicsTask.execute();
-        }
+
+        mSearchComicsTask = new SearchComicsTask();
+        mSearchComicsTask.execute();
+
     }
 
     private void createFab(View v) {
@@ -249,147 +276,47 @@ public class ComicListFragment extends Fragment {
         }
     }
 
-    private void searchComics() {
-        //map of <filename, filepath>
-        Map<String,String> map = FileLoader.searchComics(getActivity());
-
-        TreeMap<String, String> treemap = new TreeMap<>(map);
-
-        long startTime = System.currentTimeMillis();
-
-        List<Comic> currentComics = mAdapter.getComics();
-        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
-        List<String> savedComicsFileNames = new ArrayList<>();
-
-        for (int i=0;i<savedComics.size();i++)
-        {
-            savedComicsFileNames.add(savedComics.get(i).getFilePath()+"/"+savedComics.get(i).getFileName());
-        }
-
-        List<String> currentComicsFileNames = new ArrayList<>();
-
-        for (int i=0;i<currentComics.size();i++)
-        {
-            currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
-        }
-
-        mTotalComicCount = map.size();
-        mProgress = 0;
-
-        updateProgressDialog(mProgress, mTotalComicCount);
-
-        for (String str:treemap.keySet())
-        {
-            if (mSearchComicsTask.isCancelled())
-                break;
-
-            //open the new found file
-            final String comicPath = map.get(str)+"/"+str;
-            File file = new File(comicPath);
-
-            //check if comic is one of the saved comic files and add
-            if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
-            {
-                int pos = savedComicsFileNames.indexOf(comicPath);
-
-                try {
-                    Thread.sleep(2, 0);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                Comic comic = savedComics.get(pos);
-
-                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
-                {
-                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
-                }
-
-                ComicLoader.setComicColor(getActivity(), comic);
-
-                final Comic finalComic = comic;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.addComicSorted(finalComic);
-                        mRecyclerView.scrollToPosition(0);
-                    }
-                });
-
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
-            }//if it is a newly added comic
-            else if (getComicPositionInList(str)==-1
-                    && Utilities.checkExtension(str)
-                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
-
-                Comic comic = new Comic(str, map.get(str));
-
-                ComicLoader.loadComicSync( mApplicationContext, comic);
-
-                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()) && comic.getPageCount()>0)
-                {
-                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
-                }
-
-                final Comic finalComic = comic;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.addComicSorted(finalComic);
-                    }
-                });
-
-                PreferenceSetter.saveComic(getActivity(), comic);
-
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
-            }
-            else // if it's not a valid comic file
-            {
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-            }
-        }
-
-        updateLastReadComics();
-
-        long endTime = System.currentTimeMillis();
-
-        Log.d("search comics in list", "time: "+(endTime-startTime));
-    }
-
     private void updateLastReadComics()
     {
 
         String lastReadComic = PreferenceSetter.getLastReadComic(getActivity());
 
-        for (int i=0;i<mAdapter.getComics().size();i++)
+        for (int i=0;i<mAdapter.getComicsAndFiles().size();i++)
         {
-            if (mAdapter.getComics().get(i).getFileName().equals(lastReadComic))
-            {
-                final int pos = i;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.notifyItemChanged(pos);
-                    }
-                });
+            if (mAdapter.getComicsAndFiles().get(i) instanceof Comic) {
+
+                Comic comic = (Comic) mAdapter.getComicsAndFiles().get(i);
+                if (comic.getFileName().equals(lastReadComic)) {
+                    final int pos = i;
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.notifyItemChanged(pos);
+                        }
+                    });
+                }
             }
         }
     }
 
     private int getComicPositionInList(String filename)
     {
-        List<Comic> currentComics = mAdapter.getComics();
+        List<Object> currentComics = mAdapter.getComicsAndFiles();
+
         for (int pos=0;pos<currentComics.size();pos++)
         {
-            if (currentComics.get(pos).getFileName().equals(filename))
-                return pos;
+            if (currentComics.get(pos) instanceof Comic) {
+                if (((Comic)(currentComics.get(pos))).getFileName().equals(filename))
+                    return pos;
+            }
+            else
+            {
+                File folder = (File) currentComics.get(pos);
+                if (folder.getName().equals(filename))
+                {
+                    return pos;
+                }
+            }
         }
         return -1;
     }
@@ -416,7 +343,7 @@ public class ComicListFragment extends Fragment {
     private void onLoadingFinished()
     {
 
-        if (mSearchComicsTask != null && !mSearchComicsTask.isCancelled()) {
+        if (mSearchComicsTask != null && !mSearchComicsTask.isCancelled() && !PreferenceSetter.getFolderEnabledSetting(getActivity())) {
             PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
         }
 
@@ -463,6 +390,7 @@ public class ComicListFragment extends Fragment {
 
         PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
         enableSearchBar(false);
+        addShowFolderViewButton(false);
     }
 
     @Override
@@ -479,8 +407,8 @@ public class ComicListFragment extends Fragment {
         super.onResume();
         setPreferences();
 
+        addShowFolderViewButton(true);
         enableSearchBar(true);
-
 
         if (isFiltered)
             filterList("");
@@ -491,11 +419,57 @@ public class ComicListFragment extends Fragment {
         }
     }
 
+    private void addShowFolderViewButton(boolean enable) {
+
+        if (enable) {
+            final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+            mFolderViewToggleButton = new ImageButton(getActivity());
+            mFolderViewToggleButton.setAlpha(0.75f);
+            mFolderViewToggleButton.setBackground(null);
+
+            if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
+            {
+                mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
+            }
+            else
+            {
+                mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_folder));
+            }
+
+            mFolderViewToggleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
+                    {
+                        PreferenceSetter.setFolderEnabledSetting(getActivity(),false);
+                        mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_folder));
+                        refresh();
+                    }
+                    else
+                    {
+                        PreferenceSetter.setFolderEnabledSetting(getActivity(),true);
+                        mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
+                        refresh();
+                    }
+                }
+            });
+
+            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
+            toolbar.addView(mFolderViewToggleButton, layoutParamsCollapsed);
+        }
+        else
+        {
+            Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+            toolbar.removeView(mFolderViewToggleButton);
+        }
+    }
+
     private void enableSearchBar(boolean enabled)
     {
         if (enabled) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             mSearchView = new SearchView(getActivity());
+
 
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
 
@@ -577,12 +551,18 @@ public class ComicListFragment extends Fragment {
         if (dpWidth>=1280)
         {
             columnCount = 3;
-            mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
+            if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
+                mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+            else
+                mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
         }
         else if (dpWidth>=598)
         {
             columnCount = 2;
-            mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
+            if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
+                mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+            else
+                mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
         }
         else
         {
@@ -620,7 +600,7 @@ public class ComicListFragment extends Fragment {
             {
                 mAdapter = new ComicAdapter(getActivity());
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
-                    mAdapter.addComic((Comic) savedInstanceState.getParcelable("Comic " + (i + 1)));
+                    mAdapter.addObject((Comic) savedInstanceState.getParcelable("Comic " + (i + 1)));
                 mRecyclerView.setAdapter(mAdapter);
             }
         }
@@ -632,18 +612,28 @@ public class ComicListFragment extends Fragment {
             isFiltered = true;
 
             filteredList = new ArrayList<>();
-            List<Comic> currentComics = mAdapter.getComics();
+            List<Object> currentComics = mAdapter.getComicsAndFiles();
 
             for (int i = 0; i < currentComics.size(); i++) {
 
                 boolean found = false;
 
-                if (currentComics.get(i).getFileName().toLowerCase().contains(query.toLowerCase())) {
-                    found = true;
+                if (currentComics.get(i) instanceof Comic) {
+                    Comic comic = (Comic) currentComics.get(i);
+
+                    if (comic.getFileName().toLowerCase().contains(query.toLowerCase())) {
+                        found = true;
+                    } else if ((comic.getTitle().toLowerCase() + " " + comic.getIssueNumber()).contains(query.toLowerCase())) {
+                        found = true;
+                    }
                 }
-                else if ((currentComics.get(i).getTitle().toLowerCase()+" "+currentComics.get(i).getIssueNumber()).contains(query.toLowerCase()))
+                else
                 {
-                    found=true;
+                    File folder = (File) currentComics.get(i);
+                    if (folder.getName().toLowerCase().contains(query.toLowerCase()))
+                    {
+                        found = true;
+                    }
                 }
                 if (found)
                     filteredList.add(currentComics.get(i));
@@ -660,4 +650,254 @@ public class ComicListFragment extends Fragment {
 
     }
 
+    private void searchComics() {
+        //map of <filename, filepath>
+        Map<String,String> map = FileLoader.searchComics(getActivity());
+
+        TreeMap<String, String> treemap = new TreeMap<>(map);
+
+        long startTime = System.currentTimeMillis();
+
+        List<Comic> currentComics = mAdapter.getComics();
+        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
+        List<String> savedComicsFileNames = new ArrayList<>();
+
+        for (int i=0;i<savedComics.size();i++)
+        {
+            savedComicsFileNames.add(savedComics.get(i).getFilePath()+"/"+savedComics.get(i).getFileName());
+        }
+
+        List<String> currentComicsFileNames = new ArrayList<>();
+
+        for (int i=0;i<currentComics.size();i++)
+        {
+            currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
+        }
+
+        mTotalComicCount = map.size();
+        mProgress = 0;
+
+        updateProgressDialog(mProgress, mTotalComicCount);
+
+        for (String str:treemap.keySet())
+        {
+            if (mSearchComicsTask.isCancelled())
+                break;
+
+            //open the new found file
+            final String comicPath = map.get(str)+"/"+str;
+            File file = new File(comicPath);
+
+            //check if comic is one of the saved comic files and add
+            if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
+            {
+                int pos = savedComicsFileNames.indexOf(comicPath);
+
+                try {
+                    Thread.sleep(2, 0);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                Comic comic = savedComics.get(pos);
+
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
+                ComicLoader.setComicColor(getActivity(), comic);
+
+                final Comic finalComic = comic;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addObjectSorted(finalComic);
+                        mRecyclerView.scrollToPosition(0);
+                    }
+                });
+
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
+            }//if it is a newly added comic
+            else if (getComicPositionInList(str)==-1
+                    && Utilities.checkExtension(str)
+                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
+
+                Comic comic = new Comic(str, map.get(str));
+
+                ComicLoader.loadComicSync( mApplicationContext, comic);
+
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()) && comic.getPageCount()>0)
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
+                final Comic finalComic = comic;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addObjectSorted(finalComic);
+                    }
+                });
+
+                PreferenceSetter.saveComic(getActivity(), comic);
+
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
+            }
+            else // if it's not a valid comic file
+            {
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+            }
+        }
+
+        updateLastReadComics();
+
+        long endTime = System.currentTimeMillis();
+
+        Log.d("search comics in list", "time: "+(endTime-startTime));
+    }
+
+    private void searchComicsAndFolders() {
+        //map of <filename, filepath>
+        Map<String,String> map = FileLoader.searchComicsAndFolders(getActivity());
+
+        TreeMap<String, String> treemap = new TreeMap<>(map);
+
+        long startTime = System.currentTimeMillis();
+
+        List<Comic> currentComics = mAdapter.getComics();
+        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
+        List<String> savedComicsFileNames = new ArrayList<>();
+
+        for (int i=0;i<savedComics.size();i++)
+        {
+            savedComicsFileNames.add(savedComics.get(i).getFilePath()+"/"+savedComics.get(i).getFileName());
+        }
+
+        List<String> currentComicsFileNames = new ArrayList<>();
+
+        for (int i=0;i<currentComics.size();i++)
+        {
+            currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
+        }
+
+        mTotalComicCount = treemap.size();
+        mProgress = 0;
+
+        updateProgressDialog(mProgress, mTotalComicCount);
+
+        for (String str:treemap.keySet())
+        {
+            if (mSearchComicsTask.isCancelled())
+                break;
+
+            //open the new found file
+            final String comicPath = map.get(str)+"/"+str;
+            final File file = new File(comicPath);
+
+            //this is a folder
+            if (file.isDirectory() && getComicPositionInList(file.getName())==-1) {
+                try {
+                    Thread.sleep(20, 0);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addObjectSorted(file);
+                        mRecyclerView.scrollToPosition(0);
+                    }
+                });
+
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
+            }//check if comic is one of the saved comic files and add
+            else if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
+            {
+                int pos = savedComicsFileNames.indexOf(comicPath);
+
+                try {
+                    Thread.sleep(5, 0);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                Comic comic = savedComics.get(pos);
+
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
+                ComicLoader.setComicColor(getActivity(), comic);
+
+                final Comic finalComic = comic;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addObjectSorted(finalComic);
+                        mRecyclerView.scrollToPosition(0);
+                    }
+                });
+
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
+            }//if it is a newly added comic
+            else if (getComicPositionInList(str)==-1
+                    && Utilities.checkExtension(str)
+                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
+
+                Comic comic = new Comic(str, map.get(str));
+
+                ComicLoader.loadComicSync( mApplicationContext, comic);
+
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()) && comic.getPageCount()>0)
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
+                final Comic finalComic = comic;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addObjectSorted(finalComic);
+                    }
+                });
+
+                PreferenceSetter.saveComic(getActivity(), comic);
+
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
+            }
+            else // if it's not a valid comic file
+            {
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+            }
+        }
+
+        updateLastReadComics();
+
+        long endTime = System.currentTimeMillis();
+
+        Log.d("search comics in list", "time: "+(endTime-startTime));
+    }
+
 }
+
+

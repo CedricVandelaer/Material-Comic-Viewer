@@ -116,7 +116,6 @@ public class ComicPageFragment extends Fragment {
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                         if (mSpinner!=null)
                             mSpinner.setVisibility(View.GONE);
-                        failReason.getCause().printStackTrace();
                     }
 
                     @Override

@@ -40,11 +40,27 @@ public class PreferenceSetter {
     public static final String APP_THEME_COLOR = "appThemeColor";
     private static final String PAGE_NUMBER_SETTING="pageNumberSetting";
     private static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
+    private static final String FOLDER_VIEW_ENABLED="folderViewEnabled";
 
     public static boolean getAutoFitSetting(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(WIDTH_AUTO_FIT_SETTING, true);
+    }
+
+    public static boolean getFolderEnabledSetting(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(FOLDER_VIEW_ENABLED, false);
+    }
+
+    public static void setFolderEnabledSetting(Context context, boolean enabled)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putBoolean(FOLDER_VIEW_ENABLED, enabled);
+        editor.apply();
     }
 
     public static String getPageNumberSetting(Context context)

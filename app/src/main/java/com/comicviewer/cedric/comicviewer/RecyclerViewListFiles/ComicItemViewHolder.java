@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.swipe.SwipeLayout;
 import com.melnykov.fab.FloatingActionButton;
@@ -45,6 +46,18 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected LinearLayout mDeleteButtonLayout;
     protected LinearLayout mMarkReadButtonLayout;
     protected LinearLayout mMarkUnreadButtonLayout;
+
+    protected Comic mComic = null;
+
+    public void setComic(Comic comic)
+    {
+        mComic = comic;
+    }
+
+    public Comic getComic()
+    {
+        return mComic;
+    }
 
     public ComicItemViewHolder(View itemView) {
         super(itemView);

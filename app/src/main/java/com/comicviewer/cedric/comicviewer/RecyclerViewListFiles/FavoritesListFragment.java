@@ -59,7 +59,6 @@ public class FavoritesListFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFab;
     private ArrayList<String> mFilePaths;
-    private boolean mUseRecents;
     private int mProgress;
     private int mTotalComicCount;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -240,8 +239,6 @@ public class FavoritesListFragment extends Fragment {
 
         PreferenceSetter.setBackgroundColorPreference(getActivity());
 
-        mUseRecents = prefs.getBoolean("useRecents",true);
-
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 
         if (prefs.getString("cardSize", "Normal cards").equals(getString(R.string.card_size_setting_3)))
@@ -320,7 +317,7 @@ public class FavoritesListFragment extends Fragment {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mAdapter.addComicSorted(finalComic);
+                        mAdapter.addObjectSorted(finalComic);
                         mRecyclerView.scrollToPosition(0);
                     }
                 });
@@ -342,7 +339,7 @@ public class FavoritesListFragment extends Fragment {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mAdapter.addComicSorted(finalComic);
+                        mAdapter.addObjectSorted(finalComic);
                     }
                 });
 
@@ -609,7 +606,7 @@ public class FavoritesListFragment extends Fragment {
             {
                 mAdapter = new ComicAdapter(getActivity());
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
-                    mAdapter.addComic((Comic) savedInstanceState.getParcelable("Comic " + (i + 1)));
+                    mAdapter.addObject((Comic) savedInstanceState.getParcelable("Comic " + (i + 1)));
                 mRecyclerView.setAdapter(mAdapter);
             }
         }
@@ -637,7 +634,7 @@ public class FavoritesListFragment extends Fragment {
                 if (found)
                     filteredList.add(currentComics.get(i));
             }
-            ComicAdapter tempAdapter = new ComicAdapter(getActivity(), filteredList);
+            ComicAdapter tempAdapter = new ComicAdapter(getActivity(), filteredList, false);
             tempAdapter.setRootAdapter(mAdapter);
             mRecyclerView.swapAdapter(tempAdapter,false);
         }

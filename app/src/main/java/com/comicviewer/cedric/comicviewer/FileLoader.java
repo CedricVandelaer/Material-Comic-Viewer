@@ -20,6 +20,29 @@ import java.util.TreeMap;
  * Class to create the list of comics without actually loading them
  */
 public class FileLoader {
+
+    public static Map<String, String> searchComicsAndFolders(Context context)
+    {
+        long startTime = System.currentTimeMillis();
+
+        ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(context);
+        ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
+
+        for (String path:excludedPaths)
+        {
+            if (filepaths.contains(path))
+                filepaths.remove(path);
+        }
+
+        Map<String,String> map = findFilesAndFoldersInPaths(filepaths);
+
+        long endTime = System.currentTimeMillis();
+
+        Log.d("File loader", "time: "+(endTime-startTime));
+
+        return map;
+    }
+
     public static Map<String, String> searchComics(Context context) {
 
         long startTime = System.currentTimeMillis();
@@ -49,6 +72,42 @@ public class FileLoader {
         return -1;
     }
 
+    private static Map findFilesAndFoldersInPaths(ArrayList<String> pathsToSearch)
+    {
+        // list of filenames
+        ArrayList<String> files = new ArrayList<>();
+        // list of directories to search from
+        ArrayList<String> paths = new ArrayList<>();
+
+        // map to map the filenames to their directories
+        Map<String,String> map = new HashMap<>();
+
+        // search for all files in all paths
+        for (int i=0;i<pathsToSearch.size();i++)
+        {
+            String path = pathsToSearch.get(i);
+            File f = new File(path);
+            f.mkdirs();
+
+            File fileList[] = f.listFiles();
+
+            if (fileList!=null)
+            {
+                for (int j=0;j<fileList.length;j++)
+                {
+                    files.add(fileList[j].getName());
+                    paths.add(path);
+                }
+            }
+        }
+
+        // map the filenames to their directories
+        for (int i=0;i<files.size();i++) {
+            map.put(files.get(i),paths.get(i));
+        }
+
+        return map;
+    }
 
     private static Map findFilesInPaths(ArrayList<String> pathsToSearch)
     {
