@@ -64,6 +64,8 @@ public class ComicPageFragment extends Fragment {
     // The spinner to show when an image is loading
     ProgressBarCircularIndeterminate mSpinner;
 
+    private Handler mHandler;
+
     public static ComicPageFragment newInstance(String comicPath, String pageFileName, int page)
     {
         ComicPageFragment fragment = new ComicPageFragment();
@@ -114,7 +116,7 @@ public class ComicPageFragment extends Fragment {
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                         if (mSpinner!=null)
                             mSpinner.setVisibility(View.GONE);
-                        mFullscreenComicView.setZoom(1.0f);
+                        failReason.getCause().printStackTrace();
                     }
 
                     @Override
@@ -138,6 +140,7 @@ public class ComicPageFragment extends Fragment {
 
         Bundle args = getArguments();
 
+        mHandler = new Handler();
         mSpinner = (ProgressBarCircularIndeterminate) rootView.findViewById(R.id.spinner);
         mComicArchivePath = args.getString("ComicArchive");
         if (mComicArchivePath.contains("/"))
@@ -173,20 +176,15 @@ public class ComicPageFragment extends Fragment {
         zoomImageView();
     }
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-    }
 
     public void zoomImageView()
     {
         if (PreferenceSetter.getAutoFitSetting(getActivity())
                 && getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            new Handler().postDelayed(new Runnable() {
+            mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     mFullscreenComicView.setScrollPosition(0.5f,0.0f);
                 }
             },100);
