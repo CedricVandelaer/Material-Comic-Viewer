@@ -159,8 +159,21 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         else
         {
             v = mInflater.inflate(R.layout.folder_card, null);
-            return new FolderItemViewHolder(v);
+            FolderItemViewHolder folderItemViewHolder = new FolderItemViewHolder(v);
+            addFolderClickListener(folderItemViewHolder);
+            return folderItemViewHolder;
         }
+    }
+
+    private void addFolderClickListener(final FolderItemViewHolder folderItemViewHolder) {
+        folderItemViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String path = folderItemViewHolder.getFile().getAbsolutePath();
+                ComicListFragment.getInstance().NavigationStack.push(path);
+                ComicListFragment.getInstance().refresh();
+            }
+        });
     }
 
     private void addClickListener(final ComicItemViewHolder vh) {
@@ -225,6 +238,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         {
             FolderItemViewHolder folderItemViewHolder = (FolderItemViewHolder)itemViewHolder;
             initialiseFolderCard(folderItemViewHolder, position);
+            folderItemViewHolder.setFile((File)mComicList.get(position));
         }
     }
 

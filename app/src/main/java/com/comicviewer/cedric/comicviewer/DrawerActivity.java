@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.app.ActivityManager;
+import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -21,8 +22,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
+import java.util.Stack;
+
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
+import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
 
 /**
  * Created by Cédric on 5/03/2015.
@@ -33,9 +37,12 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
 {
 
     MaterialSection[] mSectionsArray;
+    private Stack<MaterialSection> mSectionNavigationStack;
 
     @Override
     public void init(Bundle savedInstanceState) {
+
+        mSectionNavigationStack = new Stack<>();
 
         new SimpleEula(this).show();
         new SetTaskDescriptionTask().execute();
@@ -43,7 +50,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         mSectionsArray = new MaterialSection[5];
 
         this.disableLearningPattern();
-        this.setBackPattern(BACKPATTERN_BACK_TO_FIRST);
+        this.setBackPattern(BACKPATTERN_CUSTOM);
         this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
         enableToolbarElevation();
         allowArrowAnimation();
@@ -52,7 +59,6 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
             ImageLoader.getInstance().init(config);
         }
-
 
         setDrawerHeaderImage();
 
@@ -76,11 +82,82 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         mSectionsArray[4] = aboutSection;
         addBottomSection(aboutSection);
 
-        for (MaterialSection section:mSectionsArray)
+        mSectionNavigationStack.push(mSectionsArray[0]);
+        for (final MaterialSection section:mSectionsArray)
         {
             section.setSectionColor(PreferenceSetter.getAppThemeColor(this));
+
+            section.setOnClickListener(new MaterialSectionListener() {
+                @Override
+                public void onClick(MaterialSection materialSection) {
+                    mSectionNavigationStack.push(materialSection);
+                    setSection(materialSection);
+                    setFragment(getFragment(materialSection),materialSection.getTitle());
+                }
+            });
         }
 
+
+
+    }
+
+
+    private Fragment getFragment(MaterialSection materialSection)
+    {
+        if (materialSection.getTitle().equals("All comics"))
+            return ComicListFragment.getInstance();
+        else if (materialSection.getTitle().equals("Favorites"))
+            return FavoritesListFragment.getInstance();
+        else if (materialSection.getTitle().equals("Statistics"))
+            return StatisticsFragment.newInstance();
+        else if (materialSection.getTitle().equals("Settings"))
+            return SettingsFragment.newInstance();
+        else if (materialSection.getTitle().equals("About"))
+            return AboutFragment.newInstance();
+        else
+            return ComicListFragment.getInstance();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (getCurrentSection() == mSectionsArray[0])
+        {
+            if (!ComicListFragment.getInstance().NavigationStack.isEmpty())
+                ComicListFragment.getInstance().NavigationStack.pop();
+            if (!ComicListFragment.getInstance().NavigationStack.isEmpty())
+            {
+                ComicListFragment.getInstance().refresh();
+            }
+            else
+            {
+                if (!mSectionNavigationStack.isEmpty())
+                    mSectionNavigationStack.pop();
+                if (mSectionNavigationStack.isEmpty())
+                {
+                    finish();
+                }
+                else
+                {
+                    setFragment(getFragment(mSectionNavigationStack.peek()), mSectionNavigationStack.peek().getTitle());
+                    setSection(mSectionNavigationStack.peek());
+                }
+            }
+        }
+        else
+        {
+            if (!mSectionNavigationStack.isEmpty())
+                mSectionNavigationStack.pop();
+            if (mSectionNavigationStack.isEmpty())
+            {
+                finish();
+            }
+            else
+            {
+                setFragment(getFragment(mSectionNavigationStack.peek()), mSectionNavigationStack.peek().getTitle());
+                setSection(mSectionNavigationStack.peek());
+            }
+        }
     }
 
     @Override
@@ -98,7 +175,6 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         LayerDrawable layerDrawable = new LayerDrawable(layers);
 
         this.setDrawerHeaderImage(layerDrawable);
-
     }
 
     private class SetTaskDescriptionTask extends AsyncTask

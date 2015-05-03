@@ -52,6 +52,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.TreeMap;
 
 
@@ -63,7 +64,6 @@ public class ComicListFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFab;
     private ArrayList<String> mFilePaths;
-    private boolean mUseRecents;
     private int mProgress;
     private int mTotalComicCount;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -77,6 +77,8 @@ public class ComicListFragment extends Fragment {
     private SearchComicsTask mSearchComicsTask=null;
     private PowerManager.WakeLock mWakeLock=null;
     private ImageButton mFolderViewToggleButton;
+    public Stack<String> NavigationStack;
+    private static String ROOT="root";
 
     private static final String WAKE_LOCK="SearchTaskWakeLock";
 
@@ -109,6 +111,9 @@ public class ComicListFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
+
+        NavigationStack = new Stack<>();
+        NavigationStack.push(ROOT);
 
         isFiltered = false;
         mHandler = new Handler();
@@ -208,7 +213,7 @@ public class ComicListFragment extends Fragment {
         });
     }
 
-    private void refresh()
+    public void refresh()
     {
         if (mSearchComicsTask!=null) {
             mSearchComicsTask.cancel(true);
@@ -266,8 +271,6 @@ public class ComicListFragment extends Fragment {
 
         PreferenceSetter.setBackgroundColorPreference(getActivity());
 
-        mUseRecents = prefs.getBoolean("useRecents",true);
-
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 
         if (prefs.getString("cardSize", "Normal cards").equals(getString(R.string.card_size_setting_3)))
@@ -320,8 +323,6 @@ public class ComicListFragment extends Fragment {
         }
         return -1;
     }
-
-
 
     private void updateProgressDialog(int progress, int total)
     {
@@ -442,12 +443,15 @@ public class ComicListFragment extends Fragment {
                     if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
                     {
                         PreferenceSetter.setFolderEnabledSetting(getActivity(),false);
+                        NavigationStack.clear();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_folder));
                         refresh();
                     }
                     else
                     {
                         PreferenceSetter.setFolderEnabledSetting(getActivity(),true);
+                        NavigationStack.clear();
+                        NavigationStack.push(ROOT);
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
                         refresh();
                     }
@@ -766,7 +770,7 @@ public class ComicListFragment extends Fragment {
 
     private void searchComicsAndFolders() {
         //map of <filename, filepath>
-        Map<String,String> map = FileLoader.searchComicsAndFolders(getActivity());
+        Map<String,String> map = FileLoader.searchComicsAndFolders(getActivity(), NavigationStack.peek());
 
         TreeMap<String, String> treemap = new TreeMap<>(map);
 

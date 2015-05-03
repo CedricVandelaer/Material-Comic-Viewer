@@ -41,7 +41,7 @@ public class FolderItemViewHolder extends RecyclerView.ViewHolder {
         mFile = file;
     }
 
-    public File getFile(File file)
+    public File getFile()
     {
         return mFile;
     }

@@ -21,12 +21,21 @@ import java.util.TreeMap;
  */
 public class FileLoader {
 
-    public static Map<String, String> searchComicsAndFolders(Context context)
+    public static Map<String, String> searchComicsAndFolders(Context context, String folder)
     {
         long startTime = System.currentTimeMillis();
 
+        ArrayList<String> filepaths;
+        if (folder.equals("root"))
+        {
+            filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
+        }
+        else
+        {
+            filepaths = new ArrayList<>();
+            filepaths.add(folder);
+        }
         ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(context);
-        ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
 
         for (String path:excludedPaths)
         {

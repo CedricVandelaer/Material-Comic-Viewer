@@ -5,7 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.comicviewer.cedric.comicviewer.R;
-
+/*
 
 public class SettingsActivity extends Activity {
 
@@ -27,3 +27,4 @@ public class SettingsActivity extends Activity {
     }
 
 }
+*/
