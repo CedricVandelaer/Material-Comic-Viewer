@@ -32,6 +32,10 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
         outRect.bottom = mVerticalSpace;
 
+
+        outRect.right = mHorizontalSpace;
+        outRect.left = mHorizontalSpace;
+        /*
         if ((parent.getChildPosition(view) % mColumnCount) == 0) {
             outRect.left = mHorizontalSpace;
         } else {
@@ -45,6 +49,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         {
             outRect.right = mHorizontalSpace/2;
         }
+        */
 
         // Add top margin only for the first item to avoid double space between items
 
