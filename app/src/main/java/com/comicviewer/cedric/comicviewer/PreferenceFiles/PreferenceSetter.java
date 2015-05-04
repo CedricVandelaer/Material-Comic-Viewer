@@ -51,7 +51,7 @@ public class PreferenceSetter {
     public static boolean getFolderEnabledSetting(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(FOLDER_VIEW_ENABLED, false);
+        return prefs.getBoolean(FOLDER_VIEW_ENABLED, true);
     }
 
     public static void setFolderEnabledSetting(Context context, boolean enabled)

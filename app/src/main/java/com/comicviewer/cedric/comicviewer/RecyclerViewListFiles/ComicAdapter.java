@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 import java.util.UUID;
 
 /**
@@ -170,6 +171,11 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 String path = folderItemViewHolder.getFile().getAbsolutePath();
+                if (ComicListFragment.getInstance().NavigationStack != null)
+                {
+                    ComicListFragment.getInstance().NavigationStack = new Stack<>();
+                    ComicListFragment.getInstance().NavigationStack.push("root");
+                }
                 ComicListFragment.getInstance().NavigationStack.push(path);
                 ComicListFragment.getInstance().refresh();
             }

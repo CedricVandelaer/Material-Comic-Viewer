@@ -191,6 +191,8 @@ public class DisplayComicActivity extends FragmentActivity {
                 PreferenceSetter.incrementNumberOfComicsStarted(DisplayComicActivity.this, 1);
             }
 
+            PreferenceSetter.saveLastReadComic(DisplayComicActivity.this,mCurrentComic.getFileName(),mPager.getCurrentItem());
+
             if (position+1==mPageCount)
             {
                 requestNewInterstitial();
@@ -380,7 +382,6 @@ public class DisplayComicActivity extends FragmentActivity {
     @Override
     public void onBackPressed()
     {
-        PreferenceSetter.saveLastReadComic(this,mCurrentComic.getFileName(),mPager.getCurrentItem());
         removeExtractedFiles();
         if (Build.VERSION.SDK_INT>20) {
             finishAfterTransition();

@@ -361,11 +361,18 @@ public class ComicListFragment extends Fragment {
     {
         super.onSaveInstanceState(savedState);
 
-        List<Comic> currentComics = mAdapter.getComics();
+        List<Object> currentList = mAdapter.getComicsAndFiles();
 
-        for (int i=0;i<currentComics.size();i++)
+        for (int i=0;i<currentList.size();i++)
         {
-            savedState.putParcelable("Comic "+ (i+1), currentComics.get(i));
+            if (currentList.get(i) instanceof File)
+            {
+                savedState.putSerializable("Folder "+ (i+1), (File)currentList.get(i));
+            }
+            else if (currentList.get(i) instanceof Comic)
+            {
+                savedState.putParcelable("Comic "+ (i+1),(Comic) currentList.get(i));
+            }
         }
 
         StringBuilder csvList = new StringBuilder();
@@ -557,16 +564,12 @@ public class ComicListFragment extends Fragment {
             columnCount = 3;
             if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
                 mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
-            else
-                mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
         }
         else if (dpWidth>=598)
         {
             columnCount = 2;
             if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
                 mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
-            else
-                mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
         }
         else
         {
@@ -603,8 +606,10 @@ public class ComicListFragment extends Fragment {
             for (int i=0;i<savedInstanceState.size();i++)
             {
                 mAdapter = new ComicAdapter(getActivity());
+                if (savedInstanceState.getSerializable("Folder "+ (i+1))!=null)
+                    mAdapter.addObject(savedInstanceState.getSerializable("Folder " + (i + 1)));
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
-                    mAdapter.addObject((Comic) savedInstanceState.getParcelable("Comic " + (i + 1)));
+                    mAdapter.addObject(savedInstanceState.getParcelable("Comic " + (i + 1)));
                 mRecyclerView.setAdapter(mAdapter);
             }
         }

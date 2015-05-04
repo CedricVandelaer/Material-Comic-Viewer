@@ -178,19 +178,19 @@ public class ComicPageFragment extends Fragment {
 
     public void zoomImageView()
     {
-        if (PreferenceSetter.getAutoFitSetting(getActivity())
-                && getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    mFullscreenComicView.setScrollPosition(0.5f,0.0f);
-                }
-            },100);
-        }
-        else
-        {
-            mFullscreenComicView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        if (getActivity()!=null) {
+            if (PreferenceSetter.getAutoFitSetting(getActivity())
+                    && getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        mFullscreenComicView.setScrollPosition(0.5f, 0.0f);
+                    }
+                }, 100);
+            } else {
+                mFullscreenComicView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            }
         }
     }
 

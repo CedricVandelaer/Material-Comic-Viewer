@@ -42,6 +42,8 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
+        v1.3\n
+        - Bugfixes\n\n
         v1.2\n
         - Landscape mode\n
         - Option to auto fit pages in landscape mode\n
