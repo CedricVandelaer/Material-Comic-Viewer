@@ -368,9 +368,10 @@ public class ComicListFragment extends Fragment {
             }
         }
 
-        for (int i=0;i<NavigationStack.size();i++)
+        int stackSize = NavigationStack.size();
+        for (int i=0;i<stackSize;i++)
         {
-            savedState.putString("Path "+(i+1), NavigationStack.get(i));
+            savedState.putString("Path "+(i+1), NavigationStack.peek());
         }
 
         StringBuilder csvList = new StringBuilder();
@@ -612,16 +613,26 @@ public class ComicListFragment extends Fragment {
         {
             for (int i=0;i<savedInstanceState.size();i++)
             {
-                if (savedInstanceState.getString("Path "+(i+1))!=null)
-                    NavigationStack.add(savedInstanceState.getString("Path "+(i+1)));
                 if (savedInstanceState.getSerializable("Folder "+ (i+1))!=null)
                     mAdapter.addObject(savedInstanceState.getSerializable("Folder " + (i + 1)));
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
                     mAdapter.addObject(savedInstanceState.getParcelable("Comic " + (i + 1)));
             }
+
+            for (int i=savedInstanceState.size();i>=0;i--)
+            {
+                if (savedInstanceState.getString("Path "+(i+1))!=null)
+                    NavigationStack.push(savedInstanceState.getString("Path "+(i+1)));
+            }
             mRecyclerView.setAdapter(mAdapter);
 
         }
+    }
+
+    public void navigateToFolder(String path)
+    {
+        NavigationStack.push(path);
+        refresh();
     }
 
     private void filterList(String query)
@@ -699,7 +710,7 @@ public class ComicListFragment extends Fragment {
 
         for (String str:treemap.keySet())
         {
-            if (mSearchComicsTask.isCancelled()) {
+            if (mSearchComicsTask!= null && mSearchComicsTask.isCancelled()) {
                 mAdapter.clearList();
                 break;
             }
@@ -807,7 +818,7 @@ public class ComicListFragment extends Fragment {
 
         for (String str:treemap.keySet())
         {
-            if (mSearchComicsTask.isCancelled())
+            if (mSearchComicsTask!= null && mSearchComicsTask.isCancelled())
                 break;
 
             //open the new found file
@@ -895,7 +906,7 @@ public class ComicListFragment extends Fragment {
 
         long endTime = System.currentTimeMillis();
 
-        Log.d("search comics in list", "time: "+(endTime-startTime));
+        Log.d("comics/files-search", "time: "+(endTime-startTime));
     }
 
 }

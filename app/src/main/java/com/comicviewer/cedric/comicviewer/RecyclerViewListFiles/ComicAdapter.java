@@ -172,8 +172,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             public void onClick(View v) {
                 Log.d("ItemClick",folderItemViewHolder.getFile().getAbsolutePath());
                 String path = folderItemViewHolder.getFile().getAbsolutePath();
-                ComicListFragment.getInstance().NavigationStack.push(path);
-                ComicListFragment.getInstance().refresh();
+                ComicListFragment.getInstance().navigateToFolder(path);
             }
         });
     }
