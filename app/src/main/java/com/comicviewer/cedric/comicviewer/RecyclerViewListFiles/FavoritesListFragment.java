@@ -193,7 +193,7 @@ public class FavoritesListFragment extends Fragment {
 
     private void refresh()
     {
-        mAdapter.clearComicList();
+        mAdapter.clearList();
 
         mAdapter.notifyDataSetChanged();
 
@@ -602,13 +602,14 @@ public class FavoritesListFragment extends Fragment {
         }
         else
         {
+            mAdapter = new ComicAdapter(getActivity());
+
             for (int i=0;i<savedInstanceState.size();i++)
             {
-                mAdapter = new ComicAdapter(getActivity());
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
                     mAdapter.addObject((Comic) savedInstanceState.getParcelable("Comic " + (i + 1)));
-                mRecyclerView.setAdapter(mAdapter);
             }
+            mRecyclerView.setAdapter(mAdapter);
         }
     }
 

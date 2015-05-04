@@ -112,9 +112,6 @@ public class ComicListFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
 
-        NavigationStack = new Stack<>();
-        NavigationStack.push(ROOT);
-
         isFiltered = false;
         mHandler = new Handler();
 
@@ -125,7 +122,7 @@ public class ComicListFragment extends Fragment {
 
         initialiseRefresh(v);
 
-        initialiseAdapter(savedInstanceState);
+        initialiseVariables(savedInstanceState);
 
         // Inflate the layout for this fragment
         return v;
@@ -144,10 +141,11 @@ public class ComicListFragment extends Fragment {
         @Override
         protected void onPreExecute()
         {
-            PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+            /*
+            PowerManager pm = (PowerManager) mApplicationContext.getSystemService(Context.POWER_SERVICE);
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK);
             mWakeLock.acquire();
-
+            */
             enableSearchBar(false);
             addShowFolderViewButton(false);
         }
@@ -155,13 +153,12 @@ public class ComicListFragment extends Fragment {
         @Override
         protected Object doInBackground(Object[] params) {
 
-            if (PreferenceSetter.getFolderEnabledSetting(getActivity())) {
+            if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext)) {
                 searchComicsAndFolders();
-            }
-            else
-            {
+            } else {
                 searchComics();
             }
+
             mSearchComicsTask = null;
 
             return null;
@@ -172,7 +169,7 @@ public class ComicListFragment extends Fragment {
         {
             addShowFolderViewButton(true);
             enableSearchBar(true);
-            mWakeLock.release();
+            //mWakeLock.release();
         }
 
     }
@@ -180,6 +177,11 @@ public class ComicListFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        if (activity==null)
+            Log.d("OnAttach", "Activity is null");
+        else
+            Log.d("OnAttach", "Activity is not null");
+        mApplicationContext = activity;
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -217,19 +219,9 @@ public class ComicListFragment extends Fragment {
     {
         if (mSearchComicsTask!=null) {
             mSearchComicsTask.cancel(true);
-            try
-            {
-                Thread.sleep(50,0);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
         }
 
-        mAdapter.clearComicList();
-
-
+        mAdapter.clearList();
 
         mSearchComicsTask = new SearchComicsTask();
         mSearchComicsTask.execute();
@@ -282,7 +274,7 @@ public class ComicListFragment extends Fragment {
     private void updateLastReadComics()
     {
 
-        String lastReadComic = PreferenceSetter.getLastReadComic(getActivity());
+        String lastReadComic = PreferenceSetter.getLastReadComic(mApplicationContext);
 
         for (int i=0;i<mAdapter.getComicsAndFiles().size();i++)
         {
@@ -344,8 +336,9 @@ public class ComicListFragment extends Fragment {
     private void onLoadingFinished()
     {
 
-        if (mSearchComicsTask != null && !mSearchComicsTask.isCancelled() && !PreferenceSetter.getFolderEnabledSetting(getActivity())) {
-            PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
+        if (mSearchComicsTask != null && !mSearchComicsTask.isCancelled() && !PreferenceSetter.getFolderEnabledSetting(mApplicationContext
+        )) {
+            PreferenceSetter.saveComicList(mApplicationContext, mAdapter.getComics());
         }
 
         mHandler.post(new Runnable() {
@@ -373,6 +366,11 @@ public class ComicListFragment extends Fragment {
             {
                 savedState.putParcelable("Comic "+ (i+1),(Comic) currentList.get(i));
             }
+        }
+
+        for (int i=0;i<NavigationStack.size();i++)
+        {
+            savedState.putString("Path "+(i+1), NavigationStack.get(i));
         }
 
         StringBuilder csvList = new StringBuilder();
@@ -427,9 +425,14 @@ public class ComicListFragment extends Fragment {
         }
     }
 
+    public Handler getHandler()
+    {
+        return mHandler;
+    }
+
     private void addShowFolderViewButton(boolean enable) {
 
-        if (enable) {
+        if (enable && getActivity()!=null) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             mFolderViewToggleButton = new ImageButton(getActivity());
             mFolderViewToggleButton.setAlpha(0.75f);
@@ -470,17 +473,18 @@ public class ComicListFragment extends Fragment {
         }
         else
         {
-            Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
-            toolbar.removeView(mFolderViewToggleButton);
+            if (getActivity()!=null) {
+                Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+                toolbar.removeView(mFolderViewToggleButton);
+            }
         }
     }
 
     private void enableSearchBar(boolean enabled)
     {
-        if (enabled) {
+        if (enabled && getActivity()!=null) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             mSearchView = new SearchView(getActivity());
-
 
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
 
@@ -511,8 +515,10 @@ public class ComicListFragment extends Fragment {
         }
         else
         {
-            Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
-            toolbar.removeView(mSearchView);
+            if (getActivity()!=null) {
+                Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+                toolbar.removeView(mSearchView);
+            }
         }
     }
 
@@ -562,14 +568,12 @@ public class ComicListFragment extends Fragment {
         if (dpWidth>=1280)
         {
             columnCount = 3;
-            if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
-                mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+            mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
         }
         else if (dpWidth>=598)
         {
             columnCount = 2;
-            if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
-                mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+            mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
         }
         else
         {
@@ -591,27 +595,32 @@ public class ComicListFragment extends Fragment {
 
     }
 
-    private void initialiseAdapter(Bundle savedInstanceState)
+    private void initialiseVariables(Bundle savedInstanceState)
     {
         mExcludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+        NavigationStack = new Stack<>();
+
+        mAdapter = new ComicAdapter(getActivity());
 
         if (savedInstanceState==null)
         {
-            mAdapter = new ComicAdapter(getActivity());
             mRecyclerView.setAdapter(mAdapter);
+            NavigationStack.push(ROOT);
         }
         else
         {
             for (int i=0;i<savedInstanceState.size();i++)
             {
-                mAdapter = new ComicAdapter(getActivity());
+                if (savedInstanceState.getString("Path "+(i+1))!=null)
+                    NavigationStack.add(savedInstanceState.getString("Path "+(i+1)));
                 if (savedInstanceState.getSerializable("Folder "+ (i+1))!=null)
                     mAdapter.addObject(savedInstanceState.getSerializable("Folder " + (i + 1)));
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
                     mAdapter.addObject(savedInstanceState.getParcelable("Comic " + (i + 1)));
-                mRecyclerView.setAdapter(mAdapter);
             }
+            mRecyclerView.setAdapter(mAdapter);
+
         }
     }
 
@@ -661,14 +670,14 @@ public class ComicListFragment extends Fragment {
 
     private void searchComics() {
         //map of <filename, filepath>
-        Map<String,String> map = FileLoader.searchComics(getActivity());
+        Map<String,String> map = FileLoader.searchComics(mApplicationContext);
 
         TreeMap<String, String> treemap = new TreeMap<>(map);
 
         long startTime = System.currentTimeMillis();
 
         List<Comic> currentComics = mAdapter.getComics();
-        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
+        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(mApplicationContext);
         List<String> savedComicsFileNames = new ArrayList<>();
 
         for (int i=0;i<savedComics.size();i++)
@@ -690,8 +699,10 @@ public class ComicListFragment extends Fragment {
 
         for (String str:treemap.keySet())
         {
-            if (mSearchComicsTask.isCancelled())
+            if (mSearchComicsTask.isCancelled()) {
+                mAdapter.clearList();
                 break;
+            }
 
             //open the new found file
             final String comicPath = map.get(str)+"/"+str;
@@ -702,14 +713,6 @@ public class ComicListFragment extends Fragment {
             {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
-                try {
-                    Thread.sleep(2, 0);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
                 Comic comic = savedComics.get(pos);
 
                 if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
@@ -717,7 +720,7 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                ComicLoader.setComicColor(getActivity(), comic);
+                ComicLoader.setComicColor(mApplicationContext, comic);
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
@@ -775,14 +778,14 @@ public class ComicListFragment extends Fragment {
 
     private void searchComicsAndFolders() {
         //map of <filename, filepath>
-        Map<String,String> map = FileLoader.searchComicsAndFolders(getActivity(), NavigationStack.peek());
+        Map<String,String> map = FileLoader.searchComicsAndFolders(mApplicationContext, NavigationStack.peek());
 
         TreeMap<String, String> treemap = new TreeMap<>(map);
 
         long startTime = System.currentTimeMillis();
 
         List<Comic> currentComics = mAdapter.getComics();
-        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
+        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(mApplicationContext);
         List<String> savedComicsFileNames = new ArrayList<>();
 
         for (int i=0;i<savedComics.size();i++)
@@ -813,13 +816,7 @@ public class ComicListFragment extends Fragment {
 
             //this is a folder
             if (file.isDirectory() && getComicPositionInList(file.getName())==-1) {
-                try {
-                    Thread.sleep(20, 0);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -836,13 +833,6 @@ public class ComicListFragment extends Fragment {
             {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
-                try {
-                    Thread.sleep(5, 0);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
 
                 Comic comic = savedComics.get(pos);
 
@@ -851,7 +841,7 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                ComicLoader.setComicColor(getActivity(), comic);
+                ComicLoader.setComicColor(mApplicationContext, comic);
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
@@ -879,6 +869,8 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
+                PreferenceSetter.saveComic(mApplicationContext, comic);
+
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
                     @Override
@@ -887,7 +879,6 @@ public class ComicListFragment extends Fragment {
                     }
                 });
 
-                PreferenceSetter.saveComic(getActivity(), comic);
 
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);

@@ -170,12 +170,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         folderItemViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("ItemClick",folderItemViewHolder.getFile().getAbsolutePath());
                 String path = folderItemViewHolder.getFile().getAbsolutePath();
-                if (ComicListFragment.getInstance().NavigationStack != null)
-                {
-                    ComicListFragment.getInstance().NavigationStack = new Stack<>();
-                    ComicListFragment.getInstance().NavigationStack.push("root");
-                }
                 ComicListFragment.getInstance().NavigationStack.push(path);
                 ComicListFragment.getInstance().refresh();
             }
@@ -682,7 +678,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         return mComicList;
     }
 
-    public void clearComicList()
+    public void clearList()
     {
         mComicList.clear();
         notifyDataSetChanged();

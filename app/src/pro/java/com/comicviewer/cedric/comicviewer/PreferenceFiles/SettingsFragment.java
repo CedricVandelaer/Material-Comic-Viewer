@@ -84,6 +84,9 @@ public class SettingsFragment extends PreferenceFragment{
                 final Dialog dialog = new Dialog(getActivity(),"Warning","The app will have to restart to complete the operation");
                 dialog.show();
 
+                ButtonFlat cancelButton = dialog.getButtonCancel();
+                cancelButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+
                 ButtonFlat acceptButton = dialog.getButtonAccept();
                 acceptButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
 
