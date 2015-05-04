@@ -10,6 +10,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.R;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.widgets.Dialog;
@@ -78,26 +79,25 @@ public class SettingsFragment extends PreferenceFragment{
 
         appThemeListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                PreferenceSetter.saveAppThemeColor(getActivity(), (CharSequence)newValue);
+            public boolean onPreferenceChange(Preference preference, final Object newValue) {
 
-                final Dialog dialog = new Dialog(getActivity(),"Warning","The app will have to restart to complete the operation");
-                dialog.show();
-
-                ButtonFlat cancelButton = dialog.getButtonCancel();
-                cancelButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
-
-                ButtonFlat acceptButton = dialog.getButtonAccept();
-                acceptButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
-
-                acceptButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appThemeListPreference.setOnPreferenceChangeListener(null);
-                        dialog.dismiss();
-                        getActivity().finish();
-                    }
-                });
+                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                        .title("Warning")
+                        .content("The app will have to restart to complete the operation")
+                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveText("Accept")
+                        .negativeText("Cancel")
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                PreferenceSetter.saveAppThemeColor(getActivity(), (CharSequence)newValue);
+                                appThemeListPreference.setOnPreferenceChangeListener(null);
+                                getActivity().finish();
+                            }
+                        })
+                        .show();
 
                 return false;
             }

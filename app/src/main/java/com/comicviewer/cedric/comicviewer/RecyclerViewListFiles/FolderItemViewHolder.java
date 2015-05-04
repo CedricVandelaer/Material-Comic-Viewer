@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.swipe.SwipeLayout;
+import com.melnykov.fab.FloatingActionButton;
 
 import java.io.File;
 
@@ -22,12 +23,14 @@ public class FolderItemViewHolder extends RecyclerView.ViewHolder {
     protected SwipeLayout mSwipeLayout;
     protected CardView mCardView;
     protected TextView mDeleteTextView;
+    protected FloatingActionButton mDeleteButton;
 
     protected File mFile = null;
 
     public FolderItemViewHolder(View itemView) {
         super(itemView);
 
+        mDeleteButton = (FloatingActionButton) itemView.findViewById(R.id.delete_button);
         mCardView = (CardView) itemView.findViewById(R.id.card);
         mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
         mDeleteTextView = (TextView) itemView.findViewById(R.id.delete_text);

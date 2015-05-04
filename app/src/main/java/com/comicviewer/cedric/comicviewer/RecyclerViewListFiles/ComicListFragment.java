@@ -3,11 +3,8 @@ package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -16,10 +13,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -75,12 +70,9 @@ public class ComicListFragment extends Fragment {
     private Context mApplicationContext;
     private Handler mHandler;
     private SearchComicsTask mSearchComicsTask=null;
-    private PowerManager.WakeLock mWakeLock=null;
     private ImageButton mFolderViewToggleButton;
     public Stack<String> NavigationStack;
     private static String ROOT="root";
-
-    private static final String WAKE_LOCK="SearchTaskWakeLock";
 
     public static ComicListFragment getInstance() {
         if(mSingleton == null) {
@@ -141,13 +133,14 @@ public class ComicListFragment extends Fragment {
         @Override
         protected void onPreExecute()
         {
-            /*
-            PowerManager pm = (PowerManager) mApplicationContext.getSystemService(Context.POWER_SERVICE);
-            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK);
-            mWakeLock.acquire();
-            */
             enableSearchBar(false);
             addShowFolderViewButton(false);
+            int i=0;
+            for (String str:NavigationStack)
+            {
+                Log.d("Stack",""+i+". "+str);
+                i++;
+            }
         }
 
         @Override
@@ -169,7 +162,6 @@ public class ComicListFragment extends Fragment {
         {
             addShowFolderViewButton(true);
             enableSearchBar(true);
-            //mWakeLock.release();
         }
 
     }
@@ -602,12 +594,12 @@ public class ComicListFragment extends Fragment {
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
         NavigationStack = new Stack<>();
 
-        mAdapter = new ComicAdapter(getActivity());
+        mAdapter = new ComicAdapter(mApplicationContext);
 
         if (savedInstanceState==null)
         {
-            mRecyclerView.setAdapter(mAdapter);
             NavigationStack.push(ROOT);
+            mRecyclerView.setAdapter(mAdapter);
         }
         else
         {

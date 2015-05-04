@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
@@ -29,7 +30,8 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
-import com.melnykov.fab.FloatingActionButton;
+import com.gc.materialdesign.views.ButtonFlat;
+import com.gc.materialdesign.widgets.Dialog;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -38,10 +40,7 @@ import com.nostra13.universalimageloader.core.assist.ImageSize;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
-import java.util.UUID;
 
 /**
  * Created by Cédric on 23/01/2015.
@@ -162,8 +161,39 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             v = mInflater.inflate(R.layout.folder_card, null);
             FolderItemViewHolder folderItemViewHolder = new FolderItemViewHolder(v);
             addFolderClickListener(folderItemViewHolder);
+            addFolderDeleteClickListener(folderItemViewHolder);
             return folderItemViewHolder;
         }
+    }
+
+    private void addFolderDeleteClickListener(final FolderItemViewHolder folderItemViewHolder) {
+
+        folderItemViewHolder.mDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                folderItemViewHolder.mSwipeLayout.close();
+                Log.d("ItemClick", "Delete " + folderItemViewHolder.getFile().getAbsolutePath());
+                String path = folderItemViewHolder.getFile().getAbsolutePath();
+
+                MaterialDialog dialog = new MaterialDialog.Builder(mContext)
+                        .title("Warning")
+                        .content("This will delete the folder:\n\""+folderItemViewHolder.getFile().getName()+"\"\nand all its contents. " +
+                                "Are you sure you wish to continue?")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
+                        .positiveText("Accept")
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
+                        .negativeText("Cancel")
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+
+                            }
+                        })
+                        .show();
+
+            }
+        });
     }
 
     private void addFolderClickListener(final FolderItemViewHolder folderItemViewHolder) {
