@@ -218,6 +218,7 @@ public class ComicListFragment extends Fragment {
         mSearchComicsTask = new SearchComicsTask();
         mSearchComicsTask.execute();
 
+
     }
 
     private void createFab(View v) {
@@ -595,28 +596,29 @@ public class ComicListFragment extends Fragment {
         NavigationStack = new Stack<>();
 
         mAdapter = new ComicAdapter(mApplicationContext);
+        mRecyclerView.setAdapter(mAdapter);
+
 
         if (savedInstanceState==null)
         {
             NavigationStack.push(ROOT);
-            mRecyclerView.setAdapter(mAdapter);
         }
         else
         {
             for (int i=0;i<savedInstanceState.size();i++)
             {
-                if (savedInstanceState.getSerializable("Folder "+ (i+1))!=null)
-                    mAdapter.addObject(savedInstanceState.getSerializable("Folder " + (i + 1)));
+
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
                     mAdapter.addObject(savedInstanceState.getParcelable("Comic " + (i + 1)));
             }
 
             for (int i=savedInstanceState.size();i>=0;i--)
             {
+                if (savedInstanceState.getSerializable("Folder "+ (i+1))!=null)
+                    mAdapter.addObject(savedInstanceState.getSerializable("Folder " + (i + 1)));
                 if (savedInstanceState.getString("Path "+(i+1))!=null)
                     NavigationStack.push(savedInstanceState.getString("Path "+(i+1)));
             }
-            mRecyclerView.setAdapter(mAdapter);
 
         }
     }
@@ -787,7 +789,7 @@ public class ComicListFragment extends Fragment {
 
         long startTime = System.currentTimeMillis();
 
-        List<Comic> currentComics = mAdapter.getComics();
+        List<Object> currentObjects = mAdapter.getComicsAndFiles();
         ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(mApplicationContext);
         List<String> savedComicsFileNames = new ArrayList<>();
 
@@ -797,10 +799,19 @@ public class ComicListFragment extends Fragment {
         }
 
         List<String> currentComicsFileNames = new ArrayList<>();
+        List<String> currentFolderNames = new ArrayList<>();
 
-        for (int i=0;i<currentComics.size();i++)
+        for (int i=0;i<currentObjects.size();i++)
         {
-            currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
+            if (currentObjects.get(i) instanceof Comic) {
+                Comic comic = (Comic) currentObjects.get(i);
+                currentComicsFileNames.add(comic.getFilePath() + "/" + comic.getFileName());
+            }
+            else if(currentObjects.get(i) instanceof File)
+            {
+                File folder = (File) currentObjects.get(i);
+                currentFolderNames.add(folder.getName());
+            }
         }
 
         mTotalComicCount = treemap.size();
@@ -818,7 +829,7 @@ public class ComicListFragment extends Fragment {
             final File file = new File(comicPath);
 
             //this is a folder
-            if (file.isDirectory() && getComicPositionInList(file.getName())==-1) {
+            if (file.isDirectory() && !(currentFolderNames.contains(file.getName()))) {
 
                 mHandler.post(new Runnable() {
                     @Override

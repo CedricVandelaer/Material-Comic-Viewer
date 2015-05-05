@@ -2,6 +2,8 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.ActivityManager;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -38,6 +40,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
 
     MaterialSection[] mSectionsArray;
     private Stack<MaterialSection> mSectionNavigationStack;
+
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -96,8 +99,6 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
                 }
             });
         }
-
-
 
     }
 
