@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -131,20 +132,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mHandler = new Handler();
 
-        if (mPageCount<1)
-        {
-            Dialog dialog = new Dialog(this,"Error", "This file can not be opened by comic viewer");
-            dialog.show();
 
-            ButtonFlat buttonFlat = dialog.getButtonAccept();
-            buttonFlat.setBackgroundColor(PreferenceSetter.getAppThemeColor(getApplicationContext()));
-            buttonFlat.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DisplayComicActivity.this.finish();
-                }
-            });
-        }
     }
 
     private void requestNewInterstitial()
@@ -170,6 +158,13 @@ public class DisplayComicActivity extends FragmentActivity {
                 }
             }, 4000);
         }
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        PreferenceSetter.saveLastReadComic(DisplayComicActivity.this,mCurrentComic.getFileName(),mPager.getCurrentItem());
     }
 
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
@@ -314,6 +309,23 @@ public class DisplayComicActivity extends FragmentActivity {
         setPageNumber();
 
         mPager.setOnPageChangeListener(new ComicPageChangeListener());
+
+        if (mPageCount<1)
+        {
+            MaterialDialog materialDialog = new MaterialDialog.Builder(DisplayComicActivity.this)
+                    .title("Error")
+                    .content("This file can not be opened by Comic Viewer")
+                    .positiveColor(PreferenceSetter.getAppThemeColor(DisplayComicActivity.this))
+                    .positiveText("Accept")
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            DisplayComicActivity.this.finish();
+                        }
+                    })
+                    .show();
+        }
     }
 
     private void setPageNumber()
@@ -353,8 +365,8 @@ public class DisplayComicActivity extends FragmentActivity {
     @Override
     public void onStop()
     {
+        PreferenceSetter.saveLastReadComic(DisplayComicActivity.this,mCurrentComic.getFileName(),mPager.getCurrentItem());
         super.onStop();
-
     }
 
     private void removeExtractedFiles() {

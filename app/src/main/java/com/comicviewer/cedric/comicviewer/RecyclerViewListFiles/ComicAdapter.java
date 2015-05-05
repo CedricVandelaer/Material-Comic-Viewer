@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
@@ -173,7 +174,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             public void onClick(View v) {
                 folderItemViewHolder.mSwipeLayout.close();
                 Log.d("ItemClick", "Delete " + folderItemViewHolder.getFile().getAbsolutePath());
-                String path = folderItemViewHolder.getFile().getAbsolutePath();
+                final String path = folderItemViewHolder.getFile().getAbsolutePath();
 
                 MaterialDialog dialog = new MaterialDialog.Builder(mContext)
                         .title("Warning")
@@ -187,7 +188,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-
+                                removeItem(folderItemViewHolder.getFile());
                             }
                         })
                         .show();
@@ -866,11 +867,30 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             }
             else
             {
-                throw new UnsupportedOperationException();
+                int pos = mComicList.indexOf(obj);
+                new DeleteDirectoryTask().execute(obj);
+                mComicList.remove(pos);
+                notifyItemRemoved(pos);
+
             }
 
         }
     }
+
+    private class DeleteDirectoryTask extends AsyncTask
+    {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            File directory = (File) params[0];
+
+
+            Utilities.deleteDirectory(mContext, directory);
+
+            return null;
+        }
+    }
+
 
     @Override
     public long getItemId(int position)

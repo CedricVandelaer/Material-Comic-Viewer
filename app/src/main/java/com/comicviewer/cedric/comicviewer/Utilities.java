@@ -1,12 +1,17 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
+
+import com.comicviewer.cedric.comicviewer.Model.Comic;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import net.lingala.zip4j.core.ZipFile;
 
@@ -130,5 +135,69 @@ public class Utilities {
             return false;
         }
 
+    }
+
+    public static void deleteComic(Context context, Comic comic)
+    {
+        String coverImageFileName = comic.getCoverImage();
+        if (coverImageFileName != null && coverImageFileName.startsWith("file:///")) {
+            coverImageFileName = coverImageFileName.replace("file:///", "");
+        }
+
+        try {
+            if (coverImageFileName != null) {
+                File coverImageFile = new File(coverImageFileName);
+                if (coverImageFile.exists())
+                    coverImageFile.delete();
+            }
+
+            File archiveFile = new File(comic.getFilePath() + "/" + comic.getFileName());
+            if (archiveFile.exists())
+                archiveFile.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        PreferenceSetter.removeSavedComic(context, comic);
+    }
+
+    public static boolean deleteDirectory(Context context, File directory) {
+        if(directory.exists()){
+            File[] files = directory.listFiles();
+            if(null!=files){
+                for(int i=0; i<files.length; i++) {
+                    if(files[i].isDirectory()) {
+                        deleteDirectory(context, files[i]);
+                    }
+                    else {
+                        if (Utilities.checkExtension(files[i].getName())
+                                && (Utilities.isZipArchive(files[i]) || Utilities.isRarArchive(files[i])))
+                        {
+                            boolean found = false;
+
+                            List<Comic> savedComics = PreferenceSetter.getSavedComics(context);
+
+                            for (int j=0;j<savedComics.size() && !found;j++)
+                            {
+                                String savedPath = savedComics.get(j).getFilePath()+"/"+savedComics.get(j).getFileName();
+                                if (savedPath.equals(files[i].getAbsolutePath()))
+                                {
+                                    found = true;
+                                    deleteComic(context, savedComics.get(j));
+                                }
+                                else
+                                {
+                                    files[i].delete();
+                                }
+
+                            }
+                        }
+                        else {
+                            files[i].delete();
+                        }
+                    }
+                }
+            }
+        }
+        return(directory.delete());
     }
 }

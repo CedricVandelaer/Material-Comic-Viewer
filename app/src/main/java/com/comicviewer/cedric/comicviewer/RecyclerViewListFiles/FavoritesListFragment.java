@@ -70,9 +70,6 @@ public class FavoritesListFragment extends Fragment {
     private Context mApplicationContext;
     private Handler mHandler;
     private SearchComicsTask mSearchComicsTask=null;
-    private PowerManager.WakeLock mWakeLock=null;
-
-    private static final String WAKE_LOCK="SearchTaskWakeLock";
 
     public static FavoritesListFragment getInstance() {
         if(mSingleton == null) {
@@ -132,14 +129,6 @@ public class FavoritesListFragment extends Fragment {
     private class SearchComicsTask extends AsyncTask{
 
         @Override
-        protected void onPreExecute()
-        {
-            PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
-            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK);
-            mWakeLock.acquire();
-        }
-
-        @Override
         protected Object doInBackground(Object[] params) {
 
             searchComics();
@@ -148,11 +137,6 @@ public class FavoritesListFragment extends Fragment {
             return null;
         }
 
-        @Override
-        protected void onPostExecute(Object object)
-        {
-            mWakeLock.release();
-        }
     }
 
     @Override
@@ -306,7 +290,9 @@ public class FavoritesListFragment extends Fragment {
 
                 Comic comic = savedComics.get(pos);
 
-                ComicLoader.setComicColor(getActivity(), comic);
+                if (ComicLoader.setComicColor(getActivity(), comic))
+                    PreferenceSetter.saveComic(getActivity(), comic);
+
 
                 if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
                 {
@@ -318,7 +304,6 @@ public class FavoritesListFragment extends Fragment {
                     @Override
                     public void run() {
                         mAdapter.addObjectSorted(finalComic);
-                        mRecyclerView.scrollToPosition(0);
                     }
                 });
 

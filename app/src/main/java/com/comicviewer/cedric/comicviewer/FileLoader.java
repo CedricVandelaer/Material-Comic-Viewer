@@ -29,6 +29,7 @@ public class FileLoader {
         if (folder.equals("root"))
         {
             filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
+
         }
         else
         {
@@ -41,6 +42,17 @@ public class FileLoader {
         {
             if (filepaths.contains(path))
                 filepaths.remove(path);
+        }
+
+        if (folder.equals("root"))
+        {
+            Map<String,String> map = new HashMap<>();
+            for (int i=0;i<filepaths.size();i++)
+            {
+                File addedFolder = new File(filepaths.get(i));
+                map.put(addedFolder.getName(),new File(addedFolder.getParent()).getAbsolutePath());
+            }
+            return map;
         }
 
         Map<String,String> map = findFilesAndFoldersInPaths(filepaths);

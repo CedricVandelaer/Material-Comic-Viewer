@@ -27,6 +27,7 @@
             fab:fab_colorPressed="@color/RedDark"
             fab:fab_colorRipple="@color/RedLight" />
         <TextView
+            android:gravity="center"
             android:id="@+id/delete_text"
             android:text="Delete"
             android:textAllCaps="false"
@@ -53,6 +54,7 @@
             fab:fab_colorPressed="@color/TealDark"
             fab:fab_colorRipple="@color/TealLight" />
         <TextView
+            android:gravity="center"
             android:id="@+id/mark_read_text"
             android:text="Mark as read"
             android:textAllCaps="false"
@@ -79,6 +81,7 @@
             fab:fab_colorPressed="@color/CyanDark"
             fab:fab_colorRipple="@color/CyanLight" />
         <TextView
+            android:gravity="center"
             android:id="@+id/mark_unread_text"
             android:text="Mark as unread"
             android:textAllCaps="false"

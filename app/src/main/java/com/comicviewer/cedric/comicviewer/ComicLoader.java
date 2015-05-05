@@ -192,7 +192,7 @@ public class ComicLoader {
     }
 
 
-    public static void setComicColor(Context context,Comic comic)
+    public static boolean setComicColor(Context context,Comic comic)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String cardColorSetting = prefs.getString("cardColor", context.getString(R.string.card_color_setting_1));
@@ -227,7 +227,7 @@ public class ComicLoader {
                     Palette.Swatch lightVibrantSwatch = Palette.generate(thumbnail).getLightVibrantSwatch();
                     if (lightVibrantSwatch==null)
                     {
-                        lightVibrantSwatch = Palette.generate(thumbnail).getVibrantSwatch();
+                        lightVibrantSwatch = Palette.generate(thumbnail).getMutedSwatch();
                     }
                     color = lightVibrantSwatch.getRgb();
                     primaryTextColor = lightVibrantSwatch.getTitleTextColor();
@@ -253,8 +253,11 @@ public class ComicLoader {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                return false;
             }
+            return true;
         }
+        return false;
     }
 }
 

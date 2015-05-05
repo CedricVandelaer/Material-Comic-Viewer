@@ -27,6 +27,7 @@
             fab:fab_colorPressed="@color/RedDark"
             fab:fab_colorRipple="@color/RedLight" />
         <TextView
+            android:gravity="center"
             android:id="@+id/delete_text"
             android:text="Delete"
             android:textAllCaps="false"

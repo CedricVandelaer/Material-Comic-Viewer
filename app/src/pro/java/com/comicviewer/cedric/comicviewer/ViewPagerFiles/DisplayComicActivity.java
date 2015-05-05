@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -116,21 +117,7 @@ public class DisplayComicActivity extends FragmentActivity {
             new SetTaskDescriptionTask().execute();
         }
 
-        if (mPageCount<1)
-        {
-            final Dialog dialog = new Dialog(this,"Error", "This file can not be opened by comic viewer");
-            dialog.show();
 
-            ButtonFlat buttonFlat = dialog.getButtonAccept();
-            buttonFlat.setBackgroundColor(PreferenceSetter.getAppThemeColor(getApplicationContext()));
-            buttonFlat.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                    DisplayComicActivity.this.finish();
-                }
-            });
-        }
 
 
     }
@@ -297,6 +284,23 @@ public class DisplayComicActivity extends FragmentActivity {
         setPageNumber();
 
         mPager.setOnPageChangeListener(new ComicPageChangeListener());
+
+        if (mPageCount<1)
+        {
+            MaterialDialog materialDialog = new MaterialDialog.Builder(DisplayComicActivity.this)
+                    .title("Error")
+                    .content("This file can not be opened by comic viewer")
+                    .positiveText("Accept")
+                    .positiveColor(PreferenceSetter.getAppThemeColor(DisplayComicActivity.this))
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            DisplayComicActivity.this.finish();
+                        }
+                    }).show();
+
+        }
     }
 
 
@@ -321,6 +325,13 @@ public class DisplayComicActivity extends FragmentActivity {
         }
     }
 
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        PreferenceSetter.saveLastReadComic(DisplayComicActivity.this, mCurrentComic.getFileName(), mPager.getCurrentItem());
+
+    }
 
     @Override
     public void onBackPressed()

@@ -65,6 +65,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
 
         setDrawerHeaderImage();
 
+        ComicListFragment.getInstance().setRetainInstance(true);
         MaterialSection allComicsSection = newSection("All comics", R.drawable.book, ComicListFragment.getInstance());
         mSectionsArray[0] = allComicsSection;
         addSection(allComicsSection);
@@ -101,7 +102,6 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         }
 
     }
-
 
     private Fragment getFragment(MaterialSection materialSection)
     {

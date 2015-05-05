@@ -329,10 +329,12 @@ public class ComicListFragment extends Fragment {
     private void onLoadingFinished()
     {
 
+        /*
         if (mSearchComicsTask != null && !mSearchComicsTask.isCancelled() && !PreferenceSetter.getFolderEnabledSetting(mApplicationContext
         )) {
             PreferenceSetter.saveComicList(mApplicationContext, mAdapter.getComics());
         }
+        */
 
         mHandler.post(new Runnable() {
             @Override
@@ -364,7 +366,7 @@ public class ComicListFragment extends Fragment {
         int stackSize = NavigationStack.size();
         for (int i=0;i<stackSize;i++)
         {
-            savedState.putString("Path "+(i+1), NavigationStack.peek());
+            savedState.putString("Path "+(i+1), NavigationStack.pop());
         }
 
         StringBuilder csvList = new StringBuilder();
@@ -406,6 +408,15 @@ public class ComicListFragment extends Fragment {
     {
         super.onResume();
         setPreferences();
+
+        if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext))
+        {
+            if (NavigationStack.empty())
+            {
+                mAdapter.clearList();
+                NavigationStack.push(ROOT);
+            }
+        }
 
         addShowFolderViewButton(true);
         enableSearchBar(true);
@@ -725,14 +736,14 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                ComicLoader.setComicColor(mApplicationContext, comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic))
+                    PreferenceSetter.saveComic(mApplicationContext, comic);
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         mAdapter.addObjectSorted(finalComic);
-                        mRecyclerView.scrollToPosition(0);
                     }
                 });
 
@@ -782,6 +793,8 @@ public class ComicListFragment extends Fragment {
     }
 
     private void searchComicsAndFolders() {
+        if (NavigationStack.empty())
+            return;
         //map of <filename, filepath>
         Map<String,String> map = FileLoader.searchComicsAndFolders(mApplicationContext, NavigationStack.peek());
 
@@ -855,7 +868,8 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                ComicLoader.setComicColor(mApplicationContext, comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic))
+                    PreferenceSetter.saveComic(mApplicationContext, comic);
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
