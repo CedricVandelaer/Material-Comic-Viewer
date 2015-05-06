@@ -30,6 +30,9 @@
     <string name="card_size_setting_1">Small cards</string>
     <string name="card_size_setting_2">Normal cards</string>
     <string name="card_size_setting_3">Comic cover cards</string>
+    <string name="cloud_storage_1">Dropbox</string>
+    <string name="cloud_storage_2">Google Drive</string>
+    <string name="cloud_storage_3">Microsoft SkyDrive</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="about_text">

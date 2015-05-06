@@ -58,8 +58,10 @@
                 android:src="@drawable/star_outline"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="30dp"
+                android:layout_marginRight="30dp"
                 android:layout_gravity="end"/>
 
             <ImageView
@@ -69,8 +71,10 @@
                 android:padding="8dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_marginTop="74dp"
                 android:layout_marginEnd="30dp"
+                android:layout_marginRight="30dp"
                 android:layout_gravity="end"/>
         </android.support.v7.widget.CardView>
     </LinearLayout>

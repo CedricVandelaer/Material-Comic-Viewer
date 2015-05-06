@@ -57,4 +57,9 @@
         <item>@string/page_number_setting_2</item>
         <item>@string/page_number_setting_3</item>
     </string-array>
+    <string-array name="Cloud_storage_services">
+        <item>@string/cloud_storage_1</item>
+        <item>@string/cloud_storage_2</item>
+        <item>@string/cloud_storage_3</item>
+    </string-array>
 </resources>

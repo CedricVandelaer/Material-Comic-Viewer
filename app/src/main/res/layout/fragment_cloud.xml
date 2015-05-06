@@ -4,6 +4,20 @@
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     tools:context="com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment">
 
+    <!-- A RecyclerView with some commonly used attributes -->
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/cloud_list_recyclerview"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

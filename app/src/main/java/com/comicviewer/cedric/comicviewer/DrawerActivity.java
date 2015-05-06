@@ -2,11 +2,6 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.ActivityManager;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -14,13 +9,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.ComicListFragment;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.FavoritesListFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;

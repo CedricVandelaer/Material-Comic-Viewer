@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
+package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;

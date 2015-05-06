@@ -1,4 +1,4 @@
-package com.comicviewer.cedric.comicviewer.RecyclerViewListFiles;
+package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -28,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.FileLoader;
@@ -37,8 +35,10 @@ import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PauseOnScrollListener;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PreCachingLayoutManager;
 import com.comicviewer.cedric.comicviewer.Utilities;
-import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
 
 import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.ImageLoader;

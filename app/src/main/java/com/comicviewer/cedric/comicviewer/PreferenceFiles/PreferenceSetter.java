@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
 
+import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 
@@ -41,6 +42,46 @@ public class PreferenceSetter {
     private static final String PAGE_NUMBER_SETTING="pageNumberSetting";
     private static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
     private static final String FOLDER_VIEW_ENABLED="folderViewEnabled";
+
+    public static void saveCloudService(Context context, CloudService service)
+    {
+        ArrayList<CloudService> cloudServicesList = getCloudServices(context);
+
+        cloudServicesList.add(service);
+
+        saveCloudServicesList(context, cloudServicesList);
+    }
+
+    public static ArrayList<CloudService> getCloudServices(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        ArrayList<CloudService> cloudServices = new ArrayList<>();
+
+        int i =0;
+        while (prefs.getString("CloudService "+i, null)!=null)
+        {
+            cloudServices.add(CloudService.create(prefs.getString("CloudService "+i,null)));
+            i++;
+        }
+
+        return cloudServices;
+    }
+
+    public static void saveCloudServicesList(Context context, List<CloudService> cloudServiceList)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        SharedPreferences.Editor editor = prefs.edit();
+
+        for (int i=0;i<cloudServiceList.size();i++)
+        {
+            editor.putString("CloudService "+i,cloudServiceList.get(i).serialize());
+        }
+
+        editor.apply();
+
+    }
 
     public static boolean getAutoFitSetting(Context context)
     {
