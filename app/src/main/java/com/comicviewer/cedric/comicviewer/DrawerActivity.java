@@ -195,7 +195,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
                 try {
                     ImageSize size = new ImageSize(64, 64);
                     tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
-                            ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.logohighres, size),
+                            ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
                             PreferenceSetter.getAppThemeColor(DrawerActivity.this));
                 } catch (Exception e) {
                     e.printStackTrace();

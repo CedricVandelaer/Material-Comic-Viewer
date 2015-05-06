@@ -12,6 +12,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.R;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.widgets.Dialog;
@@ -77,20 +78,22 @@ public class SettingsFragment extends PreferenceFragment{
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                final Dialog dialog = new Dialog(getActivity(), "Notice", "This feature requires the pro version of the app. ");
-                dialog.show();
 
-                dialog.getButtonAccept().setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
-                dialog.getButtonAccept().setText("Go to play store");
-                dialog.getButtonAccept().setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro") );
-                        startActivity( browse );
-                    }
-                });
-
+                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                        .title("Notice")
+                        .content("This feature requires the pro version of the app.")
+                        .negativeText("Cancel")
+                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveText("Go to play store")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro") );
+                                startActivity(browse);
+                            }
+                        }).show();
 
                 return false;
             }
