@@ -29,6 +29,9 @@
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="updates">
+        v1.3.1\n
+        - Open comics from other apps\n
+        - Added support for more devices\n\n
         v1.3\n
         - Folder view\n
         - Increased loading speeds\n

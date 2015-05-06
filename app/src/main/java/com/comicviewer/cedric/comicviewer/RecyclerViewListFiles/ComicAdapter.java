@@ -499,12 +499,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             ImageLoader.getInstance().displayImage(comic.getCoverImage(), comicItemViewHolder.mCoverPicture, mImageOptions);
         }
         Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
-        comicItemViewHolder.mFavoriteButton.setBackground(circle);
+        if (Build.VERSION.SDK_INT>15)
+            comicItemViewHolder.mFavoriteButton.setBackground(circle);
 
         if (PreferenceSetter.getReadComics(mContext).containsKey(comic.getFileName()))
         {
 
-            comicItemViewHolder.mLastReadIcon.setBackground(circle);
+            if (Build.VERSION.SDK_INT>15)
+                comicItemViewHolder.mLastReadIcon.setBackground(circle);
 
             if (PreferenceSetter.getReadComics(mContext).get(comic.getFileName())+1==comic.getPageCount())
             {
@@ -527,7 +529,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         else
         {
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
-            comicItemViewHolder.mLastReadIcon.setBackground(null);
+            if (Build.VERSION.SDK_INT>15)
+                comicItemViewHolder.mLastReadIcon.setBackground(null);
+            else
+                comicItemViewHolder.mLastReadIcon.getBackground().setAlpha(0);
         }
 
     }

@@ -42,6 +42,9 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
+        v1.3.1\n
+        - Open comics from other apps\n
+        - Added support for more devices\n\n
         v1.3\n
         - Folder view\n
         - Increased loading speeds\n

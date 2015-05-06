@@ -441,7 +441,10 @@ public class ComicListFragment extends Fragment {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             mFolderViewToggleButton = new ImageButton(getActivity());
             mFolderViewToggleButton.setAlpha(0.75f);
-            mFolderViewToggleButton.setBackground(null);
+            if (Build.VERSION.SDK_INT>15)
+                mFolderViewToggleButton.setBackground(null);
+            else
+                mFolderViewToggleButton.getBackground().setAlpha(0);
 
             if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
             {

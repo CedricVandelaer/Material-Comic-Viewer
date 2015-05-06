@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -82,7 +84,17 @@ public class DisplayComicActivity extends FragmentActivity {
         
         int lastReadPage;
 
-        mCurrentComic = intent.getParcelableExtra("Comic");
+        if (intent.getAction()!= null && intent.getAction().equals(Intent.ACTION_VIEW))
+        {
+            Uri uri = intent.getData();
+            File file = new File(uri.getPath());
+            Comic comic = new Comic(file.getName(), new File(file.getParent()).getPath());
+            ComicLoader.loadComicSync(this, comic);
+            mCurrentComic = comic;
+        }
+        else {
+            mCurrentComic = intent.getParcelableExtra("Comic");
+        }
 
         mPageCount = mCurrentComic.getPageCount();
 
