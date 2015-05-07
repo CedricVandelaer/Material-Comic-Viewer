@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.daimajia.swipe.SwipeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <!-- Bottom View Start-->
+    <include layout="@layout/file_card_background_options"/>
+
+    <!-- Bottom View End-->
+
+    <!-- Surface View Start -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <!--What you want to show in SurfaceView-->
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            card_view:cardElevation="4dp"
+            card_view:cardBackgroundColor="@color/Teal"
+            card_view:cardUseCompatPadding="true"
+            android:id="@+id/card"
+            android:clickable="true"
+            android:foreground="@drawable/ripple"
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="120dp">
+                <ImageView
+                    android:src="@drawable/file_icon"
+                    android:id="@+id/file_image_view"
+                    android:layout_height="100dp"
+                    android:layout_width="100dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"/>
+                <com.devspark.robototextview.widget.RobotoTextView
+                    android:id="@+id/file_title_text_view"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:layout_toEndOf="@id/file_image_view"
+                    android:layout_centerInParent="true"
+                    android:padding="10dp"
+                    android:text="File name"
+                    android:textColor="@color/White"
+                    android:textSize="24sp"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+    <!-- Surface View End -->
+</com.daimajia.swipe.SwipeLayout>

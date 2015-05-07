@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Environment;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 
-public class CloudFragment extends Fragment {
+public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private static CloudFragment mSingleton;
 
@@ -42,16 +44,15 @@ public class CloudFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private CloudListAdapter mAdapter;
+    private Handler mHandler;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private OnFragmentInteractionListener mListener;
 
-    
-    final static private String ROOT="root";
     final static private String APP_KEY = "id9ssazcpa41gys";
     final static private String APP_SECRET = "yj0gk3nipr6ti4u";
 
-    public Stack<String> NavigationStack;
 
     public static CloudFragment getInstance() {
 
@@ -70,8 +71,7 @@ public class CloudFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        NavigationStack = new Stack<>();
-        NavigationStack.push(ROOT);
+        mHandler = new Handler();
 
     }
 
@@ -85,6 +85,16 @@ public class CloudFragment extends Fragment {
 
     }
 
+    @Override
+    public void onRefresh() {
+        mAdapter.refreshCloudServiceList();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
 
 
     private class AddDropboxUserInfoTask extends AsyncTask
@@ -151,6 +161,8 @@ public class CloudFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_cloud, container, false);
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.cloud_list_recyclerview);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mAdapter = new CloudListAdapter(getActivity());
 
