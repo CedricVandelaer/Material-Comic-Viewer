@@ -29,21 +29,16 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Stack;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link CloudFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link CloudFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class CloudFragment extends Fragment {
 
+    private static CloudFragment mSingleton;
 
     private FloatingActionButton mFab;
     private DropboxAPI<AndroidAuthSession> mDBApi;
-
 
     private RecyclerView mRecyclerView;
     private CloudListAdapter mAdapter;
@@ -51,13 +46,20 @@ public class CloudFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    
+    final static private String ROOT="root";
     final static private String APP_KEY = "id9ssazcpa41gys";
     final static private String APP_SECRET = "yj0gk3nipr6ti4u";
 
-    public static CloudFragment newInstance() {
-        CloudFragment fragment = new CloudFragment();
+    public Stack<String> NavigationStack;
 
-        return fragment;
+    public static CloudFragment getInstance() {
+
+        if (mSingleton == null) {
+            mSingleton = new CloudFragment();
+        }
+
+        return mSingleton;
     }
 
     public CloudFragment() {
@@ -68,6 +70,9 @@ public class CloudFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        NavigationStack = new Stack<>();
+        NavigationStack.push(ROOT);
+
     }
 
     @Override
@@ -76,39 +81,66 @@ public class CloudFragment extends Fragment {
         super.onResume();
         PreferenceSetter.setBackgroundColorPreference(getActivity());
 
+        new AddDropboxUserInfoTask().execute();
 
-        if (mDBApi != null &&
-                mDBApi.getSession()!=null &&
-                mDBApi.getSession().authenticationSuccessful()) {
-            try {
-                // Required to complete auth, sets the access token on the session
-                mDBApi.getSession().finishAuthentication();
+    }
 
-                String userName = "User";
-                String email = "Email";
 
+
+    private class AddDropboxUserInfoTask extends AsyncTask
+    {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            if (mDBApi != null &&
+                    mDBApi.getSession()!=null &&
+                    mDBApi.getSession().authenticationSuccessful()) {
                 try {
-                    userName = mDBApi.accountInfo().displayName;
-                    email = mDBApi.accountInfo().email;
+                    // Required to complete auth, sets the access token on the session
+                    mDBApi.getSession().finishAuthentication();
+
+                    String userName = "User";
+                    String email = "Email";
+                    String service = "Dropbox";
+
+                    try {
+                        userName = mDBApi.accountInfo().displayName;
+                        email = mDBApi.accountInfo().email;
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    ArrayList<CloudService> savedCloudServices = PreferenceSetter.getCloudServices(getActivity());
+
+                    boolean inList = false;
+
+                    for (int i=0;i<savedCloudServices.size() && !inList;i++)
+                    {
+                        if (savedCloudServices.get(i).getEmail().equals(email) &&
+                                savedCloudServices.get(i).getName().equals(service))
+                        {
+                            inList = true;
+                        }
+                    }
+
+                    if (!inList) {
+                        String accessToken = mDBApi.getSession().getOAuth2AccessToken();
+                        CloudService cloudService = new CloudService(service, accessToken, userName, email);
+
+                        PreferenceSetter.saveCloudService(getActivity(), cloudService);
+
+                        mAdapter.refreshCloudServiceList();
+                    }
+
+                } catch (IllegalStateException e) {
+                    Log.i("DbAuthLog", "Error authenticating", e);
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-
-                String accessToken = mDBApi.getSession().getOAuth2AccessToken();
-                CloudService cloudService = new CloudService("Dropbox",accessToken, userName, email);
-
-                PreferenceSetter.saveCloudService(getActivity(), cloudService);
-
-                mAdapter.refreshCloudServiceList();
-
-            } catch (IllegalStateException e) {
-                Log.i("DbAuthLog", "Error authenticating", e);
             }
+            return null;
         }
-
     }
 
 

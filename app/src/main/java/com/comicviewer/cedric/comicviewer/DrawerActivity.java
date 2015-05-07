@@ -70,7 +70,8 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         mSectionsArray[1] = favoritesSection;
         addSection(favoritesSection);
 
-        MaterialSection cloudSection = newSection("Cloud storage", R.drawable.cloud, CloudFragment.newInstance());
+        CloudFragment.getInstance().setRetainInstance(true);
+        MaterialSection cloudSection = newSection("Cloud storage", R.drawable.cloud, CloudFragment.getInstance());
         mSectionsArray[2] = cloudSection;
         addSection(cloudSection);
 
@@ -110,7 +111,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         else if (materialSection.getTitle().equals("Favorites"))
             return FavoritesListFragment.getInstance();
         else if (materialSection.getTitle().equals("Cloud storage"))
-            return CloudFragment.newInstance();
+            return CloudFragment.getInstance();
         else if (materialSection.getTitle().equals("Statistics"))
             return StatisticsFragment.newInstance();
         else if (materialSection.getTitle().equals("Settings"))

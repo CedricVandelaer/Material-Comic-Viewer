@@ -1,6 +1,8 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +25,13 @@ public class CloudListAdapter extends RecyclerView.Adapter {
     private ArrayList<CloudService> mCloudServiceList;
     private Context mContext;
     private LayoutInflater mInflater;
+    private Handler mHandler;
 
     public CloudListAdapter(Context context)
     {
         mCloudServiceList = new ArrayList<>();
         mContext = context;
+        mHandler = new Handler();
 
         mCloudServiceList = PreferenceSetter.getCloudServices(mContext);
 
@@ -37,7 +41,12 @@ public class CloudListAdapter extends RecyclerView.Adapter {
     public void refreshCloudServiceList()
     {
         mCloudServiceList = PreferenceSetter.getCloudServices(mContext);
-        notifyDataSetChanged();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -46,7 +55,23 @@ public class CloudListAdapter extends RecyclerView.Adapter {
 
         CloudServiceViewHolder cloudServiceViewHolder = new CloudServiceViewHolder(v);
 
+        addClickListener(cloudServiceViewHolder);
+
         return cloudServiceViewHolder;
+    }
+
+    private void addClickListener(final CloudServiceViewHolder cloudServiceViewHolder) {
+
+        cloudServiceViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, CloudBrowserActivity.class);
+                intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
+
+                mContext.startActivity(intent);
+            }
+        });
+
     }
 
     @Override

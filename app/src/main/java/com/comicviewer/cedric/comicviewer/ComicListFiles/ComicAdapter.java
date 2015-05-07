@@ -572,7 +572,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
 
         Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
-        comicItemViewHolder.mFavoriteButton.setBackground(circle);
+        if(Build.VERSION.SDK_INT>15)
+            comicItemViewHolder.mFavoriteButton.setBackground(circle);
 
         if (PreferenceSetter.getFavoriteComics(mContext).contains(comic.getFileName()))
         {
@@ -652,12 +653,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star_outline, comicItemViewHolder.mFavoriteButton);
         }
 
-        comicItemViewHolder.mFavoriteButton.setBackground(circle);
+        if (Build.VERSION.SDK_INT>15)
+            comicItemViewHolder.mFavoriteButton.setBackground(circle);
 
         if (PreferenceSetter.getReadComics(mContext).containsKey((comic.getFileName())))
         {
             comicItemViewHolder.mLastReadIcon.setVisibility(View.VISIBLE);
-            comicItemViewHolder.mLastReadIcon.setBackground(circle);
+            if (Build.VERSION.SDK_INT>15)
+                comicItemViewHolder.mLastReadIcon.setBackground(circle);
 
             if (PreferenceSetter.getReadComics(mContext).get((comic.getFileName()))+1==comic.getPageCount())
             {

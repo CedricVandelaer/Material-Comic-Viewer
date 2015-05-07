@@ -85,4 +85,5 @@
         \n\nNo comic are included in this app. You have to obtain them in a legal way and place them on your internal memory and/or sd card.
         \n\nAFFILIATIONS: This product is not affiliated with, nor authorized, endorsed or licensed in any way by Marvel, DC Comics, any other comic company, their affiliates or subsidiaries.
     </string>
+    <string name="title_activity_cloud_browser">CloudBrowserActivity</string>
 </resources>
