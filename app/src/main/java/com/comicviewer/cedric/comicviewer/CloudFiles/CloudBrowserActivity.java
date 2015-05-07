@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +39,9 @@ public class CloudBrowserActivity extends Activity {
 
         mCloudService = (CloudService) getIntent().getSerializableExtra("CloudService");
 
+        mNavigationStack = new Stack<>();
+        mNavigationStack.push("/");
+
         setContentView(R.layout.activity_cloud_browser);
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
@@ -51,6 +55,24 @@ public class CloudBrowserActivity extends Activity {
         AndroidAuthSession session = new AndroidAuthSession(appKeys, mCloudService.getToken());
         mDBApi = new DropboxAPI<AndroidAuthSession>(session);
 
+    }
+
+    private class RetrieveFilesTask extends AsyncTask
+    {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            try {
+                DropboxAPI.Entry existingEntry = mDBApi.metadata(mNavigationStack.peek(), 1000, null, false, null);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
     }
 
     @Override
