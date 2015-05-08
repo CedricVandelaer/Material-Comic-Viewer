@@ -65,10 +65,13 @@ public class CloudListAdapter extends RecyclerView.Adapter {
         cloudServiceViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, CloudBrowserActivity.class);
-                intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
+                Intent intent;
+                if (cloudServiceViewHolder.getCloudService().getName().equals("Dropbox")) {
+                    intent = new Intent(mContext, DropboxActivity.class);
+                    intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
 
-                mContext.startActivity(intent);
+                    mContext.startActivity(intent);
+                }
             }
         });
 

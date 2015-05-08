@@ -8,6 +8,8 @@
     <color name="Black">#000000</color>
     <color name="WhiteBG">#fff3f3f3</color>
     <color name="Blue">#2196F3</color>
+    <color name="BlueDark">#1976D2</color>
+    <color name="BlueLight">#64B5F6</color>
     <color name="Cyan">#00BCD4</color>
     <color name="CyanDark">#0097A7</color>
     <color name="CyanLight">#4DD0E1</color>

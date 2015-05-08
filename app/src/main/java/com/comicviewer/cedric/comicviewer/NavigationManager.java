@@ -12,6 +12,7 @@ public class NavigationManager {
     private static NavigationManager mSingleton;
     private Stack<String> mFileNavigationStack;
     private Stack<MaterialSection> mSectionNavigationStack;
+    private Stack<String> mCloudStack;
     public final static String ROOT = "root";
 
     public static NavigationManager getInstance()
@@ -27,8 +28,10 @@ public class NavigationManager {
     {
         mFileNavigationStack = new Stack<>();
         mSectionNavigationStack = new Stack<>();
+        mCloudStack = new Stack<>();
 
         mFileNavigationStack.push(ROOT);
+        mCloudStack.push("/");
     }
 
     public void resetFileStack()
@@ -42,6 +45,12 @@ public class NavigationManager {
         mSectionNavigationStack.clear();
     }
 
+    public void resetCloudStack()
+    {
+        mCloudStack.clear();
+        mCloudStack.push("/");
+    }
+
     public void pushPathToFileStack(String path)
     {
         mFileNavigationStack.push(path);
@@ -52,6 +61,10 @@ public class NavigationManager {
         mSectionNavigationStack.push(section);
     }
 
+    public void pushPathToCloudStack(String path)
+    {
+        mCloudStack.push(path);
+    }
     public String popFromFileStack()
     {
         if (!mFileNavigationStack.empty())
@@ -68,6 +81,14 @@ public class NavigationManager {
             return null;
     }
 
+    public String popFromCloudStack()
+    {
+        if (!mCloudStack.empty())
+            return mCloudStack.pop();
+        else
+            return null;
+    }
+
     public String getPathFromFileStack()
     {
         return mFileNavigationStack.peek();
@@ -78,6 +99,11 @@ public class NavigationManager {
         return mSectionNavigationStack.peek();
     }
 
+    public String getPathFromCloudStack()
+    {
+        return mCloudStack.peek();
+    }
+
     public boolean fileStackEmpty()
     {
         return mFileNavigationStack.empty();
@@ -86,5 +112,10 @@ public class NavigationManager {
     public boolean sectionStackEmpty()
     {
         return mSectionNavigationStack.empty();
+    }
+
+    public boolean cloudStackEmpty()
+    {
+        return mCloudStack.empty();
     }
 }

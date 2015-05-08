@@ -59,7 +59,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CloudFiles.CloudBrowserActivity"
+            android:name=".CloudFiles.DropboxActivity"
             android:label="@string/title_activity_cloud_browser" >
         </activity>
     </application>

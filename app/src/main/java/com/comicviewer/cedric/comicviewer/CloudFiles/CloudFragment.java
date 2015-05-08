@@ -125,25 +125,25 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                     ArrayList<CloudService> savedCloudServices = PreferenceSetter.getCloudServices(getActivity());
 
-                    boolean inList = false;
 
-                    for (int i=0;i<savedCloudServices.size() && !inList;i++)
+                    for (int i=0;i<savedCloudServices.size();i++)
                     {
                         if (savedCloudServices.get(i).getEmail().equals(email) &&
                                 savedCloudServices.get(i).getName().equals(service))
                         {
-                            inList = true;
+                            PreferenceSetter.removeCloudService(getActivity(),
+                                    email, service);
                         }
                     }
 
-                    if (!inList) {
-                        String accessToken = mDBApi.getSession().getOAuth2AccessToken();
-                        CloudService cloudService = new CloudService(service, accessToken, userName, email);
 
-                        PreferenceSetter.saveCloudService(getActivity(), cloudService);
+                    String accessToken = mDBApi.getSession().getOAuth2AccessToken();
+                    CloudService cloudService = new CloudService(service, accessToken, userName, email);
 
-                        mAdapter.refreshCloudServiceList();
-                    }
+                    PreferenceSetter.saveCloudService(getActivity(), cloudService);
+
+                    mAdapter.refreshCloudServiceList();
+
 
                 } catch (IllegalStateException e) {
                     Log.i("DbAuthLog", "Error authenticating", e);

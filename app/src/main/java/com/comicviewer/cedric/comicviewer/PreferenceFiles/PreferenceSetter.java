@@ -49,6 +49,22 @@ public class PreferenceSetter {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEEP_SCREEN_ON, true);
     }
 
+    public static void removeCloudService(Context context, String email, String servicename)
+    {
+        ArrayList<CloudService> cloudServicesList = getCloudServices(context);
+
+        for (int i=0;i<cloudServicesList.size();i++)
+        {
+            if (cloudServicesList.get(i).getName().equals(servicename)
+                    && cloudServicesList.get(i).getEmail().equals(email))
+            {
+                cloudServicesList.remove(i);
+            }
+        }
+
+        saveCloudServicesList(context, cloudServicesList);
+    }
+
     public static void saveCloudService(Context context, CloudService service)
     {
         ArrayList<CloudService> cloudServicesList = getCloudServices(context);

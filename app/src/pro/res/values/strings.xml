@@ -29,6 +29,10 @@
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="updates">
+        v2.0\n
+        - Dropbox support\n
+        - Option to keep the screen on\n
+        - Better folder navigation\n\n
         v1.3.1\n
         - Open comics from other apps\n
         - Changed recents icon\n
