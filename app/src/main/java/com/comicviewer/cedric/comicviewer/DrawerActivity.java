@@ -35,13 +35,13 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
 {
 
     MaterialSection[] mSectionsArray;
-    private Stack<MaterialSection> mSectionNavigationStack;
+    private NavigationManager mNavigationManager;
 
 
     @Override
     public void init(Bundle savedInstanceState) {
 
-        mSectionNavigationStack = new Stack<>();
+        mNavigationManager = NavigationManager.getInstance();
 
         new SimpleEula(this).show();
         new SetTaskDescriptionTask().execute();
@@ -87,7 +87,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         mSectionsArray[5] = aboutSection;
         addBottomSection(aboutSection);
 
-        mSectionNavigationStack.push(mSectionsArray[0]);
+        NavigationManager.getInstance().pushToSectionStack(mSectionsArray[0]);
         for (final MaterialSection section:mSectionsArray)
         {
             section.setSectionColor(PreferenceSetter.getAppThemeColor(this));
@@ -95,7 +95,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
             section.setOnClickListener(new MaterialSectionListener() {
                 @Override
                 public void onClick(MaterialSection materialSection) {
-                    mSectionNavigationStack.push(materialSection);
+                    NavigationManager.getInstance().pushToSectionStack(materialSection);
                     setSection(materialSection);
                     setFragment(getFragment(materialSection),materialSection.getTitle());
                 }
@@ -127,39 +127,39 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
     {
         if (getCurrentSection() == mSectionsArray[0])
         {
-            if (!ComicListFragment.getInstance().NavigationStack.isEmpty())
-                ComicListFragment.getInstance().NavigationStack.pop();
-            if (!ComicListFragment.getInstance().NavigationStack.isEmpty())
+            NavigationManager.getInstance().popFromFileStack();
+
+            if (!NavigationManager.getInstance().fileStackEmpty())
             {
                 ComicListFragment.getInstance().refresh();
             }
             else
             {
-                if (!mSectionNavigationStack.isEmpty())
-                    mSectionNavigationStack.pop();
-                if (mSectionNavigationStack.isEmpty())
+                NavigationManager.getInstance().popFromSectionStack();
+                if (NavigationManager.getInstance().sectionStackEmpty())
                 {
                     finish();
                 }
                 else
                 {
-                    setFragment(getFragment(mSectionNavigationStack.peek()), mSectionNavigationStack.peek().getTitle());
-                    setSection(mSectionNavigationStack.peek());
+                    setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                            NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+                    setSection(NavigationManager.getInstance().getSectionFromSectionStack());
                 }
             }
         }
         else
         {
-            if (!mSectionNavigationStack.isEmpty())
-                mSectionNavigationStack.pop();
-            if (mSectionNavigationStack.isEmpty())
+            NavigationManager.getInstance().popFromSectionStack();
+            if (NavigationManager.getInstance().sectionStackEmpty())
             {
                 finish();
             }
             else
             {
-                setFragment(getFragment(mSectionNavigationStack.peek()), mSectionNavigationStack.peek().getTitle());
-                setSection(mSectionNavigationStack.peek());
+                setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                        NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+                setSection(NavigationManager.getInstance().getSectionFromSectionStack());
             }
         }
     }

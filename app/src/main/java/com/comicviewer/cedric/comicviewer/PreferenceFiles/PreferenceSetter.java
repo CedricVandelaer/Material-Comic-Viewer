@@ -42,6 +42,12 @@ public class PreferenceSetter {
     private static final String PAGE_NUMBER_SETTING="pageNumberSetting";
     private static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
     private static final String FOLDER_VIEW_ENABLED="folderViewEnabled";
+    private static final String KEEP_SCREEN_ON= "keepScreenOn";
+
+    public static boolean getScreenOnSetting(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEEP_SCREEN_ON, true);
+    }
 
     public static void saveCloudService(Context context, CloudService service)
     {

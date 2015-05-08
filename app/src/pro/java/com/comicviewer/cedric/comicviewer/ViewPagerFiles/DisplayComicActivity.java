@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
@@ -112,6 +113,8 @@ public class DisplayComicActivity extends FragmentActivity {
         }
 
 
+        if (PreferenceSetter.getScreenOnSetting(this))
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
     }

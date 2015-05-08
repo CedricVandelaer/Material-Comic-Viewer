@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
+import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -199,7 +200,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             public void onClick(View v) {
                 Log.d("ItemClick",folderItemViewHolder.getFile().getAbsolutePath());
                 String path = folderItemViewHolder.getFile().getAbsolutePath();
-                ComicListFragment.getInstance().navigateToFolder(path);
+                NavigationManager.getInstance().pushPathToFileStack(path);
+                ComicListFragment.getInstance().refresh();
             }
         });
     }

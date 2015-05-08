@@ -33,6 +33,7 @@ import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
+import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -71,7 +72,6 @@ public class ComicListFragment extends Fragment {
     private Handler mHandler;
     private SearchComicsTask mSearchComicsTask=null;
     private ImageButton mFolderViewToggleButton;
-    public Stack<String> NavigationStack;
     private static String ROOT="root";
 
     public static ComicListFragment getInstance() {
@@ -135,12 +135,6 @@ public class ComicListFragment extends Fragment {
         {
             enableSearchBar(false);
             addShowFolderViewButton(false);
-            int i=0;
-            for (String str:NavigationStack)
-            {
-                Log.d("Stack",""+i+". "+str);
-                i++;
-            }
         }
 
         @Override
@@ -363,11 +357,6 @@ public class ComicListFragment extends Fragment {
             }
         }
 
-        int stackSize = NavigationStack.size();
-        for (int i=0;i<stackSize;i++)
-        {
-            savedState.putString("Path "+(i+1), NavigationStack.pop());
-        }
 
         StringBuilder csvList = new StringBuilder();
         for(String s : mFilePaths){
@@ -375,7 +364,7 @@ public class ComicListFragment extends Fragment {
             csvList.append(",");
         }
 
-        savedState.putString("Filepaths",csvList.toString());
+        savedState.putString("Filepaths", csvList.toString());
 
         savedState.putBoolean("isRefreshing", mSwipeRefreshLayout.isRefreshing());
     }
@@ -411,10 +400,10 @@ public class ComicListFragment extends Fragment {
 
         if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext))
         {
-            if (NavigationStack.empty())
+            if (NavigationManager.getInstance().fileStackEmpty())
             {
                 mAdapter.clearList();
-                NavigationStack.push(ROOT);
+                NavigationManager.getInstance().resetFileStack();
             }
         }
 
@@ -458,18 +447,14 @@ public class ComicListFragment extends Fragment {
             mFolderViewToggleButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
-                    {
-                        PreferenceSetter.setFolderEnabledSetting(getActivity(),false);
-                        NavigationStack.clear();
+                    if (PreferenceSetter.getFolderEnabledSetting(getActivity())) {
+                        PreferenceSetter.setFolderEnabledSetting(getActivity(), false);
+                        NavigationManager.getInstance().resetFileStack();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_folder));
                         refresh();
-                    }
-                    else
-                    {
-                        PreferenceSetter.setFolderEnabledSetting(getActivity(),true);
-                        NavigationStack.clear();
-                        NavigationStack.push(ROOT);
+                    } else {
+                        PreferenceSetter.setFolderEnabledSetting(getActivity(), true);
+                        NavigationManager.getInstance().resetFileStack();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
                         refresh();
                     }
@@ -607,7 +592,6 @@ public class ComicListFragment extends Fragment {
     {
         mExcludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
         mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
-        NavigationStack = new Stack<>();
 
         mAdapter = new ComicAdapter(mApplicationContext);
         mRecyclerView.setAdapter(mAdapter);
@@ -615,7 +599,7 @@ public class ComicListFragment extends Fragment {
 
         if (savedInstanceState==null)
         {
-            NavigationStack.push(ROOT);
+
         }
         else
         {
@@ -630,18 +614,11 @@ public class ComicListFragment extends Fragment {
             {
                 if (savedInstanceState.getSerializable("Folder "+ (i+1))!=null)
                     mAdapter.addObject(savedInstanceState.getSerializable("Folder " + (i + 1)));
-                if (savedInstanceState.getString("Path "+(i+1))!=null)
-                    NavigationStack.push(savedInstanceState.getString("Path "+(i+1)));
             }
 
         }
     }
 
-    public void navigateToFolder(String path)
-    {
-        NavigationStack.push(path);
-        refresh();
-    }
 
     private void filterList(String query)
     {
@@ -796,10 +773,10 @@ public class ComicListFragment extends Fragment {
     }
 
     private void searchComicsAndFolders() {
-        if (NavigationStack.empty())
+        if (NavigationManager.getInstance().fileStackEmpty())
             return;
         //map of <filename, filepath>
-        Map<String,String> map = FileLoader.searchComicsAndFolders(mApplicationContext, NavigationStack.peek());
+        Map<String,String> map = FileLoader.searchComicsAndFolders(mApplicationContext, NavigationManager.getInstance().getPathFromFileStack());
 
         TreeMap<String, String> treemap = new TreeMap<>(map);
 

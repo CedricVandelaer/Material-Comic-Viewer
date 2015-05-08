@@ -40,6 +40,10 @@
             android:key="widthAutoFit"
             android:title="Auto fit screen in landscape"
             android:defaultValue="true"/>
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="keepScreenOn"
+            android:title="Keep screen on when reading comics"
+            android:defaultValue="true"/>
         <ListPreference
             android:key="pageNumberSetting"
             android:title="Show page number"

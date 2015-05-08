@@ -21,6 +21,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -144,7 +145,8 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mHandler = new Handler();
 
-
+        if (PreferenceSetter.getScreenOnSetting(this))
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void requestNewInterstitial()

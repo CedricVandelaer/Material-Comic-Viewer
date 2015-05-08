@@ -45,6 +45,9 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
+        v2.0\n
+        - Dropbox support\n
+        - Better folder navigation\n\n
         v1.3.1\n
         - Open comics from other apps\n
         - Changed recents icon\n
