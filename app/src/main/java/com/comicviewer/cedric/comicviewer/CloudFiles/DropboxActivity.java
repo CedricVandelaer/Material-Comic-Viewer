@@ -251,7 +251,8 @@ public class DropboxActivity extends Activity {
 
             if (mDBApi != null &&
                     mDBApi.getSession()!=null &&
-                    mDBApi.getSession().authenticationSuccessful()) {
+                    mDBApi.getSession().authenticationSuccessful() &&
+                    mDBApi.getSession().isLinked()) {
                 try {
                     // Required to complete auth, sets the access token on the session
                     mDBApi.getSession().finishAuthentication();
@@ -269,22 +270,11 @@ public class DropboxActivity extends Activity {
                         e.printStackTrace();
                     }
 
-                    ArrayList<CloudService> savedCloudServices = PreferenceSetter.getCloudServices(DropboxActivity.this);
-
-
-                    for (int i=0;i<savedCloudServices.size();i++)
-                    {
-                        if (savedCloudServices.get(i).getEmail().equals(email) &&
-                                savedCloudServices.get(i).getName().equals(service))
-                        {
-                            PreferenceSetter.removeCloudService(DropboxActivity.this,
-                                    email, service);
-                        }
-                    }
-
 
                     String accessToken = mDBApi.getSession().getOAuth2AccessToken();
                     CloudService cloudService = new CloudService(service, accessToken, userName, email);
+
+                    PreferenceSetter.removeCloudService(DropboxActivity.this, cloudService.getEmail(), cloudService.getName());
 
                     PreferenceSetter.saveCloudService(DropboxActivity.this, cloudService);
 
