@@ -597,11 +597,7 @@ public class ComicListFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
 
 
-        if (savedInstanceState==null)
-        {
-
-        }
-        else
+        if (!(savedInstanceState==null))
         {
             for (int i=0;i<savedInstanceState.size();i++)
             {

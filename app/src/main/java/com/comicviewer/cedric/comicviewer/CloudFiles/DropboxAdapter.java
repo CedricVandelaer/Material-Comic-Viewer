@@ -7,7 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
 
 import java.util.ArrayList;
@@ -18,17 +21,17 @@ import java.util.List;
  */
 public class DropboxAdapter extends RecyclerView.Adapter {
 
-    private Context mContext;
+    private DropboxActivity mActivity;
     private Handler mHandler;
     private LayoutInflater mInflater;
     private List<DropboxAPI.Entry> mFileList;
 
-    public DropboxAdapter(Context context)
+    public DropboxAdapter(DropboxActivity activity)
     {
         mFileList = new ArrayList<>();
         mHandler = new Handler();
-        mContext = context;
-        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mActivity = activity;
+        this.mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -48,15 +51,38 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         if (viewType==0) {
             v = mInflater.inflate(R.layout.cloud_folder_card, null);
             CloudFolderViewHolder cloudFolderViewHolder = new CloudFolderViewHolder(v);
+            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mActivity)));
+            if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
+                cloudFolderViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
+            addFolderClickListener(cloudFolderViewHolder);
             return cloudFolderViewHolder;
         }
         else {
             v = mInflater.inflate(R.layout.file_card, null);
             CloudFileViewHolder cloudFileViewHolder = new CloudFileViewHolder(v);
+            if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
+                cloudFileViewHolder.mDeleteTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
+            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mActivity));
             return cloudFileViewHolder;
         }
 
 
+    }
+
+    private void addFolderClickListener(final CloudFolderViewHolder cloudFolderViewHolder) {
+        cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavigationManager.getInstance().pushPathToCloudStack(cloudFolderViewHolder.getDropboxEntry().path);
+                mActivity.refresh();
+            }
+        });
+    }
+
+    public void clear()
+    {
+        mFileList.clear();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -83,11 +109,11 @@ public class DropboxAdapter extends RecyclerView.Adapter {
 
     public void addDropBoxEntry(final DropboxAPI.Entry entry)
     {
-        final int pos = mFileList.size();
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mFileList.add(pos, entry);
+                mFileList.add(entry);
+                int pos = mFileList.indexOf(entry);
                 notifyItemInserted(pos);
             }
         });

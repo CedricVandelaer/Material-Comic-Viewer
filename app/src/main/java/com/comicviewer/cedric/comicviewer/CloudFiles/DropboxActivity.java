@@ -1,8 +1,12 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -10,6 +14,8 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Menu;
+import android.view.View;
+import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
@@ -31,7 +37,10 @@ public class DropboxActivity extends Activity {
     private CloudService mCloudService;
 
     private RecyclerView mRecyclerView;
+    private TextView mErrorTextView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private DropboxAdapter mAdapter;
+    private Handler mHandler;
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
 
@@ -42,11 +51,30 @@ public class DropboxActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCloudService = (CloudService) getIntent().getSerializableExtra("CloudService");
-
         setContentView(R.layout.activity_dropbox);
 
+        mCloudService = (CloudService) getIntent().getSerializableExtra("CloudService");
+
+        mHandler = new Handler();
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+
+        mErrorTextView = (TextView) findViewById(R.id.error_text_view);
+
+
+        if (PreferenceSetter.getBackgroundColorPreference(this)==getResources().getColor(R.color.WhiteBG))
+            mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
+
+        mErrorTextView.setVisibility(View.GONE);
+
         getActionBar().setTitle("Dropbox");
+
+        getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
+
+        if (Build.VERSION.SDK_INT>20)
+            getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
+
+        NavigationManager.getInstance().resetCloudStack();
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
@@ -77,12 +105,35 @@ public class DropboxActivity extends Activity {
         mDBApi = new DropboxAPI<AndroidAuthSession>(session);
 
         if (mDBApi.getSession().authenticationSuccessful()) {
+            String token = mDBApi.getSession().finishAuthentication();
+            mCloudService.setToken(token);
+            PreferenceSetter.saveCloudService(this, mCloudService);
+        }
+
+        if (mDBApi.getSession().isLinked()) {
             new RetrieveFilesTask().execute();
         }
-        else {
+        else
+        {
             mDBApi.getSession().startOAuth2Authentication(this);
         }
 
+    }
+
+    public void refresh()
+    {
+        mAdapter.clear();
+        new RetrieveFilesTask().execute();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        NavigationManager.getInstance().popFromCloudStack();
+        if (NavigationManager.getInstance().cloudStackEmpty())
+            finish();
+        else
+            refresh();
     }
 
     @Override
@@ -101,6 +152,13 @@ public class DropboxActivity extends Activity {
 
         @Override
         protected Object doInBackground(Object[] params) {
+
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            });
 
             DropboxAPI.Entry existingEntry = null;
 
@@ -136,9 +194,40 @@ public class DropboxActivity extends Activity {
                         mAdapter.addDropBoxEntry(entryList.get(i));
                 }
 
+
             }
 
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+            });
+
             return null;
+        }
+
+        @Override
+        public void onPostExecute(Object object)
+        {
+            if (mAdapter.getItemCount()==0)
+            {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mErrorTextView.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+            else
+            {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mErrorTextView.setVisibility(View.GONE);
+                    }
+                });
+            }
         }
     }
 

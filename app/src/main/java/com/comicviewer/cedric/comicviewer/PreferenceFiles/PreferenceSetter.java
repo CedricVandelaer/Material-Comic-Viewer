@@ -69,6 +69,7 @@ public class PreferenceSetter {
     {
         ArrayList<CloudService> cloudServicesList = getCloudServices(context);
 
+        removeCloudService(context, service.getEmail(), service.getName());
         cloudServicesList.add(service);
 
         saveCloudServicesList(context, cloudServicesList);
@@ -95,6 +96,14 @@ public class PreferenceSetter {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         SharedPreferences.Editor editor = prefs.edit();
+
+        int j = 0;
+
+        while (prefs.getString("CloudService "+j,null)!=null)
+        {
+            editor.remove("CloudService "+j);
+            j++;
+        }
 
         for (int i=0;i<cloudServiceList.size();i++)
         {

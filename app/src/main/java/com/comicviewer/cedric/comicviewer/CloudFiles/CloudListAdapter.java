@@ -55,9 +55,32 @@ public class CloudListAdapter extends RecyclerView.Adapter {
 
         CloudServiceViewHolder cloudServiceViewHolder = new CloudServiceViewHolder(v);
 
+        if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+            cloudServiceViewHolder.mDeleteTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+
         addClickListener(cloudServiceViewHolder);
+        addDeleteClickListener(cloudServiceViewHolder);
 
         return cloudServiceViewHolder;
+    }
+
+    private void addDeleteClickListener(final CloudServiceViewHolder cloudServiceViewHolder) {
+
+        cloudServiceViewHolder.mDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final int pos = mCloudServiceList.indexOf(cloudServiceViewHolder.getCloudService());
+                mCloudServiceList.remove(cloudServiceViewHolder.getCloudService());
+                PreferenceSetter.removeCloudService(mContext, cloudServiceViewHolder.getCloudService().getEmail(), cloudServiceViewHolder.getCloudService().getName());
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyItemRemoved(pos);
+                    }
+                });
+            }
+        });
+
     }
 
     private void addClickListener(final CloudServiceViewHolder cloudServiceViewHolder) {

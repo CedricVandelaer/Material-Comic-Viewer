@@ -8,7 +8,7 @@
     android:layout_height="match_parent">
     <!--What you want to show-->
     <LinearLayout
-        android:id="@+id/delete_button_layout"
+        android:id="@+id/download_button_layout"
         android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="0dp"

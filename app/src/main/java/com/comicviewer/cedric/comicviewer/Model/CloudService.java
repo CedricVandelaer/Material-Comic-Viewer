@@ -34,6 +34,11 @@ public class CloudService implements Serializable{
         return gson.fromJson(serializedData, CloudService.class);
     }
 
+    public void setToken(String token)
+    {
+        mToken = token;
+    }
+
     public String getName()
     {
         return mName;
