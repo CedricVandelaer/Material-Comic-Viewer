@@ -62,6 +62,11 @@
             android:name=".CloudFiles.DropboxActivity"
             android:label="@string/title_activity_cloud_browser" >
         </activity>
+
+        <service
+            android:name=".CloudFiles.DownloadFileService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
