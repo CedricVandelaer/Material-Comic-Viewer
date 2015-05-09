@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,6 +27,9 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,6 +56,8 @@ public class DropboxActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_dropbox);
+
+        new SetTaskDescriptionTask().execute();
 
         mCloudService = (CloudService) getIntent().getSerializableExtra("CloudService");
 
@@ -287,6 +293,38 @@ public class DropboxActivity extends Activity {
                     Log.i("DbAuthLog", "Error authenticating", e);
                 }
             }
+            return null;
+        }
+    }
+
+    private class SetTaskDescriptionTask extends AsyncTask
+    {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            if (!ImageLoader.getInstance().isInited()) {
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(DropboxActivity.this).build();
+                ImageLoader.getInstance().init(config);
+            }
+
+            ActivityManager.TaskDescription tdscr = null;
+
+            if (Build.VERSION.SDK_INT>20) {
+                try {
+                    ImageSize size = new ImageSize(64, 64);
+                    tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
+                            ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
+                            PreferenceSetter.getAppThemeColor(DropboxActivity.this));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (tdscr != null)
+                setTaskDescription(tdscr);
+
+
             return null;
         }
     }
