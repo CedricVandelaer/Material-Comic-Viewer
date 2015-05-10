@@ -18,6 +18,7 @@ import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.Utilities;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.ProgressListener;
@@ -27,13 +28,14 @@ import com.dropbox.client2.session.AppKeyPair;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class DownloadFileService extends IntentService {
 
     final static private String APP_KEY = "id9ssazcpa41gys";
     final static private String APP_SECRET = "yj0gk3nipr6ti4u";
-    int mNotificationId=0;
+    private int fileCount=0;
     NotificationCompat.Builder mNotification;
 
     private static final String ACTION_DROPBOX_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.DROPBOXDOWNLOAD";
@@ -69,50 +71,58 @@ public class DownloadFileService extends IntentService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                downloadDropboxFileTask(fileUrl, cloudService);
+                downloadDropboxFile(fileUrl, cloudService);
             }
         }).start();
 
     }
 
-    private void downloadDropboxFileTask(String fileUrl, CloudService cloudService)
+
+    private void downloadDropboxFile(String fileUrl, CloudService cloudService)
     {
 
-            AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
-            AndroidAuthSession session = new AndroidAuthSession(appKeys, cloudService.getToken());
-            DropboxAPI<AndroidAuthSession> dbApi = new DropboxAPI<AndroidAuthSession>(session);
+        Random rand = new Random();
+        rand.setSeed(System.currentTimeMillis());
+
+        final int notificationId = rand.nextInt();
+
+        AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
+        AndroidAuthSession session = new AndroidAuthSession(appKeys, cloudService.getToken());
+        DropboxAPI<AndroidAuthSession> dbApi = new DropboxAPI<AndroidAuthSession>(session);
 
 
-            if (dbApi.getSession().authenticationSuccessful()) {
-                String token = dbApi.getSession().finishAuthentication();
-                cloudService.setToken(token);
-                PreferenceSetter.saveCloudService(DownloadFileService.this, cloudService);
-            }
+        if (dbApi.getSession().authenticationSuccessful()) {
+            String token = dbApi.getSession().finishAuthentication();
+            cloudService.setToken(token);
+            PreferenceSetter.saveCloudService(DownloadFileService.this, cloudService);
+        }
 
-            if (dbApi.getSession().isLinked()) {
+        if (dbApi.getSession().isLinked()) {
 
-                File dropboxDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Dropbox");
-                if (!dropboxDir.exists())
-                    dropboxDir.mkdir();
-                File output = new File(dropboxDir.getAbsolutePath()+fileUrl);
-                File renamedOutput = new File(output.getAbsolutePath()+".mcvdownload");
+            File dropboxDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Dropbox");
+            if (!dropboxDir.exists())
+                dropboxDir.mkdir();
+            File output = new File(dropboxDir.getAbsolutePath()+fileUrl);
+            File renamedOutput = new File(output.getAbsolutePath()+".mcvdownload");
 
-                String filePath = output.getAbsolutePath();
-                final String title = output.getName();
-
-
-                try {
-                    if (!output.exists() && !renamedOutput.exists()) {
+            String filePath = output.getAbsolutePath();
+            final String title = output.getName();
 
 
+            try {
+                if (!output.exists() && !renamedOutput.exists()) {
+
+                    DropboxAPI.Entry entry = dbApi.metadata(fileUrl, 1000, null, true, null);
+
+                    if (!entry.isDir) {
                         FileOutputStream outputStream = new FileOutputStream(renamedOutput);
 
-                        createStartNotification(filePath, title);
+                        createStartNotification(filePath, title, notificationId);
 
                         DropboxAPI.DropboxFileInfo info = dbApi.getFile(fileUrl, null, outputStream, new ProgressListener() {
                             @Override
                             public void onProgress(long l, long l1) {
-                                setNotificationProgress(l,l1,title);
+                                setNotificationProgress(l, l1, title, notificationId);
                             }
                         });
                         Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
@@ -128,44 +138,54 @@ public class DownloadFileService extends IntentService {
                             PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
                         }
 
-                        if (excludedpaths.contains(dropboxDir.getAbsolutePath()))
-                        {
+                        if (excludedpaths.contains(dropboxDir.getAbsolutePath())) {
                             excludedpaths.remove(dropboxDir.getAbsolutePath());
                             PreferenceSetter.saveExcludedFilePaths(DownloadFileService.this, excludedpaths);
                         }
 
-                        setEndNotification(title, filePath);
+                        setEndNotification(title, filePath, notificationId);
+                    }
+                    else
+                    {
+                        if (!output.exists())
+                        {
+                            output.mkdir();
+                            for (int i=0;i<entry.contents.size();i++)
+                            {
+                                if (Utilities.checkExtension(entry.contents.get(i).fileName()) || entry.contents.get(i).isDir)
+                                    handleActionDownload(entry.contents.get(i).path,cloudService);
+                            }
+                        }
+                    }
 
-                    }
-                    else {
-                        createFileExistsNotification(title);
-                    }
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    setErrorNotification(title);
+                else {
+                    createFileExistsNotification(title, notificationId);
                 }
             }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                setErrorNotification(title, notificationId);
+            }
+        }
 
     }
 
-    private void createFileExistsNotification(String title)
+    private void createFileExistsNotification(String title, int id)
     {
         mNotification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_recents)
                 .setContentTitle("Material Comic Viewer")
-                .setContentText(title+" already exists")
-                .setContentInfo(title+" already exists");
+                .setContentText(title + " already exists");
 
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationId = (int) Math.random()*100;
-        mNotificationManager.notify(mNotificationId, mNotification.build());
+        mNotificationManager.notify(id, mNotification.build());
     }
 
-    private void setEndNotification(String title, String filePath) {
+    private void setEndNotification(String title, String filePath, int id) {
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, DisplayComicActivity.class);
 
@@ -189,58 +209,53 @@ public class DownloadFileService extends IntentService {
                 );
         mNotification.setContentIntent(resultPendingIntent);
         mNotification.setContentText("Finished downloading " + title);
-        mNotification.setContentInfo("Finished downloading " + title);
         mNotification.setProgress(0,0,false);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = mNotification.build();
         notification.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(mNotificationId, notification);
+        notificationManager.notify(id, notification);
     }
 
-    private void setNotificationProgress(long completed, long total, String title)
+    private void setNotificationProgress(long completed, long total, String title, int id)
     {
         mNotification.setProgress((int) total, (int) completed, false)
-        .setContentText("Downloading "+title)
-        .setContentInfo("Downloading "+title);
+        .setContentText("Downloading " + title);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(mNotificationId, mNotification.build());
+        notificationManager.notify(id, mNotification.build());
     }
 
-    private void createStartNotification(String filePath, String title)
+    private void createStartNotification(String filePath, String title, int id)
     {
         mNotification = new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_recents)
                         .setColor(PreferenceSetter.getAppThemeColor(DownloadFileService.this))
                         .setContentTitle("Material Comic Viewer")
-                        .setContentText("The file "+title+" has started downloading")
-                        .setContentInfo("The file "+title+" has started downloading");
+                        .setContentText("The file " + title + " has started downloading");
 
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationId = (int) Math.random()*100;
-        mNotificationManager.notify(mNotificationId, mNotification.build());
+        mNotificationManager.notify(id, mNotification.build());
 
 
     }
 
-    private void setErrorNotification(String title)
+    private void setErrorNotification(String title, int id)
     {
         mNotification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_recents)
                 .setContentTitle("Material Comic Viewer")
                 .setColor(PreferenceSetter.getAppThemeColor(DownloadFileService.this))
-                .setContentText("An error occured downloading " + title)
-                .setContentInfo("An error occured downloading " + title);
+                .setContentText("An error occured downloading " + title);
 
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationManager.notify(mNotificationId, mNotification.build());
+        mNotificationManager.notify(id, mNotification.build());
 
 
     }

@@ -60,6 +60,7 @@ public class DropboxAdapter extends RecyclerView.Adapter {
             if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
                 cloudFolderViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
             addFolderClickListener(cloudFolderViewHolder);
+            addDownloadFolderClickListener(cloudFolderViewHolder);
             return cloudFolderViewHolder;
         }
         else {
@@ -72,6 +73,33 @@ public class DropboxAdapter extends RecyclerView.Adapter {
             return cloudFileViewHolder;
         }
 
+
+    }
+
+    private void addDownloadFolderClickListener(final CloudFolderViewHolder cloudFolderViewHolder)
+    {
+        cloudFolderViewHolder.mDownloadFolderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final DropboxAPI.Entry entry = cloudFolderViewHolder.getDropboxEntry();
+
+                MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
+                        .title("Download file")
+                        .content("Do you wish to download the folder \""+entry.fileName()+"\"?")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
+                        .positiveText("Confirm")
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
+                        .negativeText("Cancel")
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                Toast.makeText(mActivity,"Download started...",Toast.LENGTH_SHORT).show();
+                                DownloadFileService.startActionDownload(mActivity, entry.path, mCloudService);
+                            }
+                        }).show();
+            }
+        });
 
     }
 
