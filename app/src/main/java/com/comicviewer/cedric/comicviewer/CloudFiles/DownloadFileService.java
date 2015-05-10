@@ -193,7 +193,7 @@ public class DownloadFileService extends IntentService {
     private void createStartNotification(String filePath, String title)
     {
         mNotification = new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.dropbox_icon)
+                        .setSmallIcon(R.drawable.ic_recents)
                         .setContentTitle("Material Comic Viewer")
                         .setContentText("The file "+title+" has started downloading")
                         .setContentInfo("The file "+title+" has started downloading");
