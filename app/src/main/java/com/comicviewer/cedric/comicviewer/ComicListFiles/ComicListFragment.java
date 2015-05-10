@@ -59,11 +59,9 @@ public class ComicListFragment extends Fragment {
     private ComicAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFab;
-    private ArrayList<String> mFilePaths;
     private int mProgress;
     private int mTotalComicCount;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ArrayList<String> mExcludedPaths;
     private SearchView mSearchView;
     private ArrayList<Object> filteredList;
     private boolean isFiltered;
@@ -229,11 +227,15 @@ public class ComicListFragment extends Fragment {
                 dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
                     public void directorySelected(File directory) {
                         Log.d(getClass().getName(), "selected dir " + directory.toString());
-                        if (!mFilePaths.contains(directory.toString()))
-                            mFilePaths.add(directory.toString());
-                        if (mExcludedPaths.contains(directory.toString()))
-                            mExcludedPaths.remove(directory.toString());
-                        PreferenceSetter.saveFilePaths(getActivity(),mFilePaths,mExcludedPaths);
+
+                        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+                        ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
+
+                        if (!filePaths.contains(directory.toString()))
+                            filePaths.add(directory.toString());
+                        if (excludedPaths.contains(directory.toString()))
+                            excludedPaths.remove(directory.toString());
+                        PreferenceSetter.saveFilePaths(getActivity(),filePaths,excludedPaths);
                         refresh();
                     }
                 });
@@ -249,8 +251,6 @@ public class ComicListFragment extends Fragment {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         PreferenceSetter.setBackgroundColorPreference(getActivity());
-
-        mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 
         if (prefs.getString("cardSize", "Normal cards").equals(getString(R.string.card_size_setting_3)))
         {
@@ -358,14 +358,6 @@ public class ComicListFragment extends Fragment {
         }
 
 
-        StringBuilder csvList = new StringBuilder();
-        for(String s : mFilePaths){
-            csvList.append(s);
-            csvList.append(",");
-        }
-
-        savedState.putString("Filepaths", csvList.toString());
-
         savedState.putBoolean("isRefreshing", mSwipeRefreshLayout.isRefreshing());
     }
 
@@ -379,7 +371,6 @@ public class ComicListFragment extends Fragment {
             mSearchComicsTask.cancel(true);
         }
 
-        PreferenceSetter.saveFilePaths(getActivity(),mFilePaths, mExcludedPaths);
         enableSearchBar(false);
         addShowFolderViewButton(false);
     }
@@ -388,7 +379,6 @@ public class ComicListFragment extends Fragment {
     public void onStop()
     {
         super.onStop();
-        PreferenceSetter.saveFilePaths(getActivity(), mFilePaths, mExcludedPaths);
     }
 
 
@@ -590,8 +580,6 @@ public class ComicListFragment extends Fragment {
 
     private void initialiseVariables(Bundle savedInstanceState)
     {
-        mExcludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
-        mFilePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 
         mAdapter = new ComicAdapter(mApplicationContext);
         mRecyclerView.setAdapter(mAdapter);
