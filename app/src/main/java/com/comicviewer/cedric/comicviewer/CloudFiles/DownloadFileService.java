@@ -1,21 +1,44 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 
+import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.ProgressListener;
+import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.session.AppKeyPair;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
 
 
 public class DownloadFileService extends IntentService {
 
     final static private String APP_KEY = "id9ssazcpa41gys";
     final static private String APP_SECRET = "yj0gk3nipr6ti4u";
+    int mNotificationId;
+    NotificationCompat.Builder mNotification;
 
     private static final String ACTION_DROPBOX_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.DROPBOXDOWNLOAD";
 
-    public static void startActionFoo(Context context, String fileUrl, CloudService cloudService) {
+    public static void startActionDownload(Context context, String fileUrl, CloudService cloudService) {
+
         Intent intent = new Intent(context, DownloadFileService.class);
         intent.setAction(ACTION_DROPBOX_DOWNLOAD);
         intent.putExtra("FILE_URL", fileUrl);
@@ -42,7 +65,7 @@ public class DownloadFileService extends IntentService {
 
     private void handleActionDownload(String fileUrl, CloudService cloudService) {
 
-
+        new DownloadDropboxFileTask().execute(fileUrl, cloudService);
 
     }
 
@@ -52,10 +75,136 @@ public class DownloadFileService extends IntentService {
         @Override
         protected Object doInBackground(Object[] params) {
 
+            String fileUrl = (String) params[0];
+            CloudService cloudService = (CloudService) params[1];
 
+
+            AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
+            AndroidAuthSession session = new AndroidAuthSession(appKeys, cloudService.getToken());
+            DropboxAPI<AndroidAuthSession> dbApi = new DropboxAPI<AndroidAuthSession>(session);
+
+
+            if (dbApi.getSession().authenticationSuccessful()) {
+                String token = dbApi.getSession().finishAuthentication();
+                cloudService.setToken(token);
+                PreferenceSetter.saveCloudService(DownloadFileService.this, cloudService);
+            }
+
+            if (dbApi.getSession().isLinked()) {
+
+                File dropboxDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Dropbox");
+                if (!dropboxDir.exists())
+                    dropboxDir.mkdir();
+                File output = new File(dropboxDir.getAbsolutePath()+fileUrl);
+
+                String filePath = output.getAbsolutePath();
+                final String title = output.getName();
+
+                createStartNotification(filePath, title);
+
+                try {
+                    if (!output.exists()) {
+                        FileOutputStream outputStream = new FileOutputStream(output);
+                        DropboxAPI.DropboxFileInfo info = dbApi.getFile(fileUrl, null, outputStream, new ProgressListener() {
+                            @Override
+                            public void onProgress(long l, long l1) {
+                                setNotificationProgress(l,l1,title);
+                            }
+                        });
+                        Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
+
+                        ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+                        ArrayList<String> excludedpaths = PreferenceSetter.getExcludedPaths(DownloadFileService.this);
+
+
+                        if (!filepaths.contains(dropboxDir.getAbsolutePath())) {
+                            filepaths.add(dropboxDir.getAbsolutePath());
+                            PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                        }
+
+                        if (excludedpaths.contains(dropboxDir.getAbsolutePath()))
+                        {
+                            excludedpaths.remove(dropboxDir.getAbsolutePath());
+                            PreferenceSetter.saveExcludedFilePaths(DownloadFileService.this, excludedpaths);
+                        }
+
+                        setEndNotification(title, filePath);
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
+
+            }
 
             return null;
         }
+    }
+
+    private void setEndNotification(String title, String filePath) {
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, DisplayComicActivity.class);
+
+        Uri uri = new Uri.Builder().path(filePath).build();
+
+        resultIntent.setData(uri);
+        resultIntent.setAction(Intent.ACTION_VIEW);
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(DrawerActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_ONE_SHOT
+                );
+        mNotification.setContentIntent(resultPendingIntent);
+        mNotification.setContentText("Finished downloading " + title);
+        mNotification.setContentInfo("Finished downloading " + title);
+        mNotification.setProgress(0,0,false);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification notification = mNotification.build();
+        notification.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
+        notificationManager.notify(mNotificationId, notification);
+    }
+
+    private void setNotificationProgress(long completed, long total, String title)
+    {
+        mNotification.setProgress((int) total, (int) completed, false)
+        .setContentText("Downloading "+title)
+        .setContentInfo("Downloading "+title);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(mNotificationId, mNotification.build());
+    }
+
+    private void createStartNotification(String filePath, String title)
+    {
+        mNotification = new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.dropbox_icon)
+                        .setContentTitle("Material Comic Viewer")
+                        .setContentText("The file "+title+" has started downloading")
+                        .setContentInfo("The file "+title+" has started downloading");
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationId = (int) Math.random()*100;
+        mNotificationManager.notify(mNotificationId, mNotification.build());
+
+
     }
 
 }

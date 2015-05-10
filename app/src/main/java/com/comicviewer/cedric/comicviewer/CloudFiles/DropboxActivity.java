@@ -90,7 +90,7 @@ public class DropboxActivity extends Activity {
         mRecyclerView = (RecyclerView) findViewById(R.id.cloud_file_list);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new DropboxAdapter(this);
+        mAdapter = new DropboxAdapter(this, mCloudService);
         mRecyclerView.setAdapter(mAdapter);
 
         Display display = getWindowManager().getDefaultDisplay();
