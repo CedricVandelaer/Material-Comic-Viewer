@@ -43,6 +43,12 @@ public class PreferenceSetter {
     private static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
     private static final String FOLDER_VIEW_ENABLED="folderViewEnabled";
     private static final String KEEP_SCREEN_ON= "keepScreenOn";
+    private static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
+
+    public static boolean getRotatePageSetting(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(ROTATE_LANDSCAPE_PAGE, false);
+    }
 
     public static boolean getScreenOnSetting(Context context)
     {

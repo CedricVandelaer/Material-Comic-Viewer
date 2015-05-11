@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +32,7 @@ import com.google.android.gms.ads.AdView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -66,6 +68,9 @@ public class ComicPageFragment extends Fragment {
 
     private Handler mHandler;
 
+    private Bitmap mBitmap;
+    private boolean mIsRotated=false;
+
     public static ComicPageFragment newInstance(String comicPath, String pageFileName, int page)
     {
         ComicPageFragment fragment = new ComicPageFragment();
@@ -91,25 +96,51 @@ public class ComicPageFragment extends Fragment {
             ImageLoader.getInstance().init(config);
         }
         mFullscreenComicView.setImageBitmap(null);
+
         if (filename!=null) {
             if (getActivity()!=null) {
 
                 String imagePath = "file:///" + getActivity().getFilesDir().getPath()+"/" + mFolderName + "/" + filename;
                 Log.d("loadImage", imagePath);
-                ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, new SimpleImageLoadingListener(){
+
+                ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, new SimpleImageLoadingListener() {
 
                     @Override
-                    public void onLoadingCancelled(String imageUri, View view)
-                    {
+                    public void onLoadingCancelled(String imageUri, View view) {
                         zoomImageView();
                     }
 
                     @Override
                     public void onLoadingStarted(String imageUri, View view) {
-                        if (mSpinner!=null)
+                        if (mSpinner != null)
                             mSpinner.setVisibility(View.VISIBLE);
                         mFullscreenComicView.setZoom(1.0f);
 
+                    }
+
+                    @Override
+                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                        if (mSpinner != null)
+                            mSpinner.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        if (mSpinner != null)
+                            mSpinner.setVisibility(View.GONE);
+
+                        mBitmap = loadedImage;
+
+                        zoomImageView();
+                    }
+                });
+                /*
+                ImageLoader.getInstance().loadImage("file:///" + getActivity().getFilesDir().getPath() + "/" + mFolderName + "/" + filename
+                        , new ImageLoadingListener() {
+                    @Override
+                    public void onLoadingStarted(String imageUri, View view) {
+                        if (mSpinner!=null)
+                            mSpinner.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -122,9 +153,17 @@ public class ComicPageFragment extends Fragment {
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         if (mSpinner!=null)
                             mSpinner.setVisibility(View.GONE);
+
+                        mBitmap = loadedImage;
+                        mFullscreenComicView.setImageBitmap(mBitmap);
                         zoomImageView();
                     }
-                });
+
+                    @Override
+                    public void onLoadingCancelled(String imageUri, View view) {
+
+                    }
+                });*/
 
             }
         }
@@ -179,18 +218,99 @@ public class ComicPageFragment extends Fragment {
     public void zoomImageView()
     {
         if (getActivity()!=null) {
+
             if (PreferenceSetter.getAutoFitSetting(getActivity())
                     && getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        if (PreferenceSetter.getRotatePageSetting(getActivity()) && mIsRotated)
+                        {
+                            mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
+                            mIsRotated = false;
+                        }
+
                         mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         mFullscreenComicView.setScrollPosition(0.5f, 0.0f);
                     }
                 }, 100);
-            } else {
+
+
+
+            }
+            else if(PreferenceSetter.getRotatePageSetting(getActivity()))
+            {
+                if (mFullscreenComicView.getDrawable().getIntrinsicWidth()>mFullscreenComicView.getDrawable().getIntrinsicHeight()
+                        && !mIsRotated)
+                {
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap,90));
+                            mIsRotated = true;
+
+                            if (PreferenceSetter.getAutoFitSetting(getActivity()))
+                            {
+                                if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                                {
+                                    mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                    mFullscreenComicView.setScrollPosition(0.5f, 0.0f);
+                                }
+                                else
+                                {
+                                    mFullscreenComicView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                                }
+                            }
+                            else
+                            {
+                                mFullscreenComicView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                            }
+
+                        }
+                    }, 100);
+                }
+                else if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                {
+                    if (mIsRotated)
+                    {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap,0));
+                                mIsRotated = false;
+                            }
+                        }, 100);
+                    }
+                }
+                else if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+                {
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mFullscreenComicView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        }
+                    }, 100);
+                }
+            }
+            else {
+                if (mIsRotated)
+                {
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (PreferenceSetter.getRotatePageSetting(getActivity()) && mIsRotated) {
+                                mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
+                                mIsRotated = false;
+                            }
+
+                            mFullscreenComicView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        }
+                    }, 100);
+                }
                 mFullscreenComicView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             }
+
         }
     }
 
@@ -216,6 +336,8 @@ public class ComicPageFragment extends Fragment {
                         if (extractedImageFile.contains("#"))
                             extractedImageFile = extractedImageFile.replaceAll("#","");
 
+                        if (getActivity()==null)
+                            throw new NullPointerException("Activity is null while loading page");
                         File directory = new File(getActivity().getFilesDir().getPath()+"/"+mFolderName);
                         directory.mkdir();
                         File outputPage = new File(directory.getPath(), extractedImageFile);
@@ -282,6 +404,9 @@ public class ComicPageFragment extends Fragment {
                         // get rid of special chars
                         if (extractedImageFile.contains("#"))
                             extractedImageFile = extractedImageFile.replaceAll("#","");
+
+                        if (getActivity()==null)
+                            throw new NullPointerException("Activity is null while loading page");
 
                         File directory = new File(getActivity().getFilesDir().getPath()+"/"+mFolderName);
                         directory.mkdir();

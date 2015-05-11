@@ -38,8 +38,12 @@
         android:title="Functions">
         <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
             android:key="widthAutoFit"
-            android:title="Auto fit screen in landscape"
+            android:title="Adjust page to screenwidth in landscape"
             android:defaultValue="true"/>
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="rotateLandscapePage"
+            android:title="Rotate landscape pages"
+            android:defaultValue="false"/>
         <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
             android:key="keepScreenOn"
             android:title="Keep screen on when reading comics"

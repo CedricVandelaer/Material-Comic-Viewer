@@ -1,7 +1,9 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
@@ -28,6 +30,13 @@ public class Utilities {
         hsv[2] *= 0.8f; // value component
         color = Color.HSVToColor(hsv);
         return color;
+    }
+
+    public static Bitmap rotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     public static int lightenColor(int color)
