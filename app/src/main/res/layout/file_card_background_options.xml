@@ -15,21 +15,21 @@
         android:gravity="center"
         android:layout_height="match_parent">
         <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/delete_button"
+            android:id="@+id/download_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete"
+            android:src="@drawable/ic_download"
             android:adjustViewBounds="true"
             android:layout_margin="16dp"
             fab:fab_type="normal"
             fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Red"
-            fab:fab_colorPressed="@color/RedDark"
-            fab:fab_colorRipple="@color/RedLight" />
+            fab:fab_colorNormal="@color/Blue"
+            fab:fab_colorPressed="@color/BlueDark"
+            fab:fab_colorRipple="@color/BlueLight" />
         <TextView
             android:gravity="center"
-            android:id="@+id/delete_text"
-            android:text="Delete"
+            android:id="@+id/download_text"
+            android:text="Download"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

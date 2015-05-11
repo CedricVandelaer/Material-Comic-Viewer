@@ -787,7 +787,7 @@ public class PreferenceSetter {
     public static ArrayList<String> getFilePathsFromPreferences(Context context) {
         ArrayList<String> paths = new ArrayList<>();
         
-        String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
+        String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ComicViewer";
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String csvList = prefs.getString(FILEPATHS, defaultPath);
 

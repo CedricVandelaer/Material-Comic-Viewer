@@ -35,7 +35,8 @@ public class DownloadFileService extends IntentService {
 
     final static private String APP_KEY = "id9ssazcpa41gys";
     final static private String APP_SECRET = "yj0gk3nipr6ti4u";
-    private int fileCount=0;
+    final static private String NOTIFICATION_KEY="ComicViewerNotifGroup";
+
     NotificationCompat.Builder mNotification;
     private static Random mRand = new Random();
 
@@ -245,7 +246,8 @@ public class DownloadFileService extends IntentService {
         mNotification = new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_recents)
                         .setColor(PreferenceSetter.getAppThemeColor(DownloadFileService.this))
-                        .setContentTitle("Material Comic Viewer")
+                        .setGroup(NOTIFICATION_KEY)
+                .setContentTitle("Material Comic Viewer")
                         .setContentText("The file " + title + " has started downloading");
 
         NotificationManager mNotificationManager =

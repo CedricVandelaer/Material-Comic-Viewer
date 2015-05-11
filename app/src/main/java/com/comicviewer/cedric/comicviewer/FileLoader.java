@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
@@ -21,6 +22,13 @@ public class FileLoader {
     public static Map<String, String> searchComicsAndFolders(Context context, String folder)
     {
         long startTime = System.currentTimeMillis();
+        String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ComicViewer";
+
+        File defaultPathFile = new File(defaultPath);
+        if (!defaultPathFile.exists())
+        {
+            defaultPathFile.mkdir();
+        }
 
         ArrayList<String> filepaths;
         if (folder.equals("root"))
@@ -62,6 +70,14 @@ public class FileLoader {
     }
 
     public static Map<String, String> searchComics(Context context) {
+
+        String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ComicViewer";
+
+        File defaultPathFile = new File(defaultPath);
+        if (!defaultPathFile.exists())
+        {
+            defaultPathFile.mkdir();
+        }
 
         long startTime = System.currentTimeMillis();
 

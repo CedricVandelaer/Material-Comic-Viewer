@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.R;
 import com.dropbox.client2.DropboxAPI;
+import com.melnykov.fab.FloatingActionButton;
 
 /**
  * Created by Cédric on 8/05/2015.
@@ -14,8 +15,9 @@ import com.dropbox.client2.DropboxAPI;
 public class CloudFileViewHolder extends RecyclerView.ViewHolder {
 
     protected TextView mFileNameTextView;
-    protected TextView mDeleteTextView;
+    protected TextView mDownloadTextView;
     protected CardView mCardView;
+    protected FloatingActionButton mDownloadButton;
     private DropboxAPI.Entry mDropboxEntry = null;
 
     public CloudFileViewHolder(View itemView) {
@@ -23,7 +25,8 @@ public class CloudFileViewHolder extends RecyclerView.ViewHolder {
 
         mFileNameTextView = (TextView) itemView.findViewById(R.id.file_title_text_view);
         mCardView = (CardView) itemView.findViewById(R.id.card);
-        mDeleteTextView = (TextView) itemView.findViewById(R.id.delete_text);
+        mDownloadTextView = (TextView) itemView.findViewById(R.id.download_text);
+        mDownloadButton = (FloatingActionButton) itemView.findViewById(R.id.download_button);
     }
 
     public void setDropboxEntry(DropboxAPI.Entry entry)
