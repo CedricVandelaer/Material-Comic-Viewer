@@ -37,11 +37,13 @@ public class DownloadFileService extends IntentService {
     final static private String APP_SECRET = "yj0gk3nipr6ti4u";
     private int fileCount=0;
     NotificationCompat.Builder mNotification;
+    private static Random mRand = new Random();
 
     private static final String ACTION_DROPBOX_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.DROPBOXDOWNLOAD";
 
     public static void startActionDownload(Context context, String fileUrl, CloudService cloudService) {
 
+        mRand.setSeed(System.currentTimeMillis());
         Intent intent = new Intent(context, DownloadFileService.class);
         intent.setAction(ACTION_DROPBOX_DOWNLOAD);
         intent.putExtra("FILE_URL", fileUrl);
@@ -81,10 +83,7 @@ public class DownloadFileService extends IntentService {
     private void downloadDropboxFile(String fileUrl, CloudService cloudService)
     {
 
-        Random rand = new Random();
-        rand.setSeed(System.currentTimeMillis());
-
-        final int notificationId = rand.nextInt();
+        final int notificationId = mRand.nextInt();
 
         AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
         AndroidAuthSession session = new AndroidAuthSession(appKeys, cloudService.getToken());
@@ -160,6 +159,19 @@ public class DownloadFileService extends IntentService {
 
                 }
                 else {
+
+                    ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+                    ArrayList<String> excludedpaths = PreferenceSetter.getExcludedPaths(DownloadFileService.this);
+
+                    if (!filepaths.contains(dropboxDir.getAbsolutePath())) {
+                        filepaths.add(dropboxDir.getAbsolutePath());
+                        PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                    }
+
+                    if (excludedpaths.contains(dropboxDir.getAbsolutePath())) {
+                        excludedpaths.remove(dropboxDir.getAbsolutePath());
+                        PreferenceSetter.saveExcludedFilePaths(DownloadFileService.this, excludedpaths);
+                    }
                     createFileExistsNotification(title, notificationId);
                 }
             }
