@@ -38,12 +38,19 @@ public class PreferenceSetter {
     private static final String BACKGROUND_COLOR = "backgroundColor";
     private static final String COMICS_ADDED_LIST = "addedComicsList";
     private static final String LONGEST_READ_COMIC = "longestReadComic";
-    public static final String APP_THEME_COLOR = "appThemeColor";
     private static final String PAGE_NUMBER_SETTING="pageNumberSetting";
     private static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
     private static final String FOLDER_VIEW_ENABLED="folderViewEnabled";
     private static final String KEEP_SCREEN_ON= "keepScreenOn";
     private static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
+
+    public static final String APP_THEME_COLOR = "appThemeColor";
+    public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
+
+    public static String getFileFormatSetting(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(FILE_FORMAT_SETTING, context.getResources().getString(R.string.file_format_1));
+    }
 
     public static boolean getRotatePageSetting(Context context)
     {

@@ -287,6 +287,8 @@ public class FavoritesListFragment extends Fragment {
 
                 Comic comic = savedComics.get(pos);
 
+                ComicLoader.generateComicInfo(mApplicationContext, comic);
+
                 if (ComicLoader.setComicColor(getActivity(), comic))
                     PreferenceSetter.saveComic(getActivity(), comic);
 

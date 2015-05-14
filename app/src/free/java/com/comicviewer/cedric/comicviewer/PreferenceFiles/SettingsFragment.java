@@ -46,6 +46,7 @@ public class SettingsFragment extends PreferenceFragment{
 
         addRemovePathsPreference();
         addAppThemeSettings();
+        addFileFormatSettings();
 
         PreferenceCategory functionCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
         Preference goProPreference = new Preference(getActivity());
@@ -63,6 +64,43 @@ public class SettingsFragment extends PreferenceFragment{
         getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
         if (Build.VERSION.SDK_INT>20)
             getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
+
+    }
+
+    private void addFileFormatSettings()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
+
+        Preference preference = new Preference(getActivity());
+
+        preference.setKey("BUY_PRO_FILEFORMAT");
+        preference.setTitle("Comic file format (PRO)");
+
+        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                        .title("Notice")
+                        .content("This feature requires the pro version of the app.")
+                        .negativeText("Cancel")
+                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveText("Go to play store")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro"));
+                                startActivity(browse);
+                            }
+                        }).show();
+
+                return false;
+            }
+        });
+
+        targetCategory.addPreference(preference);
 
     }
 

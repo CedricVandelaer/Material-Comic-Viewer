@@ -41,7 +41,7 @@ public class SettingsFragment extends PreferenceFragment{
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
-
+        addFilenameFormatSettings();
         addRemovePathsPreference();
         addAppThemeSettings();
 
@@ -49,6 +49,32 @@ public class SettingsFragment extends PreferenceFragment{
         if (Build.VERSION.SDK_INT>20)
             getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
 
+    }
+
+    private void addFilenameFormatSettings()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
+
+        ListPreference fileFormatList = new ListPreference(getActivity());
+
+        String[] entries = getActivity().getResources().getStringArray(R.array.File_formats);
+
+        CharSequence[] charSequences = new CharSequence[entries.length];
+
+        for (int i=0;i<charSequences.length;i++)
+        {
+            charSequences[i] = entries[i];
+        }
+
+        fileFormatList.setKey(PreferenceSetter.FILE_FORMAT_SETTING);
+        fileFormatList.setSummary("Note: Extra or special characters will be removed");
+        fileFormatList.setEntries(charSequences);
+        fileFormatList.setEntryValues(charSequences);
+        fileFormatList.setTitle("Comic file format");
+        fileFormatList.setDialogTitle("Choose the file format");
+        fileFormatList.setDefaultValue(getActivity().getResources().getString(R.string.file_format_1));
+
+        targetCategory.addPreference(fileFormatList);
     }
 
     private void addAppThemeSettings()

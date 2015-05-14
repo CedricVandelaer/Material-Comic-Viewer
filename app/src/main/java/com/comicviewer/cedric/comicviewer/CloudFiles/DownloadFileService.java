@@ -173,7 +173,29 @@ public class DownloadFileService extends IntentService {
                         excludedpaths.remove(dropboxDir.getAbsolutePath());
                         PreferenceSetter.saveExcludedFilePaths(DownloadFileService.this, excludedpaths);
                     }
-                    createFileExistsNotification(title, notificationId);
+
+                    DropboxAPI.Entry entry;
+
+                    try
+                    {
+                        entry = dbApi.metadata(fileUrl, 1000, null, true, null);
+                        if (!entry.isDir)
+                            createFileExistsNotification(title, notificationId);
+                        else
+                        {
+                            for (int i=0;i<entry.contents.size();i++)
+                            {
+                                if (Utilities.checkExtension(entry.contents.get(i).fileName()) || entry.contents.get(i).isDir)
+                                    handleActionDownload(entry.contents.get(i).path,cloudService);
+                            }
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                 }
             }
             catch (Exception e)

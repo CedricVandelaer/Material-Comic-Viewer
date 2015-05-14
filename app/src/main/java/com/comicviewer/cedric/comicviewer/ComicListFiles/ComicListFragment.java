@@ -700,6 +700,8 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
+                ComicLoader.generateComicInfo(mApplicationContext, comic);
+
                 if (ComicLoader.setComicColor(mApplicationContext, comic))
                     PreferenceSetter.saveComic(mApplicationContext, comic);
 
@@ -831,6 +833,8 @@ public class ComicListFragment extends Fragment {
                 {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
+
+                ComicLoader.generateComicInfo(mApplicationContext, comic);
 
                 if (ComicLoader.setComicColor(mApplicationContext, comic))
                     PreferenceSetter.saveComic(mApplicationContext, comic);

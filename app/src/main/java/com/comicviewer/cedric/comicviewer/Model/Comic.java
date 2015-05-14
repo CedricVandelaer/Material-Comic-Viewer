@@ -204,6 +204,8 @@ public class Comic implements Parcelable
         mYear = in.readInt();
     }
 
+    public void setTitle(String title){mTitle = title;}
+
     public void setPrimaryTextColor(int color) { mPrimaryTextColor = color;}
     
     public int getPrimaryTextColor() { return mPrimaryTextColor;}
@@ -234,12 +236,19 @@ public class Comic implements Parcelable
         return mIssueNumber;
     }
 
+    public void setIssueNumber(int issueNumber){mIssueNumber = issueNumber;}
+
     public String getFileName()
     {
         return mFileName;
     }
     
     public int getYear() { return mYear; }
+
+    public void setYear(int year)
+    {
+        mYear = year;
+    }
 
     public String getFilePath()
     {
@@ -255,6 +264,7 @@ public class Comic implements Parcelable
     {
         return mTitle;
     }
+
     public String getCoverImage()
     {
         return mCoverImage;

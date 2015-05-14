@@ -62,4 +62,12 @@
         <item>@string/cloud_storage_2</item>
         <item>@string/cloud_storage_3</item>
     </string-array>
+    <string-array name="File_formats">
+        <item>@string/file_format_1</item>
+        <item>@string/file_format_2</item>
+        <item>@string/file_format_3</item>
+        <item>@string/file_format_4</item>
+        <item>@string/file_format_5</item>
+        <item>@string/file_format_6</item>
+    </string-array>
 </resources>

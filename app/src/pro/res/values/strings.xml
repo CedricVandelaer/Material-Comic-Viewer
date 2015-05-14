@@ -31,6 +31,7 @@
     <string name="updates">
         v2.0\n
         - Dropbox support\n
+        - Option to choose the file format (Pro)\n
         - Option to keep the screen on\n
         - Option to rotate landscape pages in portrait mode\n
         - Better folder navigation\n\n

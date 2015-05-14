@@ -8,6 +8,7 @@ import android.support.v7.graphics.Palette;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.github.junrar.Archive;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Cédric on 1/04/2015.
@@ -32,6 +35,8 @@ public class ComicLoader {
     {
         try {
             File file = new File(comic.getFilePath() + "/" + comic.getFileName());
+
+            generateComicInfo(context, comic);
 
             if (Utilities.isZipArchive(file)) {
                 extractZipComic(comic, context);
@@ -44,8 +49,7 @@ public class ComicLoader {
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.e("ComicLoader", "Error loading comic: "+comic.getFileName());
-
+            Log.e("ComicLoader", "Error loading comic: " + comic.getFileName());
         }
     }
 
@@ -258,6 +262,132 @@ public class ComicLoader {
             return true;
         }
         return false;
+    }
+
+    public static void generateComicInfo(Context context, Comic comic)
+    {
+        String fileFormat = PreferenceSetter.getFileFormatSetting(context);
+        String[] parts = fileFormat.split(",");
+
+        String filename = comic.getFileName();
+
+        try {
+            for (int i = 0; i < parts.length; i++) {
+                if (parts[i].trim().equals("Title")) {
+                    String title = generateTitle(filename);
+                    if (title != null)
+                        comic.setTitle(title);
+                    filename = Utilities.removeFirstText(filename);
+                } else if (parts[i].trim().equals("Issue number")) {
+                    int issueNumber = generateIssueNumber(filename);
+                    if (issueNumber != -1)
+                        comic.setIssueNumber(issueNumber);
+                    filename = Utilities.removeFirstDigits(filename);
+                } else if (parts[i].trim().equals("Year")) {
+                    int year = generateYear(filename);
+                    if (year != -1)
+                        comic.setYear(year);
+                    filename = Utilities.removeFirstDigits(filename);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static String generateTitle(String filename)
+    {
+        String delimiter = "COMICVIEWERDELIM";
+        String title;
+
+        try {
+            if (filename.contains("("))
+                title = filename.substring(0, filename.indexOf('('));
+            else
+                title = filename;
+
+            title = title.replaceAll("_", " ");
+
+            title = title.replaceAll("#", "");
+
+            title = title.trim();
+
+            title = title.replaceAll("\\d+", delimiter);
+
+            if (title.contains(delimiter)) {
+                if (title.indexOf(delimiter) > 0)
+                    title = title.substring(0, title.indexOf(delimiter));
+                else {
+                    title = title.replace(delimiter, "");
+                    if (title.contains(delimiter))
+                        title = title.substring(0, title.indexOf(delimiter));
+                }
+            }
+
+            title = title.trim();
+
+            if (title.startsWith("-")) {
+                title = title.substring(1, title.length());
+            }
+
+            if (title.endsWith("-")) {
+                title = title.substring(0, title.length() - 1);
+            }
+
+            title = title.trim();
+            return title;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static int generateIssueNumber(String filename)
+    {
+        try {
+            int i = 0;
+
+            while (!Character.isDigit(filename.charAt(i)))
+                i++;
+
+            int j=i;
+            while (Character.isDigit(filename.charAt(j)))
+                j++;
+
+            int issueNumber = -1;
+
+            issueNumber = Integer.parseInt(filename.substring(i, j));
+            return issueNumber;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static int generateYear(String filename)
+    {
+        try {
+            int year = -1;
+            Pattern pattern = Pattern.compile("\\d\\d\\d\\d");
+            Matcher matcher = pattern.matcher(filename);
+            if (matcher.find())
+            {
+                year = Integer.parseInt(matcher.group(0));
+            }
+            return year;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }
 

@@ -209,4 +209,39 @@ public class Utilities {
         }
         return(directory.delete());
     }
+
+    public static String removeFirstDigits(String text)
+    {
+        try {
+            int i = 0;
+
+            text = text.trim();
+            while (Character.isDigit(text.charAt(i)))
+                i++;
+            return text.substring(i, text.length());
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return text;
+        }
+    }
+
+    public static String removeFirstText(String text)
+    {
+        try {
+            int i = 0;
+            text = text.trim();
+            while (!Character.isDigit(text.charAt(i)))
+                i++;
+            return text.substring(i, text.length());
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return text;
+        }
+    }
 }

@@ -33,6 +33,12 @@
     <string name="cloud_storage_1">Dropbox</string>
     <string name="cloud_storage_2">Google Drive (Coming soon!)</string>
     <string name="cloud_storage_3">Microsoft SkyDrive (Coming soon!)</string>
+    <string name="file_format_1">Title, Issue number, Year</string>
+    <string name="file_format_2">Title, Year, Issue number </string>
+    <string name="file_format_3">Issue number, Year, Title</string>
+    <string name="file_format_4">Issue number, Title, Year</string>
+    <string name="file_format_5">Year, Title, Issue number</string>
+    <string name="file_format_6">Year, Issue number, Title</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="about_text">
@@ -47,6 +53,7 @@
     <string name="updates">
         v2.0\n
         - Dropbox support\n
+        - Option to choose the file format (Pro)\n
         - Option to keep the screen on\n
         - Option to rotate landscape pages in portrait mode\n
         - Better folder navigation\n\n
