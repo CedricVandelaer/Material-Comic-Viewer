@@ -28,6 +28,9 @@
     <string name="card_size_setting_3">Comic cover cards</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
+    <string name="dropbox_app_key">id9ssazcpa41gys</string>
+    <string name="dropbox_app_secret">yj0gk3nipr6ti4u</string>
+    <string name="db_scheme">db-id9ssazcpa41gys</string>
     <string name="updates">
         v2.0\n
         - Dropbox support\n

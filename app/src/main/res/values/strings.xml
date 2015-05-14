@@ -41,6 +41,9 @@
     <string name="file_format_6">Year, Issue number, Title</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_about">AboutActivity</string>
+    <string name="dropbox_app_key">pz24rrsbb0dvzib</string>
+    <string name="dropbox_app_secret">kpdixgm5szbiryj</string>
+    <string name="db_scheme">db-pz24rrsbb0dvzib</string>
     <string name="about_text">
         Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
         science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan

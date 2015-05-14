@@ -36,6 +36,7 @@
     <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory
         android:key="FunctionalityCategory"
         android:title="Functions">
+
         <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
             android:key="widthAutoFit"
             android:title="Adjust page to screenwidth in landscape"

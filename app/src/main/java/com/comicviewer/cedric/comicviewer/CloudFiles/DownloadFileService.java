@@ -33,8 +33,6 @@ import java.util.Random;
 
 public class DownloadFileService extends IntentService {
 
-    final static private String APP_KEY = "id9ssazcpa41gys";
-    final static private String APP_SECRET = "yj0gk3nipr6ti4u";
     final static private String NOTIFICATION_KEY="ComicViewerNotifGroup";
 
     NotificationCompat.Builder mNotification;
@@ -86,7 +84,7 @@ public class DownloadFileService extends IntentService {
 
         final int notificationId = mRand.nextInt();
 
-        AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
+        AppKeyPair appKeys = new AppKeyPair(getResources().getString(R.string.dropbox_app_key), getResources().getString(R.string.dropbox_app_secret));
         AndroidAuthSession session = new AndroidAuthSession(appKeys, cloudService.getToken());
         DropboxAPI<AndroidAuthSession> dbApi = new DropboxAPI<AndroidAuthSession>(session);
 

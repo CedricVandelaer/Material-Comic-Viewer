@@ -50,9 +50,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     private OnFragmentInteractionListener mListener;
 
-    final static private String APP_KEY = "id9ssazcpa41gys";
-    final static private String APP_SECRET = "yj0gk3nipr6ti4u";
-
 
     public static CloudFragment getInstance() {
 
@@ -216,7 +213,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     }
 
     private void addDropboxAccount() {
-        AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
+        AppKeyPair appKeys = new AppKeyPair(getResources().getString(R.string.dropbox_app_key), getResources().getString(R.string.dropbox_app_secret));
         AndroidAuthSession session = new AndroidAuthSession(appKeys);
         mDBApi = new DropboxAPI<AndroidAuthSession>(session);
         mDBApi.getSession().startOAuth2Authentication(getActivity());

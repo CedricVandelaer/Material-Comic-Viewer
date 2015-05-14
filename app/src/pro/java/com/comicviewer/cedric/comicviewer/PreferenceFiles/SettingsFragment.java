@@ -97,7 +97,7 @@ public class SettingsFragment extends PreferenceFragment{
 
         appThemeListPreference.setEntries(entries);
         appThemeListPreference.setEntryValues(entryValues);
-        appThemeListPreference.setDefaultValue(""+PreferenceSetter.getAppThemeColor(getActivity()));
+        appThemeListPreference.setDefaultValue("" + PreferenceSetter.getAppThemeColor(getActivity()));
 
         appThemeListPreference.setTitle("App theme color");
         appThemeListPreference.setSummary("Note: app will have to restart");
@@ -118,7 +118,7 @@ public class SettingsFragment extends PreferenceFragment{
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                PreferenceSetter.saveAppThemeColor(getActivity(), (CharSequence)newValue);
+                                PreferenceSetter.saveAppThemeColor(getActivity(), (CharSequence) newValue);
                                 appThemeListPreference.setOnPreferenceChangeListener(null);
                                 getActivity().finish();
                             }
@@ -131,6 +131,21 @@ public class SettingsFragment extends PreferenceFragment{
 
         targetCategory.addPreference(appThemeListPreference);
 
+    }
+
+    private void addMangaPreference()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
+
+        CustomCheckBoxPreference mangaPreference = new CustomCheckBoxPreference(getActivity());
+
+
+        mangaPreference.setKey(PreferenceSetter.MANGA_SETTING);
+        mangaPreference.setSummary("Note: By checking this option comics will open in manga modus by default");
+        mangaPreference.setTitle("Manga modus");
+        mangaPreference.setDefaultValue(false);
+
+        targetCategory.addPreference(mangaPreference);
     }
 
     private void addRemovePathsPreference()

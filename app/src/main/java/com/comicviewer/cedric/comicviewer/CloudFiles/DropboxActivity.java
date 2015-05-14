@@ -48,9 +48,6 @@ public class DropboxActivity extends Activity {
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
 
-    final static private String APP_KEY = "id9ssazcpa41gys";
-    final static private String APP_SECRET = "yj0gk3nipr6ti4u";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +103,7 @@ public class DropboxActivity extends Activity {
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace));
 
-        AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
+        AppKeyPair appKeys = new AppKeyPair(getResources().getString(R.string.dropbox_app_key), getResources().getString(R.string.dropbox_app_secret));
         AndroidAuthSession session = new AndroidAuthSession(appKeys, mCloudService.getToken());
         mDBApi = new DropboxAPI<AndroidAuthSession>(session);
 

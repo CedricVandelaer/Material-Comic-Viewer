@@ -46,6 +46,12 @@ public class PreferenceSetter {
 
     public static final String APP_THEME_COLOR = "appThemeColor";
     public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
+    public static final String MANGA_SETTING = "mangaEnabled";
+
+    public static boolean getMangaSetting(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(MANGA_SETTING, false);
+    }
 
     public static String getFileFormatSetting(Context context)
     {
