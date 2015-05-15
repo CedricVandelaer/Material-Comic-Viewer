@@ -99,11 +99,25 @@ public class DisplayComicActivity extends FragmentActivity {
         mPager.setOffscreenPageLimit(2);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+
+        boolean isManga = false;
+        if ((PreferenceSetter.getMangaSetting(this) && !PreferenceSetter.isNormalComic(this,mCurrentComic))
+                || (!(PreferenceSetter.getMangaSetting(this)) && PreferenceSetter.isMangaComic(this, mCurrentComic)))
+        {
+            mPager.setCurrentItem(mCurrentComic.getPageCount()-1);
+            isManga = true;
+        }
         
         if (PreferenceSetter.getReadComics(this).containsKey(mCurrentComic.getFileName()))
         {
             lastReadPage = PreferenceSetter.getReadComics(this).get(mCurrentComic.getFileName());
-            mPager.setCurrentItem(lastReadPage);            
+            if (isManga)
+            {
+                mPager.setCurrentItem(mPageCount-1-lastReadPage);
+            }
+            else {
+                mPager.setCurrentItem(lastReadPage);
+            }
         }
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
@@ -128,6 +142,12 @@ public class DisplayComicActivity extends FragmentActivity {
         @Override
         public void onPageSelected(int position) {
 
+            if ((PreferenceSetter.getMangaSetting(DisplayComicActivity.this) && !PreferenceSetter.isNormalComic(DisplayComicActivity.this,mCurrentComic))
+                    || (!(PreferenceSetter.getMangaSetting(DisplayComicActivity.this)) && PreferenceSetter.isMangaComic(DisplayComicActivity.this, mCurrentComic)))
+            {
+                position = mPageCount-1-position;
+            }
+
             setPageNumber();
 
             int pagesRead = PreferenceSetter.getPagesReadForComic(DisplayComicActivity.this, mCurrentComic.getFileName());
@@ -137,7 +157,8 @@ public class DisplayComicActivity extends FragmentActivity {
                 PreferenceSetter.incrementNumberOfComicsStarted(DisplayComicActivity.this, 1);
             }
 
-            PreferenceSetter.saveLastReadComic(DisplayComicActivity.this, mCurrentComic.getFileName(), mPager.getCurrentItem());
+
+            PreferenceSetter.saveLastReadComic(DisplayComicActivity.this, mCurrentComic.getFileName(), position);
 
             if (position+1> pagesRead)
             {
@@ -164,13 +185,21 @@ public class DisplayComicActivity extends FragmentActivity {
 
     private void setPageNumber()
     {
+        int pageNumber = mPager.getCurrentItem()+1;
+
+        if ((PreferenceSetter.getMangaSetting(DisplayComicActivity.this) && !PreferenceSetter.isNormalComic(DisplayComicActivity.this,mCurrentComic))
+                || (!(PreferenceSetter.getMangaSetting(DisplayComicActivity.this)) && PreferenceSetter.isMangaComic(DisplayComicActivity.this, mCurrentComic)))
+        {
+            pageNumber = mCurrentComic.getPageCount()-mPager.getCurrentItem();
+        }
+
         if (mPageNumberSetting.equals(getString(R.string.page_number_setting_1)) && mPageCount>0)
         {
-            mPageIndicator.setText(""+(mPager.getCurrentItem()+1)+" of "+mPageCount);
+            mPageIndicator.setText(""+pageNumber+" of "+mPageCount);
         }
         else if (mPageNumberSetting.equals(getString(R.string.page_number_setting_2)) && mPageCount>0)
         {
-            final String currentPageText = ""+(mPager.getCurrentItem()+1)+" of "+mPageCount;
+            final String currentPageText = ""+pageNumber+" of "+mPageCount;
             mPageIndicator.setText(currentPageText);
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -326,7 +355,15 @@ public class DisplayComicActivity extends FragmentActivity {
     public void onPause()
     {
         super.onPause();
-        PreferenceSetter.saveLastReadComic(DisplayComicActivity.this, mCurrentComic.getFileName(), mPager.getCurrentItem());
+
+        int pageNumber = mPager.getCurrentItem();
+
+        if ((PreferenceSetter.getMangaSetting(DisplayComicActivity.this) && !PreferenceSetter.isNormalComic(DisplayComicActivity.this,mCurrentComic))
+                || (!(PreferenceSetter.getMangaSetting(DisplayComicActivity.this)) && PreferenceSetter.isMangaComic(DisplayComicActivity.this, mCurrentComic)))
+        {
+            pageNumber = mCurrentComic.getPageCount()-1-mPager.getCurrentItem();
+        }
+        PreferenceSetter.saveLastReadComic(DisplayComicActivity.this, mCurrentComic.getFileName(), pageNumber);
 
     }
 

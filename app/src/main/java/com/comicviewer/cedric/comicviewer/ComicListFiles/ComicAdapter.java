@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.ComicActions;
+import com.comicviewer.cedric.comicviewer.Info.InfoActivity;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -475,10 +476,12 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                         FloatingActionButton deleteButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.delete_button);
                         FloatingActionButton markUnreadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.mark_unread_button);
                         FloatingActionButton normalButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.normal_button);
+                        FloatingActionButton infoButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.info_button);
 
                         addDeleteButtonClickListener(dialog, deleteButton, vh.getComic());
                         addNormalComicClickListener(dialog, normalButton, vh.getComic());
                         addMarkUnreadClickListener(dialog, markUnreadButton, vh.getComic());
+                        addInfoClickListener(dialog, infoButton, vh.getComic());
                     }
                 }, 300);
 
@@ -497,6 +500,26 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 PreferenceSetter.saveNormalComic(mContext, comic);
                 int pos = mComicList.indexOf(comic);
                 notifyItemChanged(pos);
+            }
+        });
+    }
+
+    private void addInfoClickListener(final MaterialDialog dialog, View v, final Comic comic)
+    {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(mContext, InfoActivity.class);
+                        intent.putExtra("Comic", comic);
+                        mContext.startActivity(intent);
+                    }
+                }, 100);
+
             }
         });
     }

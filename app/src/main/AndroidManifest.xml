@@ -67,6 +67,11 @@
             android:name=".CloudFiles.DownloadFileService"
             android:exported="false" >
         </service>
+
+        <activity
+            android:name=".Info.InfoActivity"
+            android:label="@string/title_activity_info" >
+        </activity>
     </application>
 
 </manifest>

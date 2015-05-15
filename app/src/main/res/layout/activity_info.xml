@@ -1,0 +1,55 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.comicviewer.cedric.comicviewer.Info.InfoActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView android:text="Batman and Robin"
+            android:id="@+id/title_text_view"
+            android:background="@color/Red"
+            android:textSize="22sp"
+            android:gravity="center"
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/cover_image_view"
+            android:layout_marginTop="-20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/comicplaceholder"
+            android:layout_below="@id/title_text_view"
+            android:layout_width="160dp"
+            android:layout_height="200dp" />
+        <LinearLayout
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:layout_below="@id/title_text_view"
+            android:layout_toEndOf="@id/cover_image_view"
+            android:layout_toRightOf="@id/cover_image_view"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="Issue number: 8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+            <TextView
+                android:text="Year: 1994"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

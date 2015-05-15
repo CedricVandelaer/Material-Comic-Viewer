@@ -43,15 +43,11 @@ public class Extractor {
             || (!(PreferenceSetter.getMangaSetting(context)) && PreferenceSetter.isMangaComic(context, comicToExtract)))
         {
             if (pages.size()>0) {
-                String coverPage = pages.get(0);
                 ArrayList<String> mangaPages = new ArrayList<>();
                 for (int i=pages.size()-1;i>=0;i--)
                 {
                     mangaPages.add(pages.get(i));
                 }
-
-                mangaPages.remove(mangaPages.size()-1);
-                mangaPages.add(0, coverPage);
 
                 return mangaPages;
             }
