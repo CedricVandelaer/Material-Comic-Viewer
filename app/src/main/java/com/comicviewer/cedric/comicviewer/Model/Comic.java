@@ -275,6 +275,8 @@ public class Comic implements Parcelable
         return mColorSetting;
     }
 
+    public void setFilePath(String path){mFilePath = path;}
+
     public void setColorSetting(String colorSetting)
     {
         mColorSetting = colorSetting;

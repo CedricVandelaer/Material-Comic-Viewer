@@ -32,5 +32,6 @@
     <color name="LightGreenDark">#689F38</color>
     <color name="Green">#4CAF50</color>
     <color name="Yellow">#FFEB3B</color>
-
+    <color name="YellowLight">#FFF176</color>
+    <color name="YellowDark">#FBC02D</color>
 </resources>

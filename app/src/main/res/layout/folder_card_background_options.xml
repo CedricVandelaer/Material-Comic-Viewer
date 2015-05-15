@@ -34,6 +34,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
-
+    <LinearLayout
+        android:id="@+id/rename_layout"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:layout_height="match_parent">
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/rename_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_pencil"
+            android:adjustViewBounds="true"
+            android:layout_margin="16dp"
+            fab:fab_type="normal"
+            fab:fab_shadow="true"
+            fab:fab_colorNormal="@color/Yellow"
+            fab:fab_colorPressed="@color/YellowDark"
+            fab:fab_colorRipple="@color/YellowLight" />
+        <TextView
+            android:gravity="center"
+            android:id="@+id/rename_text"
+            android:text="Rename"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
 </LinearLayout>

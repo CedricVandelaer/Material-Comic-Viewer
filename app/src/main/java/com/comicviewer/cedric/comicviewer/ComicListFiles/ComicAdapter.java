@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -165,7 +166,99 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             FolderItemViewHolder folderItemViewHolder = new FolderItemViewHolder(v);
             addFolderClickListener(folderItemViewHolder);
             addFolderDeleteClickListener(folderItemViewHolder);
+            addFolderRenameClickListener(folderItemViewHolder);
             return folderItemViewHolder;
+        }
+    }
+
+    private void addFolderRenameClickListener(final FolderItemViewHolder folderItemViewHolder) {
+
+        folderItemViewHolder.mRenameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                folderItemViewHolder.mSwipeLayout.close();
+
+                if (folderItemViewHolder.getFile().getName().equals("ComicViewer"))
+                {
+                    Toast.makeText(mContext, "This folder can't be renamed", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        MaterialDialog dialog = new MaterialDialog.Builder(mContext)
+                                .title("Rename folder")
+                                .negativeText("Cancel")
+                                .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
+                                .positiveText("Confirm")
+                                .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
+                                .inputType(InputType.TYPE_CLASS_TEXT)
+                                .input("Folder name",
+                                        folderItemViewHolder.getFile().getName(), new MaterialDialog.InputCallback() {
+                                            @Override
+                                            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                                                materialDialog.dismiss();
+
+                                                String oldPath = folderItemViewHolder.getFile().getAbsolutePath();
+                                                String newPath = folderItemViewHolder.getFile().getParentFile().getAbsolutePath()
+                                                        + "/" + charSequence;
+
+                                                int pos = mComicList.indexOf(folderItemViewHolder.getFile());
+
+                                                File newFolder = new File(newPath);
+
+                                                if (!newFolder.exists()) {
+                                                    new RenameTask().execute(oldPath, newPath, folderItemViewHolder.getFile());
+
+                                                } else {
+                                                    Toast.makeText(mContext, "This folder already exists", Toast.LENGTH_LONG).show();
+                                                }
+
+                                            }
+                                        }
+                                ).show();
+                    }
+                }, 300);
+            }
+        });
+
+    }
+
+    private class RenameTask extends AsyncTask
+    {
+
+        MaterialDialog mDialog;
+
+        @Override
+        protected void onPreExecute()
+        {
+            mDialog = new MaterialDialog.Builder(mContext).title("Renaming folder")
+                    .content("Please be patient while the app updates the saved comic data.")
+                    .cancelable(false)
+                    .progress(true,1,false)
+                    .show();
+        }
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            String oldPath = (String) params[0];
+            String newPath = (String) params[1];
+            File folder = (File) params[2];
+
+            PreferenceSetter.renamePaths(mContext, oldPath, newPath);
+            folder.renameTo(new File(newPath));
+
+            return null;
+        }
+
+        @Override
+        public void onPostExecute(Object object)
+        {
+            if (mDialog!=null)
+                mDialog.dismiss();
+            ComicListFragment.getInstance().refresh();
         }
     }
 
