@@ -11,7 +11,8 @@ import com.comicviewer.cedric.comicviewer.R;
 import com.melnykov.fab.FloatingActionButton;
 
 /**
- * Created by Cédric on 6/05/2015.
+ * Created by CV on 6/05/2015.
+ * Class to represent a cloud service like Dropbox
  */
 public class CloudServiceViewHolder extends RecyclerView.ViewHolder {
 

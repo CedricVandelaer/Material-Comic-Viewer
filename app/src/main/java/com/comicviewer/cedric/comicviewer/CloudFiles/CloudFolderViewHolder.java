@@ -10,8 +10,8 @@ import com.dropbox.client2.DropboxAPI;
 import com.melnykov.fab.FloatingActionButton;
 
 /**
- * Created by Cédric on 8/05/2015.
- *
+ * Created by CV on 8/05/2015.
+ * Class to represent a folder in the cloud
  */
 public class CloudFolderViewHolder extends RecyclerView.ViewHolder {
 

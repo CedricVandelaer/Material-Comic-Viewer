@@ -47,6 +47,7 @@ public class SettingsFragment extends PreferenceFragment{
         addRemovePathsPreference();
         addAppThemeSettings();
         addFileFormatSettings();
+        addMangaPreference();
 
         PreferenceCategory functionCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
         Preference goProPreference = new Preference(getActivity());
@@ -65,6 +66,24 @@ public class SettingsFragment extends PreferenceFragment{
         if (Build.VERSION.SDK_INT>20)
             getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
 
+    }
+
+    private void addMangaPreference()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
+
+        CustomCheckBoxPreference mangaPreference = new CustomCheckBoxPreference(getActivity());
+
+
+
+        mangaPreference.setKey(PreferenceSetter.MANGA_SETTING);
+        mangaPreference.setSummary("Note: By checking this option comics will open in manga modus by default");
+        mangaPreference.setTitle("Manga modus (PRO)");
+        mangaPreference.setDefaultValue(false);
+
+        mangaPreference.setEnabled(false);
+
+        targetCategory.addPreference(mangaPreference);
     }
 
     private void addFileFormatSettings()

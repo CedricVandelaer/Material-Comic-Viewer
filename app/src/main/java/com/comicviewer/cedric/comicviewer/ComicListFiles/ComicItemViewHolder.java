@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -34,18 +35,25 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected TextView mYear;
     protected ImageView mLastReadIcon;
     protected ImageView mFavoriteButton;
+    protected ImageView mMangaPicture;
     protected SwipeLayout mSwipeLayout;
-    protected FloatingActionButton mDeleteButton;
+    //protected FloatingActionButton mDeleteButton;
     protected FloatingActionButton mMarkReadButton;
-    protected FloatingActionButton mMarkUnreadButton;
+    //protected FloatingActionButton mMarkUnreadButton;
+    protected FloatingActionButton mOptionsButton;
+    protected FloatingActionButton mMangaButton;
 
-    protected TextView mDeleteTextView;
+    //protected TextView mDeleteTextView;
     protected TextView mMarkReadTextView;
-    protected TextView mMarkUnreadTextView;
+    //protected TextView mMarkUnreadTextView;
+    protected TextView mOptionsTextView;
+    protected TextView mMangaTextView;
 
-    protected LinearLayout mDeleteButtonLayout;
+    //protected LinearLayout mDeleteButtonLayout;
     protected LinearLayout mMarkReadButtonLayout;
-    protected LinearLayout mMarkUnreadButtonLayout;
+    //protected LinearLayout mMarkUnreadButtonLayout;
+    protected LinearLayout mOptionsLayout;
+    protected LinearLayout mMangaLayout;
 
     protected Comic mComic = null;
 
@@ -72,6 +80,12 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         else
             initialiseCardComicBg(itemView);
 
+        mMangaPicture = (ImageView) itemView.findViewById(R.id.manga_indicator);
+
+        mMangaButton = (FloatingActionButton) itemView.findViewById(R.id.manga_button);
+        mMangaLayout = (LinearLayout) itemView.findViewById(R.id.manga_layout);
+        mMangaTextView = (TextView) itemView.findViewById(R.id.manga_text);
+
         initSwipeLayout(itemView);
 
     }
@@ -79,17 +93,20 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     private void initSwipeLayout(View itemView) {
         mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
 
-        mDeleteButtonLayout = (LinearLayout) itemView.findViewById(R.id.delete_button_layout);
+        //mDeleteButtonLayout = (LinearLayout) itemView.findViewById(R.id.delete_button_layout);
         mMarkReadButtonLayout = (LinearLayout) itemView.findViewById(R.id.mark_read_layout);
-        mMarkUnreadButtonLayout = (LinearLayout) itemView.findViewById(R.id.mark_unread_layout);
+        //mMarkUnreadButtonLayout = (LinearLayout) itemView.findViewById(R.id.mark_unread_layout);
+        mOptionsLayout = (LinearLayout) itemView.findViewById(R.id.more_layout);
 
-        mDeleteButton = (FloatingActionButton) itemView.findViewById(R.id.delete_button);
+        //mDeleteButton = (FloatingActionButton) itemView.findViewById(R.id.delete_button);
         mMarkReadButton = (FloatingActionButton) itemView.findViewById(R.id.mark_read_button);
-        mMarkUnreadButton = (FloatingActionButton) itemView.findViewById(R.id.mark_unread_button);
+        //mMarkUnreadButton = (FloatingActionButton) itemView.findViewById(R.id.mark_unread_button);
+        mOptionsButton = (FloatingActionButton) itemView.findViewById(R.id.more_button);
 
-        mDeleteTextView = (TextView) itemView.findViewById(R.id.delete_text);
+        //mDeleteTextView = (TextView) itemView.findViewById(R.id.delete_text);
         mMarkReadTextView = (TextView) itemView.findViewById(R.id.mark_read_text);
-        mMarkUnreadTextView = (TextView) itemView.findViewById(R.id.mark_unread_text);
+        //mMarkUnreadTextView = (TextView) itemView.findViewById(R.id.mark_unread_text);
+        mOptionsTextView = (TextView) itemView.findViewById(R.id.more_text);
 
     }
 

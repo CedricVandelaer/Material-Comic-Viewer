@@ -7,6 +7,7 @@
     android:gravity="center"
     android:layout_height="match_parent">
     <!--What you want to show-->
+    <!--
     <LinearLayout
         android:id="@+id/delete_button_layout"
         android:orientation="vertical"
@@ -34,6 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+    -->
     <LinearLayout
         android:id="@+id/mark_read_layout"
         android:orientation="vertical"
@@ -56,11 +58,12 @@
         <TextView
             android:gravity="center"
             android:id="@+id/mark_read_text"
-            android:text="Mark as read"
+            android:text="Mark read"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+    <!--
     <LinearLayout
         android:id="@+id/mark_unread_layout"
         android:orientation="vertical"
@@ -84,6 +87,61 @@
             android:gravity="center"
             android:id="@+id/mark_unread_text"
             android:text="Mark as unread"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    -->
+    <LinearLayout
+        android:id="@+id/manga_layout"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:layout_height="match_parent">
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/manga_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_fish"
+            android:adjustViewBounds="true"
+            android:layout_margin="16dp"
+            fab:fab_type="normal"
+            fab:fab_shadow="true"
+            fab:fab_colorNormal="@color/Orange"
+            fab:fab_colorPressed="@color/OrangeDark"
+            fab:fab_colorRipple="@color/OrangeLight" />
+        <TextView
+            android:gravity="center"
+            android:id="@+id/manga_text"
+            android:text="Manga comic"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/more_layout"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:layout_height="match_parent">
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/more_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_dots_horizontal"
+            android:adjustViewBounds="true"
+            android:layout_margin="16dp"
+            fab:fab_type="normal"
+            fab:fab_shadow="true"
+            fab:fab_colorNormal="@color/Purple"
+            fab:fab_colorPressed="@color/PurpleDark"
+            fab:fab_colorRipple="@color/PurpleLight" />
+        <TextView
+            android:gravity="center"
+            android:id="@+id/more_text"
+            android:text="Options"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

@@ -17,8 +17,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.ArrayList;
 
 /**
- * Created by Cédric on 6/05/2015.
- *
+ * Created by CV on 6/05/2015.
+ * controller class to map the data of cloud files on their respective views
  */
 public class CloudListAdapter extends RecyclerView.Adapter {
 

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.ComicActions;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -31,6 +33,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
+import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -52,6 +55,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
     private int lastPosition=-1;
     private DisplayImageOptions mImageOptions;
     private ComicAdapter mRootAdapterReference = null;
+    private Handler mHandler;
 
     public ComicAdapter(Context context, List<Comic> comics, boolean dummy)
     {
@@ -65,6 +69,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
         mComicList=comicList;
         mContext=context;
+        mHandler = new Handler();
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
@@ -86,7 +91,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 .considerExifParams(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
-
+        mHandler = new Handler();
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -101,7 +106,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 .considerExifParams(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
-
+        mHandler = new Handler();
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -148,9 +153,9 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
             addFavoriteClickListener(comicItemViewHolder);
             addClickListener(comicItemViewHolder);
-            addDeleteButtonClickListener(comicItemViewHolder);
             addMarkReadClickListener(comicItemViewHolder);
-            addMarkUnreadClickListener(comicItemViewHolder);
+            addOptionsClickListener(comicItemViewHolder);
+            addMangaClickListener(comicItemViewHolder);
 
             return comicItemViewHolder;
         }
@@ -162,6 +167,26 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             addFolderDeleteClickListener(folderItemViewHolder);
             return folderItemViewHolder;
         }
+    }
+
+    private void addMangaClickListener(final ComicItemViewHolder comicItemViewHolder) {
+
+        comicItemViewHolder.mMangaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Comic comic = comicItemViewHolder.getComic();
+                PreferenceSetter.saveMangaComic(mContext, comic);
+                PreferenceSetter.removeNormalComic(mContext, comic);
+                comicItemViewHolder.mSwipeLayout.close();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        int pos = mComicList.indexOf(comic);
+                        notifyItemChanged(pos);
+                    }
+                },300);
+            }
+        });
     }
 
     private void addFolderDeleteClickListener(final FolderItemViewHolder folderItemViewHolder) {
@@ -198,7 +223,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         folderItemViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("ItemClick",folderItemViewHolder.getFile().getAbsolutePath());
+                Log.d("ItemClick", folderItemViewHolder.getFile().getAbsolutePath());
                 String path = folderItemViewHolder.getFile().getAbsolutePath();
                 NavigationManager.getInstance().pushPathToFileStack(path);
                 ComicListFragment.getInstance().refresh();
@@ -255,20 +280,53 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 initialiseCardBg(comicItemViewHolder, position);
             }
 
+
+
             if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG)) {
-                comicItemViewHolder.mMarkUnreadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+                //comicItemViewHolder.mMarkUnreadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
                 comicItemViewHolder.mMarkReadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mDeleteTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+                //comicItemViewHolder.mDeleteTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+                comicItemViewHolder.mOptionsTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+                comicItemViewHolder.mMangaTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
             }
 
-            comicItemViewHolder.setComic((Comic)mComicList.get(position));
+            comicItemViewHolder.setComic((Comic) mComicList.get(position));
+
+            comicItemViewHolder.mMangaPicture.setVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT>15)
+                comicItemViewHolder.mMangaPicture.setBackground(null);
+            comicItemViewHolder.mMangaPicture.setImageDrawable(null);
+            if (PreferenceSetter.getMangaSetting(mContext))
+            {
+                if (PreferenceSetter.isNormalComic(mContext, comicItemViewHolder.getComic()))
+                {
+                    comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
+                    Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+                    if(Build.VERSION.SDK_INT>15)
+                        comicItemViewHolder.mMangaPicture.setBackground(circle);
+
+                    ImageLoader.getInstance().displayImage("drawable://" + R.drawable.ic_fire, comicItemViewHolder.mMangaPicture);
+                }
+            }
+            else
+            {
+                if (PreferenceSetter.isMangaComic(mContext, comicItemViewHolder.getComic()))
+                {
+                    comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
+                    Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+                    if(Build.VERSION.SDK_INT>15)
+                        comicItemViewHolder.mMangaPicture.setBackground(circle);
+
+                    ImageLoader.getInstance().displayImage("drawable://" + R.drawable.ic_fish, comicItemViewHolder.mMangaPicture);
+                }
+            }
 
         }
         else
         {
             FolderItemViewHolder folderItemViewHolder = (FolderItemViewHolder)itemViewHolder;
             initialiseFolderCard(folderItemViewHolder, position);
-            folderItemViewHolder.setFile((File)mComicList.get(position));
+            folderItemViewHolder.setFile((File) mComicList.get(position));
         }
     }
 
@@ -304,32 +362,67 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         return -1;
     }
 
-    private void addMarkUnreadClickListener(final ComicItemViewHolder vh) {
-
-        vh.mMarkUnreadButton.setOnClickListener(new View.OnClickListener() {
+    private void addOptionsClickListener(final ComicItemViewHolder vh)
+    {
+        vh.mOptionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PreferenceSetter.getReadComics(mContext).containsKey((vh.getComic().getFileName()))) {
+                vh.mSwipeLayout.close();
 
-                    Comic comic = vh.getComic();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        MaterialDialog dialog = new MaterialDialog.Builder(mContext)
+                                .title("Options")
+                                .positiveText("Cancel")
+                                .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
+                                .customView(R.layout.options_menu_layout,true)
+                                .show();
 
-                    PreferenceSetter.removeReadComic(mContext, comic.getFileName());
+                        FloatingActionButton deleteButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.delete_button);
+                        FloatingActionButton markUnreadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.mark_unread_button);
+                        FloatingActionButton normalButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.normal_button);
 
-                    int pagesRead = PreferenceSetter.getPagesReadForComic(mContext, comic.getFileName());
-
-                    PreferenceSetter.resetSavedPagesForComic(mContext, comic.getFileName());
-
-                    if (pagesRead > 0) {
-                        PreferenceSetter.decrementNumberOfComicsStarted(mContext, 1);
+                        addDeleteButtonClickListener(dialog, deleteButton, vh.getComic());
+                        addNormalComicClickListener(dialog, normalButton, vh.getComic());
+                        addMarkUnreadClickListener(dialog, markUnreadButton, vh.getComic());
                     }
+                }, 300);
 
-                    if (pagesRead >= comic.getPageCount()) {
-                        PreferenceSetter.decrementNumberOfComicsRead(mContext, 1);
-                    }
+            }
+        });
+    }
 
-                    PreferenceSetter.decrementPagesForSeries(mContext, comic.getTitle(), pagesRead);
-                    vh.mSwipeLayout.close(true);
-                    notifyItemChanged(vh.getPosition());
+    private void addNormalComicClickListener(final MaterialDialog dialog, View v, final Comic comic)
+    {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                PreferenceSetter.removeMangaComic(mContext, comic);
+                PreferenceSetter.saveNormalComic(mContext, comic);
+                int pos = mComicList.indexOf(comic);
+                notifyItemChanged(pos);
+            }
+        });
+    }
+
+    private void addMarkUnreadClickListener(final MaterialDialog dialog, View v, final Comic comic) {
+
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+
+                if (PreferenceSetter.getReadComics(mContext).containsKey((comic.getFileName()))) {
+
+
+                    ComicActions.markComicUnread(mContext, comic);
+                    int pos = mComicList.indexOf(comic);
+                    notifyItemChanged(pos);
                 }
                 else
                 {
@@ -339,18 +432,18 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 }
             }
         });
+
     }
 
-    private void addDeleteButtonClickListener(final ComicItemViewHolder vh)
+    private void addDeleteButtonClickListener(final MaterialDialog dialog, final View v, final Comic comic)
     {
 
-        vh.mDeleteButton.setOnClickListener(new View.OnClickListener() {
+        v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                dialog.dismiss();
                 String message = "";
-
-                final Comic comic = vh.getComic();
 
                 if (comic.getIssueNumber()!=-1) {
                     message = comic.getTitle() + " "+comic.getIssueNumber();
@@ -363,7 +456,6 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 final String finalMessage = message;
                 final String fileName = comic.getFileName();
 
-                vh.mSwipeLayout.close(true);
                 new AlertDialog.Builder(mContext)
                         .setTitle("Confirm delete")
                         .setMessage("Are you sure you wish to delete "+finalMessage+"?\n" +
@@ -380,67 +472,24 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                         .show();
             }
         });
+
     }
 
     private void addMarkReadClickListener(final ComicItemViewHolder vh)
     {
-
         vh.mMarkReadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PreferenceSetter.getReadComics(mContext).containsKey(vh.getComic().getFileName())) {
-
-                    if (PreferenceSetter.getReadComics(mContext).get(vh.getComic().getFileName())+1>= vh.getComic().getPageCount())
-                    {
-                        //Do nothing, already marked as read
-                        Toast message = Toast.makeText(mContext, "You have already read this comic!", Toast.LENGTH_SHORT);
-                        message.show();
+                final Comic comic = vh.getComic();
+                vh.mSwipeLayout.close(true);
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ComicActions.markComicRead(mContext, comic);
+                        int pos = mComicList.indexOf(comic);
+                        notifyItemChanged(pos);
                     }
-                    else
-                    {
-                        //Comic was opened but not yet fully read
-                        PreferenceSetter.saveLastReadComic(mContext,vh.getComic().getFileName(),vh.getComic().getPageCount()-1);
-
-                        int pagesRead = PreferenceSetter.getPagesReadForComic(mContext, vh.getComic().getFileName());
-
-                        PreferenceSetter.savePagesForComic(mContext, vh.getComic().getFileName(), vh.getComic().getPageCount());
-
-                        if (pagesRead == 0) {
-                            PreferenceSetter.incrementNumberOfComicsStarted(mContext, 1);
-                        }
-
-                        if (pagesRead < vh.getComic().getPageCount()) {
-                            PreferenceSetter.incrementNumberOfComicsRead(mContext, 1);
-                        }
-
-                        int extraPagesRead = vh.getComic().getPageCount() - pagesRead;
-                        PreferenceSetter.incrementPagesForSeries(mContext, vh.getComic().getTitle(), extraPagesRead);
-
-                        PreferenceSetter.saveLongestReadComic(mContext,
-                                vh.getComic().getFileName(),
-                                vh.getComic().getPageCount(),
-                                vh.getComic().getTitle(),
-                                vh.getComic().getIssueNumber());
-                        vh.mSwipeLayout.close(true);
-                        notifyItemChanged(vh.getPosition());
-                    }
-                }
-                else {
-                    PreferenceSetter.saveLongestReadComic(mContext,
-                            vh.getComic().getFileName(),
-                            vh.getComic().getPageCount(),
-                            vh.getComic().getTitle(),
-                            vh.getComic().getIssueNumber());
-
-                    //Comic wasn't opened yet
-                    PreferenceSetter.saveLastReadComic(mContext,vh.getComic().getFileName(),vh.getComic().getPageCount()-1);
-                    PreferenceSetter.savePagesForComic(mContext, vh.getComic().getFileName(), vh.getComic().getPageCount());
-                    PreferenceSetter.incrementNumberOfComicsStarted(mContext, 1);
-                    PreferenceSetter.incrementNumberOfComicsRead(mContext, 1);
-                    PreferenceSetter.incrementPagesForSeries(mContext, vh.getComic().getTitle(), vh.getComic().getPageCount());
-                    vh.mSwipeLayout.close(true);
-                    notifyItemChanged(vh.getPosition());
-                }
+                },300);
             }
         });
 
@@ -589,7 +638,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         if (PreferenceSetter.getReadComics(mContext).containsKey(comic.getFileName()))
         {
             //comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
-            comicItemViewHolder.mLastReadIcon.setBackground(circle);
+            if (Build.VERSION.SDK_INT>15)
+                comicItemViewHolder.mLastReadIcon.setBackground(circle);
             if (PreferenceSetter.getReadComics(mContext).get((comic.getFileName()))+1==comic.getPageCount())
             {
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
@@ -602,7 +652,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         else
         {
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
-            comicItemViewHolder.mLastReadIcon.setBackground(null);
+            if (Build.VERSION.SDK_INT>15)
+                comicItemViewHolder.mLastReadIcon.setBackground(null);
         }
 
         if (!ImageLoader.getInstance().isInited()) {
@@ -678,7 +729,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         {
             comicItemViewHolder.mLastReadIcon.setVisibility(View.GONE);
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
-            comicItemViewHolder.mLastReadIcon.setBackground(null);
+            if (Build.VERSION.SDK_INT>15)
+                comicItemViewHolder.mLastReadIcon.setBackground(null);
         }
 
         if (comic.getComicColor()!=-1)

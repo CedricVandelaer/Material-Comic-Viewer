@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Cédric on 8/05/2015.
+ * Created by CV on 8/05/2015.
+ * Class to manage the mapping of cloud files on their views
  */
 public class DropboxAdapter extends RecyclerView.Adapter {
 

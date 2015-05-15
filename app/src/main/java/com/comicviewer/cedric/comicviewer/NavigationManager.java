@@ -5,7 +5,8 @@ import java.util.Stack;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 
 /**
- * Created by Cédric on 8/05/2015.
+ * Created by CV on 8/05/2015.
+ * Class to manage file browser navigations
  */
 public class NavigationManager {
 

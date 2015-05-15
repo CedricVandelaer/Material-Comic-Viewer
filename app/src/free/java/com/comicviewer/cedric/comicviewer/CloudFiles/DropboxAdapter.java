@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Cédric on 8/05/2015.
+ * Created by CV on 8/05/2015.
+ * class to map files to their respective views
  */
 public class DropboxAdapter extends RecyclerView.Adapter {
 

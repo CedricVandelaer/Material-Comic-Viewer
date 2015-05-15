@@ -5,7 +5,8 @@ import com.google.gson.Gson;
 import java.io.Serializable;
 
 /**
- * Created by Cédric on 6/05/2015.
+ * Created by CV on 6/05/2015.
+ * Model class for a cloud service
  */
 public class CloudService implements Serializable{
 

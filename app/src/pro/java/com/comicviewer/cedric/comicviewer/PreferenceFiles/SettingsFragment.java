@@ -44,6 +44,7 @@ public class SettingsFragment extends PreferenceFragment{
         addFilenameFormatSettings();
         addRemovePathsPreference();
         addAppThemeSettings();
+        addMangaPreference();
 
         getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
         if (Build.VERSION.SDK_INT>20)

@@ -43,7 +43,7 @@
                     android:id="@+id/title"
                     android:layout_toEndOf="@id/cover"
                     android:layout_width="fill_parent"
-                    android:maxLines="3"
+                    android:maxLines="2"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:textSize="24sp"
@@ -100,6 +100,20 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="64dp"
+                    android:layout_alignParentBottom="true"/>
+                <ImageView
+                    android:id="@+id/manga_indicator"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="8dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginEnd="108dp"
+                    android:layout_marginRight="108dp"
                     android:layout_alignParentBottom="true"/>
             </RelativeLayout>
 

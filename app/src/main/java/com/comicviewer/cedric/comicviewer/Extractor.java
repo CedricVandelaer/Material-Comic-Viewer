@@ -1,8 +1,10 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 
@@ -18,7 +20,7 @@ import net.lingala.zip4j.core.ZipFile;
  */
 public class Extractor {
 
-    public static ArrayList<String> loadImageNamesFromComic(Comic comicToExtract)
+    public static ArrayList<String> loadImageNamesFromComic(Context context, Comic comicToExtract)
     {
         String filename = comicToExtract.getFileName();
 
@@ -26,14 +28,36 @@ public class Extractor {
         
         File file = new File(path);
 
+        ArrayList<String> pages;
+
         if (Utilities.isZipArchive(file))
         {
-            return loadImageNamesFromComicZip(comicToExtract);
+            pages = loadImageNamesFromComicZip(comicToExtract);
         }
         else
         {
-            return loadImageNamesFromComicRar(comicToExtract);
+            pages =  loadImageNamesFromComicRar(comicToExtract);
         }
+
+        if ((PreferenceSetter.getMangaSetting(context) && !PreferenceSetter.isNormalComic(context,comicToExtract))
+            || (!(PreferenceSetter.getMangaSetting(context)) && PreferenceSetter.isMangaComic(context, comicToExtract)))
+        {
+            if (pages.size()>0) {
+                String coverPage = pages.get(0);
+                ArrayList<String> mangaPages = new ArrayList<>();
+                for (int i=pages.size()-1;i>=0;i--)
+                {
+                    mangaPages.add(pages.get(i));
+                }
+
+                mangaPages.remove(mangaPages.size()-1);
+                mangaPages.add(0, coverPage);
+
+                return mangaPages;
+            }
+        }
+
+        return pages;
     }
 
     /**
@@ -68,6 +92,9 @@ public class Extractor {
         }
         
         Collections.sort(pages);
+
+
+
         return pages;
     }
 

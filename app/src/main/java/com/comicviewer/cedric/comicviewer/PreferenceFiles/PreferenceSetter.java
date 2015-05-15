@@ -43,10 +43,144 @@ public class PreferenceSetter {
     private static final String FOLDER_VIEW_ENABLED="folderViewEnabled";
     private static final String KEEP_SCREEN_ON= "keepScreenOn";
     private static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
+    private static final String MANGA_LIST="mangaList";
+    private static final String NORMAL_LIST="normalList";
 
     public static final String APP_THEME_COLOR = "appThemeColor";
     public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
     public static final String MANGA_SETTING = "mangaEnabled";
+
+    public static boolean isNormalComic(Context context, Comic comic)
+    {
+        List<String> normalList = getNormalComicList(context);
+
+        for (int i=0;i<normalList.size();i++)
+        {
+            if (normalList.get(i).equals(comic.getFilePath()+"/"+comic.getFileName()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void removeNormalComic(Context context, Comic comic)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String csvList = preferences.getString(NORMAL_LIST, "");
+        String newList = "";
+
+        String parts[] = csvList.split(",");
+
+        for (int i=0;i<parts.length;i++)
+        {
+            if (!parts[i].equals(comic.getFilePath()+"/"+comic.getFileName()))
+            {
+                newList+=parts[i]+",";
+            }
+        }
+
+        editor.putString(NORMAL_LIST, newList);
+        editor.apply();
+    }
+
+    public static void saveNormalComic(Context context, Comic comic)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String csvList = preferences.getString(NORMAL_LIST,"");
+        csvList+=comic.getFilePath()+"/"+comic.getFileName()+",";
+        editor.putString(NORMAL_LIST, csvList);
+        editor.apply();
+    }
+
+    public static List<String> getNormalComicList(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        List<String> normalComicPaths = new ArrayList<>();
+
+        String csvList = prefs.getString(NORMAL_LIST, null);
+
+        if (csvList!=null)
+        {
+            String paths[] = csvList.split(",");
+            for (int i =0;i<paths.length;i++)
+            {
+                normalComicPaths.add(paths[i]);
+            }
+        }
+
+        return normalComicPaths;
+    }
+
+    public static boolean isMangaComic(Context context, Comic comic)
+    {
+        List<String> mangaList = getMangaComicList(context);
+
+        for (int i=0;i<mangaList.size();i++)
+        {
+            if (mangaList.get(i).equals(comic.getFilePath()+"/"+comic.getFileName()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void removeMangaComic(Context context, Comic comic)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String csvList = preferences.getString(MANGA_LIST, "");
+        String newList = "";
+
+        String parts[] = csvList.split(",");
+
+        for (int i=0;i<parts.length;i++)
+        {
+            if (!parts[i].equals(comic.getFilePath()+"/"+comic.getFileName()))
+            {
+                newList+=parts[i]+",";
+            }
+        }
+
+        editor.putString(MANGA_LIST, newList);
+        editor.apply();
+    }
+
+    public static void saveMangaComic(Context context, Comic comic)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String csvList = preferences.getString(MANGA_LIST,"");
+        csvList+=comic.getFilePath()+"/"+comic.getFileName()+",";
+        editor.putString(MANGA_LIST, csvList);
+        editor.apply();
+    }
+
+    public static List<String> getMangaComicList(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        List<String> mangaComicPaths = new ArrayList<>();
+
+        String csvList = prefs.getString(MANGA_LIST, null);
+
+        if (csvList!=null)
+        {
+            String paths[] = csvList.split(",");
+            for (int i =0;i<paths.length;i++)
+            {
+                mangaComicPaths.add(paths[i]);
+            }
+        }
+
+        return mangaComicPaths;
+    }
 
     public static boolean getMangaSetting(Context context)
     {
