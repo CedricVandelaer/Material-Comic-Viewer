@@ -5,6 +5,11 @@
         <item name="android:statusBarColor">@color/TealDark</item>
         <item name="android:colorAccent">@color/BlueGrey</item>
         <item name="android:windowContentTransitions">true</item>
+        <!-- specify shared element transitions -->
+        <item name="android:windowSharedElementEnterTransition">
+            @transition/cover_transition</item>
+        <item name="android:windowSharedElementExitTransition">
+            @transition/cover_transition</item>
     </style>
 
     <style name="FullscreenTheme" parent="android:Theme.NoTitleBar">
@@ -32,6 +37,8 @@
         <item name="colorAccent">@color/White</item>
         <item name="drawerType">@integer/DRAWERTYPE_IMAGE</item>
         <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowSharedElementEnterTransition">
+            @transition/cover_transition</item>
         <item name="android:windowSharedElementExitTransition">
             @transition/cover_transition</item>
     </style>

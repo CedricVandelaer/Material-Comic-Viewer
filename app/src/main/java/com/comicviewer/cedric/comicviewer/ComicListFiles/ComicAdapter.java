@@ -1,5 +1,6 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -470,7 +471,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                                 .title("Options")
                                 .positiveText("Cancel")
                                 .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
-                                .customView(R.layout.options_menu_layout,true)
+                                .customView(R.layout.options_menu_layout, true)
                                 .show();
 
                         FloatingActionButton deleteButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.delete_button);
@@ -481,7 +482,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                         addDeleteButtonClickListener(dialog, deleteButton, vh.getComic());
                         addNormalComicClickListener(dialog, normalButton, vh.getComic());
                         addMarkUnreadClickListener(dialog, markUnreadButton, vh.getComic());
-                        addInfoClickListener(dialog, infoButton, vh.getComic());
+                        addInfoClickListener(dialog, infoButton, vh,  vh.getComic());
                     }
                 }, 300);
 
@@ -504,7 +505,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         });
     }
 
-    private void addInfoClickListener(final MaterialDialog dialog, View v, final Comic comic)
+    private void addInfoClickListener(final MaterialDialog dialog, View v, final ComicItemViewHolder vh, final Comic comic)
     {
         v.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -516,7 +517,13 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                     public void run() {
                         Intent intent = new Intent(mContext, InfoActivity.class);
                         intent.putExtra("Comic", comic);
-                        mContext.startActivity(intent);
+                        if (Build.VERSION.SDK_INT > 20) {
+                            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ComicListFragment.getInstance().getActivity(),
+                                    vh.mCoverPicture, "cover");
+                            mContext.startActivity(intent, options.toBundle());
+                        } else {
+                            mContext.startActivity(intent);
+                        }
                     }
                 }, 100);
 

@@ -20,11 +20,11 @@
             android:layout_height="wrap_content" />
         <ImageView
             android:id="@+id/cover_image_view"
+            android:transitionName="cover"
             android:layout_marginTop="-20dp"
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/comicplaceholder"
             android:layout_below="@id/title_text_view"
             android:layout_width="160dp"
             android:layout_height="240dp" />
@@ -47,6 +47,12 @@
             <TextView
                 android:id="@+id/year_text_view"
                 android:text="Year: 1994"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+            <TextView
+                android:id="@+id/pages_text_view"
+                android:text="Pages: 23"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"/>

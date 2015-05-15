@@ -26,6 +26,7 @@ public class InfoActivity extends Activity {
     private TextView mYearTextView;
     private TextView mFilenameTextView;
     private TextView mFileSizeTextView;
+    private TextView mPagesTextView;
 
 
     @Override
@@ -53,6 +54,7 @@ public class InfoActivity extends Activity {
         mYearTextView = (TextView) findViewById(R.id.year_text_view);
         mFilenameTextView = (TextView) findViewById(R.id.filename_text_view);
         mFileSizeTextView = (TextView) findViewById(R.id.filesize_text_view);
+        mPagesTextView = (TextView) findViewById(R.id.pages_text_view);
 
         mTitleTextView.setText(mComic.getTitle());
         mTitleTextView.setBackgroundColor(mComic.getComicColor());
@@ -77,6 +79,15 @@ public class InfoActivity extends Activity {
         else
         {
             mYearTextView.setVisibility(View.GONE);
+        }
+
+        if (mComic.getPageCount()>0)
+        {
+            mPagesTextView.setText("Pages: "+mComic.getPageCount());
+        }
+        else
+        {
+            mPagesTextView.setVisibility(View.GONE);
         }
 
         File archiveFile = new File(mComic.getFilePath()+"/"+mComic.getFileName());
