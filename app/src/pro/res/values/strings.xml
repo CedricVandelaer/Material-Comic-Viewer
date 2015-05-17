@@ -32,6 +32,8 @@
     <string name="dropbox_app_secret">yj0gk3nipr6ti4u</string>
     <string name="db_scheme">db-id9ssazcpa41gys</string>
     <string name="updates">
+        v2.1.2\n
+        - Fixed a crash for some users\n\n
         v2.1.1\n
         - Added transition to the info page\n\n
         v2.1\n

@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -19,6 +21,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
+import java.io.File;
+import java.util.Map;
 import java.util.Stack;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
@@ -120,6 +124,49 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
             return AboutFragment.newInstance();
         else
             return ComicListFragment.getInstance();
+    }
+
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+
+        cleanFiles();
+
+    }
+
+    public void cleanFiles()
+    {
+        File[] savedFolders = getFilesDir().listFiles();
+        Map<String, String> allFiles = FileLoader.searchComics(this);
+        String defaultPath = getFilesDir().getAbsolutePath();
+
+        for (File folder:savedFolders)
+        {
+            boolean found = false;
+
+            for (String filename:allFiles.keySet())
+            {
+                String comicFolder = defaultPath+"/"+filename;
+
+                comicFolder = Utilities.removeExtension(comicFolder);
+
+                File foundFolder = new File(comicFolder);
+
+                if (foundFolder.getAbsolutePath().equals(folder.getAbsolutePath()))
+                    found = true;
+            }
+
+            if (!found)
+            {
+                Log.d("OnStop", "Folder to delete: " + folder.getAbsolutePath());
+                Utilities.deleteDirectory(this, folder);
+            }
+        }
+
+
+
     }
 
     @Override

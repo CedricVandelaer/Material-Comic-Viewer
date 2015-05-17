@@ -106,7 +106,10 @@ public class CloudListAdapter extends RecyclerView.Adapter {
         CloudServiceViewHolder cloudServiceViewHolder = (CloudServiceViewHolder) holder;
 
         cloudServiceViewHolder.setCloudService(mCloudServiceList.get(position));
-        cloudServiceViewHolder.mTitleTextView.setText(mCloudServiceList.get(position).getUsername());
+        if (mCloudServiceList.get(position).getUsername()!=null)
+            cloudServiceViewHolder.mTitleTextView.setText(mCloudServiceList.get(position).getUsername());
+        else
+            cloudServiceViewHolder.mTitleTextView.setText(mCloudServiceList.get(position).getName());
 
         cloudServiceViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mContext)));
 

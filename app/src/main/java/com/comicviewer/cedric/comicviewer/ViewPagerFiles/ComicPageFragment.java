@@ -134,36 +134,7 @@ public class ComicPageFragment extends Fragment {
                         zoomImageView();
                     }
                 });
-                /*
-                ImageLoader.getInstance().loadImage("file:///" + getActivity().getFilesDir().getPath() + "/" + mFolderName + "/" + filename
-                        , new ImageLoadingListener() {
-                    @Override
-                    public void onLoadingStarted(String imageUri, View view) {
-                        if (mSpinner!=null)
-                            mSpinner.setVisibility(View.VISIBLE);
-                    }
 
-                    @Override
-                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                        if (mSpinner!=null)
-                            mSpinner.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                        if (mSpinner!=null)
-                            mSpinner.setVisibility(View.GONE);
-
-                        mBitmap = loadedImage;
-                        mFullscreenComicView.setImageBitmap(mBitmap);
-                        zoomImageView();
-                    }
-
-                    @Override
-                    public void onLoadingCancelled(String imageUri, View view) {
-
-                    }
-                });*/
 
             }
         }
