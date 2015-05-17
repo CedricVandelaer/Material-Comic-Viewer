@@ -54,6 +54,8 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
+        v2.1.1\n
+        - Added transition to the info page\n\n
         v2.1\n
         - Fixed manga mode\n
         - Rename folders\n\n
