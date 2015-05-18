@@ -10,6 +10,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/LiveSDK-for-Android-master/src" />
+            <option value="$PROJECT_DIR$/LiveSDK-for-Android-master/utilities" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

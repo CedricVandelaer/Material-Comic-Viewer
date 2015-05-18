@@ -17,6 +17,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.FileDialog;
@@ -29,18 +30,33 @@ import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
 import com.melnykov.fab.FloatingActionButton;
+import com.microsoft.live.LiveAuthClient;
+import com.microsoft.live.LiveAuthException;
+import com.microsoft.live.LiveAuthListener;
+import com.microsoft.live.LiveConnectClient;
+import com.microsoft.live.LiveConnectSession;
+import com.microsoft.live.LiveOperation;
+import com.microsoft.live.LiveOperationException;
+import com.microsoft.live.LiveOperationListener;
+import com.microsoft.live.LiveStatus;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 
 
-public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LiveAuthListener{
 
     private static CloudFragment mSingleton;
 
     private FloatingActionButton mFab;
     private DropboxAPI<AndroidAuthSession> mDBApi;
+
+    private LiveAuthClient mOneDriveAuth;
+    private LiveConnectClient mOneDriveClient;
 
     private RecyclerView mRecyclerView;
     private CloudListAdapter mAdapter;
@@ -91,6 +107,70 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    @Override
+    public void onAuthComplete(LiveStatus status, LiveConnectSession session, Object userState) {
+        if(status == LiveStatus.CONNECTED) {
+            mOneDriveClient = new LiveConnectClient(session);
+
+            final String token = session.getAccessToken();
+
+
+            mOneDriveClient.getAsync("me", new LiveOperationListener() {
+                @Override
+                public void onComplete(LiveOperation operation) {
+
+                    JSONObject result = operation.getResult();
+
+                    String name = "OneDrive";
+                    String email = "Email";
+
+                    try
+                    {
+                        name = result.getString("first_name");
+                        name += " " + result.getString("last_name");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    try
+                    {
+                        JSONObject emails = result.getJSONObject("emails");
+                        email = emails.getString("preferred");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    CloudService newOneDrive = new CloudService("OneDrive",
+                            token,
+                            name
+                            , email);
+
+                    PreferenceSetter.saveCloudService(getActivity(), newOneDrive);
+                    mAdapter.refreshCloudServiceList();
+                }
+
+                @Override
+                public void onError(LiveOperationException exception, LiveOperation operation) {
+                    Toast.makeText(getActivity(), "An error occured retrieving OneDrive credentials...", Toast.LENGTH_LONG).show();
+                }
+            });
+
+
+        }
+        else {
+            mOneDriveClient = null;
+        }
+    }
+
+    @Override
+    public void onAuthError(LiveAuthException exception, Object userState) {
+        Toast.makeText(getActivity(), "Something went wrong signing into OneDrive", Toast.LENGTH_LONG).show();
     }
 
 
@@ -161,6 +241,8 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
+        this.mOneDriveAuth = new LiveAuthClient(getActivity(), getActivity().getResources().getString(R.string.onedrive_id));
+
         mAdapter = new CloudListAdapter(getActivity());
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -202,6 +284,11 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                             public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                                 if (text.equals(getString(R.string.cloud_storage_1)))
                                     addDropboxAccount();
+                                else if (text.equals(getString(R.string.cloud_storage_3)))
+                                {
+                                    Iterable<String> scopes = Arrays.asList("wl.signin", "wl.basic", "wl.emails");
+                                    mOneDriveAuth.login(getActivity(), scopes, CloudFragment.this);
+                                }
                             }
                         })
                         .negativeText("Cancel")
