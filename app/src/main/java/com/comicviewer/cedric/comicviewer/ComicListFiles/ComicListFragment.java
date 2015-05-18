@@ -323,13 +323,6 @@ public class ComicListFragment extends Fragment {
     private void onLoadingFinished()
     {
 
-        /*
-        if (mSearchComicsTask != null && !mSearchComicsTask.isCancelled() && !PreferenceSetter.getFolderEnabledSetting(mApplicationContext
-        )) {
-            PreferenceSetter.saveComicList(mApplicationContext, mAdapter.getComics());
-        }
-        */
-
         mHandler.post(new Runnable() {
             @Override
             public void run() {

@@ -5,6 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/comic-viewer.iml" filepath="$PROJECT_DIR$/comic-viewer.iml" />
       <module fileurl="file://$PROJECT_DIR$/LiveSDK-for-Android-master/src/src.iml" filepath="$PROJECT_DIR$/LiveSDK-for-Android-master/src/src.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LiveSDK-for-Android-master/src/src.iml" filepath="$PROJECT_DIR$/LiveSDK-for-Android-master/src/src.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LiveSDK-for-Android-master/utilities/utilities.iml" filepath="$PROJECT_DIR$/LiveSDK-for-Android-master/utilities/utilities.iml" />
       <module fileurl="file://$PROJECT_DIR$/LiveSDK-for-Android-master/utilities/utilities.iml" filepath="$PROJECT_DIR$/LiveSDK-for-Android-master/utilities/utilities.iml" />
     </modules>
   </component>

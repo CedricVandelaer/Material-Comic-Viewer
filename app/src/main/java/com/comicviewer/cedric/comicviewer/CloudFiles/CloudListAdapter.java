@@ -89,12 +89,13 @@ public class CloudListAdapter extends RecyclerView.Adapter {
             @Override
             public void onClick(View v) {
                 Intent intent;
-                if (cloudServiceViewHolder.getCloudService().getName().equals("Dropbox")) {
+                if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_1))) {
                     intent = new Intent(mContext, DropboxActivity.class);
                     intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
 
                     mContext.startActivity(intent);
                 }
+
             }
         });
 
@@ -113,9 +114,13 @@ public class CloudListAdapter extends RecyclerView.Adapter {
 
         cloudServiceViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mContext)));
 
-        if (mCloudServiceList.get(position).equals("Dropbox"))
+        if (mCloudServiceList.get(position).equals(mContext.getString(R.string.cloud_storage_1)))
         {
             ImageLoader.getInstance().displayImage("Drawable://"+R.drawable.dropbox_icon,cloudServiceViewHolder.mLogoImageView);
+        }
+        else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_3)))
+        {
+            ImageLoader.getInstance().displayImage("drawable://" + R.drawable.onedrive_icon, cloudServiceViewHolder.mLogoImageView);
         }
     }
 

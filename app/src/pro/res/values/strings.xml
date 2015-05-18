@@ -32,6 +32,8 @@
     <string name="dropbox_app_secret">yj0gk3nipr6ti4u</string>
     <string name="db_scheme">db-id9ssazcpa41gys</string>
     <string name="updates">
+        v2.2\n
+        - Microsoft OneDrive support\n\n
         v2.1.3\n
         - Better cleanup of data files when they are no longer needed\n\n
         v2.1.2\n

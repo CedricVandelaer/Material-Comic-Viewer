@@ -146,7 +146,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                         e.printStackTrace();
                     }
 
-                    CloudService newOneDrive = new CloudService("OneDrive",
+                    CloudService newOneDrive = new CloudService(getString(R.string.cloud_storage_3),
                             token,
                             name
                             , email);
@@ -189,7 +189,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                     String userName = "User";
                     String email = "Email";
-                    String service = "Dropbox";
+                    String service = getString(R.string.cloud_storage_1);
 
                     try {
                         userName = mDBApi.accountInfo().displayName;
