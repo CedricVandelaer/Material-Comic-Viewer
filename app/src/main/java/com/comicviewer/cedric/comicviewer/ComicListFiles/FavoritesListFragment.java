@@ -422,7 +422,7 @@ public class FavoritesListFragment extends Fragment {
 
         if (mSearchComicsTask != null)
         {
-            mSearchComicsTask.cancel(true);
+            mSearchComicsTask.cancel(false);
         }
     }
 

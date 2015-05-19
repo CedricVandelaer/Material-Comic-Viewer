@@ -202,7 +202,7 @@ public class ComicListFragment extends Fragment {
     public void refresh()
     {
         if (mSearchComicsTask!=null) {
-            mSearchComicsTask.cancel(true);
+            mSearchComicsTask.cancel(false);
         }
 
         mAdapter.clearList();
@@ -361,7 +361,7 @@ public class ComicListFragment extends Fragment {
 
         if (mSearchComicsTask != null)
         {
-            mSearchComicsTask.cancel(true);
+            mSearchComicsTask.cancel(false);
         }
 
         enableSearchBar(false);
