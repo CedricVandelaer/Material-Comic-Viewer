@@ -286,7 +286,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                     addDropboxAccount();
                                 else if (text.equals(getString(R.string.cloud_storage_3)))
                                 {
-                                    Iterable<String> scopes = Arrays.asList("wl.signin", "wl.basic", "wl.emails");
+                                    Iterable<String> scopes = Arrays.asList("wl.signin", "wl.basic","wl.skydrive", "wl.emails");
                                     mOneDriveAuth.login(getActivity(), scopes, CloudFragment.this);
                                 }
                             }

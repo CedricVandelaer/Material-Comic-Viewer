@@ -57,7 +57,9 @@
 
     <string name="updates">
         v2.2\n
-        - Microsoft OneDrive support\n\n
+        - Microsoft OneDrive support\n
+        - Reload comics\n
+        - Bugfixes\n\n
         v2.1.3\n
         - Better cleanup of data files when they are no longer needed\n\n
         v2.1.2\n
