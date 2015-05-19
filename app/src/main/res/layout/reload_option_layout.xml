@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/reload_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_refresh"
+        android:adjustViewBounds="true"
+        android:layout_margin="16dp"
+        fab:fab_type="normal"
+        fab:fab_shadow="true"
+        fab:fab_colorNormal="@color/Cyan"
+        fab:fab_colorPressed="@color/CyanDark"
+        fab:fab_colorRipple="@color/CyanLight" />
+    <TextView
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:id="@+id/reload_text"
+        android:text="Reload comic"
+        android:textAllCaps="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>

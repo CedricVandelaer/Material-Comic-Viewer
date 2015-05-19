@@ -37,21 +37,15 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected ImageView mFavoriteButton;
     protected ImageView mMangaPicture;
     protected SwipeLayout mSwipeLayout;
-    //protected FloatingActionButton mDeleteButton;
     protected FloatingActionButton mMarkReadButton;
-    //protected FloatingActionButton mMarkUnreadButton;
     protected FloatingActionButton mOptionsButton;
     protected FloatingActionButton mMangaButton;
 
-    //protected TextView mDeleteTextView;
     protected TextView mMarkReadTextView;
-    //protected TextView mMarkUnreadTextView;
     protected TextView mOptionsTextView;
     protected TextView mMangaTextView;
 
-    //protected LinearLayout mDeleteButtonLayout;
     protected LinearLayout mMarkReadButtonLayout;
-    //protected LinearLayout mMarkUnreadButtonLayout;
     protected LinearLayout mOptionsLayout;
     protected LinearLayout mMangaLayout;
 

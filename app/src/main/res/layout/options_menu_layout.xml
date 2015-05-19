@@ -6,5 +6,6 @@
     <include layout="@layout/normal_option_layout"></include>
     <include layout="@layout/unread_option_layout"></include>
     <include layout="@layout/info_layout"></include>
+    <include layout="@layout/reload_option_layout"></include>
     <include layout="@layout/delete_option_layout"></include>
 </LinearLayout>

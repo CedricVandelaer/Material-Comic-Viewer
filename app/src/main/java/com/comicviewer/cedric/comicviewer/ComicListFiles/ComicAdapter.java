@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.ComicActions;
+import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Info.InfoActivity;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
@@ -378,9 +379,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
 
             if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG)) {
-                //comicItemViewHolder.mMarkUnreadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
                 comicItemViewHolder.mMarkReadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
-                //comicItemViewHolder.mDeleteTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
                 comicItemViewHolder.mOptionsTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
                 comicItemViewHolder.mMangaTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
             }
@@ -478,16 +477,64 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                         FloatingActionButton markUnreadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.mark_unread_button);
                         FloatingActionButton normalButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.normal_button);
                         FloatingActionButton infoButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.info_button);
+                        FloatingActionButton reloadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.reload_button);
 
                         addDeleteButtonClickListener(dialog, deleteButton, vh.getComic());
                         addNormalComicClickListener(dialog, normalButton, vh.getComic());
                         addMarkUnreadClickListener(dialog, markUnreadButton, vh.getComic());
                         addInfoClickListener(dialog, infoButton, vh,  vh.getComic());
+                        addReloadClickListener(dialog, reloadButton, vh.getComic());
                     }
                 }, 300);
 
             }
         });
+    }
+
+    private void addReloadClickListener(final MaterialDialog dialog, View v, final Comic comic)
+    {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                new ReloadComicTask().execute(comic);
+            }
+        });
+    }
+
+    private class ReloadComicTask extends AsyncTask
+    {
+        MaterialDialog mDialog;
+        @Override
+        public void onPreExecute()
+        {
+            mDialog = new MaterialDialog.Builder(mContext).title("Reloading comic")
+                    .content("Please be patient while the app updates the comic data.")
+                    .cancelable(false)
+                    .progress(true,1,false)
+                    .show();
+        }
+
+        @Override
+        public Object doInBackground(Object[] params)
+        {
+            Comic comic = (Comic) params[0];
+            Integer pos = mComicList.indexOf(comic);
+
+            ComicLoader.loadComicSync(mContext, comic);
+
+            return pos;
+        }
+
+        @Override
+        public void onPostExecute(Object object)
+        {
+            if (mDialog!=null)
+                mDialog.dismiss();
+            Integer pos = (Integer) object;
+            notifyItemChanged(pos);
+        }
     }
 
     private void addNormalComicClickListener(final MaterialDialog dialog, View v, final Comic comic)
