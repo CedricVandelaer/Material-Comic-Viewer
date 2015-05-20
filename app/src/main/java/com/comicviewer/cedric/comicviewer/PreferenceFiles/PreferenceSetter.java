@@ -49,9 +49,63 @@ public class PreferenceSetter {
     public static final String APP_THEME_COLOR = "appThemeColor";
     public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
     public static final String MANGA_SETTING = "mangaEnabled";
+    public static final String UNHIDE_LIST = "unhideListSetting";
+
+    public static void addHiddenPath(Context context, String path)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String csvList = prefs.getString(UNHIDE_LIST, "");
+
+        csvList+=","+path;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(UNHIDE_LIST, csvList);
+        editor.apply();
+    }
+
+    public static void removeHiddenPath(Context context, String path)
+    {
+        ArrayList<String> paths = getHiddenFiles(context);
+        String csvList = "";
+
+        for (int i=0;i<paths.size();i++)
+        {
+            if (!paths.get(i).equals(path))
+                csvList+=","+paths.get(i);
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(UNHIDE_LIST, csvList);
+        editor.apply();
+    }
+
+    public static ArrayList<String> getHiddenFiles(Context context)
+    {
+        ArrayList<String> hiddenList = new ArrayList<>();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String csvList = prefs.getString(UNHIDE_LIST, "");
+
+        String[] parts = csvList.split(",");
+
+        for (int i=0;i<parts.length;i++)
+        {
+            if (!parts[i].equals(""))
+            {
+                hiddenList.add(parts[i]);
+            }
+        }
+
+        return hiddenList;
+    }
 
     public static void renamePaths(Context context, String originalPath, String newPath)
     {
+        if (getHiddenFiles(context).contains(originalPath)) {
+            removeHiddenPath(context, originalPath);
+            addHiddenPath(context, newPath);
+        }
+
         ArrayList<String> excludedPaths = getExcludedPaths(context);
         for (int i=0;i<excludedPaths.size();i++)
         {

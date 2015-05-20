@@ -120,28 +120,12 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
 
         mOneDriveAuth.initialize(scopes, this, userState, mCloudService.getToken());
 
-        mDBApi = new DropboxAPI<AndroidAuthSession>(session);
-
-        if (mDBApi.getSession().authenticationSuccessful()) {
-            String token = mDBApi.getSession().finishAuthentication();
-            mCloudService.setToken(token);
-            PreferenceSetter.saveCloudService(this, mCloudService);
-        }
-
-        if (mDBApi.getSession().isLinked()) {
-            new RetrieveFilesTask().execute();
-        }
-        else
-        {
-            mDBApi.getSession().startOAuth2Authentication(this);
-        }
 
     }
 
     public void refresh()
     {
         mAdapter.clear();
-        new RetrieveFilesTask().execute();
     }
 
     @Override
@@ -160,9 +144,6 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
         super.onResume();
         PreferenceSetter.setBackgroundColorPreference(this);
 
-        if (!mDBApi.getSession().authenticationSuccessful()) {
-            new AddDropboxUserInfoTask().execute();
-        }
     }
 
     @Override
@@ -175,89 +156,6 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
 
     }
 
-    private class RetrieveFilesTask extends AsyncTask
-    {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(true);
-                }
-            });
-
-            DropboxAPI.Entry existingEntry = null;
-
-            try {
-                existingEntry = mDBApi.metadata(NavigationManager.getInstance().getPathFromCloudStack(), 1000, null, true, null);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            if (existingEntry!=null) {
-                Log.d("RetrieveFileTask", existingEntry.path);
-
-                List<DropboxAPI.Entry> entryList = existingEntry.contents;
-
-                Collections.sort(entryList, new Comparator<DropboxAPI.Entry>() {
-                    @Override
-                    public int compare(DropboxAPI.Entry lhs, DropboxAPI.Entry rhs) {
-                        return lhs.fileName().compareToIgnoreCase(rhs.fileName());
-                    }
-                });
-
-                for (int i=0;i<entryList.size();i++) {
-
-                    if (entryList.get(i).isDir)
-                        mAdapter.addDropBoxEntry(entryList.get(i));
-                }
-
-                for (int i=0;i<entryList.size();i++) {
-
-                    if (Utilities.checkExtension(entryList.get(i).fileName()))
-                        mAdapter.addDropBoxEntry(entryList.get(i));
-                }
-
-
-            }
-
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
-            });
-
-            return null;
-        }
-
-        @Override
-        public void onPostExecute(Object object)
-        {
-            if (mAdapter.getItemCount()==0)
-            {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mErrorTextView.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-            else
-            {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mErrorTextView.setVisibility(View.GONE);
-                    }
-                });
-            }
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -265,49 +163,6 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
     }
 
 
-    private class AddDropboxUserInfoTask extends AsyncTask
-    {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            if (mDBApi != null &&
-                    mDBApi.getSession()!=null &&
-                    mDBApi.getSession().authenticationSuccessful() &&
-                    mDBApi.getSession().isLinked()) {
-                try {
-                    // Required to complete auth, sets the access token on the session
-                    mDBApi.getSession().finishAuthentication();
-
-                    String userName = "User";
-                    String email = "Email";
-                    String service = "Dropbox";
-
-                    try {
-                        userName = mDBApi.accountInfo().displayName;
-                        email = mDBApi.accountInfo().email;
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-
-                    String accessToken = mDBApi.getSession().getOAuth2AccessToken();
-                    CloudService cloudService = new CloudService(service, accessToken, userName, email);
-
-                    PreferenceSetter.removeCloudService(DropboxActivity.this, cloudService.getEmail(), cloudService.getName());
-
-                    PreferenceSetter.saveCloudService(DropboxActivity.this, cloudService);
-
-
-                } catch (IllegalStateException e) {
-                    Log.i("DbAuthLog", "Error authenticating", e);
-                }
-            }
-            return null;
-        }
-    }
 
     private class SetTaskDescriptionTask extends AsyncTask
     {
@@ -316,7 +171,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
         protected Object doInBackground(Object[] params) {
 
             if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(DropboxActivity.this).build();
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(OneDriveActivity.this).build();
                 ImageLoader.getInstance().init(config);
             }
 
@@ -327,7 +182,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
                     ImageSize size = new ImageSize(64, 64);
                     tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
                             ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            PreferenceSetter.getAppThemeColor(DropboxActivity.this));
+                            PreferenceSetter.getAppThemeColor(OneDriveActivity.this));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

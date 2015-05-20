@@ -86,23 +86,6 @@ public class DropboxAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 final DropboxAPI.Entry entry = cloudFolderViewHolder.getDropboxEntry();
 
-                /*
-                MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title("Download file")
-                        .content("Do you wish to download the folder \""+entry.fileName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .positiveText("Confirm")
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .negativeText("Cancel")
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                super.onPositive(dialog);
-                                Toast.makeText(mActivity,"Download started...",Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry.path, mCloudService);
-                            }
-                        }).show();
-                        */
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
                         .title("Notice")
                         .content("Downloading folders is only available in the pro version.")

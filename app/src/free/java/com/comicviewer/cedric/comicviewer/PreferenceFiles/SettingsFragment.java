@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.ListPreference;
+import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -66,6 +67,22 @@ public class SettingsFragment extends PreferenceFragment{
         if (Build.VERSION.SDK_INT>20)
             getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
 
+    }
+
+    private void addUnhidePreference()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
+
+        MultiSelectListPreference unhideListPreference = new MultiSelectListPreference(getActivity());
+
+
+
+
+        unhideListPreference.setKey(PreferenceSetter.UNHIDE_LIST);
+        unhideListPreference.setTitle("Unhide comics and folders");
+        
+
+        targetCategory.addPreference(unhideListPreference);
     }
 
     private void addMangaPreference()
