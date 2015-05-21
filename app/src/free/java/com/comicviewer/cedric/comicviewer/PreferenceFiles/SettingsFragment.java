@@ -48,9 +48,11 @@ public class SettingsFragment extends PreferenceFragment{
 
 
         addRemovePathsPreference();
+        addUnhidePreference();
         addAppThemeSettings();
         addFileFormatSettings();
         addMangaPreference();
+
 
         PreferenceCategory functionCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
         Preference goProPreference = new Preference(getActivity());
@@ -93,6 +95,7 @@ public class SettingsFragment extends PreferenceFragment{
         unhideListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
+
                 List<CharSequence> selected = Arrays.asList((CharSequence[]) newValue);
 
                 for (int i=0;i<selected.size();i++)

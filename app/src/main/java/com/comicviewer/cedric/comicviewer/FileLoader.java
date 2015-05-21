@@ -10,6 +10,8 @@ import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -49,18 +51,42 @@ public class FileLoader {
                 filepaths.remove(path);
         }
 
+        ArrayList<String> hiddenFiles = PreferenceSetter.getHiddenFiles(context);
+
         if (folder.equals("root"))
         {
             Map<String,String> map = new HashMap<>();
+
             for (int i=0;i<filepaths.size();i++)
             {
-                File addedFolder = new File(filepaths.get(i));
-                map.put(addedFolder.getName(),new File(addedFolder.getParent()).getAbsolutePath());
+                // don't add hidden files
+                if (!hiddenFiles.contains(filepaths.get(i))) {
+                    File addedFolder = new File(filepaths.get(i));
+                    map.put(addedFolder.getName(), new File(addedFolder.getParent()).getAbsolutePath());
+                }
             }
             return map;
         }
 
         Map<String,String> map = findFilesAndFoldersInPaths(filepaths);
+
+
+        //remove hidden files and folders
+        Iterator iterator = map.keySet().iterator();
+        List<String> keys = new ArrayList<String>();
+
+        while(iterator.hasNext()) {
+            keys.add((String)iterator.next());
+        }
+        for (int i=0;i<keys.size();i++)
+        {
+            String str = keys.get(i);
+            String path = map.get(str)+"/"+str;
+            if (hiddenFiles.contains(path))
+            {
+                map.remove(str);
+            }
+        }
 
         long endTime = System.currentTimeMillis();
 
@@ -72,6 +98,7 @@ public class FileLoader {
     public static Map<String, String> searchComics(Context context) {
 
         String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ComicViewer";
+        ArrayList<String> hiddenFiles = PreferenceSetter.getHiddenFiles(context);
 
         File defaultPathFile = new File(defaultPath);
         if (!defaultPathFile.exists())
@@ -86,7 +113,33 @@ public class FileLoader {
 
         ArrayList<String> subFolders = searchSubFolders(filepaths, excludedPaths);
 
+        //remove hidden folders
+        for (int i=0;i<hiddenFiles.size();i++)
+        {
+            if (subFolders.contains(hiddenFiles.get(i)))
+            {
+                subFolders.remove(hiddenFiles.get(i));
+            }
+        }
+
         Map<String,String> map = findFilesInPaths(subFolders);
+
+        //remove hidden files and folders
+        Iterator iterator = map.keySet().iterator();
+        List<String> keys = new ArrayList<String>();
+
+        while(iterator.hasNext()) {
+            keys.add((String)iterator.next());
+        }
+        for (int i=0;i<keys.size();i++)
+        {
+            String str = keys.get(i);
+            String path = map.get(str)+"/"+str;
+            if (hiddenFiles.contains(path))
+            {
+                map.remove(str);
+            }
+        }
 
         long endTime = System.currentTimeMillis();
 
