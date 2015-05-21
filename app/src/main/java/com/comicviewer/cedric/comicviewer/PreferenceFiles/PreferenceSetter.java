@@ -439,7 +439,7 @@ public class PreferenceSetter {
 
         while (prefs.getString("CloudService "+j,null)!=null)
         {
-            editor.remove("CloudService "+j);
+            editor.remove("CloudService " + j);
             j++;
         }
 
@@ -485,7 +485,7 @@ public class PreferenceSetter {
     public static int getAppThemeColor(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String color = prefs.getString(APP_THEME_COLOR,""+context.getResources().getColor(R.color.Teal));
+        String color = prefs.getString(APP_THEME_COLOR, "" + context.getResources().getColor(R.color.Teal));
         return Integer.parseInt(color);
     }
 
@@ -507,7 +507,7 @@ public class PreferenceSetter {
         editor.putString(SERIES_PAGES_READ_LIST,"");
         editor.putString(PAGES_READ_LIST,"");
         editor.putInt(NUMBER_OF_COMICS_READ,0);
-        editor.putInt(NUMBER_OF_COMICS_STARTED,0);
+        editor.putInt(NUMBER_OF_COMICS_STARTED, 0);
         editor.apply();
     }
 
@@ -515,7 +515,7 @@ public class PreferenceSetter {
     public static int getLongestReadComicPages(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String longestReadString = prefs.getString(LONGEST_READ_COMIC,"comicFileName,0,comicTitle,comicIssueNumber");
+        String longestReadString = prefs.getString(LONGEST_READ_COMIC, "comicFileName,0,comicTitle,comicIssueNumber");
 
         return Integer.parseInt(longestReadString.split(",")[1]);
     }
@@ -879,14 +879,14 @@ public class PreferenceSetter {
     public static int getNumberOfComicsRead(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getInt(NUMBER_OF_COMICS_READ,0);
+        return prefs.getInt(NUMBER_OF_COMICS_READ, 0);
     }
 
     public static boolean usesRecents(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return prefs.getBoolean(USES_RECENTS,true);
+        return prefs.getBoolean(USES_RECENTS, true);
     }
 
     public static List<String> getFavoriteComics(Context context)
@@ -970,7 +970,7 @@ public class PreferenceSetter {
 
         while (prefs.getString("Comic "+i, null)!=null)
         {
-            comicList.add(Comic.create(prefs.getString("Comic "+i,null)));
+            comicList.add(Comic.create(prefs.getString("Comic " + i, null)));
             i++;
         }
 
@@ -1113,6 +1113,26 @@ public class PreferenceSetter {
         }
         
         return color;
+    }
+
+    public static void removeFilePath(Context context, String path)
+    {
+        String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ComicViewer";
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String csvList = prefs.getString(FILEPATHS, defaultPath);
+        String[] parts = csvList.split(",");
+
+        String newList = "";
+
+        for (int i=0;i<parts.length;i++)
+        {
+            if (!parts[i].equals(path) || parts[i].equals(defaultPath))
+                newList+= path + ",";
+        }
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(FILEPATHS, newList);
+        editor.apply();
     }
 
     public static ArrayList<String> getFilePathsFromPreferences(Context context) {

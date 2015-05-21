@@ -19,6 +19,8 @@ import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.widgets.Dialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -56,8 +58,8 @@ public class SettingsFragment extends PreferenceFragment{
         goProPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro") );
-                startActivity( browse );
+                Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro"));
+                startActivity(browse);
                 return false;
             }
         });
@@ -75,12 +77,32 @@ public class SettingsFragment extends PreferenceFragment{
 
         MultiSelectListPreference unhideListPreference = new MultiSelectListPreference(getActivity());
 
+        ArrayList<String> hiddenPaths = PreferenceSetter.getHiddenFiles(getActivity());
 
+        CharSequence[] entries = new CharSequence[hiddenPaths.size()];
 
+        for (int i=0;i<entries.length;i++)
+        {
+            entries[i] = hiddenPaths.get(i);
+        }
 
         unhideListPreference.setKey(PreferenceSetter.UNHIDE_LIST);
         unhideListPreference.setTitle("Unhide comics and folders");
-        
+        unhideListPreference.setEntries(entries);
+        unhideListPreference.setEntryValues(entries);
+        unhideListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                List<CharSequence> selected = Arrays.asList((CharSequence[]) newValue);
+
+                for (int i=0;i<selected.size();i++)
+                {
+                    PreferenceSetter.removeHiddenPath(getActivity(), selected.get(i).toString());
+                }
+
+                return true;
+            }
+        });
 
         targetCategory.addPreference(unhideListPreference);
     }

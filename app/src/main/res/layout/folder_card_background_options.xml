@@ -62,4 +62,32 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/hide_layout"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:layout_height="match_parent">
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/hide_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_eye_off"
+            android:adjustViewBounds="true"
+            android:layout_margin="16dp"
+            fab:fab_type="normal"
+            fab:fab_shadow="true"
+            fab:fab_colorNormal="#222222"
+            fab:fab_colorPressed="#000000"
+            fab:fab_colorRipple="#444444"/>
+        <TextView
+            android:gravity="center"
+            android:id="@+id/hide_text"
+            android:text="Hide"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
 </LinearLayout>

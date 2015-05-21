@@ -26,6 +26,8 @@ public class FolderItemViewHolder extends RecyclerView.ViewHolder {
     protected FloatingActionButton mDeleteButton;
     protected TextView mRenameTextView;
     protected FloatingActionButton mRenameButton;
+    protected FloatingActionButton mHideButton;
+    protected TextView mHideTextView;
 
     protected File mFile = null;
 
@@ -40,6 +42,8 @@ public class FolderItemViewHolder extends RecyclerView.ViewHolder {
         mFolderTitleTextView = (TextView) itemView.findViewById(R.id.folder_title_text_view);
         mRenameTextView = (TextView) itemView.findViewById(R.id.rename_text);
         mRenameButton = (FloatingActionButton) itemView.findViewById(R.id.rename_button);
+        mHideButton = (FloatingActionButton) itemView.findViewById(R.id.hide_button);
+        mHideTextView = (TextView) itemView.findViewById(R.id.hide_text);
     }
 
     public void setFile(File file)

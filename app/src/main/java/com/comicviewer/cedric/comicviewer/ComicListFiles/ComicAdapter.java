@@ -170,6 +170,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             addFolderClickListener(folderItemViewHolder);
             addFolderDeleteClickListener(folderItemViewHolder);
             addFolderRenameClickListener(folderItemViewHolder);
+            addFolderHideClickListener(folderItemViewHolder.mHideButton, folderItemViewHolder);
             return folderItemViewHolder;
         }
     }
@@ -434,6 +435,9 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG)) {
 
             folderItemViewHolder.mDeleteTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            folderItemViewHolder.mRenameTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            folderItemViewHolder.mHideTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+
         }
 
         setAnimation(folderItemViewHolder.mCardView, i);
@@ -454,6 +458,21 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
 
         return -1;
+    }
+
+    private void addFolderHideClickListener(View v, final FolderItemViewHolder vh)
+    {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                PreferenceSetter.addHiddenPath(mContext, vh.getFile().getAbsolutePath());
+                PreferenceSetter.removeFilePath(mContext, vh.getFile().getAbsolutePath());
+                int pos = mComicList.indexOf(vh.getFile());
+                mComicList.remove(vh.getFile());
+                notifyItemRemoved(pos);
+            }
+        });
     }
 
     private void addOptionsClickListener(final ComicItemViewHolder vh)
@@ -477,16 +496,34 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                         FloatingActionButton markUnreadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.mark_unread_button);
                         FloatingActionButton normalButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.normal_button);
                         FloatingActionButton infoButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.info_button);
+                        FloatingActionButton hideButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.hide_button);
                         FloatingActionButton reloadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.reload_button);
 
                         addDeleteButtonClickListener(dialog, deleteButton, vh.getComic());
                         addNormalComicClickListener(dialog, normalButton, vh.getComic());
                         addMarkUnreadClickListener(dialog, markUnreadButton, vh.getComic());
-                        addInfoClickListener(dialog, infoButton, vh,  vh.getComic());
+                        addInfoClickListener(dialog, infoButton, vh, vh.getComic());
                         addReloadClickListener(dialog, reloadButton, vh.getComic());
+                        addHideClickListener(dialog, hideButton, vh.getComic());
                     }
                 }, 300);
 
+            }
+        });
+    }
+
+    private void addHideClickListener(final MaterialDialog dialog, View v, final Comic comic)
+    {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                PreferenceSetter.addHiddenPath(mContext, comic.getFilePath() + "/" + comic.getFileName());
+                PreferenceSetter.removeFilePath(mContext, comic.getFilePath() + "/" + comic.getFileName());
+                int pos = mComicList.indexOf(comic);
+                mComicList.remove(comic);
+                notifyItemRemoved(pos);
             }
         });
     }
