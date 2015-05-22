@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -694,7 +695,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                         int pos = mComicList.indexOf(comic);
                         notifyItemChanged(pos);
                     }
-                },300);
+                }, 300);
             }
         });
 
@@ -707,12 +708,9 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PreferenceSetter.getFavoriteComics(mContext).contains(vh.getComic().getFileName()))
-                {
+                if (PreferenceSetter.getFavoriteComics(mContext).contains(vh.getComic().getFileName())) {
                     PreferenceSetter.removeFavoriteComic(mContext, vh.getComic().getFileName());
-                }
-                else
-                {
+                } else {
                     PreferenceSetter.saveFavoriteComic(mContext, vh.getComic().getFileName());
                 }
                 notifyItemChanged(vh.getPosition());
@@ -873,8 +871,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         else
         {
             ImageLoader.getInstance().displayImage(comic.getCoverImage(), comicItemViewHolder.mCoverPicture, mImageOptions);
-
         }
+
 
     }
 

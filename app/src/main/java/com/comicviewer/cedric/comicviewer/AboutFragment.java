@@ -55,7 +55,8 @@ public class AboutFragment extends Fragment {
         ImageView meview = (ImageView)v.findViewById(R.id.me_drawable);
 
         mVersionTextView = (TextView) v.findViewById(R.id.version_textview);
-        mVersionTextView.setText(getActivity().getResources().getString(R.string.app_name)+" v"+ getPackageInfo().versionName);
+        mVersionTextView.setText(getActivity().getResources().getString(R.string.app_name)+" v"+ getPackageInfo().versionName+
+        "\n\n"+getString(R.string.updates));
         
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(getActivity());

@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.CurrentlyReadingFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
@@ -35,7 +36,7 @@ import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionLis
  */
 public class DrawerActivity extends MaterialNavigationDrawer implements ComicListFragment.OnFragmentInteractionListener,
 AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInteractionListener, StatisticsFragment.OnFragmentInteractionListener,
-        CloudFragment.OnFragmentInteractionListener
+        CloudFragment.OnFragmentInteractionListener, CurrentlyReadingFragment.OnFragmentInteractionListener
 {
 
     MaterialSection[] mSectionsArray;
@@ -50,7 +51,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         new SimpleEula(this).show();
         new SetTaskDescriptionTask().execute();
 
-        mSectionsArray = new MaterialSection[6];
+        mSectionsArray = new MaterialSection[7];
 
         this.disableLearningPattern();
         this.setBackPattern(BACKPATTERN_CUSTOM);
@@ -70,25 +71,29 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         mSectionsArray[0] = allComicsSection;
         addSection(allComicsSection);
 
+        MaterialSection currentlyReadingSection = newSection("Currently reading", R.drawable.last_read, CurrentlyReadingFragment.getInstance());
+        mSectionsArray[1] = currentlyReadingSection;
+        addSection(currentlyReadingSection);
+
         MaterialSection favoritesSection = newSection("Favorites", R.drawable.star, FavoritesListFragment.getInstance());
-        mSectionsArray[1] = favoritesSection;
+        mSectionsArray[2] = favoritesSection;
         addSection(favoritesSection);
 
         CloudFragment.getInstance().setRetainInstance(true);
         MaterialSection cloudSection = newSection("Cloud storage", R.drawable.cloud, CloudFragment.getInstance());
-        mSectionsArray[2] = cloudSection;
+        mSectionsArray[3] = cloudSection;
         addSection(cloudSection);
 
         MaterialSection statsSection = newSection("Statistics", R.drawable.stats, StatisticsFragment.newInstance());
-        mSectionsArray[3] = statsSection;
+        mSectionsArray[4] = statsSection;
         addSection(statsSection);
 
         MaterialSection settingsSection = newSection("Settings", R.drawable.settings, SettingsFragment.newInstance());
-        mSectionsArray[4] = settingsSection;
+        mSectionsArray[5] = settingsSection;
         addBottomSection(settingsSection);
         
         MaterialSection aboutSection = newSection("About", R.drawable.about, AboutFragment.newInstance());
-        mSectionsArray[5] = aboutSection;
+        mSectionsArray[6] = aboutSection;
         addBottomSection(aboutSection);
 
         NavigationManager.getInstance().pushToSectionStack(mSectionsArray[0]);
@@ -112,6 +117,8 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
     {
         if (materialSection.getTitle().equals("All comics"))
             return ComicListFragment.getInstance();
+        else if (materialSection.getTitle().equals("Currently reading"))
+            return CurrentlyReadingFragment.getInstance();
         else if (materialSection.getTitle().equals("Favorites"))
             return FavoritesListFragment.getInstance();
         else if (materialSection.getTitle().equals("Cloud storage"))
