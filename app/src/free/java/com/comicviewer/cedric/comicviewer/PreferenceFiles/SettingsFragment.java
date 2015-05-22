@@ -52,6 +52,7 @@ public class SettingsFragment extends PreferenceFragment{
         addAppThemeSettings();
         addFileFormatSettings();
         addMangaPreference();
+        disableVolumeKeyPreference();
 
 
         PreferenceCategory functionCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
@@ -79,43 +80,15 @@ public class SettingsFragment extends PreferenceFragment{
 
         Preference unhideListPreference = new Preference(getActivity());
 
-        unhideListPreference.setTitle("Unhide comics and folders");
+        unhideListPreference.setTitle("Unhide comics and folders (PRO)");
 
         unhideListPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-
-                ArrayList<String> hiddenPaths = PreferenceSetter.getHiddenFiles(getActivity());
-
-                CharSequence[] charSequences = new CharSequence[hiddenPaths.size()];
-
-                for (int i = 0; i < charSequences.length; i++) {
-                    charSequences[i] = hiddenPaths.get(i);
-                }
-
-                new MaterialDialog.Builder(getActivity())
-                        .title("Unhide files")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .positiveText("Unhide")
-                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .negativeText("Cancel")
-                        .items(charSequences)
-                        .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
-                                materialDialog.dismiss();
-                                for (int i = 0; i < charSequences.length; i++) {
-                                    PreferenceSetter.removeHiddenPath(getActivity(), charSequences[i].toString());
-                                }
-
-                                return false;
-                            }
-                        }).show();
+                showBuyProDialog();
                 return true;
             }
         });
-
-
 
         targetCategory.addPreference(unhideListPreference);
     }
@@ -124,16 +97,21 @@ public class SettingsFragment extends PreferenceFragment{
     {
         PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
 
-        CustomCheckBoxPreference mangaPreference = new CustomCheckBoxPreference(getActivity());
-
-
+        final CustomCheckBoxPreference mangaPreference = new CustomCheckBoxPreference(getActivity());
 
         mangaPreference.setKey(PreferenceSetter.MANGA_SETTING);
         mangaPreference.setSummary("Note: By checking this option comics will open in manga modus by default");
         mangaPreference.setTitle("Manga modus (PRO)");
         mangaPreference.setDefaultValue(false);
 
-        mangaPreference.setEnabled(false);
+        mangaPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                showBuyProDialog();
+                mangaPreference.setChecked(!mangaPreference.isChecked());
+                return true;
+            }
+        });
 
         targetCategory.addPreference(mangaPreference);
     }
@@ -151,23 +129,9 @@ public class SettingsFragment extends PreferenceFragment{
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                        .title("Notice")
-                        .content("This feature requires the pro version of the app.")
-                        .negativeText("Cancel")
-                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .positiveText("Go to play store")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                super.onPositive(dialog);
-                                Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro"));
-                                startActivity(browse);
-                            }
-                        }).show();
+                showBuyProDialog();
 
-                return false;
+                return true;
             }
         });
 
@@ -188,27 +152,27 @@ public class SettingsFragment extends PreferenceFragment{
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                        .title("Notice")
-                        .content("This feature requires the pro version of the app.")
-                        .negativeText("Cancel")
-                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .positiveText("Go to play store")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                super.onPositive(dialog);
-                                Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro") );
-                                startActivity(browse);
-                            }
-                        }).show();
-
-                return false;
+                showBuyProDialog();
+                return true;
             }
         });
 
         targetCategory.addPreference(preference);
+
+    }
+
+    private void disableVolumeKeyPreference()
+    {
+        final CustomCheckBoxPreference volumePreference = (CustomCheckBoxPreference) findPreference("volumeKeysOption");
+        volumePreference.setTitle("Use volume keys to turn pages (PRO)");
+        volumePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                showBuyProDialog();
+                volumePreference.setChecked(!volumePreference.isChecked());
+                return true;
+            }
+        });
 
     }
 
@@ -265,6 +229,26 @@ public class SettingsFragment extends PreferenceFragment{
         PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
 
         targetCategory.addPreference(removePathsPreference);
+    }
+
+    public void showBuyProDialog()
+    {
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("Notice")
+                .content("This feature requires the pro version of the app.")
+                .negativeText("Cancel")
+                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                .positiveText("Go to play store")
+                .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro") );
+                        startActivity(browse);
+                    }
+                }).show();
+
     }
 
 }

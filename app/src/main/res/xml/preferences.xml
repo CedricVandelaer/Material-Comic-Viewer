@@ -48,6 +48,10 @@
             android:key="keepScreenOn"
             android:title="Keep screen on when reading comics"
             android:defaultValue="true"/>
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="volumeKeysOption"
+            android:title="Use volume keys to turn pages"
+            android:defaultValue="false"/>
         <ListPreference
             android:key="pageNumberSetting"
             android:title="Show page number"

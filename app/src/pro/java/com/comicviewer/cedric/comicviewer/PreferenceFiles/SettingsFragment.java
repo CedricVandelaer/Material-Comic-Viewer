@@ -42,6 +42,7 @@ public class SettingsFragment extends PreferenceFragment{
         addPreferencesFromResource(R.xml.preferences);
 
         addFilenameFormatSettings();
+        addUnhidePreference();
         addRemovePathsPreference();
         addAppThemeSettings();
         addMangaPreference();
@@ -149,46 +150,106 @@ public class SettingsFragment extends PreferenceFragment{
         targetCategory.addPreference(mangaPreference);
     }
 
+    private void addUnhidePreference()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
+
+        Preference unhideListPreference = new Preference(getActivity());
+
+        unhideListPreference.setTitle("Unhide comics and folders");
+
+        unhideListPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                ArrayList<String> hiddenPaths = PreferenceSetter.getHiddenFiles(getActivity());
+
+                CharSequence[] charSequences = new CharSequence[hiddenPaths.size()];
+
+                for (int i = 0; i < charSequences.length; i++) {
+                    charSequences[i] = hiddenPaths.get(i);
+                }
+
+                new MaterialDialog.Builder(getActivity())
+                        .title("Unhide files")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveText("Unhide")
+                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .negativeText("Cancel")
+                        .items(charSequences)
+                        .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                                materialDialog.dismiss();
+                                for (int i = 0; i < charSequences.length; i++) {
+                                    PreferenceSetter.removeHiddenPath(getActivity(), charSequences[i].toString());
+                                }
+
+                                return false;
+                            }
+                        }).show();
+                return true;
+            }
+        });
+
+
+
+        targetCategory.addPreference(unhideListPreference);
+    }
+
     private void addRemovePathsPreference()
     {
-        ArrayList<CharSequence> paths = new ArrayList<>();
-        ArrayList<CharSequence> excludedPaths = new ArrayList<>();
+        Preference removePathsPreference = new Preference(getActivity());
 
-        String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
+        removePathsPreference.setTitle("Remove added filepaths");
+        removePathsPreference.setSummary(getString(R.string.path_preference_summary));
 
 
-        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
-        ArrayList<String> excludedFilePaths = PreferenceSetter.getExcludedPaths(getActivity());
+        removePathsPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
 
-        for (int i=0;i<filePaths.size();i++)
-        {
-            if (excludedFilePaths.contains(filePaths.get(i)))
-                filePaths.remove(i);
-        }
-        if (!filePaths.contains(defaultPath))
-            filePaths.add(defaultPath);
+                final String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
+                ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+
+                if (!filePaths.contains(defaultPath))
+                    filePaths.add(defaultPath);
+
+                CharSequence[] charSequences = new CharSequence[filePaths.size()];
+
+                for (int i = 0; i < charSequences.length; i++) {
+                    charSequences[i] = filePaths.get(i);
+                }
+
+
+                new MaterialDialog.Builder(getActivity())
+                        .title("Remove filepaths")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveText("Remove")
+                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .negativeText("Cancel")
+                        .items(charSequences)
+                        .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                                materialDialog.dismiss();
+                                for (int i = 0; i < charSequences.length; i++) {
+                                    if (!charSequences.toString().equals(defaultPath))
+                                        PreferenceSetter.removeFilePath(getActivity(), charSequences[i].toString());
+                                }
+
+                                return false;
+                            }
+                        }).show();
+                return true;
+            }
+        });
 
 
         PreferenceCategory targetCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
 
-        CustomMultiSelectListPreference multiListPref = createListPreference(filePaths,filePaths);
-
-        targetCategory.addPreference(multiListPref);
+        targetCategory.addPreference(removePathsPreference);
     }
 
-    private CustomMultiSelectListPreference createListPreference(ArrayList<String> keys, ArrayList<String> values)
-    {
-        CustomMultiSelectListPreference listPref = new CustomMultiSelectListPreference(getActivity(),keys,values, "Choose paths to remove");
-        
-        listPref.setTitle("Remove added paths");
-        listPref.setSummary(getString(R.string.path_preference_summary));
-
-        listPref.setPositiveButtonText("Remove");
-        listPref.setNegativeButtonText("Cancel");
-        
-
-        return listPref;
-        
-    }
 
 }

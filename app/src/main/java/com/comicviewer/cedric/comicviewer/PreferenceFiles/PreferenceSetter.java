@@ -49,6 +49,13 @@ public class PreferenceSetter {
     public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
     public static final String MANGA_SETTING = "mangaEnabled";
     public static final String UNHIDE_LIST = "unhideListSetting";
+    public static final String VOLUME_KEY_OPTION = "volumeKeysOption";
+
+    public static boolean getVolumeKeyPreference(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(VOLUME_KEY_OPTION, false);
+    }
 
     public static void addHiddenPath(Context context, String path)
     {

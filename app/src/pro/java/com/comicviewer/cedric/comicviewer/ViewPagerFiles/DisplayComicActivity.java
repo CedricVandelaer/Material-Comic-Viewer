@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -58,7 +59,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
     private Handler mHandler;
 
-
+    private boolean mMangaComic = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,18 +101,18 @@ public class DisplayComicActivity extends FragmentActivity {
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
-        boolean isManga = false;
+        mMangaComic = false;
         if ((PreferenceSetter.getMangaSetting(this) && !PreferenceSetter.isNormalComic(this,mCurrentComic))
                 || (!(PreferenceSetter.getMangaSetting(this)) && PreferenceSetter.isMangaComic(this, mCurrentComic)))
         {
             mPager.setCurrentItem(mCurrentComic.getPageCount()-1);
-            isManga = true;
+            mMangaComic = true;
         }
         
         if (PreferenceSetter.getReadComics(this).containsKey(mCurrentComic.getFileName()))
         {
             lastReadPage = PreferenceSetter.getReadComics(this).get(mCurrentComic.getFileName());
-            if (isManga)
+            if (mMangaComic)
             {
                 mPager.setCurrentItem(mPageCount-1-lastReadPage);
             }
@@ -375,6 +376,56 @@ public class DisplayComicActivity extends FragmentActivity {
             finishAfterTransition();
         else
             finish();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+        int keyCode = event.getKeyCode();
+        int action = event.getAction();
+
+        if (PreferenceSetter.getVolumeKeyPreference(this) && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+        {
+            if (action == KeyEvent.ACTION_DOWN) {
+                int page = mPager.getCurrentItem();
+                if (mMangaComic) {
+                    page++;
+                    if (page >= 0 && page < mPageCount) {
+                        mPager.setCurrentItem(page);
+                    }
+                } else {
+                    page--;
+                    if (page >= 0 && page < mPageCount) {
+                        mPager.setCurrentItem(page);
+                    }
+                }
+            }
+
+            return true;
+
+        }
+        else if (PreferenceSetter.getVolumeKeyPreference(this) && keyCode == KeyEvent.KEYCODE_VOLUME_UP)
+        {
+            if (action == KeyEvent.ACTION_DOWN) {
+                int page = mPager.getCurrentItem();
+                if (mMangaComic) {
+                    page--;
+                    if (page >= 0 && page < mPageCount) {
+                        mPager.setCurrentItem(page);
+                    }
+                } else {
+                    page++;
+                    if (page >= 0 && page < mPageCount) {
+                        mPager.setCurrentItem(page);
+                    }
+                }
+            }
+            return true;
+        }
+        else
+        {
+            return super.dispatchKeyEvent(event);
+        }
     }
 
 }
