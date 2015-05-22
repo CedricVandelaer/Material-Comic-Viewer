@@ -467,7 +467,6 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             public void onClick(View v) {
 
                 PreferenceSetter.addHiddenPath(mContext, vh.getFile().getAbsolutePath());
-                PreferenceSetter.removeFilePath(mContext, vh.getFile().getAbsolutePath());
                 int pos = mComicList.indexOf(vh.getFile());
                 mComicList.remove(vh.getFile());
                 notifyItemRemoved(pos);
@@ -520,7 +519,6 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
                 dialog.dismiss();
                 PreferenceSetter.addHiddenPath(mContext, comic.getFilePath() + "/" + comic.getFileName());
-                PreferenceSetter.removeFilePath(mContext, comic.getFilePath() + "/" + comic.getFileName());
                 int pos = mComicList.indexOf(comic);
                 mComicList.remove(comic);
                 notifyItemRemoved(pos);

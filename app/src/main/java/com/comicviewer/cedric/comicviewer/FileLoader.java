@@ -24,8 +24,10 @@ public class FileLoader {
     public static Map<String, String> searchComicsAndFolders(Context context, String folder)
     {
         long startTime = System.currentTimeMillis();
+        //the deafault path
         String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ComicViewer";
 
+        // create the default path if not exists
         File defaultPathFile = new File(defaultPath);
         if (!defaultPathFile.exists())
         {
@@ -43,13 +45,6 @@ public class FileLoader {
             filepaths = new ArrayList<>();
             filepaths.add(folder);
         }
-        ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(context);
-
-        for (String path:excludedPaths)
-        {
-            if (filepaths.contains(path))
-                filepaths.remove(path);
-        }
 
         ArrayList<String> hiddenFiles = PreferenceSetter.getHiddenFiles(context);
 
@@ -59,9 +54,10 @@ public class FileLoader {
 
             for (int i=0;i<filepaths.size();i++)
             {
+                File addedFolder = new File(filepaths.get(i));
+                String path = new File(addedFolder.getParent()).getAbsolutePath()+"/"+addedFolder.getName();
                 // don't add hidden files
-                if (!hiddenFiles.contains(filepaths.get(i))) {
-                    File addedFolder = new File(filepaths.get(i));
+                if (!hiddenFiles.contains(path)) {
                     map.put(addedFolder.getName(), new File(addedFolder.getParent()).getAbsolutePath());
                 }
             }
@@ -108,10 +104,9 @@ public class FileLoader {
 
         long startTime = System.currentTimeMillis();
 
-        ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(context);
         ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
 
-        ArrayList<String> subFolders = searchSubFolders(filepaths, excludedPaths);
+        ArrayList<String> subFolders = searchSubFolders(filepaths);
 
         //remove hidden folders
         for (int i=0;i<hiddenFiles.size();i++)
@@ -237,7 +232,7 @@ public class FileLoader {
         return map;
     }
 
-    public static ArrayList<String> searchSubFolders(ArrayList<String> paths, ArrayList<String> excludedPaths)
+    public static ArrayList<String> searchSubFolders(ArrayList<String> paths)
     {
         ArrayList<String> allFoldersInPaths = new ArrayList<>();
 
@@ -245,19 +240,18 @@ public class FileLoader {
         {
             File root = new File(paths.get(i));
 
-            if (!excludedPaths.contains(paths.get(i))) {
 
-                if (root.isDirectory()) {
+            if (root.isDirectory()) {
 
-                    allFoldersInPaths.add(paths.get(i));
-                    File[] subFiles = root.listFiles();
-                    ArrayList<String> subFolders = new ArrayList<>();
+                allFoldersInPaths.add(paths.get(i));
+                File[] subFiles = root.listFiles();
+                ArrayList<String> subFolders = new ArrayList<>();
 
-                    for (int j = 0; j < subFiles.length; j++) {
-                        subFolders.add(subFiles[j].toString());
-                    }
-                    allFoldersInPaths.addAll(searchSubFolders(subFolders, excludedPaths));
+                for (int j = 0; j < subFiles.length; j++) {
+                    subFolders.add(subFiles[j].toString());
                 }
+                allFoldersInPaths.addAll(searchSubFolders(subFolders));
+
             }
 
         }
@@ -265,36 +259,4 @@ public class FileLoader {
         return allFoldersInPaths;
     }
 
-    public static void removeOldComics(Context context, ArrayList<Comic> comicList)
-    {
-
-        ArrayList<String> excludedpaths = PreferenceSetter.getExcludedPaths(context);
-        ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
-
-        ArrayList<String> subFolders = searchSubFolders(filepaths, excludedpaths);
-
-        Map<String,String> map = findFilesInPaths(subFolders);
-
-        //create treemap to sort the filenames
-        Map<String,String> treemap = new TreeMap(map);
-
-        for (int j=0;j<comicList.size();j++)
-        {
-            Comic comicToRemove = comicList.get(j);
-            boolean isInList = false;
-
-            for (int k=0;k<treemap.keySet().size();k++)
-            {
-                if (treemap.containsKey(comicToRemove.getFileName()))
-                {
-                    isInList=true;
-                }
-            }
-            if (!isInList)
-            {
-                comicList.remove(j);
-            }
-        }
-
-    }
 }

@@ -33,7 +33,6 @@ public class PreferenceSetter {
     private static final String READ_COMIC_LIST = "lastReadComicList";
     private static final String LAST_READ_COMIC = "lastReadComic";
     private static final String FILEPATHS = "Filepaths";
-    private static final String EXCLUDED_FILEPATHS = "Excludedpaths";
     private static final String CARD_SIZE = "cardSize";
     private static final String BACKGROUND_COLOR = "backgroundColor";
     private static final String COMICS_ADDED_LIST = "addedComicsList";
@@ -56,7 +55,7 @@ public class PreferenceSetter {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String csvList = prefs.getString(UNHIDE_LIST, "");
 
-        csvList+=","+path;
+        csvList+=path+",";
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(UNHIDE_LIST, csvList);
         editor.apply();
@@ -70,7 +69,7 @@ public class PreferenceSetter {
         for (int i=0;i<paths.size();i++)
         {
             if (!paths.get(i).equals(path))
-                csvList+=","+paths.get(i);
+                csvList+=paths.get(i)+",";
         }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -106,16 +105,6 @@ public class PreferenceSetter {
             addHiddenPath(context, newPath);
         }
 
-        ArrayList<String> excludedPaths = getExcludedPaths(context);
-        for (int i=0;i<excludedPaths.size();i++)
-        {
-            if (excludedPaths.get(i).equals(originalPath))
-            {
-                excludedPaths.remove(i);
-                excludedPaths.add(newPath);
-            }
-        }
-        saveExcludedFilePaths(context, excludedPaths);
 
         ArrayList<String> filePaths = getFilePathsFromPreferences(context);
         for (int i=0;i<filePaths.size();i++)
@@ -1147,21 +1136,6 @@ public class PreferenceSetter {
             paths.add(items[i]);
         }
 
-        //remove duplicates
-        for (int i=0;i<paths.size()-1;i++)
-        {
-            for (int j=i+1;j<paths.size();j++)
-            {
-                if (i!=j)
-                {
-                    if (paths.get(i).equals(paths.get(j)))
-                    {
-                        paths.remove(j);
-                    }
-                }
-            }
-        }
-
         if (!paths.contains(defaultPath))
             paths.add(defaultPath);
         if (paths.contains(""))
@@ -1170,46 +1144,6 @@ public class PreferenceSetter {
         return paths;
     }
 
-    public static ArrayList getExcludedPaths(Context context)
-    {
-        ArrayList<String> paths = new ArrayList<>();
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String csvList = prefs.getString(EXCLUDED_FILEPATHS, null);
-        String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
-
-        if (csvList!=null) {
-            String[] items = csvList.split(",");
-            for (int i = 0; i < items.length; i++) {
-                paths.add(items[i]);
-            }
-            //remove duplicates
-            for (int i = 0; i < paths.size() - 1; i++) {
-                for (int j = i + 1; j < paths.size(); j++) {
-                    if (i != j) {
-                        if (paths.get(i).equals(paths.get(j))) {
-                            paths.remove(j);
-                        }
-                    }
-                }
-            } 
-        }
-
-        if (paths.contains(defaultPath))
-            paths.remove(defaultPath);
-        if (paths.contains(""))
-            paths.remove("");
-
-        return paths;
-        
-    }
-
-    
-    public static void saveFilePaths(Context context, ArrayList<String> filepaths, ArrayList<String> excludedPaths)
-    {
-        saveFilePaths(context, filepaths);
-        saveExcludedFilePaths(context, excludedPaths);
-    }
 
     public static void saveFilePaths(Context context, ArrayList<String> filePaths)
     {
@@ -1221,24 +1155,6 @@ public class PreferenceSetter {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
         sharedPreferencesEditor.putString(FILEPATHS, csvList.toString());
-
-        sharedPreferencesEditor.apply();
-    }
-
-    public static void saveExcludedFilePaths(Context context, ArrayList<String> excludedFilePaths)
-    {
-        if (excludedFilePaths.contains(""))
-            excludedFilePaths.remove("");
-
-        StringBuilder csvList = new StringBuilder();
-        for(int i=0;i<excludedFilePaths.size();i++){
-            csvList.append(excludedFilePaths.get(i));
-            csvList.append(",");
-        }
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putString(EXCLUDED_FILEPATHS, csvList.toString());
 
         sharedPreferencesEditor.apply();
     }

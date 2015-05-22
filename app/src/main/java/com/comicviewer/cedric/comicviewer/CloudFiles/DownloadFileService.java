@@ -128,7 +128,6 @@ public class DownloadFileService extends IntentService {
                         renamedOutput.renameTo(output);
 
                         ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
-                        ArrayList<String> excludedpaths = PreferenceSetter.getExcludedPaths(DownloadFileService.this);
 
 
                         if (!filepaths.contains(dropboxDir.getAbsolutePath())) {
@@ -136,10 +135,6 @@ public class DownloadFileService extends IntentService {
                             PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
                         }
 
-                        if (excludedpaths.contains(dropboxDir.getAbsolutePath())) {
-                            excludedpaths.remove(dropboxDir.getAbsolutePath());
-                            PreferenceSetter.saveExcludedFilePaths(DownloadFileService.this, excludedpaths);
-                        }
 
                         setEndNotification(title, filePath, notificationId);
                     }
@@ -160,16 +155,10 @@ public class DownloadFileService extends IntentService {
                 else {
 
                     ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
-                    ArrayList<String> excludedpaths = PreferenceSetter.getExcludedPaths(DownloadFileService.this);
 
                     if (!filepaths.contains(dropboxDir.getAbsolutePath())) {
                         filepaths.add(dropboxDir.getAbsolutePath());
                         PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
-                    }
-
-                    if (excludedpaths.contains(dropboxDir.getAbsolutePath())) {
-                        excludedpaths.remove(dropboxDir.getAbsolutePath());
-                        PreferenceSetter.saveExcludedFilePaths(DownloadFileService.this, excludedpaths);
                     }
 
                     DropboxAPI.Entry entry;

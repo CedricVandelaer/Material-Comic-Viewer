@@ -199,13 +199,11 @@ public class FavoritesListFragment extends Fragment {
                         Log.d(getClass().getName(), "selected dir " + directory.toString());
 
                         ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
-                        ArrayList<String> excludedPaths = PreferenceSetter.getExcludedPaths(getActivity());
 
                         if (!filePaths.contains(directory.toString()))
                             filePaths.add(directory.toString());
-                        if (excludedPaths.contains(directory.toString()))
-                            excludedPaths.remove(directory.toString());
-                        PreferenceSetter.saveFilePaths(getActivity(),filePaths,excludedPaths);
+
+                        PreferenceSetter.saveFilePaths(getActivity(),filePaths);
                         refresh();
                     }
                 });
