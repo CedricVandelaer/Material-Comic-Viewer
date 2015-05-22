@@ -17,6 +17,7 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
@@ -32,15 +33,21 @@ import com.microsoft.live.LiveAuthException;
 import com.microsoft.live.LiveAuthListener;
 import com.microsoft.live.LiveConnectClient;
 import com.microsoft.live.LiveConnectSession;
+import com.microsoft.live.LiveOperation;
+import com.microsoft.live.LiveOperationException;
+import com.microsoft.live.LiveOperationListener;
 import com.microsoft.live.LiveStatus;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class OneDriveActivity extends Activity implements LiveAuthListener{
@@ -85,7 +92,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
 
-        NavigationManager.getInstance().resetCloudStack();
+        NavigationManager.getInstance().resetCloudStackWithString("me/skydrive");
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
@@ -116,11 +123,11 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
 
         mOneDriveAuth = new LiveAuthClient(this, getString(R.string.onedrive_id));
         Object userState = new Object();
-        Iterable<String> scopes = Arrays.asList("wl.signin", "wl.basic", "wl.skydrive", "wl.emails");
+        Iterable<String> scopes = Arrays.asList("wl.signin", "wl.offline_access", "wl.basic", "wl.skydrive", "wl.emails");
 
         mOneDriveAuth.initialize(scopes, this, userState, mCloudService.getToken());
 
-
+        //mOneDriveAuth.login(this, scopes, this, userState);
     }
 
     public void refresh()
@@ -144,11 +151,53 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
         super.onResume();
         PreferenceSetter.setBackgroundColorPreference(this);
 
+        if (mOneDriveClient!=null)
+        {
+            readFolder();
+        }
+        else
+        {
+            mErrorTextView.setText("An error occured during authentication...");
+        }
+    }
+
+    public void readFolder() {
+
+
+        mOneDriveClient.getAsync(NavigationManager.getInstance().getPathFromCloudStack(), new LiveOperationListener() {
+            public void onComplete(LiveOperation operation) {
+                JSONObject result = operation.getResult();
+                Log.d("Result", result.toString());
+                try {
+                    Log.d("Result ID", result.getString("id"));
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            public void onError(LiveOperationException exception, LiveOperation operation) {
+                exception.printStackTrace();
+            }
+        });
     }
 
     @Override
     public void onAuthComplete(LiveStatus status, LiveConnectSession session, Object userState) {
 
+        if(status == LiveStatus.CONNECTED)
+        {
+            mOneDriveClient = new LiveConnectClient(session);
+            final String token = session.getRefreshToken();
+            CloudService cloudService = new CloudService(mCloudService.getName(), token, mCloudService.getUsername(), mCloudService.getEmail());
+            PreferenceSetter.saveCloudService(OneDriveActivity.this, cloudService);
+            readFolder();
+        }
+        else
+        {
+            mOneDriveClient = null;
+        }
     }
 
     @Override

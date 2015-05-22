@@ -63,6 +63,11 @@
             android:label="@string/title_activity_cloud_browser" >
         </activity>
 
+        <activity
+            android:name=".CloudFiles.OneDriveActivity"
+            android:label="@string/title_activity_cloud_browser" >
+        </activity>
+
         <service
             android:name=".CloudFiles.DownloadFileService"
             android:exported="false" >

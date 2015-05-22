@@ -32,7 +32,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="120dp">
                 <ImageView
-                    android:src="@drawable/dropbox_icon"
                     android:id="@+id/cloud_image_view"
                     android:layout_height="100dp"
                     android:layout_width="100dp"

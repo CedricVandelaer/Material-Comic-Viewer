@@ -401,9 +401,10 @@ public class PreferenceSetter {
 
     public static void saveCloudService(Context context, CloudService service)
     {
+        removeCloudService(context, service.getEmail(), service.getName());
+
         ArrayList<CloudService> cloudServicesList = getCloudServices(context);
 
-        removeCloudService(context, service.getEmail(), service.getName());
         cloudServicesList.add(service);
 
         saveCloudServicesList(context, cloudServicesList);

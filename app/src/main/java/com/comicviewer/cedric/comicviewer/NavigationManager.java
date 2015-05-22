@@ -52,6 +52,13 @@ public class NavigationManager {
         mCloudStack.push("/");
     }
 
+    public void resetCloudStackWithString(String root)
+    {
+        mCloudStack.clear();
+        mCloudStack.push(root);
+    }
+
+
     public void pushPathToFileStack(String path)
     {
         mFileNavigationStack.push(path);
