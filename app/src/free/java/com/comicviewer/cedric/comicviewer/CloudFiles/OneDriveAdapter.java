@@ -83,6 +83,11 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
 
     private void addDownloadFolderClickListener(final CloudFolderViewHolder cloudFolderViewHolder)
     {
+        cloudFolderViewHolder.mDownloadFolderButton.setVisibility(View.GONE);
+        cloudFolderViewHolder.mDownloadTextView.setVisibility(View.GONE);
+        cloudFolderViewHolder.mSwipeLayout.setLeftSwipeEnabled(false);
+        cloudFolderViewHolder.mSwipeLayout.setRightSwipeEnabled(false);
+        /*
         cloudFolderViewHolder.mDownloadFolderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,7 +110,7 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
                         }).show();
             }
         });
-
+        */
     }
 
     private void addFileClickListener(final CloudFileViewHolder cloudFileViewHolder) {
@@ -127,7 +132,7 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
                                 Toast.makeText(mActivity, "Download started...", Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry.getId(), mCloudService);
+                                DownloadFileService.startActionDownload(mActivity, entry, mCloudService);
                             }
                         }).show();
             }

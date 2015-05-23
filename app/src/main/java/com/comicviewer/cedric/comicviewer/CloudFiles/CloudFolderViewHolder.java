@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
 import com.comicviewer.cedric.comicviewer.R;
+import com.daimajia.swipe.SwipeLayout;
 import com.dropbox.client2.DropboxAPI;
 import com.melnykov.fab.FloatingActionButton;
 
@@ -20,6 +21,7 @@ public class CloudFolderViewHolder extends RecyclerView.ViewHolder {
     protected CardView mCardView;
     protected TextView mDownloadTextView;
     protected FloatingActionButton mDownloadFolderButton;
+    protected SwipeLayout mSwipeLayout;
 
     private DropboxAPI.Entry mDropboxEntry = null;
 
@@ -32,6 +34,7 @@ public class CloudFolderViewHolder extends RecyclerView.ViewHolder {
         mFolderNameTextView = (TextView) itemView.findViewById(R.id.folder_title_text_view);
         mCardView = (CardView) itemView.findViewById(R.id.card);
         mDownloadFolderButton = (FloatingActionButton) itemView.findViewById(R.id.download_button);
+        mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
     }
 
     public void setDropboxEntry(DropboxAPI.Entry entry)

@@ -13,9 +13,13 @@ import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.view.View;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.Model.ObjectType;
+import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
+import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -24,14 +28,29 @@ import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.ProgressListener;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
+import com.microsoft.live.LiveAuthClient;
+import com.microsoft.live.LiveAuthException;
+import com.microsoft.live.LiveAuthListener;
+import com.microsoft.live.LiveConnectClient;
+import com.microsoft.live.LiveConnectSession;
+import com.microsoft.live.LiveDownloadOperation;
+import com.microsoft.live.LiveDownloadOperationListener;
+import com.microsoft.live.LiveOperation;
+import com.microsoft.live.LiveOperationException;
+import com.microsoft.live.LiveOperationListener;
+import com.microsoft.live.LiveStatus;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 
-public class DownloadFileService extends IntentService {
+public class DownloadFileService extends IntentService implements LiveAuthListener {
 
     final static private String NOTIFICATION_KEY="ComicViewerNotifGroup";
 
@@ -39,6 +58,10 @@ public class DownloadFileService extends IntentService {
     private static Random mRand = new Random();
 
     private static final String ACTION_DROPBOX_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.DROPBOXDOWNLOAD";
+    private static final String ACTION_ONEDRIVE_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.ONEDRIVEDOWNLOAD";
+
+
+    private LiveConnectClient mLiveConnectClient = null;
 
     public static void startActionDownload(Context context, String fileUrl, CloudService cloudService) {
 
@@ -50,8 +73,18 @@ public class DownloadFileService extends IntentService {
         context.startService(intent);
     }
 
+    public static void startActionDownload(Context context, OneDriveObject oneDriveObject, CloudService cloudService) {
+
+        mRand.setSeed(System.currentTimeMillis());
+        Intent intent = new Intent(context, DownloadFileService.class);
+        intent.setAction(ACTION_ONEDRIVE_DOWNLOAD);
+        intent.putExtra("ONEDRIVE_OBJECT", oneDriveObject);
+        intent.putExtra("CLOUD_SERVICE", cloudService);
+        context.startService(intent);
+    }
+
     public DownloadFileService() {
-        super("DownloadDropboxFileService");
+        super("DownloadFileService");
     }
 
     @Override
@@ -59,10 +92,19 @@ public class DownloadFileService extends IntentService {
 
         if (intent != null) {
             final String action = intent.getAction();
+
             if (ACTION_DROPBOX_DOWNLOAD.equals(action)) {
                 final String file_url = intent.getStringExtra("FILE_URL");
                 final CloudService cloudService = (CloudService) intent.getSerializableExtra("CLOUD_SERVICE");
+
                 handleActionDownload(file_url, cloudService);
+            }
+            else if (ACTION_ONEDRIVE_DOWNLOAD.equals(action))
+            {
+                final OneDriveObject oneDriveObject = (OneDriveObject) intent.getSerializableExtra("ONEDRIVE_OBJECT");
+                final CloudService cloudService = (CloudService) intent.getSerializableExtra("CLOUD_SERVICE");
+
+                handleActionDownload(oneDriveObject, cloudService);
             }
         }
     }
@@ -72,10 +114,179 @@ public class DownloadFileService extends IntentService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                downloadDropboxFile(fileUrl, cloudService);
+                if (cloudService.getName().equals(getString(R.string.cloud_storage_1)))
+                    downloadDropboxFile(fileUrl, cloudService);
             }
         }).start();
+    }
 
+    private void handleActionDownload(final OneDriveObject oneDriveObject, final CloudService cloudService) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (cloudService.getName().equals(getString(R.string.cloud_storage_3)))
+                    downloadOneDriveFile(oneDriveObject, cloudService, "");
+            }
+        }).start();
+    }
+
+    private void downloadOneDriveFile(OneDriveObject oneDriveObject, CloudService cloudService, String parentPath)
+    {
+        final int notificationId = mRand.nextInt();
+
+        if (mLiveConnectClient==null) {
+            LiveAuthClient oneDriveAuth = new LiveAuthClient(this, getString(R.string.onedrive_id));
+            Object userState = new Object();
+            Iterable<String> scopes = Arrays.asList("wl.signin", "wl.offline_access", "wl.basic", "wl.skydrive", "wl.emails");
+
+            oneDriveAuth.initialize(scopes, this, userState, cloudService.getToken());
+
+            int i=0;
+            while (mLiveConnectClient==null && i<20) {
+                try {
+                    Thread.sleep(200);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                i++;
+            }
+        }
+
+
+        if (mLiveConnectClient!=null) {
+
+            final File oneDriveDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/OneDrive");
+            if (!oneDriveDir.exists())
+                oneDriveDir.mkdir();
+            final File output = new File(oneDriveDir.getAbsolutePath()+"/"+parentPath+oneDriveObject.getName());
+            final File renamedOutput = new File(output.getAbsolutePath()+".mcvdownload");
+
+            final String filePath = output.getAbsolutePath();
+            final String title = output.getName();
+
+
+            try {
+                if (!output.exists() && !renamedOutput.exists()) {
+
+                    if (! (oneDriveObject.getType() == ObjectType.FOLDER)) {
+
+                        createStartNotification(filePath, title, notificationId);
+
+                        mLiveConnectClient.downloadAsync(oneDriveObject.getId()+"/content", renamedOutput, new LiveDownloadOperationListener() {
+
+                            private int progress = 0;
+
+                            @Override
+                            public void onDownloadCompleted(LiveDownloadOperation operation) {
+
+
+                                renamedOutput.renameTo(output);
+
+                                ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+
+
+                                if (!filepaths.contains(oneDriveDir.getAbsolutePath())) {
+                                    filepaths.add(oneDriveDir.getAbsolutePath());
+                                    PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                                }
+
+                                setEndNotification(title, filePath, notificationId);
+                            }
+
+                            @Override
+                            public void onDownloadFailed(LiveOperationException exception, LiveDownloadOperation operation) {
+                                setErrorNotification(title, notificationId);
+                                exception.printStackTrace();
+                            }
+
+                            @Override
+                            public void onDownloadProgress(int totalBytes, int bytesRemaining, LiveDownloadOperation operation) {
+
+                                if ((totalBytes-bytesRemaining)>progress+1000000) {
+                                    setNotificationProgress(totalBytes - bytesRemaining, totalBytes, title, notificationId);
+                                    progress+=1000000;
+                                }
+                            }
+                        });
+
+
+                    }
+                    else
+                    {
+                        if (!output.exists())
+                        {
+                            output.mkdir();
+
+                            downloadOneDriveFolder(oneDriveObject, cloudService, parentPath);
+                        }
+                    }
+
+                }
+                else {
+
+                    ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+
+                    if (!filepaths.contains(oneDriveDir.getAbsolutePath())) {
+                        filepaths.add(oneDriveDir.getAbsolutePath());
+                        PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                    }
+
+                    try
+                    {
+                        if (!(oneDriveObject.getType()==ObjectType.FOLDER))
+                            createFileExistsNotification(title, notificationId);
+                        else
+                        {
+                            downloadOneDriveFolder(oneDriveObject, cloudService, parentPath);
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                setErrorNotification(title, notificationId);
+            }
+        }
+    }
+
+    private void downloadOneDriveFolder(final OneDriveObject oneDriveObject, final CloudService cloudService, final String parentPath)
+    {
+        if (mLiveConnectClient!=null) {
+            mLiveConnectClient.getAsync(oneDriveObject.getId()+"/files", new LiveOperationListener() {
+
+                public void onComplete(LiveOperation operation) {
+                    JSONObject result = operation.getResult();
+                    Log.d("Result", result.toString());
+                    try {
+                        JSONArray data = result.getJSONArray("data");
+
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject folder = data.getJSONObject(i);
+                            OneDriveObject newFile = new OneDriveObject(folder.getString("name"), folder.getString("id"));
+
+                            if (newFile.getType() == ObjectType.FOLDER || Utilities.checkExtension(newFile.getName())) {
+                                downloadOneDriveFile(newFile, cloudService, parentPath + oneDriveObject.getName()+"/");
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                public void onError(LiveOperationException exception, LiveOperation operation) {
+                    exception.printStackTrace();
+                }
+            });
+        }
     }
 
 
@@ -283,4 +494,20 @@ public class DownloadFileService extends IntentService {
 
     }
 
+    @Override
+    public void onAuthComplete(LiveStatus status, LiveConnectSession session, Object userState) {
+        if(status == LiveStatus.CONNECTED)
+        {
+            mLiveConnectClient = new LiveConnectClient(session);
+        }
+        else
+        {
+            mLiveConnectClient = null;
+        }
+    }
+
+    @Override
+    public void onAuthError(LiveAuthException exception, Object userState) {
+
+    }
 }

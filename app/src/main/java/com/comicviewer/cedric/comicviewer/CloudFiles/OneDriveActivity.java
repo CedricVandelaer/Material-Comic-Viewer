@@ -123,9 +123,6 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
 
         mSwipeRefreshLayout.setRefreshing(true);
 
-        AppKeyPair appKeys = new AppKeyPair(getResources().getString(R.string.dropbox_app_key), getResources().getString(R.string.dropbox_app_secret));
-        AndroidAuthSession session = new AndroidAuthSession(appKeys, mCloudService.getToken());
-
         mOneDriveAuth = new LiveAuthClient(this, getString(R.string.onedrive_id));
         Object userState = new Object();
         Iterable<String> scopes = Arrays.asList("wl.signin", "wl.offline_access", "wl.basic", "wl.skydrive", "wl.emails");
@@ -158,6 +155,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
 
         if (mOneDriveClient!=null)
         {
+            mAdapter.clear();
             readFolder();
         }
         else

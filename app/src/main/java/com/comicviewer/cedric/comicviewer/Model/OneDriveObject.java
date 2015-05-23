@@ -1,10 +1,12 @@
 package com.comicviewer.cedric.comicviewer.Model;
 
+import java.io.Serializable;
+
 /**
  * Created by CV on 23/05/2015.
  * class to represent a OneDrive file or folder
  */
-public class OneDriveObject {
+public class OneDriveObject implements Serializable{
 
     private ObjectType mObjectType = ObjectType.UNKNOWN;
     private String mName;
