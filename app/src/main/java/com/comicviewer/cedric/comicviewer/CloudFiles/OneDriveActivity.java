@@ -20,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.Model.ObjectType;
+import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
@@ -41,6 +43,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -118,6 +121,8 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace));
 
+        mSwipeRefreshLayout.setRefreshing(true);
+
         AppKeyPair appKeys = new AppKeyPair(getResources().getString(R.string.dropbox_app_key), getResources().getString(R.string.dropbox_app_secret));
         AndroidAuthSession session = new AndroidAuthSession(appKeys, mCloudService.getToken());
 
@@ -127,12 +132,12 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
 
         mOneDriveAuth.initialize(scopes, this, userState, mCloudService.getToken());
 
-        //mOneDriveAuth.login(this, scopes, this, userState);
     }
 
     public void refresh()
     {
         mAdapter.clear();
+        readFolder();
     }
 
     @Override
@@ -163,13 +168,50 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
 
     public void readFolder() {
 
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
 
         mOneDriveClient.getAsync(NavigationManager.getInstance().getPathFromCloudStack(), new LiveOperationListener() {
             public void onComplete(LiveOperation operation) {
                 JSONObject result = operation.getResult();
                 Log.d("Result", result.toString());
-                try {
-                    Log.d("Result ID", result.getString("id"));
+                try
+                {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                    JSONArray data = result.getJSONArray("data");
+
+                    boolean fileFound = false;
+
+                    for (int i=0;i<data.length();i++)
+                    {
+                        JSONObject folder = data.getJSONObject(i);
+                        OneDriveObject newFile = new OneDriveObject(folder.getString("name"), folder.getString("id"));
+
+                        if (newFile.getType()== ObjectType.FOLDER || Utilities.checkExtension(newFile.getName())) {
+                            mAdapter.addOneDriveEntry(newFile);
+                            fileFound = true;
+                        }
+                    }
+
+                    if (!fileFound)
+                    {
+                        mErrorTextView.setVisibility(View.VISIBLE);
+                        mErrorTextView.setText("There were no compatible files found...");
+                    }
+                    else
+                    {
+                        mErrorTextView.setVisibility(View.GONE);
+                    }
+
                 }
                 catch (Exception e)
                 {

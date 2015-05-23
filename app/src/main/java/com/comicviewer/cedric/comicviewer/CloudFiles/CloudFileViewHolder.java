@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
 import com.comicviewer.cedric.comicviewer.R;
 import com.dropbox.client2.DropboxAPI;
 import com.melnykov.fab.FloatingActionButton;
@@ -20,6 +21,7 @@ public class CloudFileViewHolder extends RecyclerView.ViewHolder {
     protected CardView mCardView;
     protected FloatingActionButton mDownloadButton;
     private DropboxAPI.Entry mDropboxEntry = null;
+    private OneDriveObject mOneDriveEntry = null;
 
     public CloudFileViewHolder(View itemView) {
         super(itemView);
@@ -38,5 +40,15 @@ public class CloudFileViewHolder extends RecyclerView.ViewHolder {
     public DropboxAPI.Entry getDropboxEntry()
     {
         return mDropboxEntry;
+    }
+
+    public void setOneDriveEntry(OneDriveObject entry)
+    {
+        mOneDriveEntry = entry;
+    }
+
+    public OneDriveObject getOneDriveEnty()
+    {
+        return mOneDriveEntry;
     }
 }

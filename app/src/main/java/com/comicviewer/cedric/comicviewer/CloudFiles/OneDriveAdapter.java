@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.Model.ObjectType;
+import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
@@ -31,7 +33,7 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
     private CloudService mCloudService;
     private Handler mHandler;
     private LayoutInflater mInflater;
-    private List<DropboxAPI.Entry> mFileList;
+    private List<OneDriveObject> mFileList;
 
     public OneDriveAdapter(OneDriveActivity activity, CloudService cloudService)
     {
@@ -45,7 +47,7 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position)
     {
-        if (mFileList.get(position).isDir)
+        if (mFileList.get(position).getType() == ObjectType.FOLDER)
             return 0;
         else
             return 1;
@@ -84,7 +86,7 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mDownloadFolderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DropboxAPI.Entry entry = cloudFolderViewHolder.getDropboxEntry();
+                final OneDriveObject entry = cloudFolderViewHolder.getOneDriveEnty();
 
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
                         .title("Notice")
@@ -111,11 +113,11 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DropboxAPI.Entry entry = cloudFileViewHolder.getDropboxEntry();
+                final OneDriveObject entry = cloudFileViewHolder.getOneDriveEnty();
 
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
                         .title("Download file")
-                        .content("Do you wish to download file \""+entry.fileName()+"\"?")
+                        .content("Do you wish to download file \""+entry.getName()+"\"?")
                         .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
                         .positiveText("Confirm")
                         .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
@@ -124,8 +126,8 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Toast.makeText(mActivity,"Download started...",Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry.path, mCloudService);
+                                Toast.makeText(mActivity, "Download started...", Toast.LENGTH_SHORT).show();
+                                DownloadFileService.startActionDownload(mActivity, entry.getId(), mCloudService);
                             }
                         }).show();
             }
@@ -140,7 +142,7 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavigationManager.getInstance().pushPathToCloudStack(cloudFolderViewHolder.getDropboxEntry().path);
+                NavigationManager.getInstance().pushPathToCloudStack(cloudFolderViewHolder.getOneDriveEnty().getId()+"/files");
                 mActivity.refresh();
             }
         });
@@ -155,17 +157,17 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        if (mFileList.get(position).isDir)
+        if (mFileList.get(position).getType() == ObjectType.FOLDER)
         {
             CloudFolderViewHolder cloudFolderViewHolder = (CloudFolderViewHolder) holder;
-            cloudFolderViewHolder.setDropboxEntry(mFileList.get(position));
-            cloudFolderViewHolder.mFolderNameTextView.setText(cloudFolderViewHolder.getDropboxEntry().fileName());
+            cloudFolderViewHolder.setOneDriveEntry(mFileList.get(position));
+            cloudFolderViewHolder.mFolderNameTextView.setText(cloudFolderViewHolder.getOneDriveEnty().getName());
         }
         else
         {
             CloudFileViewHolder cloudFileViewHolder = (CloudFileViewHolder) holder;
-            cloudFileViewHolder.setDropboxEntry(mFileList.get(position));
-            cloudFileViewHolder.mFileNameTextView.setText(cloudFileViewHolder.getDropboxEntry().fileName());
+            cloudFileViewHolder.setOneDriveEntry(mFileList.get(position));
+            cloudFileViewHolder.mFileNameTextView.setText(cloudFileViewHolder.getOneDriveEnty().getName());
         }
     }
 
@@ -174,7 +176,7 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         return mFileList.size();
     }
 
-    public void addDropBoxEntry(final DropboxAPI.Entry entry)
+    public void addOneDriveEntry(final OneDriveObject entry)
     {
         mHandler.post(new Runnable() {
             @Override
