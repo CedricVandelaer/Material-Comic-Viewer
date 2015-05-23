@@ -92,7 +92,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
 
-        NavigationManager.getInstance().resetCloudStackWithString("me/skydrive");
+        NavigationManager.getInstance().resetCloudStackWithString("me/skydrive/files");
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
