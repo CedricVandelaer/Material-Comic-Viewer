@@ -53,7 +53,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-public class OneDriveActivity extends Activity implements LiveAuthListener{
+public class OneDriveActivity extends Activity implements LiveAuthListener, SwipeRefreshLayout.OnRefreshListener{
 
     private CloudService mCloudService;
 
@@ -122,6 +122,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace));
 
         mSwipeRefreshLayout.setRefreshing(true);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mOneDriveAuth = new LiveAuthClient(this, getString(R.string.onedrive_id));
         Object userState = new Object();
@@ -251,6 +252,11 @@ public class OneDriveActivity extends Activity implements LiveAuthListener{
         return false;
     }
 
+    @Override
+    public void onRefresh() {
+        mAdapter.clear();
+        readFolder();
+    }
 
 
     private class SetTaskDescriptionTask extends AsyncTask

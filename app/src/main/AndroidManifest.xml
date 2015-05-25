@@ -62,7 +62,6 @@
             android:name=".CloudFiles.DropboxActivity"
             android:label="@string/title_activity_cloud_browser" >
         </activity>
-
         <activity
             android:name=".CloudFiles.OneDriveActivity"
             android:label="@string/title_activity_cloud_browser" >
@@ -77,6 +76,28 @@
             android:name=".Info.InfoActivity"
             android:label="@string/title_activity_info" >
         </activity>
+
+        <service
+            android:name=".MuzeiService"
+            android:label="@string/muzei_source"
+            android:description="@string/muzei_description"
+            android:icon="@drawable/muzei_source">
+            <intent-filter>
+                <action android:name="com.google.android.apps.muzei.api.MuzeiArtSource" />
+            </intent-filter>
+            <meta-data android:name="color" android:value="#009688" />
+        </service>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="@string/file_provider_string"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
+
     </application>
 
 </manifest>

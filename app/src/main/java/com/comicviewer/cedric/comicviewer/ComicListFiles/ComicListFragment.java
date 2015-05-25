@@ -205,7 +205,10 @@ public class ComicListFragment extends Fragment {
             mSearchComicsTask.cancel(false);
         }
 
-        mAdapter.clearList();
+        if (mAdapter != null)
+            mAdapter.clearList();
+        else
+            mAdapter = new ComicAdapter(getActivity());
 
         mSearchComicsTask = new SearchComicsTask();
         mSearchComicsTask.execute();

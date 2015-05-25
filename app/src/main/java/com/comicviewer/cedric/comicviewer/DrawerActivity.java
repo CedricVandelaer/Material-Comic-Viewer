@@ -165,7 +165,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
                     found = true;
             }
 
-            if (!found)
+            if (!found && !(folder.getName().equals("muzei")))
             {
                 Log.d("OnStop", "Folder to delete: " + folder.getAbsolutePath());
                 Utilities.deleteDirectory(this, folder);

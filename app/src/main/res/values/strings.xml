@@ -46,6 +46,9 @@
     <string name="onedrive_id">000000004C1508EF</string>
     <string name="onedrive_secret">ZRVOz8PE6ZEKNjYC1Q8b2v3Vl7pw0Jfa</string>
     <string name="db_scheme">db-pz24rrsbb0dvzib</string>
+    <string name="file_provider_string">com.comicviewer.free.fileprovider</string>
+    <string name="muzei_source">Comic Viewer</string>
+    <string name="muzei_description">Use your comic covers as wallpaper</string>
     <string name="about_text">
         Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
         science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan
@@ -56,6 +59,10 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
+        v2.3\n
+        - Muzei support\n\n
+        v2.2.1\n
+        - Small bugfixes\n\n
         v2.2\n
         - Currently reading section\n
         - Microsoft OneDrive support\n

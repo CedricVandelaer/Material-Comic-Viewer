@@ -30,8 +30,13 @@
     <string name="title_activity_about">AboutActivity</string>
     <string name="dropbox_app_key">id9ssazcpa41gys</string>
     <string name="dropbox_app_secret">yj0gk3nipr6ti4u</string>
+    <string name="file_provider_string">com.comicviewer.pro.fileprovider</string>
     <string name="db_scheme">db-id9ssazcpa41gys</string>
     <string name="updates">
+        v2.3\n
+        - Muzei support\n\n
+        v2.2.1\n
+        - Small bugfixes\n\n
         v2.2\n
         - Currently reading section\n
         - Microsoft OneDrive support\n
