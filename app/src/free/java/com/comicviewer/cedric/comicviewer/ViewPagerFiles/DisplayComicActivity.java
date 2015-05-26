@@ -34,18 +34,14 @@ import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.devspark.robototextview.widget.RobotoTextView;
-import com.gc.materialdesign.views.ButtonFlat;
-import com.gc.materialdesign.widgets.Dialog;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
+import com.purplebrain.adbuddiz.sdk.AdBuddiz;
 
 import java.io.File;
 import java.util.ArrayList;
+
 
 /**
  * The activity to display a fullscreen comic
@@ -68,7 +64,7 @@ public class DisplayComicActivity extends FragmentActivity {
     private RobotoTextView mPageIndicator;
 
     //ads
-    private InterstitialAd mInterstitialAd;
+
 
     private Handler mHandler;
 
@@ -83,6 +79,8 @@ public class DisplayComicActivity extends FragmentActivity {
         setContentView(R.layout.activity_display_comic);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+        AdBuddiz.setPublisherKey("e5ef796f-a43b-4b25-b15f-ebebcbbcabf4");
+        AdBuddiz.cacheAds(this); // this = current Activity
 
         Intent intent = getIntent();
         
@@ -141,54 +139,32 @@ public class DisplayComicActivity extends FragmentActivity {
             new SetTaskDescriptionTask().execute();
         }
 
-        mInterstitialAd= new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-1913373193124965/9353062734");
-        requestNewInterstitial();
-
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                //requestNewInterstitial();
-            }
-
-            @Override
-            public void onAdLoaded()
-            {
-                showAd();
-            }
-        });
-
-
 
         mHandler = new Handler();
 
         if (PreferenceSetter.getScreenOnSetting(this))
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
 
-    private void requestNewInterstitial()
-    {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mInterstitialAd.loadAd(adRequest);
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showAd();
+            }
+        },1500);
     }
 
     private void showAd()
     {
-        if (mInterstitialAd.isLoaded()) {
-            mPager.setVisibility(View.VISIBLE);
-            mInterstitialAd.show();
-        }
-        else {
-            requestNewInterstitial();
-            mPager.setVisibility(View.INVISIBLE);
-            Toast.makeText(DisplayComicActivity.this, "Ad failed to load, please wait", Toast.LENGTH_LONG).show();
+        if (AdBuddiz.isReadyToShowAd(DisplayComicActivity.this))
+            AdBuddiz.showAd(DisplayComicActivity.this);
+        else
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mPager.setVisibility(View.VISIBLE);
+                    showAd();
                 }
-            }, 4000);
-        }
+            }, 1500);
     }
 
     @Override
@@ -228,7 +204,7 @@ public class DisplayComicActivity extends FragmentActivity {
 
             if (position+1==mPageCount)
             {
-                requestNewInterstitial();
+                showAd();
             }
 
             if (position+1> pagesRead)
@@ -364,6 +340,8 @@ public class DisplayComicActivity extends FragmentActivity {
                     })
                     .show();
         }
+
+
     }
 
     private void setPageNumber()

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="admob_ad_unit_id">ca-app-pub-1913373193124965/9353062734</string>
     <string name="app_name">Comic Viewer Free</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -59,6 +59,8 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
+        v2.3.1\n
+        - Fixed a crash for some users\n\n
         v2.3\n
         - Muzei support\n\n
         v2.2.1\n
