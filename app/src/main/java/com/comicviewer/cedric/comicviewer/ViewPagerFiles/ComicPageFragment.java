@@ -11,6 +11,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -100,7 +101,12 @@ public class ComicPageFragment extends Fragment {
         if (filename!=null) {
             if (getActivity()!=null) {
 
-                String imagePath = "file:///" + getActivity().getFilesDir().getPath()+"/" + mFolderName + "/" + filename;
+                String imagePath;
+                File archive = new File(mComicArchivePath);
+                if (!archive.isDirectory())
+                    imagePath = "file:///" + getActivity().getFilesDir().getPath()+"/" + mFolderName + "/" + filename;
+                else
+                    imagePath = "file:///" + mComicArchivePath + "/" + filename;
                 Log.d("loadImage", imagePath);
 
                 ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, new SimpleImageLoadingListener() {
@@ -171,7 +177,9 @@ public class ComicPageFragment extends Fragment {
 
         File file = new File(mComicArchivePath);
 
-        if (Utilities.isZipArchive(file))
+        if (file.isDirectory())
+            loadImage(mImageFileName);
+        else if (Utilities.isZipArchive(file))
             new ExtractZipTask().execute();
         else
             new ExtractRarTask().execute();

@@ -38,7 +38,11 @@ public class ComicLoader {
 
             generateComicInfo(context, comic);
 
-            if (Utilities.isZipArchive(file)) {
+            if (file.isDirectory())
+            {
+                initialiseImageFolderComic(comic);
+            }
+            else if (Utilities.isZipArchive(file)) {
                 extractZipComic(comic, context);
             } else {
                 extractRarComic(context, comic);
@@ -50,6 +54,38 @@ public class ComicLoader {
         {
             e.printStackTrace();
             Log.e("ComicLoader", "Error loading comic: " + comic.getFileName());
+        }
+    }
+
+    private static void initialiseImageFolderComic(Comic comic)
+    {
+        File folder = new File(comic.getFilePath()+"/"+comic.getFileName());
+
+        File[] images = folder.listFiles();
+
+        ArrayList<File> imagesList = new ArrayList();
+
+        if (images.length>0) {
+            for (int i = 0; i < images.length; i++) {
+                imagesList.add(images[i]);
+            }
+
+            comic.setPageCount(images.length);
+
+            Collections.sort(imagesList, new Comparator<File>() {
+                @Override
+                public int compare(File lhs, File rhs) {
+                    int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getName(), rhs.getName());
+                    if (res == 0) {
+                        res = lhs.getName().compareTo(rhs.getName());
+                    }
+                    return res;
+                }
+            });
+
+            String coverImage = "file:///" + imagesList.get(0).getAbsolutePath();
+
+            comic.setCoverImage(coverImage);
         }
     }
 

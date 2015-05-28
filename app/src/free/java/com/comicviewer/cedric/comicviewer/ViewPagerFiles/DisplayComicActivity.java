@@ -403,24 +403,26 @@ public class DisplayComicActivity extends FragmentActivity {
     }
 
     private void removeExtractedFiles() {
-        
-        for (int i=0;i<mPages.size();i++)
+
+        File archive = new File(mCurrentComic.getFilePath()+"/"+mCurrentComic.getFileName());
+        if (!archive.isDirectory())
         {
-            if (i!=0) {
-                try {
-                    String filename = mPages.get(i);
-                    if (filename.contains("#"))
-                        filename = filename.replaceAll("#","");
-                    File file = new File(getFilesDir().getPath()+"/"+ Utilities.removeExtension(mCurrentComic.getFileName()) + "/" + filename);
-                    if (file.delete())
-                        Log.d("DisplayComic Onstop", "Deleted file " +filename);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
+            for (int i = 0; i < mPages.size(); i++) {
+                if (i != 0) {
+                    try {
+                        String filename = mPages.get(i);
+                        if (filename.contains("#"))
+                            filename = filename.replaceAll("#", "");
+                        File file = new File(getFilesDir().getPath() + "/" + Utilities.removeExtension(mCurrentComic.getFileName()) + "/" + filename);
+                        if (file.delete())
+                            Log.d("DisplayComic Onstop", "Deleted file " + filename);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
+
     }
 
 

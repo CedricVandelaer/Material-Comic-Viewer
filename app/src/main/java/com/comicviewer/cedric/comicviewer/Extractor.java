@@ -11,6 +11,7 @@ import com.github.junrar.rarfile.FileHeader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -30,7 +31,11 @@ public class Extractor {
 
         ArrayList<String> pages;
 
-        if (Utilities.isZipArchive(file))
+        if (file.isDirectory())
+        {
+            pages = loadImageNamesFromImageFolderComic(comicToExtract);
+        }
+        else if (Utilities.isZipArchive(file))
         {
             pages = loadImageNamesFromComicZip(comicToExtract);
         }
@@ -54,6 +59,43 @@ public class Extractor {
         }
 
         return pages;
+    }
+
+    public static ArrayList<String> loadImageNamesFromImageFolderComic(Comic comic)
+    {
+        File folder = new File(comic.getFilePath()+"/"+comic.getFileName());
+
+        File[] images = folder.listFiles();
+
+        ArrayList<File> imagesList = new ArrayList();
+
+        if (images.length>0) {
+            for (int i = 0; i < images.length; i++) {
+                imagesList.add(images[i]);
+            }
+
+            comic.setPageCount(images.length);
+
+            Collections.sort(imagesList, new Comparator<File>() {
+                @Override
+                public int compare(File lhs, File rhs) {
+                    int res = String.CASE_INSENSITIVE_ORDER.compare(lhs.getName(), rhs.getName());
+                    if (res == 0) {
+                        res = lhs.getName().compareTo(rhs.getName());
+                    }
+                    return res;
+                }
+            });
+        }
+
+        ArrayList<String> imageListString = new ArrayList<>();
+
+        for (File file:imagesList)
+        {
+            imageListString.add(file.getName());
+        }
+
+        return imageListString;
     }
 
     /**

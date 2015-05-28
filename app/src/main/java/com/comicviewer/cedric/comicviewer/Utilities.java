@@ -1,17 +1,24 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -210,6 +217,73 @@ public class Utilities {
         return(directory.delete());
     }
 
+    public static boolean checkImageFolder(File folder)
+    {
+        if (!folder.isDirectory())
+            return false;
+        if (!folder.exists())
+            return false;
+        File files[] = folder.listFiles();
+
+        for (int i=0;i<files.length;i++)
+        {
+            if (files[i].isDirectory())
+                return false;
+            try {
+                if (!(isJPEG(files[i]) || isPNG(files[i])))
+                    return false;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Boolean isJPEG(File file) throws Exception {
+        DataInputStream ins = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        try {
+            if (ins.readInt() == 0xffd8ffe0) {
+                return true;
+            } else {
+                return false;
+
+            }
+        } finally {
+            ins.close();
+        }
+    }
+
+    public static boolean isPNG(File file) throws IOException {
+        // create input stream
+        int numRead;
+        byte[] signature = new byte[8];
+        byte[] pngIdBytes = { -119, 80, 78, 71, 13, 10, 26, 10 };
+        InputStream is = null;
+
+        try {
+            is = new FileInputStream(file);
+
+            // if first 8 bytes are PNG then return PNG reader
+            numRead = is.read(signature);
+
+            if (numRead == -1)
+                throw new IOException("Trying to reda from 0 byte stream");
+
+        } finally {
+            if (is != null)
+                is.close();
+        }
+
+        if (numRead == 8 && Arrays.equals(signature, pngIdBytes)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static String removeFirstDigits(String text)
     {
         try {
@@ -243,5 +317,19 @@ public class Utilities {
             e.printStackTrace();
             return text;
         }
+    }
+
+    public static void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
     }
 }

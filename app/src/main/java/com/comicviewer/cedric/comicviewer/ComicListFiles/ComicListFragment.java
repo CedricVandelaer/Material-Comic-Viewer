@@ -205,14 +205,12 @@ public class ComicListFragment extends Fragment {
             mSearchComicsTask.cancel(false);
         }
 
-        if (mAdapter != null)
+        if (mAdapter != null) {
             mAdapter.clearList();
-        else {
-            mAdapter = new ComicAdapter(mApplicationContext);
-        }
 
-        mSearchComicsTask = new SearchComicsTask();
-        mSearchComicsTask.execute();
+            mSearchComicsTask = new SearchComicsTask();
+            mSearchComicsTask.execute();
+        }
 
 
     }
@@ -801,8 +799,36 @@ public class ComicListFragment extends Fragment {
             final String comicPath = map.get(str)+"/"+str;
             final File file = new File(comicPath);
 
-            //this is a folder
-            if (file.isDirectory() && !(currentFolderNames.contains(file.getName()))) {
+
+
+            //check for image folder
+            if (file.isDirectory() && Utilities.checkImageFolder(file) && !(currentComicsFileNames.contains(comicPath))) {
+                Comic comic = new Comic(file.getName(), file.getParentFile().getAbsolutePath());
+
+                ComicLoader.loadComicSync(mApplicationContext, comic);
+
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
+                if (ComicLoader.setComicColor(mApplicationContext, comic))
+                    PreferenceSetter.saveComic(mApplicationContext, comic);
+
+
+                final Comic finalComic = comic;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addObjectSorted(finalComic);
+                    }
+                });
+
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
+            }
+            else if (file.isDirectory() && !(currentFolderNames.contains(file.getName())) && !(currentComicsFileNames.contains(comicPath))) {
 
                 mHandler.post(new Runnable() {
                     @Override
@@ -819,7 +845,6 @@ public class ComicListFragment extends Fragment {
             else if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
             {
                 int pos = savedComicsFileNames.indexOf(comicPath);
-
 
                 Comic comic = savedComics.get(pos);
 
@@ -852,7 +877,7 @@ public class ComicListFragment extends Fragment {
 
                 Comic comic = new Comic(str, map.get(str));
 
-                ComicLoader.loadComicSync( mApplicationContext, comic);
+                ComicLoader.loadComicSync(mApplicationContext, comic);
 
                 if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()) && comic.getPageCount()>0)
                 {
@@ -885,7 +910,7 @@ public class ComicListFragment extends Fragment {
 
         long endTime = System.currentTimeMillis();
 
-        Log.d("comics/files-search", "time: "+(endTime-startTime));
+        Log.d("comics/files-search", "time: " + (endTime - startTime));
     }
 
 }
