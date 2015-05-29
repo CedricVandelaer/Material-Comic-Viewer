@@ -220,6 +220,11 @@ public class FileLoader {
                         files.add(fileList[j].getName());
                         paths.add(path);
                     }
+                    else if (Utilities.checkImageFolder(fileList[j]))
+                    {
+                        files.add(fileList[j].getName());
+                        paths.add(path);
+                    }
                 }
             }
         }

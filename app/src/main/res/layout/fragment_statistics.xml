@@ -24,7 +24,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total comics started:" />
+                    android:text="@string/total_comics_started" />
                 <TextView
                     android:id="@+id/total_comics_started_textview"
                     android:layout_alignParentEnd="true"
@@ -46,7 +46,7 @@
                     android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total comics read:" />
+                    android:text="@string/total_comics_read" />
                 <TextView
                     android:id="@+id/total_comics_read_textview"
                     android:layout_alignParentEnd="true"
@@ -67,7 +67,7 @@
                     android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Percentage comics finished:" />
+                    android:text="@string/finished_percentage" />
                 <TextView
                     android:id="@+id/finished_comics_percentage_textview"
                     android:layout_alignParentEnd="true"
@@ -88,7 +88,7 @@
                     android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total pages read:" />
+                    android:text="@string/total_pages_read" />
                 <TextView
                     android:id="@+id/pages_read_textview"
                     android:layout_alignParentEnd="true"
@@ -109,7 +109,7 @@
                     android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Number of comics added:" />
+                    android:text="@string/number_comics_added" />
                 <TextView
                     android:id="@+id/added_comics_textview"
                     android:layout_alignParentEnd="true"
@@ -130,7 +130,7 @@
                     android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Most read series:" />
+                    android:text="@string/most_read_series" />
                 <TextView
                     android:id="@+id/favorite_series_textview"
                     android:layout_alignParentEnd="true"
@@ -152,7 +152,7 @@
                     android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Longest comic read: " />
+                    android:text="@string/longest_read_comic" />
                 <TextView
                     android:id="@+id/longest_read_title_textview"
                     android:layout_alignParentEnd="true"
@@ -173,7 +173,7 @@
                     android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Number of pages:" />
+                    android:text="@string/number_pages" />
                 <TextView
                     android:id="@+id/longest_number_pages_textview"
                     android:layout_alignParentEnd="true"
@@ -191,7 +191,7 @@
                 android:background="@color/Teal"
                 android:textAllCaps="false"
                 android:textSize="16sp"
-                android:text="Reset statistics"
+                android:text="@string/reset_statistics"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

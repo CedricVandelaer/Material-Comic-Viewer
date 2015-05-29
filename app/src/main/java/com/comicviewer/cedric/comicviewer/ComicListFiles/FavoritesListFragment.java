@@ -268,8 +268,34 @@ public class FavoritesListFragment extends Fragment {
             final String comicPath = map.get(str)+"/"+str;
             File file = new File(comicPath);
 
-            //check if comic is one of the saved comic files and add
-            if (savedComicsFileNames.contains(comicPath)
+            if (file.isDirectory() && Utilities.checkImageFolder(file) && !(currentComicsFileNames.contains(comicPath))
+                    && favorites.contains(str)) {
+                Comic comic = new Comic(file.getName(), file.getParentFile().getAbsolutePath());
+
+                ComicLoader.loadComicSync(mApplicationContext, comic);
+
+                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
+                {
+                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
+                if (ComicLoader.setComicColor(mApplicationContext, comic))
+                    PreferenceSetter.saveComic(mApplicationContext, comic);
+
+
+                final Comic finalComic = comic;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.addObjectSorted(finalComic);
+                    }
+                });
+
+                mProgress++;
+                updateProgressDialog(mProgress, mTotalComicCount);
+
+            }//check if comic is one of the saved comic files and add
+            else if (savedComicsFileNames.contains(comicPath)
                     && !(currentComicsFileNames.contains(comicPath))
                     && favorites.contains(str))
             {

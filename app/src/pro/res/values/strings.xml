@@ -2,32 +2,6 @@
 <resources>
 
     <string name="app_name">Comic Viewer Pro</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_display_comic">DisplayComicActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="backgroundcolor_setting1">Blue grey</string>
-    <string name="backgroundcolor_setting2">True black</string>
-    <string name="backgroundcolor_setting3">White</string>
-    <string name="backgroundcolor_setting4">Brown</string>
-    <string name="backgroundcolor_setting5">Grey</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-    <string name="card_color_setting_1">Muted colors</string>
-    <string name="card_color_setting_2">Vibrant colors</string>
-    <string name="card_color_setting_3">White</string>
-    <string name="card_color_setting_4">Blue grey</string>
-    <string name="card_color_setting_5">Real black</string>
-    <string name="scroll_animation_setting_1">None</string>
-    <string name="scroll_animation_setting_2">Bounce In</string>
-    <string name="scroll_animation_setting_3">Stand up</string>
-    <string name="scroll_animation_setting_4">Fade in</string>
-    <string name="scroll_animation_setting_5">Tada</string>
-    <string name="card_size_setting_1">Small cards</string>
-    <string name="card_size_setting_2">Normal cards</string>
-    <string name="card_size_setting_3">Comic cover cards</string>
-    <string name="refresh">Refresh</string>
-    <string name="title_activity_about">AboutActivity</string>
     <string name="dropbox_app_key">id9ssazcpa41gys</string>
     <string name="dropbox_app_secret">yj0gk3nipr6ti4u</string>
     <string name="file_provider_string">com.comicviewer.pro.fileprovider</string>
@@ -87,24 +61,4 @@
         v1\n
         - Initial release\n\n
     </string>
-    <string name="eula">
-        The product is protected by Federal Copyright Law. Material Comic Viewer retains the title to and ownership of the Product. You are licensed to use this Product on the following terms and conditions:
-        \n\nLICENSE - The licensee is defined as the individual or company utilizing the Software Product. Material Comic Viewer hereby grants the licensee a license authorizing the licensee to use the enclosed product exclusively on devices in possession of the licensee. Use of this product by more than one individual or by anyone other than the licensee terminates, without notification, this license and the right to use this product.
-        \n\nYOU MAY NOT: Distribute, rent, sub-license or otherwise make available to others the software or documentation or copies thereof, except as expressly permitted in this License without prior written consent from Cédric Vandelaer. In the case of an authorized transfer, the transferee must agree to be bound by the terms and conditions of this License Agreement.
-        \n\nRESTRICTIONS: You may not remove any proprietary notices, labels, trademarks on the software or documentation.
-        You may not modify, de-compile, disassemble, reverse engineer or translate the software.
-        \n\nTERM – The term of this license will stay valid unless stated otherwise by Cédric Vandelaer. This license will also terminate automatically if you fail to comply with any term or condition in this Agreement.
-        \n\nLIMITED WARRANTY - This software and documentation are sold "as is" without any warranty as to their performance, merchantability or fitness for any particular purpose. The licensee assumes the entire risk as to the quality and performance of the software. In no event shall Cédric Vandelaer or anyone else who has been involved in the creation, development, production, or delivery of this software be liable for any direct, incidental or consequential damages, such as, but not limited to, loss of anticipated profits, benefits, use, or data resulting from the use of this software, or arising out of any breach of warranty.
-        \n\nCOPYRIGHT INFRINGEMENT - In no event shall Cédric Vandelaer or anyone else who has been involved in the creation, development, production, or delivery of this software be liable for any copyright infringements by the licensee or any other user of the software. The software does not provide any copyrighted materials and never will. Only the licensee can be held responsible for piracy or other violations regarding copyrights.
-        \n\nNo comic are included in this app. You have to obtain them in a legal way and place them on your internal memory and/or sd card.
-        \n\nAFFILIATIONS: This product is not affiliated with, nor authorized, endorsed or licensed in any way by Marvel, DC Comics, any other comic company, their affiliates or subsidiaries.
-    </string>
-    <string name="about_text">
-        Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
-        science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan
-        of android so I decided to make a comic viewer app in my free time. I wasn\'t really happy with existing apps because of 
-        their poor performance, overly complex interfaces or just because I didn\'t like how they looked. Well anyway, have fun reading
-        comics with Comic Viewer!
-    </string>
-    <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 </resources>

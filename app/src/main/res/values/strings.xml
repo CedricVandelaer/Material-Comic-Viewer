@@ -3,11 +3,24 @@
 
     <string name="admob_ad_unit_id">ca-app-pub-1913373193124965/9353062734</string>
     <string name="app_name">Comic Viewer Free</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_display_comic">DisplayComicActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="all_comics">All comics</string>
+    <string name="currently_reading">Currently reading</string>
+    <string name="favorites">Favorites</string>
+    <string name="cloud_storage">Cloud storage</string>
+    <string name="statistics">Statistics</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+    <string name="total_comics_started">Total comics started:</string>
+    <string name="total_comics_read">Total comics read:</string>
+    <string name="finished_percentage">Comics finished percentage:</string>
+    <string name="total_pages_read">Total pages read:</string>
+    <string name="number_comics_added">Number of comics added:</string>
+    <string name="most_read_series">Most read series:</string>
+    <string name="longest_read_comic">Longest comic read:</string>
+    <string name="number_pages">Number of pages:</string>
+    <string name="reset_statistics">Reset statistics</string>
     <string name="backgroundcolor_setting1">Blue grey</string>
     <string name="backgroundcolor_setting2">True black</string>
     <string name="backgroundcolor_setting3">White</string>
@@ -59,6 +72,8 @@
     <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
 
     <string name="updates">
+        v2.4\n
+        - Image folder support\n\n
         v2.3.1\n
         - Fixed a crash for some users\n\n
         v2.3\n

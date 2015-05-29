@@ -67,32 +67,32 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         setDrawerHeaderImage();
 
         ComicListFragment.getInstance().setRetainInstance(true);
-        MaterialSection allComicsSection = newSection("All comics", R.drawable.book, ComicListFragment.getInstance());
+        MaterialSection allComicsSection = newSection(getString(R.string.all_comics), R.drawable.book, ComicListFragment.getInstance());
         mSectionsArray[0] = allComicsSection;
         addSection(allComicsSection);
 
-        MaterialSection currentlyReadingSection = newSection("Currently reading", R.drawable.last_read, CurrentlyReadingFragment.getInstance());
+        MaterialSection currentlyReadingSection = newSection(getString(R.string.currently_reading), R.drawable.last_read, CurrentlyReadingFragment.getInstance());
         mSectionsArray[1] = currentlyReadingSection;
         addSection(currentlyReadingSection);
 
-        MaterialSection favoritesSection = newSection("Favorites", R.drawable.star, FavoritesListFragment.getInstance());
+        MaterialSection favoritesSection = newSection(getString(R.string.favorites), R.drawable.star, FavoritesListFragment.getInstance());
         mSectionsArray[2] = favoritesSection;
         addSection(favoritesSection);
 
         CloudFragment.getInstance().setRetainInstance(true);
-        MaterialSection cloudSection = newSection("Cloud storage", R.drawable.cloud, CloudFragment.getInstance());
+        MaterialSection cloudSection = newSection(getString(R.string.cloud_storage), R.drawable.cloud, CloudFragment.getInstance());
         mSectionsArray[3] = cloudSection;
         addSection(cloudSection);
 
-        MaterialSection statsSection = newSection("Statistics", R.drawable.stats, StatisticsFragment.newInstance());
+        MaterialSection statsSection = newSection(getString(R.string.statistics), R.drawable.stats, StatisticsFragment.newInstance());
         mSectionsArray[4] = statsSection;
         addSection(statsSection);
 
-        MaterialSection settingsSection = newSection("Settings", R.drawable.settings, SettingsFragment.newInstance());
+        MaterialSection settingsSection = newSection(getString(R.string.settings), R.drawable.settings, SettingsFragment.newInstance());
         mSectionsArray[5] = settingsSection;
         addBottomSection(settingsSection);
         
-        MaterialSection aboutSection = newSection("About", R.drawable.about, AboutFragment.newInstance());
+        MaterialSection aboutSection = newSection(getString(R.string.about), R.drawable.about, AboutFragment.newInstance());
         mSectionsArray[6] = aboutSection;
         addBottomSection(aboutSection);
 
@@ -115,19 +115,19 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
 
     private Fragment getFragment(MaterialSection materialSection)
     {
-        if (materialSection.getTitle().equals("All comics"))
+        if (materialSection.getTitle().equals(getString(R.string.all_comics)))
             return ComicListFragment.getInstance();
-        else if (materialSection.getTitle().equals("Currently reading"))
+        else if (materialSection.getTitle().equals(getString(R.string.currently_reading)))
             return CurrentlyReadingFragment.getInstance();
-        else if (materialSection.getTitle().equals("Favorites"))
+        else if (materialSection.getTitle().equals(getString(R.string.favorites)))
             return FavoritesListFragment.getInstance();
-        else if (materialSection.getTitle().equals("Cloud storage"))
+        else if (materialSection.getTitle().equals(getString(R.string.cloud_storage)))
             return CloudFragment.getInstance();
-        else if (materialSection.getTitle().equals("Statistics"))
+        else if (materialSection.getTitle().equals(getString(R.string.statistics)))
             return StatisticsFragment.newInstance();
-        else if (materialSection.getTitle().equals("Settings"))
+        else if (materialSection.getTitle().equals(getString(R.string.settings)))
             return SettingsFragment.newInstance();
-        else if (materialSection.getTitle().equals("About"))
+        else if (materialSection.getTitle().equals(getString(R.string.about)))
             return AboutFragment.newInstance();
         else
             return ComicListFragment.getInstance();

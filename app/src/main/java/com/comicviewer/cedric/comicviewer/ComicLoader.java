@@ -331,6 +331,14 @@ public class ComicLoader {
         {
             e.printStackTrace();
         }
+
+        if (comic.getTitle().equals("")) {
+            if (comic.getFilePath().contains("mangarock")) {
+                comic.setTitle("MangaRock Comic");
+            }
+            else
+                comic.setTitle("Untitled");
+        }
     }
 
 
