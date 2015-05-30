@@ -283,14 +283,15 @@ public class CurrentlyReadingFragment extends Fragment {
                 if (ComicLoader.setComicColor(mApplicationContext, comic))
                     PreferenceSetter.saveComic(mApplicationContext, comic);
 
-
-                final Comic finalComic = comic;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.addObjectSorted(finalComic);
-                    }
-                });
+                if (readMap.get(str)<comic.getPageCount()-1) {
+                    final Comic finalComic = comic;
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.addObjectSorted(finalComic);
+                        }
+                    });
+                }
 
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);

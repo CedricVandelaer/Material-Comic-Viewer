@@ -29,7 +29,7 @@
         <TextView
             android:gravity="center"
             android:id="@+id/delete_text"
-            android:text="Delete"
+            android:text="@string/delete"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

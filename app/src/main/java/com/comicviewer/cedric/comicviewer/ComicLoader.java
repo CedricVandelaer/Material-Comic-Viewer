@@ -27,7 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Cédric on 1/04/2015.
+ * Created by CV on 1/04/2015.
+ * class to load the info of the comics
  */
 public class ComicLoader {
 
@@ -335,9 +336,23 @@ public class ComicLoader {
         if (comic.getTitle().equals("")) {
             if (comic.getFilePath().contains("mangarock")) {
                 comic.setTitle("MangaRock Comic");
+                try {
+                    String folderNumber = "";
+                    for (int i=0;i<comic.getFileName().length();i++)
+                    {
+                        if (Character.isDigit(comic.getFileName().charAt(i)))
+                            folderNumber+=comic.getFileName().charAt(i);
+                    }
+                    comic.setIssueNumber(Integer.parseInt(comic.getFileName()));
+                    comic.setYear(-1);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
             else
-                comic.setTitle("Untitled");
+                comic.setTitle(context.getString(R.string.untitled));
         }
     }
 

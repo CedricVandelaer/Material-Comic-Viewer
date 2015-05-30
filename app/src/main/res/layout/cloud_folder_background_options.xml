@@ -29,7 +29,7 @@
         <TextView
             android:gravity="center"
             android:id="@+id/download_text"
-            android:text="Download"
+            android:text="@string/download"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

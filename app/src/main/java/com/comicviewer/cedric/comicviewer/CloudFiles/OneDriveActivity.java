@@ -88,7 +88,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
 
         mErrorTextView.setVisibility(View.GONE);
 
-        getActionBar().setTitle("Microsoft OneDrive");
+        getActionBar().setTitle(getString(R.string.onedrive));
 
         getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
 
@@ -161,7 +161,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
         }
         else
         {
-            mErrorTextView.setText("An error occured during authentication...");
+            mErrorTextView.setText(getString(R.string.error_while_authenticating));
         }
     }
 
@@ -204,7 +204,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
                     if (!fileFound)
                     {
                         mErrorTextView.setVisibility(View.VISIBLE);
-                        mErrorTextView.setText("There were no compatible files found...");
+                        mErrorTextView.setText(getString(R.string.no_supported_files_found));
                     }
                     else
                     {

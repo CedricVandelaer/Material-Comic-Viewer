@@ -153,7 +153,7 @@ public class StatisticsFragment extends Fragment {
         }
         else
         {
-            mFavoriteSeries.setText("None yet");
+            mFavoriteSeries.setText(getString(R.string.none_yet));
         }
 
         mLongestReadTitleTextView.setText(PreferenceSetter.getLongestReadComicTitle(getActivity()));

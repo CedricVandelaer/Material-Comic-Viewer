@@ -185,7 +185,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
                 if (folderItemViewHolder.getFile().getName().equals("ComicViewer"))
                 {
-                    Toast.makeText(mContext, "This folder can't be renamed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.folder_rename_error), Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -193,10 +193,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                     @Override
                     public void run() {
                         MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                                .title("Rename folder")
-                                .negativeText("Cancel")
+                                .title(mContext.getString(R.string.rename_folder))
+                                .negativeText(mContext.getString(R.string.cancel))
                                 .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
-                                .positiveText("Confirm")
+                                .positiveText(mContext.getString(R.string.confirm))
                                 .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
                                 .inputType(InputType.TYPE_CLASS_TEXT)
                                 .input("Folder name",
@@ -217,7 +217,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                                                     new RenameTask().execute(oldPath, newPath, folderItemViewHolder.getFile());
 
                                                 } else {
-                                                    Toast.makeText(mContext, "This folder already exists", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(mContext, mContext.getString(R.string.folder_exists_notice), Toast.LENGTH_LONG).show();
                                                 }
 
                                             }
@@ -238,10 +238,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         @Override
         protected void onPreExecute()
         {
-            mDialog = new MaterialDialog.Builder(mContext).title("Renaming folder")
-                    .content("Please be patient while the app updates the saved comic data.")
+            mDialog = new MaterialDialog.Builder(mContext).title(mContext.getString(R.string.renaming_folder))
+                    .content(mContext.getString(R.string.updating_folder_name_notice))
                     .cancelable(false)
-                    .progress(true,1,false)
+                    .progress(true, 1, false)
                     .show();
         }
 
@@ -297,13 +297,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 final String path = folderItemViewHolder.getFile().getAbsolutePath();
 
                 MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                        .title("Warning")
-                        .content("This will delete the folder:\n\""+folderItemViewHolder.getFile().getName()+"\"\nand all its contents. " +
-                                "Are you sure you wish to continue?")
+                        .title(mContext.getString(R.string.warning))
+                        .content(mContext.getString(R.string.delete_folder_notice_1)+"\n\""+folderItemViewHolder.getFile().getName()
+                                +"\"\n"+mContext.getString(R.string.delete_folder_notice_2) +
+                                mContext.getString(R.string.sure_prompt))
                         .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
-                        .positiveText("Accept")
+                        .positiveText(mContext.getString(R.string.confirm))
                         .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
-                        .negativeText("Cancel")
+                        .negativeText(mContext.getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
@@ -474,11 +475,11 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 notifyItemRemoved(pos);
                 */
                 MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                        .title("Notice")
-                        .content("Hiding comics and folders is only supported in the pro version of the app.")
-                        .positiveText("Buy full version")
+                        .title(mContext.getString(R.string.notice))
+                        .content(mContext.getString(R.string.pro_version_notice))
+                        .positiveText(mContext.getString(R.string.buy_full_version))
                         .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
-                        .negativeText("Cancel")
+                        .negativeText(mContext.getString(R.string.cancel))
                         .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
@@ -504,8 +505,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                     @Override
                     public void run() {
                         MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                                .title("Options")
-                                .positiveText("Cancel")
+                                .title(mContext.getString(R.string.options))
+                                .positiveText(mContext.getString(R.string.cancel))
                                 .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
                                 .customView(R.layout.options_menu_layout, true)
                                 .show();
@@ -544,11 +545,11 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 notifyItemRemoved(pos);
                 */
                 MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                        .title("Notice")
-                        .content("Hiding comics and folders is only supported in the pro version of the app.")
-                        .positiveText("Buy full version")
+                        .title(mContext.getString(R.string.notice))
+                        .content(mContext.getString(R.string.pro_version_notice))
+                        .positiveText(mContext.getString(R.string.buy_full_version))
                         .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
-                        .negativeText("Cancel")
+                        .negativeText(mContext.getString(R.string.cancel))
                         .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
@@ -581,8 +582,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         @Override
         public void onPreExecute()
         {
-            mDialog = new MaterialDialog.Builder(mContext).title("Reloading comic")
-                    .content("Please be patient while the app updates the comic data.")
+            mDialog = new MaterialDialog.Builder(mContext).title(mContext.getString(R.string.reloading_comic))
+                    .content(mContext.getString(R.string.updating_data_notice))
                     .cancelable(false)
                     .progress(true,1,false)
                     .show();
@@ -669,7 +670,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 else
                 {
                     //Do nothing, already marked as unread
-                    Toast message = Toast.makeText(mContext, "You haven't started this comic yet!", Toast.LENGTH_SHORT);
+                    Toast message = Toast.makeText(mContext, mContext.getString(R.string.not_started_toast), Toast.LENGTH_SHORT);
                     message.show();
                 }
             }
@@ -699,10 +700,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 final String fileName = comic.getFileName();
 
                 new AlertDialog.Builder(mContext)
-                        .setTitle("Confirm delete")
-                        .setMessage("Are you sure you wish to delete "+finalMessage+"?\n" +
-                                "This will also remove the file \""+fileName+"\".")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        .setTitle(mContext.getString(R.string.confirm_delete))
+                        .setMessage(mContext.getString(R.string.sure_delete_prompt)+" "+finalMessage+"?\n" +
+                                mContext.getString(R.string.will_also_remove_file) + " \""+fileName+"\".")
+                        .setPositiveButton(mContext.getString(R.string.yes), new DialogInterface.OnClickListener() {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -710,7 +711,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                             }
 
                         })
-                        .setNegativeButton("No", null)
+                        .setNegativeButton(mContext.getString(R.string.no), null)
                         .show();
             }
         });
@@ -835,17 +836,17 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         comicItemViewHolder.mCoverPicture.setImageBitmap(null);
 
         if (comic.getIssueNumber()!=-1)
-            comicItemViewHolder.mIssueNumber.setText("Issue number: "+comic.getIssueNumber());
+            comicItemViewHolder.mIssueNumber.setText(mContext.getString(R.string.issue_number)+": "+comic.getIssueNumber());
         else
             comicItemViewHolder.mIssueNumber.setText("");
 
         if (comic.getYear()!=-1)
-            comicItemViewHolder.mYear.setText("Year: "+comic.getYear());
+            comicItemViewHolder.mYear.setText(mContext.getString(R.string.year)+": "+comic.getYear());
         else
             comicItemViewHolder.mYear.setText("");
 
         if (comic.getPageCount()!=-1)
-            comicItemViewHolder.mPageCount.setText("Pages: "+comic.getPageCount());
+            comicItemViewHolder.mPageCount.setText(mContext.getString(R.string.pages)+": "+comic.getPageCount());
         else
             comicItemViewHolder.mPageCount.setText("");
 
@@ -921,17 +922,17 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         comicItemViewHolder.mTitle.setText(comic.getTitle());
         if (comic.getIssueNumber()!= -1)
-            comicItemViewHolder.mIssueNumber.setText("Issue number: "+comic.getIssueNumber());
+            comicItemViewHolder.mIssueNumber.setText(mContext.getString(R.string.issue_number)+": "+comic.getIssueNumber());
         else
             comicItemViewHolder.mIssueNumber.setText("");
 
         if (comic.getYear()!=-1)
-            comicItemViewHolder.mYear.setText("Year: "+comic.getYear());
+            comicItemViewHolder.mYear.setText(mContext.getString(R.string.year)+": "+comic.getYear());
         else
             comicItemViewHolder.mYear.setText("");
 
         if (comic.getPageCount()!=-1)
-            comicItemViewHolder.mPageCount.setText(""+comic.getPageCount()+" pages");
+            comicItemViewHolder.mPageCount.setText(""+comic.getPageCount()+" "+mContext.getString(R.string.pages_no_capital));
         else
             comicItemViewHolder.mPageCount.setText("");
 

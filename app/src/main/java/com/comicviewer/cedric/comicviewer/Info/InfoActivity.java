@@ -65,7 +65,7 @@ public class InfoActivity extends Activity {
 
         if (mComic.getIssueNumber()!=-1)
         {
-            mIssueNumberTextView.setText("Issue number: "+mComic.getIssueNumber());
+            mIssueNumberTextView.setText(getString(R.string.issue_number)+": "+mComic.getIssueNumber());
         }
         else
         {
@@ -74,7 +74,7 @@ public class InfoActivity extends Activity {
 
         if (mComic.getYear()!=-1)
         {
-            mYearTextView.setText("Year: "+mComic.getYear());
+            mYearTextView.setText(getString(R.string.year)+": "+mComic.getYear());
         }
         else
         {
@@ -83,7 +83,7 @@ public class InfoActivity extends Activity {
 
         if (mComic.getPageCount()>0)
         {
-            mPagesTextView.setText("Pages: "+mComic.getPageCount());
+            mPagesTextView.setText(getString(R.string.pages)+": "+mComic.getPageCount());
         }
         else
         {
@@ -92,8 +92,8 @@ public class InfoActivity extends Activity {
 
         File archiveFile = new File(mComic.getFilePath()+"/"+mComic.getFileName());
 
-        mFilenameTextView.setText("Filename:\n"+archiveFile.getName());
-        mFileSizeTextView.setText("File size: "+archiveFile.length()/(1024*1024)+" mb");
+        mFilenameTextView.setText(getString(R.string.filename)+":\n"+archiveFile.getName());
+        mFileSizeTextView.setText(getString(R.string.file_size)+": "+archiveFile.length()/(1024*1024)+" mb");
 
     }
 

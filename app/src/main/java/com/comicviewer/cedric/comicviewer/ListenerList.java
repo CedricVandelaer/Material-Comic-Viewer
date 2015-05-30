@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Cédric on 29/04/2015.
+ * Created by CV on 29/04/2015.
+ * helper class for filedialog
  */
 public class ListenerList<L> {
     private List<L> listenerList = new ArrayList<L>();

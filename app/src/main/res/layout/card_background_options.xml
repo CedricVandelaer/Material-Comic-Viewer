@@ -58,40 +58,11 @@
         <TextView
             android:gravity="center"
             android:id="@+id/mark_read_text"
-            android:text="Mark read"
+            android:text="@string/mark_read"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
-    <!--
-    <LinearLayout
-        android:id="@+id/mark_unread_layout"
-        android:orientation="vertical"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:gravity="center"
-        android:layout_height="match_parent">
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/mark_unread_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_close"
-            android:adjustViewBounds="true"
-            android:layout_margin="16dp"
-            fab:fab_type="normal"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Cyan"
-            fab:fab_colorPressed="@color/CyanDark"
-            fab:fab_colorRipple="@color/CyanLight" />
-        <TextView
-            android:gravity="center"
-            android:id="@+id/mark_unread_text"
-            android:text="Mark as unread"
-            android:textAllCaps="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-    -->
     <LinearLayout
         android:id="@+id/manga_layout"
         android:orientation="vertical"
@@ -114,7 +85,7 @@
         <TextView
             android:gravity="center"
             android:id="@+id/manga_text"
-            android:text="Manga comic"
+            android:text="@string/manga_comic"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -141,7 +112,7 @@
         <TextView
             android:gravity="center"
             android:id="@+id/more_text"
-            android:text="Options"
+            android:text="@string/options"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Created by Cédric on 11/03/2015.
+ * Created by CV on 11/03/2015.
  * Class to create the list of comics without actually loading them
  */
 public class FileLoader {

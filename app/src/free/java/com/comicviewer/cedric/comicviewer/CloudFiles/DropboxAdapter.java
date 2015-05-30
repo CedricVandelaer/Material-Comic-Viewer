@@ -87,17 +87,17 @@ public class DropboxAdapter extends RecyclerView.Adapter {
                 final DropboxAPI.Entry entry = cloudFolderViewHolder.getDropboxEntry();
 
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title("Notice")
-                        .content("Downloading folders is only available in the pro version.")
+                        .title(mActivity.getString(R.string.notice))
+                        .content(mActivity.getString(R.string.pro_version_notice))
                         .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .positiveText("Buy pro version")
+                        .positiveText(mActivity.getString(R.string.buy_full_version))
                         .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .negativeText("Cancel")
+                        .negativeText(mActivity.getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro") );
+                                Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro"));
                                 mActivity.startActivity(browse);
                             }
                         }).show();
@@ -114,17 +114,17 @@ public class DropboxAdapter extends RecyclerView.Adapter {
                 final DropboxAPI.Entry entry = cloudFileViewHolder.getDropboxEntry();
 
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title("Download file")
-                        .content("Do you wish to download file \""+entry.fileName()+"\"?")
+                        .title(mActivity.getString(R.string.download_file))
+                        .content(mActivity.getString(R.string.download_request)+" \""+entry.fileName()+"\"?")
                         .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .positiveText("Confirm")
+                        .positiveText(mActivity.getString(R.string.confirm))
                         .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .negativeText("Cancel")
+                        .negativeText(mActivity.getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Toast.makeText(mActivity,"Download started...",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mActivity, mActivity.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
                                 DownloadFileService.startActionDownload(mActivity, entry.path, mCloudService);
                             }
                         }).show();

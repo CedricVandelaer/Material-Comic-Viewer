@@ -87,19 +87,13 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     private void initSwipeLayout(View itemView) {
         mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
 
-        //mDeleteButtonLayout = (LinearLayout) itemView.findViewById(R.id.delete_button_layout);
         mMarkReadButtonLayout = (LinearLayout) itemView.findViewById(R.id.mark_read_layout);
-        //mMarkUnreadButtonLayout = (LinearLayout) itemView.findViewById(R.id.mark_unread_layout);
         mOptionsLayout = (LinearLayout) itemView.findViewById(R.id.more_layout);
 
-        //mDeleteButton = (FloatingActionButton) itemView.findViewById(R.id.delete_button);
         mMarkReadButton = (FloatingActionButton) itemView.findViewById(R.id.mark_read_button);
-        //mMarkUnreadButton = (FloatingActionButton) itemView.findViewById(R.id.mark_unread_button);
         mOptionsButton = (FloatingActionButton) itemView.findViewById(R.id.more_button);
 
-        //mDeleteTextView = (TextView) itemView.findViewById(R.id.delete_text);
         mMarkReadTextView = (TextView) itemView.findViewById(R.id.mark_read_text);
-        //mMarkUnreadTextView = (TextView) itemView.findViewById(R.id.mark_unread_text);
         mOptionsTextView = (TextView) itemView.findViewById(R.id.more_text);
 
     }

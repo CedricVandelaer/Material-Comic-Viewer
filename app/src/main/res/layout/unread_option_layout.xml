@@ -22,7 +22,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:id="@+id/mark_unread_text"
-        android:text="Mark unread"
+        android:text="@string/mark_unread"
         android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

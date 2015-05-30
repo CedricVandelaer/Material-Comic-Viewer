@@ -49,7 +49,7 @@ public class SimpleEula {
             AlertDialog.Builder builder = new AlertDialog.Builder(mActivity)
                     .setTitle(title)
                     .setMessage(message)
-                    .setPositiveButton("Accept", new Dialog.OnClickListener() {
+                    .setPositiveButton(mActivity.getString(R.string.accept), new Dialog.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -60,7 +60,7 @@ public class SimpleEula {
                             dialogInterface.dismiss();
                         }
                     })
-                    .setNegativeButton("Decline", new Dialog.OnClickListener() {
+                    .setNegativeButton(mActivity.getString(R.string.decline), new Dialog.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

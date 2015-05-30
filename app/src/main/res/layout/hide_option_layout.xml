@@ -22,7 +22,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:id="@+id/hide_text"
-        android:text="Hide"
+        android:text="@string/hide"
         android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

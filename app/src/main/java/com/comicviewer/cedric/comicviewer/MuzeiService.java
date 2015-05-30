@@ -103,7 +103,7 @@ public class MuzeiService extends MuzeiArtSource {
 
         publishArtwork(new Artwork.Builder()
                 .title(comicList.get(pos).getTitle())
-                .byline("Issue number: " + comicList.get(pos).getIssueNumber())
+                .byline(getString(R.string.issue_number)+": " + comicList.get(pos).getIssueNumber())
                 .imageUri(contentUri)
                 .token(comicList.get(pos).getFileName())
                 .build());

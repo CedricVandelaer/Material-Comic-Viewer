@@ -223,6 +223,12 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
     {
         super.onResume();
         changeToolbarColor(PreferenceSetter.getAppThemeColor(this),darkenColor(PreferenceSetter.getAppThemeColor(this)));
+        if (!NavigationManager.getInstance().sectionStackEmpty())
+        {
+            if (NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.all_comics)))
+                setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                        NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+        }
     }
 
     private void setDrawerHeaderImage()

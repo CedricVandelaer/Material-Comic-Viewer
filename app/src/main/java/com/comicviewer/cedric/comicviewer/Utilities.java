@@ -225,6 +225,9 @@ public class Utilities {
             return false;
         File files[] = folder.listFiles();
 
+        if (files.length<1)
+            return false;
+
         for (int i=0;i<files.length;i++)
         {
             if (files[i].isDirectory())
@@ -270,7 +273,7 @@ public class Utilities {
             numRead = is.read(signature);
 
             if (numRead == -1)
-                throw new IOException("Trying to reda from 0 byte stream");
+                throw new IOException("Trying to read from 0 byte stream");
 
         } finally {
             if (is != null)

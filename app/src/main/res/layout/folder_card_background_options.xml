@@ -29,7 +29,7 @@
         <TextView
             android:gravity="center"
             android:id="@+id/delete_text"
-            android:text="Delete"
+            android:text="@string/delete"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -56,7 +56,7 @@
         <TextView
             android:gravity="center"
             android:id="@+id/rename_text"
-            android:text="Rename"
+            android:text="@string/rename"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -84,7 +84,7 @@
         <TextView
             android:gravity="center"
             android:id="@+id/hide_text"
-            android:text="Hide"
+            android:text="@string/hide"
             android:textAllCaps="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

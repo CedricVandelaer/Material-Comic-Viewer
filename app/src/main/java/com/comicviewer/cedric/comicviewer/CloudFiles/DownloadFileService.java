@@ -410,7 +410,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
         mNotification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_recents)
                 .setContentTitle("Material Comic Viewer")
-                .setContentText(title + " already exists");
+                .setContentText(getString(R.string.error)+": "+title + " "+getString(R.string.already_exists));
 
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -441,8 +441,8 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                         PendingIntent.FLAG_ONE_SHOT
                 );
         mNotification.setContentIntent(resultPendingIntent);
-        mNotification.setContentText("Finished downloading " + title);
-        mNotification.setProgress(0,0,false);
+        mNotification.setContentText(getString(R.string.finished_downloading) + ": " + title);
+        mNotification.setProgress(0, 0, false);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -454,7 +454,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
     private void setNotificationProgress(long completed, long total, String title, int id)
     {
         mNotification.setProgress((int) total, (int) completed, false)
-        .setContentText("Downloading " + title);
+        .setContentText(getString(R.string.downloading)+": " + title);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -468,7 +468,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                         .setColor(PreferenceSetter.getAppThemeColor(DownloadFileService.this))
                         .setGroup(NOTIFICATION_KEY)
                 .setContentTitle("Material Comic Viewer")
-                        .setContentText("The file " + title + " has started downloading");
+                        .setContentText(getString(R.string.downloading)+": " + title);
 
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -484,7 +484,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                 .setSmallIcon(R.drawable.ic_recents)
                 .setContentTitle("Material Comic Viewer")
                 .setColor(PreferenceSetter.getAppThemeColor(DownloadFileService.this))
-                .setContentText("An error occured downloading " + title);
+                .setContentText(getString(R.string.error_while_downloading)+": " + title);
 
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

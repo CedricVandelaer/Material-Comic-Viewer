@@ -57,7 +57,7 @@ public class SettingsFragment extends PreferenceFragment{
 
         PreferenceCategory functionCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
         Preference goProPreference = new Preference(getActivity());
-        goProPreference.setTitle("Buy full version");
+        goProPreference.setTitle(getString(R.string.buy_full_version));
         goProPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -80,7 +80,7 @@ public class SettingsFragment extends PreferenceFragment{
 
         Preference unhideListPreference = new Preference(getActivity());
 
-        unhideListPreference.setTitle("Unhide comics and folders (PRO)");
+        unhideListPreference.setTitle(getString(R.string.unhide_setting_non_pro));
 
         unhideListPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -100,8 +100,8 @@ public class SettingsFragment extends PreferenceFragment{
         final CustomCheckBoxPreference mangaPreference = new CustomCheckBoxPreference(getActivity());
 
         mangaPreference.setKey(PreferenceSetter.MANGA_SETTING);
-        mangaPreference.setSummary("Note: By checking this option comics will open in manga modus by default");
-        mangaPreference.setTitle("Manga modus (PRO)");
+        mangaPreference.setSummary(getString(R.string.manga_setting_note));
+        mangaPreference.setTitle(getString(R.string.manga_setting_non_pro));
         mangaPreference.setDefaultValue(false);
 
         mangaPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -123,7 +123,7 @@ public class SettingsFragment extends PreferenceFragment{
         Preference preference = new Preference(getActivity());
 
         preference.setKey("BUY_PRO_FILEFORMAT");
-        preference.setTitle("Comic file format (PRO)");
+        preference.setTitle(getString(R.string.file_format_setting_non_pro));
 
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -146,7 +146,7 @@ public class SettingsFragment extends PreferenceFragment{
         Preference preference = new Preference(getActivity());
 
         preference.setKey("BUY_PRO");
-        preference.setTitle("App theme color (PRO)");
+        preference.setTitle(getString(R.string.app_theme_setting_non_pro));
 
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -164,7 +164,7 @@ public class SettingsFragment extends PreferenceFragment{
     private void disableVolumeKeyPreference()
     {
         final CustomCheckBoxPreference volumePreference = (CustomCheckBoxPreference) findPreference("volumeKeysOption");
-        volumePreference.setTitle("Use volume keys to turn pages (PRO)");
+        volumePreference.setTitle(getString(R.string.volume_key_setting_non_pro));
         volumePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -181,7 +181,7 @@ public class SettingsFragment extends PreferenceFragment{
 
         Preference removePathsPreference = new Preference(getActivity());
 
-        removePathsPreference.setTitle("Remove added filepaths");
+        removePathsPreference.setTitle(getString(R.string.remove_filepaths_setting));
         removePathsPreference.setSummary(getString(R.string.path_preference_summary));
 
 
@@ -203,11 +203,11 @@ public class SettingsFragment extends PreferenceFragment{
 
 
                 new MaterialDialog.Builder(getActivity())
-                        .title("Remove filepaths")
+                        .title(getString(R.string.remove_filepaths))
                         .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .positiveText("Remove")
+                        .positiveText(getString(R.string.remove))
                         .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .negativeText("Cancel")
+                        .negativeText(getString(R.string.cancel))
                         .items(charSequences)
                         .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
                             @Override
@@ -234,11 +234,11 @@ public class SettingsFragment extends PreferenceFragment{
     public void showBuyProDialog()
     {
         MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Notice")
-                .content("This feature requires the pro version of the app.")
-                .negativeText("Cancel")
+                .title(getString(R.string.notice))
+                .content(getString(R.string.pro_version_notice))
+                .negativeText(getString(R.string.cancel))
                 .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                .positiveText("Go to play store")
+                .positiveText(getString(R.string.go_to_play_store))
                 .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override

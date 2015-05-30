@@ -211,6 +211,17 @@ public class ComicListFragment extends Fragment {
             mSearchComicsTask = new SearchComicsTask();
             mSearchComicsTask.execute();
         }
+        else
+        {
+            if (NavigationManager.getInstance().fileStackEmpty())
+                Log.d("NavigationManager", "FileStack is empty");
+            else
+                Log.d("NavigationManager", "Top path: "+NavigationManager.getInstance().getPathFromFileStack());
+
+            if (getActivity()==null)
+                Log.d("Activity", "Activity is null");
+
+        }
 
 
     }
@@ -229,7 +240,7 @@ public class ComicListFragment extends Fragment {
                 FileDialog dialog = new FileDialog(getActivity(), path);
                 dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
                     public void directorySelected(File directory) {
-                        Log.d(getClass().getName(), "selected dir " + directory.toString());
+                        Log.d(getClass().getName(), "Selected directory: " + directory.toString());
 
                         ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 
@@ -573,26 +584,26 @@ public class ComicListFragment extends Fragment {
 
     private void initialiseVariables(Bundle savedInstanceState)
     {
-
         mAdapter = new ComicAdapter(mApplicationContext);
         mRecyclerView.setAdapter(mAdapter);
 
 
-        if (!(savedInstanceState==null))
+        if (savedInstanceState!=null)
         {
             for (int i=0;i<savedInstanceState.size();i++)
             {
 
-                if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
+                if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null) {
                     mAdapter.addObject(savedInstanceState.getParcelable("Comic " + (i + 1)));
+                }
             }
 
             for (int i=savedInstanceState.size();i>=0;i--)
             {
-                if (savedInstanceState.getSerializable("Folder "+ (i+1))!=null)
+                if (savedInstanceState.getSerializable("Folder " + (i + 1))!=null) {
                     mAdapter.addObject(savedInstanceState.getSerializable("Folder " + (i + 1)));
+                }
             }
-
         }
     }
 

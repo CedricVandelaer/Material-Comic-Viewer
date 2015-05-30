@@ -38,7 +38,7 @@ public class ComicActions {
             if (PreferenceSetter.getReadComics(context).get(comic.getFileName())+1>= comic.getPageCount())
             {
                 //Do nothing, already marked as read
-                Toast message = Toast.makeText(context, "You have already read this comic!", Toast.LENGTH_SHORT);
+                Toast message = Toast.makeText(context, context.getString(R.string.already_read_toast), Toast.LENGTH_SHORT);
                 message.show();
             }
             else

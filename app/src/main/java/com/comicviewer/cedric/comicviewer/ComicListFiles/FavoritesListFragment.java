@@ -196,7 +196,7 @@ public class FavoritesListFragment extends Fragment {
                 FileDialog dialog = new FileDialog(getActivity(), path);
                 dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
                     public void directorySelected(File directory) {
-                        Log.d(getClass().getName(), "selected dir " + directory.toString());
+                        Log.d(getClass().getName(), "Selected directory: " + directory.toString());
 
                         ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 

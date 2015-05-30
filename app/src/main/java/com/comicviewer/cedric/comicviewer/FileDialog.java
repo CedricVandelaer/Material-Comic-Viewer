@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Cédric on 5/02/2015.
+ * Created by CV on 5/02/2015.
+ * class to pick folders
  */
 public class FileDialog {
     private static final String PARENT_DIR = "..";
@@ -51,13 +52,13 @@ public class FileDialog {
 
         builder.setTitle(currentPath.getPath());
         if (selectDirectoryOption) {
-            builder.setPositiveButton("Select directory", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(activity.getString(R.string.select_directory), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     Log.d(TAG, currentPath.getPath());
                     fireDirectorySelectedEvent(currentPath);
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
