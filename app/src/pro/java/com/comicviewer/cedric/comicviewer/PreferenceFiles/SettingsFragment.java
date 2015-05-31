@@ -69,11 +69,11 @@ public class SettingsFragment extends PreferenceFragment{
         }
 
         fileFormatList.setKey(PreferenceSetter.FILE_FORMAT_SETTING);
-        fileFormatList.setSummary("Note: Extra or special characters will be removed");
+        fileFormatList.setSummary(getString(R.string.extra_chars_removed_note));
         fileFormatList.setEntries(charSequences);
         fileFormatList.setEntryValues(charSequences);
-        fileFormatList.setTitle("Comic file format");
-        fileFormatList.setDialogTitle("Choose the file format");
+        fileFormatList.setTitle(getString(R.string.file_format_setting));
+        fileFormatList.setDialogTitle(getString(R.string.choose_file_format));
         fileFormatList.setDefaultValue(getActivity().getResources().getString(R.string.file_format_1));
 
         targetCategory.addPreference(fileFormatList);
@@ -86,7 +86,18 @@ public class SettingsFragment extends PreferenceFragment{
         final ListPreference appThemeListPreference = new ListPreference(getActivity());
         appThemeListPreference.setKey(PreferenceSetter.APP_THEME_COLOR);
 
-        CharSequence[] entries = {"Teal","Red", "Orange","Blue", "Pink", "Purple", "Deep Purple", "Green", "Yellow"};
+        CharSequence[] entries = {
+                getString(R.string.teal),
+                getString(R.string.red),
+                getString(R.string.orange),
+                getString(R.string.blue),
+                getString(R.string.pink),
+                getString(R.string.purple),
+                getString(R.string.deep_purple),
+                getString(R.string.green),
+                getString(R.string.yellow),
+                getString(R.string.gold),
+                getString(R.string.indigo)};
         CharSequence[] entryValues = {""+getResources().getColor(R.color.Teal),
         ""+getResources().getColor(R.color.Red),
         ""+getResources().getColor(R.color.Orange),
@@ -95,27 +106,29 @@ public class SettingsFragment extends PreferenceFragment{
         ""+getResources().getColor(R.color.Purple),
         ""+getResources().getColor(R.color.DeepPurple),
         ""+getResources().getColor(R.color.Green),
-        ""+getResources().getColor(R.color.Yellow)};
+        ""+getResources().getColor(R.color.Yellow),
+        ""+getResources().getColor(R.color.Gold),
+        ""+getResources().getColor(R.color.Indigo)};
 
         appThemeListPreference.setEntries(entries);
         appThemeListPreference.setEntryValues(entryValues);
         appThemeListPreference.setDefaultValue("" + PreferenceSetter.getAppThemeColor(getActivity()));
 
-        appThemeListPreference.setTitle("App theme color");
-        appThemeListPreference.setSummary("Note: app will have to restart");
-        appThemeListPreference.setDialogTitle("Choose app theme color");
+        appThemeListPreference.setTitle(getString(R.string.app_theme_setting));
+        appThemeListPreference.setSummary(getString(R.string.restart_note));
+        appThemeListPreference.setDialogTitle(getString(R.string.choose_app_color));
 
         appThemeListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, final Object newValue) {
 
                 MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                        .title("Warning")
-                        .content("The app will have to restart to complete the operation")
+                        .title(getString(R.string.warning))
+                        .content(getString(R.string.restart_dialog))
                         .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
                         .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .positiveText("Accept")
-                        .negativeText("Cancel")
+                        .positiveText(getString(R.string.accept))
+                        .negativeText(getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
@@ -143,8 +156,8 @@ public class SettingsFragment extends PreferenceFragment{
 
 
         mangaPreference.setKey(PreferenceSetter.MANGA_SETTING);
-        mangaPreference.setSummary("Note: By checking this option comics will open in manga modus by default");
-        mangaPreference.setTitle("Manga modus");
+        mangaPreference.setSummary(getString(R.string.manga_setting_note));
+        mangaPreference.setTitle(getString(R.string.manga_setting));
         mangaPreference.setDefaultValue(false);
 
         targetCategory.addPreference(mangaPreference);
@@ -156,7 +169,7 @@ public class SettingsFragment extends PreferenceFragment{
 
         Preference unhideListPreference = new Preference(getActivity());
 
-        unhideListPreference.setTitle("Unhide comics and folders");
+        unhideListPreference.setTitle(getString(R.string.unhide_setting));
 
         unhideListPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -171,11 +184,11 @@ public class SettingsFragment extends PreferenceFragment{
                 }
 
                 new MaterialDialog.Builder(getActivity())
-                        .title("Unhide files")
+                        .title(getString(R.string.unhide_files))
                         .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .positiveText("Unhide")
+                        .positiveText(getString(R.string.unhide))
                         .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .negativeText("Cancel")
+                        .negativeText(getString(R.string.cancel))
                         .items(charSequences)
                         .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
                             @Override
@@ -201,7 +214,7 @@ public class SettingsFragment extends PreferenceFragment{
     {
         Preference removePathsPreference = new Preference(getActivity());
 
-        removePathsPreference.setTitle("Remove added filepaths");
+        removePathsPreference.setTitle(getString(R.string.remove_filepaths_setting));
         removePathsPreference.setSummary(getString(R.string.path_preference_summary));
 
 
@@ -223,11 +236,11 @@ public class SettingsFragment extends PreferenceFragment{
 
 
                 new MaterialDialog.Builder(getActivity())
-                        .title("Remove filepaths")
+                        .title(getString(R.string.remove_filepaths))
                         .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .positiveText("Remove")
+                        .positiveText(getString(R.string.remove))
                         .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .negativeText("Cancel")
+                        .negativeText(getString(R.string.cancel))
                         .items(charSequences)
                         .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
                             @Override

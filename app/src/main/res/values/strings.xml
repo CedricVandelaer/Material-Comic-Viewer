@@ -4,15 +4,35 @@
     <string name="admob_ad_unit_id">ca-app-pub-1913373193124965/9353062734</string>
     <string name="app_name">Comic Viewer Free</string>
     <string name="buy_full_version">Buy full version</string>
+    <string name="unhide_files">Unhide files</string>
+    <string name="unhide">Unhide</string>
     <string name="unhide_setting_non_pro">Unhide comics and folders (PRO)</string>
+    <string name="unhide_setting">Unhide comics and folders</string>
     <string name="manga_setting_note">Note: By checking this option comics will open in manga modus by default</string>
     <string name="manga_setting_non_pro">Manga modus (PRO)</string>
+    <string name="manga_setting">Manga modus</string>
     <string name="file_format_setting_non_pro">Comic file format (PRO)</string>
+    <string name="file_format_setting">Comic file format</string>
+    <string name="choose_file_format">Choose the file format</string>
+    <string name="of">of</string>
     <string name="volume_key_setting_non_pro">Use volume keys to turn pages (PRO)</string>
+    <string name="teal">Teal</string>
+    <string name="indigo">Indigo</string>
+    <string name="red">Red</string>
+    <string name="orange">Orange</string>
+    <string name="blue">Blue</string>
+    <string name="pink">Pink</string>
+    <string name="purple">Purple</string>
+    <string name="deep_purple">Deep purple</string>
+    <string name="green">Green</string>
+    <string name="yellow">Yellow</string>
+    <string name="gold">Gold</string>
     <string name="remove_filepaths_setting">Remove added filepaths</string>
     <string name="remove_filepaths">Remove filepaths</string>
     <string name="download_file">Download file</string>
+    <string name="download_folder">Download folder</string>
     <string name="download_request">Do you wish to download file</string>
+    <string name="download_folder_request">Do you wish to download the following folder:</string>
     <string name="remove">Remove</string>
     <string name="cancel">Cancel</string>
     <string name="notice">Notice</string>
@@ -64,6 +84,11 @@
     <string name="about">About</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="restart_dialog">The app will to restart to complete the operation</string>
+    <string name="choose_app_color">Choose the app color</string>
+    <string name="restart_note">Note: App will have to restart</string>
+    <string name="app_theme_setting_non_pro">App theme (PRO)</string>
+    <string name="app_theme_setting">App theme</string>
     <string name="rename_folder">Rename folder</string>
     <string name="folder_exists_notice">This folder already exists…</string>
     <string name="dropbox">Dropbox</string>
@@ -82,6 +107,7 @@
     <string name="sure_prompt">Are you sure you wish to continue?</string>
     <string name="year">Year</string>
     <string name="pages">Pages</string>
+    <string name="extra_chars_removed_note">Note: Extra or special characters will be removed</string>
     <string name="pages_no_capital">pages</string>
     <string name="filename">Filename</string>
     <string name="file_size">File size</string>
@@ -157,6 +183,7 @@
         - Image folder support\n
         - Dutch translations added\n
         - Fixed a bug that occurred when the app restarted after a long while\n
+        - Added gold and indigo app themes (PRO)\n
         - Speed improvements\n\n
         v2.3.1\n
         - Fixed a crash for some users\n\n

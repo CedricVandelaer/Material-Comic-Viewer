@@ -299,7 +299,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 MaterialDialog dialog = new MaterialDialog.Builder(mContext)
                         .title(mContext.getString(R.string.warning))
                         .content(mContext.getString(R.string.delete_folder_notice_1)+"\n\""+folderItemViewHolder.getFile().getName()
-                                +"\"\n"+mContext.getString(R.string.delete_folder_notice_2) +
+                                +"\"\n"+mContext.getString(R.string.delete_folder_notice_2) +" "+
                                 mContext.getString(R.string.sure_prompt))
                         .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
                         .positiveText(mContext.getString(R.string.confirm))

@@ -121,17 +121,17 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
                 final OneDriveObject entry = cloudFileViewHolder.getOneDriveEnty();
 
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title("Download file")
-                        .content("Do you wish to download file \""+entry.getName()+"\"?")
+                        .title(mActivity.getString(R.string.download_file))
+                        .content(mActivity.getString(R.string.download_request)+" \""+entry.getName()+"\"?")
                         .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .positiveText("Confirm")
+                        .positiveText(mActivity.getString(R.string.confirm))
                         .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .negativeText("Cancel")
+                        .negativeText(mActivity.getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Toast.makeText(mActivity, "Download started...", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mActivity, mActivity.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
                                 DownloadFileService.startActionDownload(mActivity, entry, mCloudService);
                             }
                         }).show();
