@@ -361,7 +361,7 @@ public class DisplayComicActivity extends FragmentActivity {
         }
         else if (mPageNumberSetting.equals(getString(R.string.page_number_setting_2)) && mPageCount>0)
         {
-            final String currentPageText = ""+pageNumber" "+getString(R.string.of)+" "mPageCount;
+            final String currentPageText = ""+pageNumber+" "+getString(R.string.of)+" "+mPageCount;
             mPageIndicator.setText(currentPageText);
             mHandler.postDelayed(new Runnable() {
                 @Override
