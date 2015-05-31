@@ -165,7 +165,7 @@
     <string name="already_exists">already exists</string>
     <string name="finished_downloading">Finished downloading</string>
     <string name="downloading">Downloading</string>
-    <string name="error_while_downloading">"An error occurred while downloading"</string>
+    <string name="error_while_downloading">An error occurred while downloading</string>
     <string name="recents_screen_setting_note">Note: only works on lollipop devices</string>
     <string name="recents_screen_setting">Show comics in recents screen</string>
     <string name="screen_on_setting">Keep screen on when reading comics</string>
@@ -240,7 +240,7 @@
     <string name="page_number_setting_2">On page change</string>
     <string name="page_number_setting_3">Never</string>
     <string name="scroll_animation_setting_1">None</string>
-    <string name="scroll_animation_setting_2">Bounce In</string>
+    <string name="scroll_animation_setting_2">Bounce in</string>
     <string name="scroll_animation_setting_3">Stand up</string>
     <string name="scroll_animation_setting_4">Fade in</string>
     <string name="scroll_animation_setting_5">Tada</string>
@@ -258,7 +258,7 @@
     <string name="file_format_6">Year, Issue number, Title</string>
     <string name="refresh">Refresh</string>
     <string name="muzei_description">Use your comic covers as wallpaper</string>
-    <string name="path_preference_summary">"Note: the default path \'main storage/ComicViewer\' can\'t be removed"</string>
+    <string name="path_preference_summary">Note: the default path \'main storage/ComicViewer\' can\'t be removed</string>
 
 
 </resources>

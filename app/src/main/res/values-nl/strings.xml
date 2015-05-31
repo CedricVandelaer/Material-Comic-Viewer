@@ -157,7 +157,7 @@
     <string name="background_color_setting">Achtergrond kleur</string>
     <string name="card_appearance_setting">Kaartuitzicht</string>
     <string name="reload_comic">Vernieuw strip</string>
-    <string name="error_while_downloading">"Er is een fout opgetreden bij het downloaden van"</string>
+    <string name="error_while_downloading">Er is een fout opgetreden bij het downloaden van</string>
     <string name="downloading">Aan het downloaden</string>
     <string name="card_color_setting">Kaart kleur</string>
     <string name="screen_on_setting">Houd het scherm bij het lezen van een strip</string>
@@ -257,5 +257,5 @@
     <string name="file_format_6">Jaar, Uitgavenummer, Titel</string>
     <string name="refresh">Vernieuw</string>
     <string name="muzei_description">Gebruik stripcovers als wallpaper!</string>
-    <string name="path_preference_summary">"Merk op: het default path \'main storage/ComicViewer\' kan niet verwijderd worden"</string>
+    <string name="path_preference_summary">Merk op: het default path \'main storage/ComicViewer\' kan niet verwijderd worden</string>
 </resources>
