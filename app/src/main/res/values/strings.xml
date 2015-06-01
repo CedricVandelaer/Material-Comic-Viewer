@@ -27,6 +27,8 @@
         comics with Comic Viewer!
     </string>
     <string name="updates">
+        v2.4.1\n
+        - Fixed a manifest error producing an installation error for some users\n\n
         v2.4\n
         - Image folder support\n
         - Dutch translations added\n
