@@ -37,6 +37,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.plus.Plus;
 import com.melnykov.fab.FloatingActionButton;
 import com.microsoft.live.LiveAuthClient;
 import com.microsoft.live.LiveAuthException;
@@ -99,6 +100,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(Drive.API)
+                .addApi(Plus.API)
                 .addScope(Drive.SCOPE_FILE)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -194,8 +196,12 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     @Override
     public void onConnected(Bundle bundle) {
         DriveFolder driveRoot = Drive.DriveApi.getRootFolder(mGoogleApiClient);
+        String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
+        String service = getString(R.string.cloud_storage_2);
+
 
         Log.d("Drive", driveRoot.toString());
+
     }
 
     @Override
