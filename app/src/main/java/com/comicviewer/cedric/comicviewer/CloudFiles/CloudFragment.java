@@ -1,6 +1,8 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +31,12 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveFolder;
 import com.melnykov.fab.FloatingActionButton;
 import com.microsoft.live.LiveAuthClient;
 import com.microsoft.live.LiveAuthException;
@@ -48,7 +56,7 @@ import java.util.Arrays;
 import java.util.Stack;
 
 
-public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LiveAuthListener{
+public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LiveAuthListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private static CloudFragment mSingleton;
 
@@ -58,6 +66,8 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private LiveAuthClient mOneDriveAuth;
     private LiveConnectClient mOneDriveClient;
 
+    private GoogleApiClient mGoogleApiClient;
+
     private RecyclerView mRecyclerView;
     private CloudListAdapter mAdapter;
     private Handler mHandler;
@@ -66,6 +76,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     private OnFragmentInteractionListener mListener;
 
+    public static final int RESOLVE_CONNECTION_REQUEST_CODE = 8;
 
     public static CloudFragment getInstance() {
 
@@ -85,6 +96,13 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         super.onCreate(savedInstanceState);
 
         mHandler = new Handler();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addApi(Drive.API)
+                .addScope(Drive.SCOPE_FILE)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
     }
 
@@ -171,6 +189,32 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     @Override
     public void onAuthError(LiveAuthException exception, Object userState) {
         Toast.makeText(getActivity(), "Something went wrong signing into OneDrive", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        DriveFolder driveRoot = Drive.DriveApi.getRootFolder(mGoogleApiClient);
+
+        Log.d("Drive", driveRoot.toString());
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(getActivity(), RESOLVE_CONNECTION_REQUEST_CODE);
+            } catch (IntentSender.SendIntentException e) {
+                // Unable to resolve, message user appropriately
+                e.printStackTrace();
+            }
+        } else {
+            GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), getActivity(), 0).show();
+        }
     }
 
 
@@ -289,6 +333,10 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                     Iterable<String> scopes = Arrays.asList("wl.signin", "wl.offline_access", "wl.basic","wl.skydrive", "wl.emails");
                                     mOneDriveAuth.login(getActivity(), scopes, CloudFragment.this);
                                 }
+                                else if (text.equals(getString(R.string.cloud_storage_2)))
+                                {
+                                    mGoogleApiClient.connect();
+                                }
                             }
                         })
                         .negativeText("Cancel")
@@ -310,6 +358,17 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        switch (requestCode) {
+            case RESOLVE_CONNECTION_REQUEST_CODE:
+                if (resultCode == Activity.RESULT_OK) {
+                    mGoogleApiClient.connect();
+                }
+                break;
         }
     }
 

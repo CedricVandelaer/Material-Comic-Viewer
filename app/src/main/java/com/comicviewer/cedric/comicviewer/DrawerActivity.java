@@ -1,7 +1,9 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -276,5 +278,15 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        switch (requestCode) {
+            case CloudFragment.RESOLVE_CONNECTION_REQUEST_CODE:
+                CloudFragment.getInstance().onActivityResult(requestCode,resultCode,data);
+                break;
+        }
     }
 }
