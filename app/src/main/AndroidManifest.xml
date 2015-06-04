@@ -14,9 +14,7 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:maxRecents="4"
-        android:theme="@style/AppTheme">
-
-
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".ViewPagerFiles.DisplayComicActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -44,9 +42,11 @@
         </activity>
 
         <!-- AdBuddiz -->
-        <activity android:name="com.purplebrain.adbuddiz.sdk.AdBuddizActivity"
+        <activity
+            android:name="com.purplebrain.adbuddiz.sdk.AdBuddizActivity"
             android:theme="@android:style/Theme.Translucent" />
         <!-- end AdBuddiz -->
+
 
         <!-- AdMob -->
         <activity
@@ -91,25 +91,32 @@
 
         <service
             android:name=".MuzeiService"
-            android:label="@string/muzei_source"
             android:description="@string/muzei_description"
-            android:icon="@drawable/muzei_source">
+            android:icon="@drawable/muzei_source"
+            android:label="@string/muzei_source" >
             <intent-filter>
                 <action android:name="com.google.android.apps.muzei.api.MuzeiArtSource" />
             </intent-filter>
-            <meta-data android:name="color" android:value="#009688" />
+
+            <meta-data
+                android:name="color"
+                android:value="#009688" />
         </service>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.comicviewer.free.fileprovider"
             android:exported="false"
-            android:grantUriPermissions="true">
+            android:grantUriPermissions="true" >
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
+        <activity
+            android:name=".CloudFiles.GoogleDriveActivity"
+            android:label="@string/title_activity_google_drive" >
+        </activity>
     </application>
 
 </manifest>

@@ -44,12 +44,30 @@ public class PreferenceSetter {
     private static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
     private static final String MANGA_LIST="mangaList";
     private static final String NORMAL_LIST="normalList";
+    private static final String LAST_USED_GOOGLE_ACCOUNT = "lastUsedGoogleAccount";
+
 
     public static final String APP_THEME_COLOR = "appThemeColor";
     public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
     public static final String MANGA_SETTING = "mangaEnabled";
     public static final String UNHIDE_LIST = "unhideListSetting";
     public static final String VOLUME_KEY_OPTION = "volumeKeysOption";
+
+
+    public static String getLastUsedGoogleAccount(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(LAST_USED_GOOGLE_ACCOUNT, null);
+    }
+
+    public static void saveLastUsedGoogleAccount(Context context, String id)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putString(LAST_USED_GOOGLE_ACCOUNT, id);
+
+        editor.apply();
+    }
 
     public static boolean getVolumeKeyPreference(Context context)
     {

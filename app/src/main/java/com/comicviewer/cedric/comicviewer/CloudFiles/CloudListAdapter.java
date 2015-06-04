@@ -100,6 +100,11 @@ public class CloudListAdapter extends RecyclerView.Adapter {
                     intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
 
                 }
+                else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_2)))
+                {
+                    intent = new Intent(mContext, GoogleDriveActivity.class);
+                    intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
+                }
 
                 mContext.startActivity(intent);
 
@@ -128,6 +133,10 @@ public class CloudListAdapter extends RecyclerView.Adapter {
         else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_3)))
         {
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.onedrive_icon, cloudServiceViewHolder.mLogoImageView);
+        }
+        else  if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_2)))
+        {
+            ImageLoader.getInstance().displayImage("drawable://" + R.drawable.drive_icon, cloudServiceViewHolder.mLogoImageView);
         }
     }
 

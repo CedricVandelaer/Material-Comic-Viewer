@@ -70,7 +70,7 @@ public class DropboxActivity extends Activity {
 
         mErrorTextView.setVisibility(View.GONE);
 
-        getActionBar().setTitle("Dropbox");
+        getActionBar().setTitle(getString(R.string.cloud_storage_1));
 
         getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
 

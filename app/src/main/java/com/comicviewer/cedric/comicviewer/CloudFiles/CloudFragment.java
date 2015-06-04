@@ -31,6 +31,7 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -98,13 +99,26 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         mHandler = new Handler();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addApi(Drive.API)
-                .addApi(Plus.API)
-                .addScope(Drive.SCOPE_FILE)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        if (PreferenceSetter.getLastUsedGoogleAccount(getActivity())!=null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .addApi(Drive.API)
+                    .addApi(Plus.API)
+                    .addScope(Drive.SCOPE_FILE)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+        else
+        {
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .addApi(Drive.API)
+                    .addApi(Plus.API)
+                    .addScope(Drive.SCOPE_FILE)
+                    .setAccountName(PreferenceSetter.getLastUsedGoogleAccount(getActivity()))
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
 
     }
 
@@ -195,13 +209,22 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     @Override
     public void onConnected(Bundle bundle) {
+
         DriveFolder driveRoot = Drive.DriveApi.getRootFolder(mGoogleApiClient);
         String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
         String service = getString(R.string.cloud_storage_2);
 
+        CloudService cloudService = new CloudService(
+                service,
+                "No token",
+                accountName,
+                accountName
+        );
 
-        Log.d("Drive", driveRoot.toString());
+        PreferenceSetter.saveCloudService(getActivity(), cloudService);
+        PreferenceSetter.saveLastUsedGoogleAccount(getActivity(), accountName);
 
+        mAdapter.refreshCloudServiceList();
     }
 
     @Override
@@ -341,7 +364,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                 }
                                 else if (text.equals(getString(R.string.cloud_storage_2)))
                                 {
-                                    mGoogleApiClient.connect();
+                                    new ConnectGoogleAccountTask().execute();
                                 }
                             }
                         })
@@ -351,6 +374,30 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
             }
         });
+    }
+
+    private class ConnectGoogleAccountTask extends AsyncTask
+    {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            if (PreferenceSetter.getLastUsedGoogleAccount(getActivity())!=null && mGoogleApiClient.isConnected()) {
+                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            }
+
+            if (mGoogleApiClient.isConnected())
+            {
+                mGoogleApiClient.disconnect();
+                mGoogleApiClient.connect();
+            }
+            else
+            {
+                mGoogleApiClient.connect();
+            }
+
+            return null;
+        }
     }
 
     private void addDropboxAccount() {
