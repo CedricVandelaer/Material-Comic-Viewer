@@ -4,5 +4,5 @@
     <string name="dropbox_app_key">id9ssazcpa41gys</string>
     <string name="dropbox_app_secret">yj0gk3nipr6ti4u</string>
     <string name="file_provider_string">com.comicviewer.pro.fileprovider</string>
-    <string name="db_scheme">db-id9ssazcpa41gys</string>
+    <string name="db_scheme_pro">db-id9ssazcpa41gys</string>
 </resources>
