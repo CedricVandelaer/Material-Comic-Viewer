@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common strings for all languages -->
+    <string name="admob_ad_unit_id">ca-app-pub-1913373193124965/9353062734</string>
+    <string name="app_name">Comic Viewer Free</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_display_comic">DisplayComicActivity</string>
+    <string name="dropbox">Dropbox</string>
+    <string name="onedrive">Microsoft OneDrive</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="title_activity_cloud_browser">CloudBrowserActivity</string>
+    <string name="title_activity_info">InfoActivity</string>
+    <string name="dropbox_app_key">pz24rrsbb0dvzib</string>
+    <string name="dropbox_app_secret">kpdixgm5szbiryj</string>
+    <string name="onedrive_id">000000004C1508EF</string>
+    <string name="onedrive_secret">ZRVOz8PE6ZEKNjYC1Q8b2v3Vl7pw0Jfa</string>
+    <string name="db_scheme">db-pz24rrsbb0dvzib</string>
+    <string name="file_provider_string">com.comicviewer.free.fileprovider</string>
+    <string name="muzei_source">Comic Viewer</string>
+    <string name="about_text">
+        Special thanks to:\n\n
+        Laura Welkenhuyzen - French translations\n
+        Fabrizio - Italian translations\n
+        Matteo - Spanish translations\n\n\n
+        Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
+        science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan
+        of android so I decided to make a comic viewer app in my free time. I wasn\'t really happy with existing apps because of
+        their poor performance, overly complex interfaces or just because I didn\'t like how they looked. Well anyway, have fun reading
+        comics with Comic Viewer!
+    </string>
+    <string name="updates">
+        v2.5\n
+        - New app icon\n
+        - Translations for Spanish, Italian and French\n\n
+        v2.4\n
+        - Image folder support\n
+        - Dutch translations added\n
+        - Fixed a bug that occurred when the app restarted after a long while\n
+        - Added gold and indigo app themes (PRO)\n
+        - Speed improvements\n\n
+        v2.3.1\n
+        - Fixed a crash for some users\n\n
+        v2.3\n
+        - Muzei support\n\n
+        v2.2.1\n
+        - Small bugfixes\n\n
+        v2.2\n
+        - Currently reading section\n
+        - Microsoft OneDrive support\n
+        - Hide comics and folders (PRO)\n
+        - Turn pages with volume keys (PRO)\n
+        - Reload comics\n
+        - Bugfixes\n\n
+        v2.1.3\n
+        - Better cleanup of data files when they are no longer needed\n\n
+        v2.1.2\n
+        - Fixed a crash for some users\n\n
+        v2.1.1\n
+        - Added transition to the info page\n\n
+        v2.1\n
+        - Fixed manga mode\n
+        - Rename folders\n\n
+        v2.0\n
+        - Dropbox support\n
+        - Manga support\n
+        - Option to choose the file format (Pro)\n
+        - Option to keep the screen on\n
+        - Option to rotate landscape pages in portrait mode\n
+        - Better folder navigation\n\n
+        v1.3.1\n
+        - Open comics from other apps\n
+        - Changed recents icon\n
+        - Added support for more devices\n\n
+        v1.3\n
+        - Folder view\n
+        - Increased loading speeds\n
+        - Bugfixes\n\n
+        v1.2\n
+        - Landscape mode\n
+        - Option to auto fit pages in landscape mode\n
+        - Bugfixes\n
+        - Navigation drawer image loading improvements\n
+        - Ads now only show at the start and the end of a comic\n\n
+        v1.1.1\n
+        - Added the option to show page numbers for a short time on page change\n
+        - Bugfixes\n\n
+        v1.1\n
+        - Added additional styling options for the pro version\n
+        - Changed the app drawer image\n
+        - Bugfixes\n\n
+        v1.0.2\n
+        - Fixed a bug where unrecognized files could not be deleted\n\n
+        v1.0.1\n
+        - Fixed bug with comics opening slow when loading\n\n
+        v1\n
+        - Initial release\n\n
+    </string>
+    <string name="eula">
+        The product is protected by Federal Copyright Law. Material Comic Viewer retains the title to and ownership of the Product. You are licensed to use this Product on the following terms and conditions:
+        \n\nLICENSE - The licensee is defined as the individual or company utilizing the Software Product. Material Comic Viewer hereby grants the licensee a license authorizing the licensee to use the enclosed product exclusively on devices in possession of the licensee. Use of this product by more than one individual or by anyone other than the licensee terminates, without notification, this license and the right to use this product.
+        \n\nYOU MAY NOT: Distribute, rent, sub-license or otherwise make available to others the software or documentation or copies thereof, except as expressly permitted in this License without prior written consent from Cédric Vandelaer. In the case of an authorized transfer, the transferee must agree to be bound by the terms and conditions of this License Agreement.
+        \n\nRESTRICTIONS: You may not remove any proprietary notices, labels, trademarks on the software or documentation.
+        You may not modify, de-compile, disassemble, reverse engineer or translate the software.
+        \n\nTERM – The term of this license will stay valid unless stated otherwise by Cédric Vandelaer. This license will also terminate automatically if you fail to comply with any term or condition in this Agreement.
+        \n\nLIMITED WARRANTY - This software and documentation are sold "as is" without any warranty as to their performance, merchantability or fitness for any particular purpose. The licensee assumes the entire risk as to the quality and performance of the software. In no event shall Cédric Vandelaer or anyone else who has been involved in the creation, development, production, or delivery of this software be liable for any direct, incidental or consequential damages, such as, but not limited to, loss of anticipated profits, benefits, use, or data resulting from the use of this software, or arising out of any breach of warranty.
+        \n\nCOPYRIGHT INFRINGEMENT - In no event shall Cédric Vandelaer or anyone else who has been involved in the creation, development, production, or delivery of this software be liable for any copyright infringements by the licensee or any other user of the software. The software does not provide any copyrighted materials and never will. Only the licensee can be held responsible for piracy or other violations regarding copyrights.
+        \n\nNo comic are included in this app. You have to obtain them in a legal way and place them on your internal memory and/or sd card.
+        \n\nAFFILIATIONS: This product is not affiliated with, nor authorized, endorsed or licensed in any way by Marvel, DC Comics, any other comic company, their affiliates or subsidiaries.
+    </string>
+
+
+    <!-- Language specific strings -->
+    <string name="buy_full_version">Compra versión completa</string>
+    <string name="unhide_files">Descubre fichero</string>
+    <string name="unhide_setting_non_pro">Descubre cómic y carpetas (PRO)</string>
+    <string name="unhide_setting">Scopri cómic y carpetas</string>
+    <string name="manga_setting_note">Nota: Selecionando esta opción los ficheros serán abiertos por defecto en modo manga</string>
+    <string name="manga_setting_non_pro">Modo Manga (PRO)</string>
+    <string name="manga_setting">Modo Manga</string>
+    <string name="file_format_setting_non_pro">Format cómic file (PRO)</string>
+    <string name="file_format_setting">Format cómic file </string>
+    <string name="choose_file_format">Elije el formato de los ficheros</string>
+    <string name="of">de</string>
+    <string name="volume_key_setting_non_pro">Utiliza las teclas para cambiar pagina (PRO)</string>
+    <string name="teal">Teal</string>
+    <string name="indigo">Indaco</string>
+    <string name="red">Rojo</string>
+    <string name="orange">Naranja</string>
+    <string name="blue">Azul</string>
+    <string name="pink">Rosa</string>
+    <string name="purple">Morado</string>
+    <string name="deep_purple">Morado oscuro</string>
+    <string name="green">Verde</string>
+    <string name="yellow">Amarillo</string>
+    <string name="gold">Dorado</string>
+    <string name="remove_filepaths_setting">Remueve los filepaths añadidos</string>
+    <string name="remove_filepaths">Remueve los filepaths</string>
+    <string name="download_file">Descarga fichero</string>
+    <string name="download_folder">Descarga Carpeta</string>
+    <string name="download_request">Quieres descargar el fichero</string>
+    <string name="download_folder_request">Quieres descargar la siguente carpeta:</string>
+    <string name="remove">Borrar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="notice">notificación</string>
+    <string name="pro_version_notice">Esta funcionalidad esta disponible en la versión pro de la app.</string>
+    <string name="go_to_play_store">Ir al play store</string>
+    <string name="no_supported_files_found">Ningún fichero supoertado ha sido encontrado</string>
+    <string name="mark_read">Marcar como leydo</string>
+    <string name="manga_comic">Manga cómic</string>
+    <string name="options">Opciónes</string>
+    <string name="download">Descarga</string>
+    <string name="delete">Cancellar</string>
+    <string name="rename">Renombrar</string>
+    <string name="hide">Ocultar</string>
+    <string name="info">Info</string>
+    <string name="normal_comic">Cómic normal</string>
+    <string name="reload_comic">Ricarga cómic</string>
+    <string name="background_color_setting">Color de fondo</string>
+    <string name="card_appearance_setting">Estilo Card</string>
+    <string name="card_color_setting">Color Card</string>
+    <string name="scroll_animation_setting">Animación desplazamiento</string>
+    <string name="layout_settings_category_title">Opciones disposición</string>
+    <string name="width_auto_fit_setting">En horizontal adapta la pagina al tamaño de la pantalla</string>
+    <string name="rotate_landscape_pages_setting">pasar las pagina de forma horizontal</string>
+    <string name="volume_keys_setting">Usar tecla volume por pasar las paginas</string>
+    <string name="page_number_setting">Visuaiza numeros de pagina</string>
+    <string name="other_settings">Otras opciones</string>
+    <string name="error">Error</string>
+    <string name="already_exists">ya existe</string>
+    <string name="finished_downloading">Descarga completata</string>
+    <string name="downloading">Descarga</string>
+    <string name="error_while_downloading">Error al descargar</string>
+    <string name="recents_screen_setting_note">Nota: funciona solo sobre device lollipop</string>
+    <string name="recents_screen_setting">Muestra cómics recientes</string>
+    <string name="screen_on_setting">Encendido pantalla al leer</string>
+    <string name="reading_settings_category_setting">Opciones de lectura</string>
+    <string name="scroll_animation_setting_note">Nota: solo para tarjetas normales</string>
+    <string name="mark_unread">marcar como no leydo</string>
+    <string name="all_comics">Todos los cómics</string>
+    <string name="currently_reading">Lectura</string>
+    <string name="favorites">Favoritos</string>
+    <string name="cloud_storage">Espacio Cloud</string>
+    <string name="statistics">Estadisticas</string>
+    <string name="settings">Impostaciones</string>
+    <string name="confirm">Confirmar</string>
+    <string name="download_started">Descarga empezada</string>
+    <string name="folder_rename_error">Esta carpeta no se puede renombrar</string>
+    <string name="about">Acerca de</string>
+    <string name="yes">Sì</string>
+    <string name="no">No</string>
+    <string name="restart_dialog">La app se debe reiniciar para completar la operación</string>
+    <string name="choose_app_color">Elije el color de la app</string>
+    <string name="restart_note">Nota: La app necesita reiniciar</string>
+    <string name="app_theme_setting_non_pro">Tema App (PRO)</string>
+    <string name="app_theme_setting">Tema App</string>
+    <string name="rename_folder">Renombra carpeta</string>
+    <string name="folder_exists_notice">Esta carpeta ya existe</string>
+    <string name="renaming_folder">renombra carpeta</string>
+    <string name="updating_folder_name_notice">Esperar que la app actualize los datos relaccionados a los comig guardados.</string>
+    <string name="issue_number">Numero de edición</string>
+    <string name="warning">Attenzione</string>
+    <string name="sure_delete_prompt">Estas seguro de quierer borrar el siguiente fichero:</string>
+    <string name="will_also_remove_file">Esta opción borrará el siguente fichero</string>
+    <string name="confirm_delete">Confirma cancellación</string>
+    <string name="reloading_comic">Recarga cómic</string>
+    <string name="not_started_toast">Todavia no has empezado este cómic !</string>
+    <string name="updating_data_notice">Espera mientra que la app actualize los dato del cómic.</string>
+    <string name="delete_folder_notice_1">Esta opción borrará la carpeta:</string>
+    <string name="delete_folder_notice_2">y todo su contenido.</string>
+    <string name="sure_prompt">Estás seguro de que quieres continuar?</string>
+    <string name="year">Año</string>
+    <string name="pages">Paginas</string>
+    <string name="extra_chars_removed_note">Nota: se eliminan los caracteres especiales</string>
+    <string name="pages_no_capital">paginas</string>
+    <string name="filename">Nombra fichero</string>
+    <string name="file_size">Tamaño fichero</string>
+    <string name="accept">aceptar</string>
+    <string name="decline">no acepto</string>
+    <string name="select_directory">Seleciónar la carpeta</string>
+    <string name="none_yet">Vacío</string>
+    <string name="untitled">Sin titulo</string>
+    <string name="already_read_toast"> ¡Ya has leido este cómic!</string>
+    <string name="error_while_authenticating">Se produjo un error durante la autenticación!</string>
+    <string name="total_comics_started">Total cómic empezados:</string>
+    <string name="total_comics_read">Totale cómic leydos:</string>
+    <string name="finished_percentage">Porcentaje de cómic completado:</string>
+    <string name="total_pages_read">Total de páginas leídas:</string>
+    <string name="number_comics_added">Numero de cómics añadidos:</string>
+    <string name="most_read_series">Serie mas leyda:</string>
+    <string name="longest_read_comic">Letti più a lungo:</string>
+    <string name="number_pages">Numero de paginas:</string>
+    <string name="reset_statistics">Restablecer estadísticas</string>
+    <string name="backgroundcolor_setting1">Azul Gris</string>
+    <string name="backgroundcolor_setting2">Negro</string>
+    <string name="backgroundcolor_setting3">Blanco</string>
+    <string name="backgroundcolor_setting4">Marron</string>
+    <string name="backgroundcolor_setting5">Gris</string>
+    <string name="card_color_setting_1">colores suaves</string>
+    <string name="card_color_setting_2">colores brillantes</string>
+    <string name="card_color_setting_3">Blanco</string>
+    <string name="card_color_setting_4">Azul Gris</string>
+    <string name="card_color_setting_5">Negro</string>
+    <string name="page_number_setting_1">Siempre</string>
+    <string name="page_number_setting_2">Para cambiar la página</string>
+    <string name="page_number_setting_3">Nunca</string>
+    <string name="scroll_animation_setting_1">ninguna</string>
+    <string name="scroll_animation_setting_2">rebote</string>
+    <string name="scroll_animation_setting_3">Stand up</string>
+    <string name="scroll_animation_setting_4">Fusión</string>
+    <string name="scroll_animation_setting_5">Tada</string>
+    <string name="card_size_setting_1">Cards pequeñas</string>
+    <string name="card_size_setting_2">Cards normales</string>
+    <string name="card_size_setting_3">Cards de Portada</string>
+    <string name="cloud_storage_1">Dropbox</string>
+    <string name="cloud_storage_2">Google Drive (En breve!)</string>
+    <string name="cloud_storage_3">Microsoft OneDrive</string>
+    <string name="file_format_1">Titulo, Numero edicción, Año</string>
+    <string name="file_format_2">Titulo, Año, Numero edicción </string>
+    <string name="file_format_3">Numero edicción, Año, Titulo</string>
+    <string name="file_format_4">Numero edicción, Titulo, Año</string>
+    <string name="file_format_5">Año, Titulo, Numero edicción</string>
+    <string name="file_format_6">Año, Numero edicción, Titulo</string>
+    <string name="refresh">Recargar</string>
+    <string name="muzei_description">Utilice sus portadas de cómics como fondo de pantalla</string>
+    <string name="path_preference_summary">"Nota: el path por defecto \'main storage/cómicViewer\'
+no se puede borrar"</string>
+</resources>

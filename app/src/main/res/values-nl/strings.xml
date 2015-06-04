@@ -19,6 +19,10 @@
     <string name="file_provider_string">com.comicviewer.free.fileprovider</string>
     <string name="muzei_source">Comic Viewer</string>
     <string name="about_text">
+        Special thanks to:\n\n
+        Laura Welkenhuyzen - French translations\n
+        Fabrizio - Italian translations\n
+        Matteo - Spanish translations\n\n\n
         Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
         science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan
         of android so I decided to make a comic viewer app in my free time. I wasn\'t really happy with existing apps because of
@@ -26,6 +30,9 @@
         comics with Comic Viewer!
     </string>
     <string name="updates">
+        v2.5\n
+        - New app icon\n
+        - Translations for Spanish, Italian and French\n\n
         v2.4\n
         - Image folder support\n
         - Dutch translations added\n

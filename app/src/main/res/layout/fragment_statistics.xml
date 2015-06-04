@@ -20,6 +20,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp">
                 <TextView
+                    android:id="@+id/total_comics_started_title_textview"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_width="wrap_content"
@@ -41,6 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp">
                 <TextView
+                    android:id="@+id/total_comics_read_title_textview"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_gravity="start"
@@ -62,6 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp">
                 <TextView
+                    android:id="@+id/finished_comics_percentage_title_textview"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_gravity="start"
@@ -83,6 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp">
                 <TextView
+                    android:id="@+id/pages_read_title_textview"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_gravity="start"
@@ -104,6 +108,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp">
                 <TextView
+                    android:id="@+id/added_comics_title_textview"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_gravity="start"
@@ -125,6 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp">
                 <TextView
+                    android:id="@+id/favorite_series_title_textview"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_gravity="start"
@@ -147,6 +153,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp">
                 <TextView
+                    android:id="@+id/longest_read_title_title_textview"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_gravity="start"
@@ -168,6 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp">
                 <TextView
+                    android:id="@+id/longest_number_pages_title_textview"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_gravity="start"

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common strings for all languages -->
+    <string name="admob_ad_unit_id">ca-app-pub-1913373193124965/9353062734</string>
+    <string name="app_name">Comic Viewer Free</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_display_comic">DisplayComicActivity</string>
+    <string name="dropbox">Dropbox</string>
+    <string name="onedrive">Microsoft OneDrive</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="title_activity_cloud_browser">CloudBrowserActivity</string>
+    <string name="title_activity_info">InfoActivity</string>
+    <string name="dropbox_app_key">pz24rrsbb0dvzib</string>
+    <string name="dropbox_app_secret">kpdixgm5szbiryj</string>
+    <string name="onedrive_id">000000004C1508EF</string>
+    <string name="onedrive_secret">ZRVOz8PE6ZEKNjYC1Q8b2v3Vl7pw0Jfa</string>
+    <string name="db_scheme">db-pz24rrsbb0dvzib</string>
+    <string name="file_provider_string">com.comicviewer.free.fileprovider</string>
+    <string name="muzei_source">Comic Viewer</string>
+    <string name="about_text">
+        Special thanks to:\n\n
+        Laura Welkenhuyzen - French translations\n
+        Fabrizio - Italian translations\n
+        Matteo - Spanish translations\n\n\n
+        Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
+        science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan
+        of android so I decided to make a comic viewer app in my free time. I wasn\'t really happy with existing apps because of
+        their poor performance, overly complex interfaces or just because I didn\'t like how they looked. Well anyway, have fun reading
+        comics with Comic Viewer!
+    </string>
+    <string name="updates">
+        v2.5\n
+        - New app icon\n
+        - Translations for Spanish, Italian and French\n\n
+        v2.4\n
+        - Image folder support\n
+        - Dutch translations added\n
+        - Fixed a bug that occurred when the app restarted after a long while\n
+        - Added gold and indigo app themes (PRO)\n
+        - Speed improvements\n\n
+        v2.3.1\n
+        - Fixed a crash for some users\n\n
+        v2.3\n
+        - Muzei support\n\n
+        v2.2.1\n
+        - Small bugfixes\n\n
+        v2.2\n
+        - Currently reading section\n
+        - Microsoft OneDrive support\n
+        - Hide comics and folders (PRO)\n
+        - Turn pages with volume keys (PRO)\n
+        - Reload comics\n
+        - Bugfixes\n\n
+        v2.1.3\n
+        - Better cleanup of data files when they are no longer needed\n\n
+        v2.1.2\n
+        - Fixed a crash for some users\n\n
+        v2.1.1\n
+        - Added transition to the info page\n\n
+        v2.1\n
+        - Fixed manga mode\n
+        - Rename folders\n\n
+        v2.0\n
+        - Dropbox support\n
+        - Manga support\n
+        - Option to choose the file format (Pro)\n
+        - Option to keep the screen on\n
+        - Option to rotate landscape pages in portrait mode\n
+        - Better folder navigation\n\n
+        v1.3.1\n
+        - Open comics from other apps\n
+        - Changed recents icon\n
+        - Added support for more devices\n\n
+        v1.3\n
+        - Folder view\n
+        - Increased loading speeds\n
+        - Bugfixes\n\n
+        v1.2\n
+        - Landscape mode\n
+        - Option to auto fit pages in landscape mode\n
+        - Bugfixes\n
+        - Navigation drawer image loading improvements\n
+        - Ads now only show at the start and the end of a comic\n\n
+        v1.1.1\n
+        - Added the option to show page numbers for a short time on page change\n
+        - Bugfixes\n\n
+        v1.1\n
+        - Added additional styling options for the pro version\n
+        - Changed the app drawer image\n
+        - Bugfixes\n\n
+        v1.0.2\n
+        - Fixed a bug where unrecognized files could not be deleted\n\n
+        v1.0.1\n
+        - Fixed bug with comics opening slow when loading\n\n
+        v1\n
+        - Initial release\n\n
+    </string>
+    <string name="eula">
+        The product is protected by Federal Copyright Law. Material Comic Viewer retains the title to and ownership of the Product. You are licensed to use this Product on the following terms and conditions:
+        \n\nLICENSE - The licensee is defined as the individual or company utilizing the Software Product. Material Comic Viewer hereby grants the licensee a license authorizing the licensee to use the enclosed product exclusively on devices in possession of the licensee. Use of this product by more than one individual or by anyone other than the licensee terminates, without notification, this license and the right to use this product.
+        \n\nYOU MAY NOT: Distribute, rent, sub-license or otherwise make available to others the software or documentation or copies thereof, except as expressly permitted in this License without prior written consent from Cédric Vandelaer. In the case of an authorized transfer, the transferee must agree to be bound by the terms and conditions of this License Agreement.
+        \n\nRESTRICTIONS: You may not remove any proprietary notices, labels, trademarks on the software or documentation.
+        You may not modify, de-compile, disassemble, reverse engineer or translate the software.
+        \n\nTERM – The term of this license will stay valid unless stated otherwise by Cédric Vandelaer. This license will also terminate automatically if you fail to comply with any term or condition in this Agreement.
+        \n\nLIMITED WARRANTY - This software and documentation are sold "as is" without any warranty as to their performance, merchantability or fitness for any particular purpose. The licensee assumes the entire risk as to the quality and performance of the software. In no event shall Cédric Vandelaer or anyone else who has been involved in the creation, development, production, or delivery of this software be liable for any direct, incidental or consequential damages, such as, but not limited to, loss of anticipated profits, benefits, use, or data resulting from the use of this software, or arising out of any breach of warranty.
+        \n\nCOPYRIGHT INFRINGEMENT - In no event shall Cédric Vandelaer or anyone else who has been involved in the creation, development, production, or delivery of this software be liable for any copyright infringements by the licensee or any other user of the software. The software does not provide any copyrighted materials and never will. Only the licensee can be held responsible for piracy or other violations regarding copyrights.
+        \n\nNo comic are included in this app. You have to obtain them in a legal way and place them on your internal memory and/or sd card.
+        \n\nAFFILIATIONS: This product is not affiliated with, nor authorized, endorsed or licensed in any way by Marvel, DC Comics, any other comic company, their affiliates or subsidiaries.
+    </string>
+
+
+    <!-- Language specific strings -->
+    <string name="all_comics">Toutes les BD</string>
+    <string name="currently_reading">En train de lire</string>
+    <string name="favorites">Favoris</string>
+    <string name="cloud_storage">Cloud stockage</string>
+    <string name="statistics">Statistiques</string>
+    <string name="settings">Réglages</string>
+    <string name="about">À propos</string>
+    <string name="unhide">Montrer</string>
+    <string name="buy_full_version">Acheter la version complète</string>
+    <string name="unhide_setting_non_pro">Montre BD et dossiers cachés(PRO)</string>
+    <string name="unhide_setting">Montre BD et dossiers cachés</string>
+    <string name="unhide_files">Montre fichiers</string>
+    <string name="manga_setting_non_pro">Mode Manga (PRO)</string>
+    <string name="manga_setting">Mode Manga</string>
+    <string name="of">de</string>
+    <string name="file_format_setting_non_pro">Formatter le nom (PRO)</string>
+    <string name="file_format_setting">Formatter le nom</string>
+    <string name="choose_file_format">Choissisez le format du nom de fichier</string>
+    <string name="remove_filepaths">Effacer dossiers</string>
+    <string name="download_folder">Télécharger dossier</string>
+    <string name="app_theme_setting_non_pro">Thème d’app (PRO)</string>
+    <string name="choose_app_color">Choissisez une couleur de thème</string>
+    <string name="restart_dialog">L\’app va redémarrer pour exécuter</string>
+    <string name="app_theme_setting">Thème d’app</string>
+    <string name="restart_note">Merk op: L’app va redémarrer</string>
+    <string name="download_folder_request">Télécharger le dossier suivant?</string>
+    <string name="remove">Efface</string>
+    <string name="cancel">Annuler</string>
+    <string name="teal">Bleuvert</string>
+    <string name="indigo">Indigo</string>
+    <string name="red">Rouge</string>
+    <string name="orange">Orange</string>
+    <string name="blue">Bleu</string>
+    <string name="pink">Rose</string>
+    <string name="purple">Violet</string>
+    <string name="deep_purple">Purple profond</string>
+    <string name="green">Vert</string>
+    <string name="yellow">Jaune</string>
+    <string name="gold">Or</string>
+    <string name="extra_chars_removed_note">Remarque: des caractères extras ou spéciaux  sont supprimés automatiquement</string>
+    <string name="notice">Remarque</string>
+    <string name="mark_read">Marquer comme lu</string>
+    <string name="manga_comic">BD Manga</string>
+    <string name="options">Options</string>
+    <string name="download">Télécharger</string>
+    <string name="delete">Effacer</string>
+    <string name="rename">Changer le nom </string>
+    <string name="hide">Cacher</string>
+    <string name="info">Information</string>
+    <string name="mark_unread">Marquer comme non lu</string>
+    <string name="background_color_setting">Couleur de fond</string>
+    <string name="card_appearance_setting">Apparence de la carte</string>
+    <string name="reload_comic">Actualiser BD</string>
+    <string name="error_while_downloading">Une erreur est survenue lors du téléchargement de</string>
+    <string name="downloading">En train de télécharger</string>
+    <string name="card_color_setting">Couleur de la carte</string>
+    <string name="screen_on_setting">Garder l’écran lors de lire une BD</string>
+    <string name="scroll_animation_setting">Défiler animation</string>
+    <string name="normal_comic">BD normale</string>
+    <string name="error">Erreur</string>
+    <string name="finished_downloading">Télécharger terminé</string>
+    <string name="already_exists">Existe déjà</string>
+    <string name="page_number_setting">Montrer le numéro de page</string>
+    <string name="other_settings">Réglages restants</string>
+    <string name="recents_screen_setting_note">Remarque: Fonctionne uniquement sur lollipop ou plus</string>
+    <string name="recents_screen_setting">Montrer BD sur l’écran multitasking</string>
+    <string name="volume_keys_setting">Poussez les touches de volume pour tourner des pages </string>
+    <string name="go_to_play_store">Aller au Play Store</string>
+    <string name="layout_settings_category_title">Réglages de layout</string>
+    <string name="rotate_landscape_pages_setting">Pivoter pages en mode paysage</string>
+    <string name="reading_settings_category_setting">Réglages de lire</string>
+    <string name="width_auto_fit_setting">Adapter le page à largeur d’écran en mode paysage</string>
+    <string name="scroll_animation_setting_note">Remarque: Seulement pour des cartes petites et normales</string>
+    <string name="no_supported_files_found">Pas trouvé des fichiers soutenus…</string>
+    <string name="pro_version_notice">Cette fonction nécessite la version pro de l\'app</string>
+    <string name="manga_setting_note">Remarque: En cochant cet option, les BD sont toujours ouvriées en Mode Manga</string>
+    <string name="volume_key_setting_non_pro">Poussez les touches de volume pour tourner des pages  (PRO)</string>
+    <string name="remove_filepaths_setting">Effacer dossiers supplémentaires</string>
+    <string name="total_comics_started">Total des BD commencées:</string>
+    <string name="total_comics_read">Total des BD lues:</string>
+    <string name="finished_percentage">Pourcentage des BD achevées:</string>
+    <string name="total_pages_read">Total des pages lues:</string>
+    <string name="number_comics_added">Nombre des BD ajoutées:</string>
+    <string name="most_read_series">Collection la plus lue:</string>
+    <string name="longest_read_comic">BD lue la plus longue:</string>
+    <string name="number_pages">Nombre des pages:</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="select_directory">Sélectionnez dossier</string>
+    <string name="error_while_authenticating">Une erreur est survenue lors d’authentification…</string>
+    <string name="folder_exists_notice">Ce dossier existe déjà…</string>
+    <string name="year">An</string>
+    <string name="issue_number">Numéro de collection</string>
+    <string name="pages">Pages</string>
+    <string name="pages_no_capital">pages</string>
+    <string name="warning">Avertissement</string>
+    <string name="filename">Nom du fichier</string>
+    <string name="confirm_delete">Confirmer effacer</string>
+    <string name="will_also_remove_file">Cela effacera également le fichier suivant</string>
+    <string name="sure_delete_prompt">Etes-vous certain d’effacer la BD suivante?</string>
+    <string name="reloading_comic">Actualiser BD</string>
+    <string name="not_started_toast">”Vous n’avez pas encore commencé cette BD!”</string>
+    <string name="updating_data_notice">Un peu de patience… L’app actualise la BD.</string>
+    <string name="delete_folder_notice_1">Cela effacera le dossier suivant</string>
+    <string name="delete_folder_notice_2">et tout son contenu.</string>
+    <string name="sure_prompt">Etes-vous certain de continuer?</string>
+    <string name="renaming_folder">Renommer le dossier</string>
+    <string name="updating_folder_name_notice">Un peu de patience… L’app actualise les fichiers mémorisés.</string>
+    <string name="file_size">Taille de fichier</string>
+    <string name="already_read_toast">Vous avez déjà lu cette BD!</string>
+    <string name="untitled">Pas de titre</string>
+    <string name="confirm">Confirmer</string>
+    <string name="rename_folder">Renommer le dossier</string>
+    <string name="folder_rename_error">Ce dossier ne peut pas être renommé…</string>
+    <string name="download_started">Télécharger commencé…</string>
+    <string name="accept">Accepter</string>
+    <string name="decline">Refuser</string>
+    <string name="none_yet">Aucun pour l\'instant</string>
+    <string name="download_file">Télécharger le fichier</string>
+    <string name="download_request">Télécharger le fichier suivant?</string>
+    <string name="reset_statistics">Effacer statistiques</string>
+    <string name="backgroundcolor_setting1">Bleu gris</string>
+    <string name="backgroundcolor_setting2">Vraiment noir</string>
+    <string name="backgroundcolor_setting3">Blanc</string>
+    <string name="backgroundcolor_setting4">Brun</string>
+    <string name="backgroundcolor_setting5">Gris</string>
+    <string name="card_color_setting_1">Couleurs adoucies</string>
+    <string name="card_color_setting_2">Couleurs vives</string>
+    <string name="card_color_setting_3">Blanc</string>
+    <string name="card_color_setting_4">Bleu gris</string>
+    <string name="card_color_setting_5">Vraiment noir</string>
+    <string name="page_number_setting_1">Toujours</string>
+    <string name="page_number_setting_2">En tournant la page</string>
+    <string name="page_number_setting_3">Jamais</string>
+    <string name="scroll_animation_setting_1">Nul</string>
+    <string name="scroll_animation_setting_2">Renforcer</string>
+    <string name="scroll_animation_setting_3">Lever</string>
+    <string name="scroll_animation_setting_4">Ternir</string>
+    <string name="scroll_animation_setting_5">Tada</string>
+    <string name="card_size_setting_1">Cartes petites</string>
+    <string name="card_size_setting_2">Cartes normales</string>
+    <string name="card_size_setting_3">Cartes avec couverture de BD</string>
+    <string name="cloud_storage_1">Dropbox</string>
+    <string name="cloud_storage_2">Google Drive (Disponible sous peu!)</string>
+    <string name="cloud_storage_3">Microsoft OneDrive</string>
+    <string name="file_format_1">Titre, Numéro d’édition, An</string>
+    <string name="file_format_2">Titre, An, Numéro d’édition</string>
+    <string name="file_format_3">Numéro d’édition, An, Titre</string>
+    <string name="file_format_4">Numéro d’édition, Titre, An</string>
+    <string name="file_format_5">An, Titre, Numéro d’édition</string>
+    <string name="file_format_6">An, Numéro d’édition, Titre</string>
+    <string name="refresh">Actualiser</string>
+    <string name="muzei_description">Instaurer des couverture comme fond d’écran!</string>
+    <string name="path_preference_summary">Remarque: le default path \'main storage/ComicViewer\’ne peut pas être effacé</string>
+</resources>

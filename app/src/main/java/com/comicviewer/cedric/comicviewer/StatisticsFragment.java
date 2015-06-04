@@ -33,6 +33,15 @@ public class StatisticsFragment extends Fragment {
     private TextView mLongestReadPagesTextView;
     private ButtonFlat mResetStatsButton;
 
+    private TextView mComicsStartedTitleTextView;
+    private TextView mComicsReadTitleTextView;
+    private TextView mCompletedPercentageTitleTextView;
+    private TextView mPagesReadTitleTextView;
+    private TextView mComicsAddedTitleTextView;
+    private TextView mFavoriteSeriesTitle;
+    private TextView mLongestReadTitleTitleTextView;
+    private TextView mLongestReadPagesTitleTextView;
+
     public static StatisticsFragment newInstance() {
         StatisticsFragment fragment = new StatisticsFragment();
         return fragment;
@@ -46,8 +55,9 @@ public class StatisticsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.BlueGrey));
-        if (Build.VERSION.SDK_INT>20)
-            getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
+
+
+
     }
 
     @Override
@@ -67,6 +77,25 @@ public class StatisticsFragment extends Fragment {
 
         mLongestReadTitleTextView = (TextView) v.findViewById(R.id.longest_read_title_textview);
         mLongestReadPagesTextView = (TextView) v.findViewById(R.id.longest_number_pages_textview);
+
+        mComicsStartedTitleTextView = (TextView) v.findViewById(R.id.total_comics_started_title_textview);
+        mComicsReadTitleTextView = (TextView) v.findViewById(R.id.total_comics_read_title_textview);
+        mCompletedPercentageTitleTextView = (TextView) v.findViewById(R.id.finished_comics_percentage_title_textview);
+
+        mPagesReadTitleTextView = (TextView) v.findViewById(R.id.pages_read_title_textview);
+
+        mComicsAddedTitleTextView = (TextView) v.findViewById(R.id.added_comics_title_textview);
+        mFavoriteSeriesTitle = (TextView) v.findViewById(R.id.favorite_series_title_textview);
+
+        mLongestReadTitleTitleTextView = (TextView) v.findViewById(R.id.longest_read_title_title_textview);
+        mLongestReadPagesTitleTextView = (TextView) v.findViewById(R.id.longest_number_pages_title_textview);
+
+        PreferenceSetter.setBackgroundColorPreference(getActivity());
+
+        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
+            setTitleTextViewTextColors(getResources().getColor(R.color.Black));
+
+        setTextViewTextColors(PreferenceSetter.getAppThemeColor(getActivity()));
 
         updateTextViews();
 
@@ -181,6 +210,32 @@ public class StatisticsFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(Uri uri);
+    }
+
+    public void setTextViewTextColors(int color)
+    {
+        mComicsStartedTextView.setTextColor(color);
+        mComicsReadTextView.setTextColor(color);
+        mCompletedPercentageTextView.setTextColor(color);
+        mPagesReadTextView.setTextColor(color);
+        mComicsAddedTextView.setTextColor(color);
+        mFavoriteSeries.setTextColor(color);
+        mLongestReadTitleTextView.setTextColor(color);
+        mLongestReadPagesTextView.setTextColor(color);
+
+
+    }
+
+    public void setTitleTextViewTextColors(int color)
+    {
+        mComicsStartedTitleTextView.setTextColor(color);
+        mComicsReadTitleTextView.setTextColor(color);
+        mCompletedPercentageTitleTextView.setTextColor(color);
+        mPagesReadTitleTextView.setTextColor(color);
+        mComicsAddedTitleTextView.setTextColor(color);
+        mFavoriteSeriesTitle.setTextColor(color);
+        mLongestReadTitleTitleTextView.setTextColor(color);
+        mLongestReadPagesTitleTextView.setTextColor(color);
     }
 
 }
