@@ -20,6 +20,7 @@
     <string name="muzei_source">Comic Viewer</string>
 
     <!-- Language specific strings -->
+    <string name="unhide">Show</string>
     <string name="buy_full_version">Compra versión completa</string>
     <string name="unhide_files">Descubre fichero</string>
     <string name="unhide_setting_non_pro">Descubre cómic y carpetas (PRO)</string>

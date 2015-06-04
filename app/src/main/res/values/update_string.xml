@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about_text">
+    <string name="about_text" translatable="false">
         Special thanks to:\n\n
         Laura Welkenhuyzen - French translations\n
         Fabrizio - Italian translations\n
-        Matteo - Spanish translations\n\n\n
-        Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
+        Matteo - Spanish translations\n\n\nHi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
         science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan
         of android so I decided to make a comic viewer app in my free time. I wasn\'t really happy with existing apps because of
         their poor performance, overly complex interfaces or just because I didn\'t like how they looked. Well anyway, have fun reading
         comics with Comic Viewer!
     </string>
-    <string name="updates">
+    <string name="updates" translatable="false">
         v2.5\n
         - New app icon\n
-        - Translations for Spanish, Italian and French\n\n
+        - Translations for Spanish, Italian and French\n
+        - Bugfixes\n\n
         v2.4.1\n
         - Fixed a manifest error producing an installation error for some users\n\n
         v2.4\n
@@ -80,7 +80,7 @@
         v1\n
         - Initial release\n\n
     </string>
-    <string name="eula">
+    <string name="eula" translatable="false">
         The product is protected by Federal Copyright Law. Material Comic Viewer retains the title to and ownership of the Product. You are licensed to use this Product on the following terms and conditions:
         \n\nLICENSE - The licensee is defined as the individual or company utilizing the Software Product. Material Comic Viewer hereby grants the licensee a license authorizing the licensee to use the enclosed product exclusively on devices in possession of the licensee. Use of this product by more than one individual or by anyone other than the licensee terminates, without notification, this license and the right to use this product.
         \n\nYOU MAY NOT: Distribute, rent, sub-license or otherwise make available to others the software or documentation or copies thereof, except as expressly permitted in this License without prior written consent from Cédric Vandelaer. In the case of an authorized transfer, the transferee must agree to be bound by the terms and conditions of this License Agreement.
