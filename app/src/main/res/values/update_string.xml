@@ -11,8 +11,10 @@
         comics with Comic Viewer!
     </string>
     <string name="updates" translatable="false">
-        v2.5\n
+        v3.0\n
+        - Google Drive support\n
         - New app icon\n
+        - Small visual tweaks\n
         - Translations for Spanish, Italian and French\n
         - Bugfixes\n\n
         v2.4.1\n

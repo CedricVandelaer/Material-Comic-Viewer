@@ -176,8 +176,11 @@
     <string name="muzei_description">Use your comic covers as wallpaper</string>
     <string name="path_preference_summary">Note: the default path \'main storage/ComicViewer\' can\'t be removed</string>
     <string name="title_activity_google_drive">GoogleDriveActivity</string>
+    <string name="changelog">Changelog</string>
+    <string name="synchronization">Synchronization</string>
 
-    <string name="hello_world">Hello world!</string>
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

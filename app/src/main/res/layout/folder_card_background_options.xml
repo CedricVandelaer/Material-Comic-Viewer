@@ -50,8 +50,8 @@
             android:layout_margin="16dp"
             fab:fab_type="normal"
             fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Yellow"
-            fab:fab_colorPressed="@color/YellowDark"
+            fab:fab_colorNormal="@color/Gold"
+            fab:fab_colorPressed="@color/GoldDark"
             fab:fab_colorRipple="@color/YellowLight" />
         <TextView
             android:gravity="center"

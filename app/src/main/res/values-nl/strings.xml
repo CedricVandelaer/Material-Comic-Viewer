@@ -175,4 +175,6 @@
     <string name="refresh">Vernieuw</string>
     <string name="muzei_description">Gebruik stripcovers als wallpaper!</string>
     <string name="path_preference_summary">Merk op: het default path \'main storage/ComicViewer\' kan niet verwijderd worden</string>
+    <string name="changelog">Versiewijzigingen</string>
+    <string name="synchronization">Synchronisatie</string>
 </resources>

@@ -6,17 +6,35 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * Created by Cédric on 8/02/2015.
@@ -46,12 +64,78 @@ public class PreferenceSetter {
     private static final String NORMAL_LIST="normalList";
     private static final String LAST_USED_GOOGLE_ACCOUNT = "lastUsedGoogleAccount";
 
-
     public static final String APP_THEME_COLOR = "appThemeColor";
     public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
     public static final String MANGA_SETTING = "mangaEnabled";
     public static final String UNHIDE_LIST = "unhideListSetting";
     public static final String VOLUME_KEY_OPTION = "volumeKeysOption";
+
+    public static final String COMIC_VIEWER = "ComicViewer";
+
+    public static void exportData(Context context, String locationPath)
+    {
+        try {
+
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            // root element
+            Document doc = docBuilder.newDocument();
+            Element rootElement = doc.createElement(COMIC_VIEWER);
+            doc.appendChild(rootElement);
+
+            //children of comicInfo
+            Element favorites = doc.createElement(FAVORITE_COMIC_LIST);
+            rootElement.appendChild(favorites);
+
+            Element comicsReadNumber = doc.createElement(NUMBER_OF_COMICS_READ);
+            rootElement.appendChild(comicsReadNumber);
+
+            Element comicsStartedNumber = doc.createElement(NUMBER_OF_COMICS_STARTED);
+            rootElement.appendChild(comicsStartedNumber);
+
+            Element pagesRead = doc.createElement(PAGES_READ_LIST);
+            rootElement.appendChild(pagesRead);
+
+            Element seriesPagesRead = doc.createElement(SERIES_PAGES_READ_LIST);
+            rootElement.appendChild(seriesPagesRead);
+
+            Element readComicList = doc.createElement(READ_COMIC_LIST);
+            rootElement.appendChild(readComicList);
+
+            Element comicsAdded = doc.createElement(COMICS_ADDED_LIST);
+            rootElement.appendChild(comicsAdded);
+
+            Element longestReadComic = doc.createElement(LONGEST_READ_COMIC);
+            rootElement.appendChild(longestReadComic);
+
+            Element mangaList = doc.createElement(MANGA_LIST);
+            rootElement.appendChild(mangaList);
+
+            Element normalList = doc.createElement(NORMAL_LIST);
+            rootElement.appendChild(normalList);
+
+            // write the content into xml file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+
+            DateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy");
+            Date date = new Date();
+            String outputPath = locationPath+"/"+dateFormat.format(date)+"_cvbackup.xml";
+
+            StreamResult result = new StreamResult(new File(outputPath));
+
+            transformer.transform(source, result);
+
+            Log.d("PreferenceSetter", "XML File saved to "+locationPath);
+
+        } catch (ParserConfigurationException pce) {
+            pce.printStackTrace();
+        } catch (TransformerException tfe) {
+            tfe.printStackTrace();
+        }
+    }
 
 
     public static String getLastUsedGoogleAccount(Context context)

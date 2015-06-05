@@ -174,4 +174,7 @@
     <string name="refresh">Ricarica</string>
     <string name="muzei_description">Usa le tue copertine come sfondo</string>
     <string name="path_preference_summary">Nota: il path di default \'main storage/ComicViewer\' non può essere rimosso</string>
+    <string name="changelog">Registro modifiche</string>
+    <string name="synchronization">Sincronizzazione</string>
+
 </resources>

@@ -40,19 +40,20 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             >
-            <TextView
+            <com.gc.materialdesign.views.ButtonFlat
+                android:id="@+id/updates_button"
                 android:layout_centerHorizontal="true"
-                android:id="@+id/version_textview"
-                android:text="@string/app_name"
-                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="#1E88E5"
+                android:text="@string/changelog" />
 
             <TextView
+                android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/about_text"
-                android:layout_below="@id/version_textview"
+                android:layout_below="@id/updates_button"
                 android:layout_margin="5dp"
                 android:text="@string/about_text"/>
 

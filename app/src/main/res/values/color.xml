@@ -38,4 +38,5 @@
     <color name="YellowLight">#FFF176</color>
     <color name="YellowDark">#FBC02D</color>
     <color name="Gold">#E5C100</color>
+    <color name="GoldDark">#C5B100</color>
 </resources>

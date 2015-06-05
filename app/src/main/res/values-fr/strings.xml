@@ -175,4 +175,7 @@
     <string name="refresh">Actualiser</string>
     <string name="muzei_description">Instaurer des couverture comme fond d’écran!</string>
     <string name="path_preference_summary">Remarque: le default path \'main storage/ComicViewer\’ne peut pas être effacé</string>
+    <string name="changelog">Historique des modifications</string>
+    <string name="synchronization">Synchronisation</string>
+
 </resources>

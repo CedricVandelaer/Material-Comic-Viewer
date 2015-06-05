@@ -13,14 +13,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.gc.materialdesign.views.ButtonFlat;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class AboutFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private TextView mVersionTextView;
-
+    private ButtonFlat mChangelogButton;
+    private TextView mTitleTextView;
 
     public static AboutFragment newInstance() {
         return new AboutFragment();
@@ -53,11 +56,26 @@ public class AboutFragment extends Fragment {
         
         ImageView logoview = (ImageView)v.findViewById(R.id.logo);
         ImageView meview = (ImageView)v.findViewById(R.id.me_drawable);
+        mTitleTextView = (TextView) v.findViewById(R.id.logo_text);
 
-        mVersionTextView = (TextView) v.findViewById(R.id.version_textview);
-        mVersionTextView.setText(getActivity().getResources().getString(R.string.app_name)+" v"+ getPackageInfo().versionName+
-        "\n\n"+getString(R.string.updates));
-        
+        mTitleTextView.setText(getActivity().getResources().getString(R.string.app_name)+" v"+ getPackageInfo().versionName);
+
+        mChangelogButton = (ButtonFlat) v.findViewById(R.id.updates_button);
+
+        mChangelogButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+
+        mChangelogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                        .content(getString(R.string.updates))
+                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveText(getString(R.string.accept))
+                        .title(getString(R.string.changelog))
+                        .show();
+            }
+        });
+
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(getActivity());
             ImageLoader.getInstance().init(config);

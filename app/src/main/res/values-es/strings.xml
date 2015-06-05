@@ -175,4 +175,7 @@
     <string name="muzei_description">Utilice sus portadas de cómics como fondo de pantalla</string>
     <string name="path_preference_summary">"Nota: el path por defecto \'main storage/cómicViewer\'
 no se puede borrar"</string>
+    <string name="changelog">Registro de cambios</string>
+    <string name="synchronization">Sincronización</string>
+
 </resources>

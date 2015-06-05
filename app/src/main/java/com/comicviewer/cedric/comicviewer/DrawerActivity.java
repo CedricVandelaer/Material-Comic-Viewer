@@ -38,7 +38,7 @@ import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionLis
  */
 public class DrawerActivity extends MaterialNavigationDrawer implements ComicListFragment.OnFragmentInteractionListener,
 AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInteractionListener, StatisticsFragment.OnFragmentInteractionListener,
-        CloudFragment.OnFragmentInteractionListener, CurrentlyReadingFragment.OnFragmentInteractionListener
+        CloudFragment.OnFragmentInteractionListener, CurrentlyReadingFragment.OnFragmentInteractionListener, SynchronisationFragment.OnFragmentInteractionListener
 {
 
     MaterialSection[] mSectionsArray;
@@ -53,7 +53,7 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         new SimpleEula(this).show();
         new SetTaskDescriptionTask().execute();
 
-        mSectionsArray = new MaterialSection[7];
+        mSectionsArray = new MaterialSection[8];
 
         this.disableLearningPattern();
         this.setBackPattern(BACKPATTERN_CUSTOM);
@@ -90,12 +90,16 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         mSectionsArray[4] = statsSection;
         addSection(statsSection);
 
+        MaterialSection syncSection = newSection(getString(R.string.synchronization), R.drawable.sync, SynchronisationFragment.newInstance());
+        mSectionsArray[5] = syncSection;
+        addSection(syncSection);
+
         MaterialSection settingsSection = newSection(getString(R.string.settings), R.drawable.settings, SettingsFragment.newInstance());
-        mSectionsArray[5] = settingsSection;
+        mSectionsArray[6] = settingsSection;
         addBottomSection(settingsSection);
         
         MaterialSection aboutSection = newSection(getString(R.string.about), R.drawable.about, AboutFragment.newInstance());
-        mSectionsArray[6] = aboutSection;
+        mSectionsArray[7] = aboutSection;
         addBottomSection(aboutSection);
 
         NavigationManager.getInstance().pushToSectionStack(mSectionsArray[0]);
@@ -131,6 +135,8 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
             return SettingsFragment.newInstance();
         else if (materialSection.getTitle().equals(getString(R.string.about)))
             return AboutFragment.newInstance();
+        else if (materialSection.getTitle().equals(getString(R.string.synchronization)))
+            return SynchronisationFragment.newInstance();
         else
             return ComicListFragment.getInstance();
     }
@@ -227,9 +233,14 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         changeToolbarColor(PreferenceSetter.getAppThemeColor(this),darkenColor(PreferenceSetter.getAppThemeColor(this)));
         if (!NavigationManager.getInstance().sectionStackEmpty())
         {
-            if (NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.all_comics)))
+            if (NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.all_comics))
+                    || NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.currently_reading))
+                    || NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.favorites))
+                    || NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.cloud_storage))) {
                 setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
                         NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+            }
+
         }
     }
 

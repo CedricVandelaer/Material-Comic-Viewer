@@ -17,6 +17,8 @@ import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.gc.materialdesign.views.Button;
 import com.gc.materialdesign.views.ButtonFlat;
+import com.gc.materialdesign.views.ProgressBarDeterminate;
+import com.gc.materialdesign.views.Slider;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,8 @@ public class StatisticsFragment extends Fragment {
     private TextView mLongestReadTitleTitleTextView;
     private TextView mLongestReadPagesTitleTextView;
 
+    private ProgressBarDeterminate mProgressBar;
+
     public static StatisticsFragment newInstance() {
         StatisticsFragment fragment = new StatisticsFragment();
         return fragment;
@@ -56,9 +60,6 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.BlueGrey));
-
-
 
     }
 
@@ -91,6 +92,8 @@ public class StatisticsFragment extends Fragment {
 
         mLongestReadTitleTitleTextView = (TextView) v.findViewById(R.id.longest_read_title_title_textview);
         mLongestReadPagesTitleTextView = (TextView) v.findViewById(R.id.longest_number_pages_title_textview);
+
+        mProgressBar = (ProgressBarDeterminate) v.findViewById(R.id.progress_bar);
 
         PreferenceSetter.setBackgroundColorPreference(getActivity());
 
@@ -131,20 +134,27 @@ public class StatisticsFragment extends Fragment {
         }
     }
 
-    private void updateTextViews()
-    {
+    private void updateTextViews() {
+        mProgressBar.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+
         int comicsStarted = PreferenceSetter.getNumberOfComicsStarted(getActivity());
         int comicsRead = PreferenceSetter.getNumberOfComicsRead(getActivity());
-        mComicsStartedTextView.setText(""+comicsStarted);
-        mComicsReadTextView.setText(""+comicsRead);
+        mComicsStartedTextView.setText("" + comicsStarted);
+        mComicsReadTextView.setText("" + comicsRead);
 
-        if (comicsStarted==0)
+        if (comicsStarted == 0)
+        {
             mCompletedPercentageTextView.setText("100%");
+            mProgressBar.setProgress(100);
+        }
         else
         {
             int completedPercentage = (int)(100.0f *((float)(comicsRead)/(float)(comicsStarted)));
             mCompletedPercentageTextView.setText(""+completedPercentage+"%");
+            mProgressBar.setProgress(completedPercentage);
         }
+
+
 
         Map<String, Integer> map = PreferenceSetter.getPagesReadMap(getActivity());
 
