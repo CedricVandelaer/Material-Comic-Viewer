@@ -5,25 +5,34 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Environment;
+import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
+import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.ButtonRectangle;
 import com.gc.materialdesign.widgets.SnackBar;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SynchronisationFragment extends Fragment {
 
-    private ButtonRectangle mExportButton;
+    private ButtonFlat mExportButton;
+    private CardView mDeviceExportCardView;
+    private TextView mDeviceTitleTextView;
 
     public SynchronisationFragment() {
         // Required empty public constructor
@@ -40,15 +49,40 @@ public class SynchronisationFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_synchronisation, container, false);
 
-        mExportButton = (ButtonRectangle) v.findViewById(R.id.export_button);
-        mExportButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+        mExportButton = (ButtonFlat) v.findViewById(R.id.export_button);
+        mDeviceExportCardView = (CardView) v.findViewById(R.id.export_device_card);
+        mDeviceTitleTextView = (TextView) v.findViewById(R.id.device_title_text_view);
+        mDeviceExportCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(getActivity())));
 
         PreferenceSetter.setBackgroundColorPreference(getActivity());
 
         mExportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new ExportDataTask().execute();
+                File path = new File(Environment.getExternalStorageDirectory().getPath());
+
+                FileDialog dialog = new FileDialog(getActivity(), path);
+                dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
+                    public void directorySelected(final File directory) {
+                        Log.d(getClass().getName(), "Selected directory: " + directory.toString());
+                        new MaterialDialog.Builder(getActivity()).title("Export data")
+                                .content("The data will be exported to the folder \n\""+directory.toString()+"\"\nDo you want to continue?")
+                                .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .positiveText(getString(R.string.confirm))
+                                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .negativeText(getString(R.string.cancel))
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        super.onPositive(dialog);
+                                        new ExportDataTask().execute(directory.toString());
+                                    }
+                                })
+                                .show();
+                    }
+                });
+                dialog.setSelectDirectoryOption(true);
+                dialog.showDialog();
             }
         });
 
@@ -75,7 +109,8 @@ public class SynchronisationFragment extends Fragment {
         @Override
         protected Object doInBackground(Object[] params) {
 
-            PreferenceSetter.exportData(getActivity(), getActivity().getExternalFilesDir(null).getAbsolutePath());
+            String path = (String) params[0];
+            PreferenceSetter.exportData(getActivity(), path);
 
             return null;
         }
@@ -85,8 +120,8 @@ public class SynchronisationFragment extends Fragment {
         {
             if (mDialog!=null)
                 mDialog.dismiss();
-            SnackBar snackBar = new SnackBar(getActivity(), "The app has finished exporting data!", null, null);
-            snackBar.show();
+            Toast toast = Toast.makeText(getActivity(), "The app has finished exporting data!", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 

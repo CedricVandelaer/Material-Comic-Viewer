@@ -88,32 +88,118 @@ public class PreferenceSetter {
             Element favorites = doc.createElement(FAVORITE_COMIC_LIST);
             rootElement.appendChild(favorites);
 
+            List<String> favoritesList = getFavoriteComics(context);
+
+            for (String favorite:favoritesList)
+            {
+                Element favoriteNode = doc.createElement("FavoriteComic");
+                favoriteNode.setTextContent(favorite);
+                favorites.appendChild(favoriteNode);
+            }
+
             Element comicsReadNumber = doc.createElement(NUMBER_OF_COMICS_READ);
+            comicsReadNumber.setTextContent(""+getNumberOfComicsRead(context));
             rootElement.appendChild(comicsReadNumber);
 
             Element comicsStartedNumber = doc.createElement(NUMBER_OF_COMICS_STARTED);
+            comicsStartedNumber.setTextContent(""+getNumberOfComicsStarted(context));
             rootElement.appendChild(comicsStartedNumber);
 
             Element pagesRead = doc.createElement(PAGES_READ_LIST);
             rootElement.appendChild(pagesRead);
 
+            Map<String, Integer> pagesReadMap = getPagesReadMap(context);
+
+            for (String key:pagesReadMap.keySet())
+            {
+                Element comic = doc.createElement("Comic");
+                Element name = doc.createElement("Name");
+                Element page = doc.createElement("Page");
+                name.setTextContent(key);
+                page.setTextContent(""+pagesReadMap.get(key));
+                comic.appendChild(name);
+                comic.appendChild(page);
+                pagesRead.appendChild(comic);
+            }
+
             Element seriesPagesRead = doc.createElement(SERIES_PAGES_READ_LIST);
             rootElement.appendChild(seriesPagesRead);
+
+            Map<String, Integer> seriesReadMap = getSeriesPagesReadMap(context);
+            for (String key:seriesReadMap.keySet())
+            {
+                Element series = doc.createElement("Series");
+                Element name = doc.createElement("Name");
+                Element pages = doc.createElement("Pages");
+                name.setTextContent(key);
+                pages.setTextContent(""+seriesReadMap.get(key));
+                series.appendChild(name);
+                series.appendChild(pages);
+                seriesPagesRead.appendChild(series);
+            }
 
             Element readComicList = doc.createElement(READ_COMIC_LIST);
             rootElement.appendChild(readComicList);
 
+            Map<String,Integer> readComicMap = getReadComics(context);
+            for (String key:readComicMap.keySet())
+            {
+                Element comic = doc.createElement("Comic");
+                Element name = doc.createElement("Name");
+                Element page = doc.createElement("Page");
+                name.setTextContent(key);
+                page.setTextContent(""+readComicMap.get(key));
+                comic.appendChild(name);
+                comic.appendChild(page);
+                readComicList.appendChild(comic);
+            }
+
             Element comicsAdded = doc.createElement(COMICS_ADDED_LIST);
             rootElement.appendChild(comicsAdded);
+
+            List<String> comicsAddedList = getComicsAdded(context);
+
+            for (String title:comicsAddedList)
+            {
+                Element comic = doc.createElement("Comic");
+                comic.setTextContent(title);
+                comicsAdded.appendChild(comic);
+            }
 
             Element longestReadComic = doc.createElement(LONGEST_READ_COMIC);
             rootElement.appendChild(longestReadComic);
 
+            Element longestReadName = doc.createElement("Name");
+            longestReadName.setTextContent(getLongestReadComicTitle(context));
+            longestReadComic.appendChild(longestReadName);
+
+            Element longestReadPages = doc.createElement("Pages");
+            longestReadPages.setTextContent(""+getLongestReadComicPages(context));
+            longestReadComic.appendChild(longestReadPages);
+
             Element mangaList = doc.createElement(MANGA_LIST);
             rootElement.appendChild(mangaList);
 
+            List<String> mangaComicList = getMangaComicList(context);
+
+            for (String title:mangaComicList)
+            {
+                Element comic = doc.createElement("Comic");
+                comic.setTextContent(title);
+                mangaList.appendChild(comic);
+            }
+
             Element normalList = doc.createElement(NORMAL_LIST);
             rootElement.appendChild(normalList);
+
+            List<String> normalComicList = getNormalComicList(context);
+
+            for (String title:normalComicList)
+            {
+                Element comic = doc.createElement("Comic");
+                comic.setTextContent(title);
+                normalList.appendChild(comic);
+            }
 
             // write the content into xml file
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -1000,7 +1086,8 @@ public class PreferenceSetter {
 
         for (String comic:favorites)
         {
-            favoriteArrayList.add(comic);
+            if (!comic.equals(""))
+                favoriteArrayList.add(comic);
         }
         return favoriteArrayList;
     }
