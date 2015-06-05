@@ -96,7 +96,7 @@ public class SynchronisationFragment extends Fragment {
                 dialog.setSelectDirectoryOption(false);
                 dialog.addFileListener(new FileDialog.FileSelectedListener() {
                     @Override
-                    public void fileSelected(File file) {
+                    public void fileSelected(final File file) {
                         Log.d(getClass().getName(), "Selected file: " + file.toString());
                         new MaterialDialog.Builder(getActivity()).title("Import data")
                                 .content("The data of \"" + file.getName() + "\" will be imported.\nDo you want to continue?")
@@ -108,6 +108,7 @@ public class SynchronisationFragment extends Fragment {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
                                         super.onPositive(dialog);
+                                        new ImportDataTask().execute(file);
                                     }
                                 })
                                 .show();
@@ -118,6 +119,45 @@ public class SynchronisationFragment extends Fragment {
         });
 
         return v;
+    }
+
+    private class ImportDataTask extends AsyncTask
+    {
+        MaterialDialog mDialog;
+
+        @Override
+        protected void onPreExecute()
+        {
+            mDialog = new MaterialDialog.Builder(getActivity()).title("Importing data")
+                    .content("Please wait while the app imports the app data.")
+                    .cancelable(false)
+                    .progress(true, 1, false)
+                    .show();
+        }
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            File xmlfile = (File) params[0];
+            Boolean succes = PreferenceSetter.importData(getActivity(), xmlfile);
+
+            return succes;
+        }
+
+        @Override
+        public void onPostExecute(Object object)
+        {
+            Boolean succes = (Boolean) object;
+            if (mDialog!=null)
+                mDialog.dismiss();
+            Toast toast;
+            if (succes)
+                toast = Toast.makeText(getActivity(), "The app has finished importing data!", Toast.LENGTH_SHORT);
+            else
+                toast = Toast.makeText(getActivity(), "Something went wrong while importing...", Toast.LENGTH_LONG);
+
+            toast.show();
+        }
     }
 
     private class ExportDataTask extends AsyncTask

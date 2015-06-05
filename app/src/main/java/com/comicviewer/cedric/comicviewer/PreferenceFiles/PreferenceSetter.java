@@ -16,6 +16,8 @@ import com.comicviewer.cedric.comicviewer.R;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -72,7 +74,143 @@ public class PreferenceSetter {
 
     public static final String COMIC_VIEWER = "ComicViewer";
 
-    public static void exportData(Context context, String locationPath)
+    public static boolean importData(Context context, File xmlFile)
+    {
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlFile);
+
+            //optional, but recommended
+            //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+            doc.getDocumentElement().normalize();
+
+
+            NodeList favoriteNodes = doc.getElementsByTagName(FAVORITE_COMIC_LIST);
+
+            for (int i=0;i<favoriteNodes.getLength();i++)
+            {
+                Node favoriteComic = favoriteNodes.item(i);
+                if (!favoriteComic.getTextContent().equals(""))
+                    Log.d("Import", "favorite: "+favoriteComic.getTextContent());
+            }
+
+            NodeList comicsReadNumberNodes = doc.getElementsByTagName(NUMBER_OF_COMICS_READ);
+            if (comicsReadNumberNodes.getLength()>0) {
+                Node comicsReadNumber = comicsReadNumberNodes.item(0);
+                Log.d("Import", "comics read number: " + comicsReadNumber.getTextContent());
+            }
+
+
+            NodeList comicsStartedNumberNodes = doc.getElementsByTagName(NUMBER_OF_COMICS_STARTED);
+            if (comicsStartedNumberNodes.getLength()>0) {
+                Node comicsStartedNumber = comicsStartedNumberNodes.item(0);
+                Log.d("Import", "comics started number: " + comicsStartedNumber.getTextContent());
+            }
+
+
+            NodeList pagesReadList = ((Element)doc.getElementsByTagName(PAGES_READ_LIST).item(0)).getElementsByTagName("Comic");
+
+            for (int i=0;i<pagesReadList.getLength();i++)
+            {
+                Node comic = pagesReadList.item(i);
+                if (comic.getNodeType()==Node.ELEMENT_NODE) {
+                    Element eComic = (Element)comic;
+                    Node name = eComic.getElementsByTagName("Name").item(0);
+                    Node page = eComic.getElementsByTagName("Page").item(0);
+                    Log.d("Import", "comic,  pages read: " + name.getTextContent() + " " + page.getTextContent());
+                }
+            }
+
+            /*
+            Element seriesPagesRead = doc.createElement(SERIES_PAGES_READ_LIST);
+            rootElement.appendChild(seriesPagesRead);
+
+            Map<String, Integer> seriesReadMap = getSeriesPagesReadMap(context);
+            for (String key:seriesReadMap.keySet())
+            {
+                Element series = doc.createElement("Series");
+                Element name = doc.createElement("Name");
+                Element pages = doc.createElement("Pages");
+                name.setTextContent(key);
+                pages.setTextContent(""+seriesReadMap.get(key));
+                series.appendChild(name);
+                series.appendChild(pages);
+                seriesPagesRead.appendChild(series);
+            }
+
+            Element readComicList = doc.createElement(READ_COMIC_LIST);
+            rootElement.appendChild(readComicList);
+
+            Map<String,Integer> readComicMap = getReadComics(context);
+            for (String key:readComicMap.keySet())
+            {
+                Element comic = doc.createElement("Comic");
+                Element name = doc.createElement("Name");
+                Element page = doc.createElement("Page");
+                name.setTextContent(key);
+                page.setTextContent(""+readComicMap.get(key));
+                comic.appendChild(name);
+                comic.appendChild(page);
+                readComicList.appendChild(comic);
+            }
+
+            Element comicsAdded = doc.createElement(COMICS_ADDED_LIST);
+            rootElement.appendChild(comicsAdded);
+
+            List<String> comicsAddedList = getComicsAdded(context);
+
+            for (String title:comicsAddedList)
+            {
+                Element comic = doc.createElement("Comic");
+                comic.setTextContent(title);
+                comicsAdded.appendChild(comic);
+            }
+
+            Element longestReadComic = doc.createElement(LONGEST_READ_COMIC);
+            rootElement.appendChild(longestReadComic);
+
+            Element longestReadName = doc.createElement("Name");
+            longestReadName.setTextContent(getLongestReadComicTitle(context));
+            longestReadComic.appendChild(longestReadName);
+
+            Element longestReadPages = doc.createElement("Pages");
+            longestReadPages.setTextContent(""+getLongestReadComicPages(context));
+            longestReadComic.appendChild(longestReadPages);
+
+            Element mangaList = doc.createElement(MANGA_LIST);
+            rootElement.appendChild(mangaList);
+
+            List<String> mangaComicList = getMangaComicList(context);
+
+            for (String title:mangaComicList)
+            {
+                Element comic = doc.createElement("Comic");
+                comic.setTextContent(title);
+                mangaList.appendChild(comic);
+            }
+
+            Element normalList = doc.createElement(NORMAL_LIST);
+            rootElement.appendChild(normalList);
+
+            List<String> normalComicList = getNormalComicList(context);
+
+            for (String title:normalComicList)
+            {
+                Element comic = doc.createElement("Comic");
+                comic.setTextContent(title);
+                normalList.appendChild(comic);
+            }
+            */
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public static boolean exportData(Context context, String locationPath)
     {
         try {
 
@@ -215,11 +353,14 @@ public class PreferenceSetter {
             transformer.transform(source, result);
 
             Log.d("PreferenceSetter", "XML File saved to "+locationPath);
+            return true;
 
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
+            return false;
         } catch (TransformerException tfe) {
             tfe.printStackTrace();
+            return false;
         }
     }
 
