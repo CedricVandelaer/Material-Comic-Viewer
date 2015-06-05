@@ -31,6 +31,7 @@ import java.util.ArrayList;
 public class SynchronisationFragment extends Fragment {
 
     private ButtonFlat mExportButton;
+    private ButtonFlat mImportButton;
     private CardView mDeviceExportCardView;
     private TextView mDeviceTitleTextView;
 
@@ -50,23 +51,25 @@ public class SynchronisationFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_synchronisation, container, false);
 
         mExportButton = (ButtonFlat) v.findViewById(R.id.export_button);
+        mImportButton = (ButtonFlat) v.findViewById(R.id.import_button);
         mDeviceExportCardView = (CardView) v.findViewById(R.id.export_device_card);
         mDeviceTitleTextView = (TextView) v.findViewById(R.id.device_title_text_view);
         mDeviceExportCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(getActivity())));
 
         PreferenceSetter.setBackgroundColorPreference(getActivity());
 
+        final File path = new File(Environment.getExternalStorageDirectory().getPath());
+
         mExportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File path = new File(Environment.getExternalStorageDirectory().getPath());
 
                 FileDialog dialog = new FileDialog(getActivity(), path);
                 dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
                     public void directorySelected(final File directory) {
                         Log.d(getClass().getName(), "Selected directory: " + directory.toString());
                         new MaterialDialog.Builder(getActivity()).title("Export data")
-                                .content("The data will be exported to the folder \n\""+directory.toString()+"\"\nDo you want to continue?")
+                                .content("The data will be exported to the folder \n\"" + directory.toString() + "\"\nDo you want to continue?")
                                 .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
                                 .positiveText(getString(R.string.confirm))
                                 .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
@@ -86,14 +89,39 @@ public class SynchronisationFragment extends Fragment {
             }
         });
 
+        mImportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FileDialog dialog = new FileDialog(getActivity(), path);
+                dialog.setSelectDirectoryOption(false);
+                dialog.addFileListener(new FileDialog.FileSelectedListener() {
+                    @Override
+                    public void fileSelected(File file) {
+                        Log.d(getClass().getName(), "Selected file: " + file.toString());
+                        new MaterialDialog.Builder(getActivity()).title("Import data")
+                                .content("The data of \"" + file.getName() + "\" will be imported.\nDo you want to continue?")
+                                .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .positiveText(getString(R.string.confirm))
+                                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .negativeText(getString(R.string.cancel))
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        super.onPositive(dialog);
+                                    }
+                                })
+                                .show();
+                    }
+                });
+                dialog.showDialog();
+            }
+        });
+
         return v;
     }
 
     private class ExportDataTask extends AsyncTask
     {
-
-
-
         MaterialDialog mDialog;
 
         @Override

@@ -10,6 +10,8 @@ import android.util.Log;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -148,6 +150,12 @@ public class FileDialog {
             for (String file : fileList1) {
                 r.add(file);
             }
+            Collections.sort(r, new Comparator<String>() {
+                @Override
+                public int compare(String lhs, String rhs) {
+                    return lhs.compareToIgnoreCase(rhs);
+                }
+            });
         }
         fileList = (String[]) r.toArray(new String[]{});
     }
