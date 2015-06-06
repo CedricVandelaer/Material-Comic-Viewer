@@ -114,6 +114,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     .addApi(Drive.API)
                     .addApi(Plus.API)
                     .addScope(Drive.SCOPE_FILE)
+                    .addScope(Drive.SCOPE_APPFOLDER)
                     .setAccountName(PreferenceSetter.getLastUsedGoogleAccount(getActivity()))
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)

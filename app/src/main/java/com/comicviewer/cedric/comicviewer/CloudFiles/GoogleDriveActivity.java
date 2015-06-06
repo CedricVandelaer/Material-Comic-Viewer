@@ -26,11 +26,20 @@ import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.Utilities;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.query.Filters;
+import com.google.android.gms.drive.query.Query;
+import com.google.android.gms.plus.Plus;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
-public class GoogleDriveActivity extends Activity {
+public class GoogleDriveActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private TextView mErrorTextView;
     private CloudService mCloudService;
@@ -38,6 +47,8 @@ public class GoogleDriveActivity extends Activity {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private GoogleDriveAdapter mAdapter;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +65,7 @@ public class GoogleDriveActivity extends Activity {
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
 
-        //mErrorTextView.setVisibility(View.GONE);
-        mErrorTextView.setText("Service: " + mCloudService.getName() + "\ntoken: " + mCloudService.getToken() + "\nname: " + mCloudService.getUsername() + "\nemail: " + mCloudService.getEmail());
+        mErrorTextView.setVisibility(View.GONE);
 
         PreferenceSetter.setBackgroundColorPreference(this);
         if (PreferenceSetter.getBackgroundColorPreference(this)==getResources().getColor(R.color.WhiteBG))
@@ -74,7 +84,7 @@ public class GoogleDriveActivity extends Activity {
         mRecyclerView = (RecyclerView) findViewById(R.id.cloud_file_list);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new GoogleDriveAdapter();
+        mAdapter = new GoogleDriveAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -89,11 +99,56 @@ public class GoogleDriveActivity extends Activity {
         int hSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, outMetrics);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace));
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Drive.API)
+                .addApi(Plus.API)
+                .addScope(Drive.SCOPE_FILE)
+                .addScope(Drive.SCOPE_APPFOLDER)
+                .setAccountName(mCloudService.getUsername())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        mGoogleApiClient.connect();
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return false;
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        DriveFolder rootFolder = Drive.DriveApi.getRootFolder(mGoogleApiClient);
+
+        rootFolder.listChildren(mGoogleApiClient).setResultCallback(childrenRetrievedCallback);
+        Query query = new Query.Builder()
+                .build();
+        rootFolder.queryChildren(mGoogleApiClient, query).setResultCallback(childrenRetrievedCallback);
+    }
+
+    ResultCallback<DriveApi.MetadataBufferResult> childrenRetrievedCallback = new
+            ResultCallback<DriveApi.MetadataBufferResult>() {
+                @Override
+                public void onResult(DriveApi.MetadataBufferResult result) {
+                    if (!result.getStatus().isSuccess()) {
+                        mErrorTextView.setText("Problem while retrieving files");
+                        return;
+                    }
+                    mAdapter.setData(result);
+                }
+            };
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 
     private class SetTaskDescriptionTask extends AsyncTask

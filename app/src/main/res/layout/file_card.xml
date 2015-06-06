@@ -25,7 +25,6 @@
             card_view:cardUseCompatPadding="true"
             android:id="@+id/card"
             android:clickable="true"
-            android:foreground="@drawable/ripple"
             >
 
             <RelativeLayout
