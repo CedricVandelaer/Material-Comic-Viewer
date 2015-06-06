@@ -1209,6 +1209,28 @@ public class PreferenceSetter {
 
     }
 
+    public static void batchSaveComics(Context context, ArrayList<Comic> comics)
+    {
+        List<Comic> savedComics = getSavedComics(context);
+
+        for (Comic comic:comics) {
+            boolean found = false;
+            int foundPos = 0;
+            for (int i = 0; !found && i < savedComics.size(); i++) {
+                if (savedComics.get(i).getFilePath().equals(comic.getFilePath())
+                        && savedComics.get(i).getFileName().equals(comic.getFileName())) {
+                    found = true;
+                    foundPos = i;
+                }
+            }
+            if (found) {
+                savedComics.remove(foundPos);
+            }
+            savedComics.add(comic);
+        }
+        saveComicList(context, savedComics);
+    }
+
     public static void saveComicList(Context context, List<Comic> comicList)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

@@ -259,6 +259,8 @@ public class FavoritesListFragment extends Fragment {
 
         updateProgressDialog(mProgress, mTotalComicCount);
 
+        final ArrayList<Comic> comicsToSave = new ArrayList<>();
+
         for (String str:treemap.keySet())
         {
             if (mSearchComicsTask.isCancelled())
@@ -279,8 +281,9 @@ public class FavoritesListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                if (ComicLoader.setComicColor(mApplicationContext, comic))
-                    PreferenceSetter.saveComic(mApplicationContext, comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
+                    comicsToSave.add(comic);
+                }
 
 
                 final Comic finalComic = comic;
@@ -301,20 +304,13 @@ public class FavoritesListFragment extends Fragment {
             {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
-                try {
-                    Thread.sleep(2, 0);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
                 Comic comic = savedComics.get(pos);
 
                 ComicLoader.generateComicInfo(mApplicationContext, comic);
 
-                if (ComicLoader.setComicColor(getActivity(), comic))
-                    PreferenceSetter.saveComic(getActivity(), comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
+                    comicsToSave.add(comic);
+                }
 
 
                 if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
@@ -341,7 +337,7 @@ public class FavoritesListFragment extends Fragment {
             {
                 Comic comic = new Comic(str, map.get(str));
 
-                ComicLoader.loadComicSync( mApplicationContext, comic);
+                ComicLoader.loadComicSync(mApplicationContext, comic);
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
@@ -351,7 +347,7 @@ public class FavoritesListFragment extends Fragment {
                     }
                 });
 
-                PreferenceSetter.saveComic(getActivity(), comic);
+                comicsToSave.add(comic);
 
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
@@ -363,6 +359,13 @@ public class FavoritesListFragment extends Fragment {
                 updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
+            }
+        }).run();
 
         updateLastReadComics();
 

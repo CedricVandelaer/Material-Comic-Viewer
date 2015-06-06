@@ -259,6 +259,8 @@ public class CurrentlyReadingFragment extends Fragment {
 
         updateProgressDialog(mProgress, mTotalComicCount);
 
+        final ArrayList<Comic> comicsToSave = new ArrayList<>();
+
         for (String str:treemap.keySet())
         {
             if (mSearchComicsTask.isCancelled())
@@ -280,8 +282,9 @@ public class CurrentlyReadingFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                if (ComicLoader.setComicColor(mApplicationContext, comic))
-                    PreferenceSetter.saveComic(mApplicationContext, comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
+                    comicsToSave.add(comic);
+                }
 
                 if (readMap.get(str)<comic.getPageCount()-1) {
                     final Comic finalComic = comic;
@@ -303,20 +306,13 @@ public class CurrentlyReadingFragment extends Fragment {
             {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
-                try {
-                    Thread.sleep(2, 0);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
                 Comic comic = savedComics.get(pos);
 
                 ComicLoader.generateComicInfo(mApplicationContext, comic);
 
-                if (ComicLoader.setComicColor(getActivity(), comic))
-                    PreferenceSetter.saveComic(getActivity(), comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
+                    comicsToSave.add(comic);
+                }
 
 
                 if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
@@ -357,7 +353,7 @@ public class CurrentlyReadingFragment extends Fragment {
                     });
                 }
 
-                PreferenceSetter.saveComic(getActivity(), comic);
+                comicsToSave.add(comic);
 
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
@@ -369,6 +365,13 @@ public class CurrentlyReadingFragment extends Fragment {
                 updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
+            }
+        }).run();
 
         updateLastReadComics();
 

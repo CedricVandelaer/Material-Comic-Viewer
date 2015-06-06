@@ -681,6 +681,8 @@ public class ComicListFragment extends Fragment {
 
         updateProgressDialog(mProgress, mTotalComicCount);
 
+        final ArrayList<Comic> comicsToSave = new ArrayList<>();
+
         for (String str:treemap.keySet())
         {
             if (mSearchComicsTask!= null && mSearchComicsTask.isCancelled()) {
@@ -703,8 +705,9 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                if (ComicLoader.setComicColor(mApplicationContext, comic))
-                    PreferenceSetter.saveComic(mApplicationContext, comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
+                    comicsToSave.add(comic);
+                }
 
 
                 final Comic finalComic = comic;
@@ -732,8 +735,9 @@ public class ComicListFragment extends Fragment {
 
                 ComicLoader.generateComicInfo(mApplicationContext, comic);
 
-                if (ComicLoader.setComicColor(mApplicationContext, comic))
-                    PreferenceSetter.saveComic(mApplicationContext, comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
+                    comicsToSave.add(comic);
+                }
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
@@ -753,7 +757,7 @@ public class ComicListFragment extends Fragment {
 
                 Comic comic = new Comic(str, map.get(str));
 
-                ComicLoader.loadComicSync( mApplicationContext, comic);
+                ComicLoader.loadComicSync(mApplicationContext, comic);
 
                 if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()) && comic.getPageCount()>0)
                 {
@@ -768,7 +772,7 @@ public class ComicListFragment extends Fragment {
                     }
                 });
 
-                PreferenceSetter.saveComic(getActivity(), comic);
+                comicsToSave.add(comic);
 
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
@@ -780,6 +784,13 @@ public class ComicListFragment extends Fragment {
                 updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
+            }
+        }).run();
 
         updateLastReadComics();
 
@@ -823,6 +834,8 @@ public class ComicListFragment extends Fragment {
             }
         }
 
+        final ArrayList<Comic> comicsToSave = new ArrayList<>();
+
         mTotalComicCount = treemap.size();
         mProgress = 0;
 
@@ -837,8 +850,6 @@ public class ComicListFragment extends Fragment {
             final String comicPath = map.get(str)+"/"+str;
             final File file = new File(comicPath);
 
-
-
             //check for image folder
             if (file.isDirectory() && Utilities.checkImageFolder(file) && !(currentComicsFileNames.contains(comicPath))) {
                 Comic comic = new Comic(file.getName(), file.getParentFile().getAbsolutePath());
@@ -850,9 +861,9 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                if (ComicLoader.setComicColor(mApplicationContext, comic))
-                    PreferenceSetter.saveComic(mApplicationContext, comic);
-
+                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
+                    comicsToSave.add(comic);
+                }
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
@@ -882,9 +893,11 @@ public class ComicListFragment extends Fragment {
             }//check if comic is one of the saved comic files and add
             else if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
             {
+
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
                 Comic comic = savedComics.get(pos);
+
 
                 if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
                 {
@@ -893,15 +906,15 @@ public class ComicListFragment extends Fragment {
 
                 ComicLoader.generateComicInfo(mApplicationContext, comic);
 
-                if (ComicLoader.setComicColor(mApplicationContext, comic))
-                    PreferenceSetter.saveComic(mApplicationContext, comic);
+                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
+                    comicsToSave.add(comic);
+                }
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         mAdapter.addObjectSorted(finalComic);
-                        mRecyclerView.scrollToPosition(0);
                     }
                 });
 
@@ -922,9 +935,10 @@ public class ComicListFragment extends Fragment {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
 
-                PreferenceSetter.saveComic(mApplicationContext, comic);
-
                 final Comic finalComic = comic;
+
+                comicsToSave.add(comic);
+
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -943,6 +957,13 @@ public class ComicListFragment extends Fragment {
                 updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
+            }
+        }).run();
 
         updateLastReadComics();
 
