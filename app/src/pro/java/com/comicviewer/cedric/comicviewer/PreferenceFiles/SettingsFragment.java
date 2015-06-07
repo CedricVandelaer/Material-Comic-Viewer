@@ -48,6 +48,7 @@ public class SettingsFragment extends PreferenceFragment{
         addAppThemeSettings();
         addMangaPreference();
         addBackgroundChangeListener();
+        addViewPagerAnimationPreference();
 
         if (PreferenceSetter.getBackgroundColorPreference(getActivity())!= getResources().getColor(R.color.WhiteBG))
         {
@@ -59,6 +60,22 @@ public class SettingsFragment extends PreferenceFragment{
             if (Build.VERSION.SDK_INT>20)
                 getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
         }
+    }
+
+    private void addViewPagerAnimationPreference()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("ReadCategory");
+
+        ListPreference viewPagerAnimationPreference = new ListPreference(getActivity());
+
+
+        viewPagerAnimationPreference.setKey(PreferenceSetter.VIEWPAGER_ANIMATION_SETTING);
+        viewPagerAnimationPreference.setTitle(getString(R.string.page_flip_animation_setting));
+        viewPagerAnimationPreference.setEntries(getResources().getTextArray(R.array.Viewpager_animations));
+        viewPagerAnimationPreference.setEntryValues(getResources().getTextArray(R.array.Viewpager_animations));
+        viewPagerAnimationPreference.setDefaultValue(getString(R.string.none));
+
+        targetCategory.addPreference(viewPagerAnimationPreference);
     }
 
     private void addBackgroundChangeListener()

@@ -14,6 +14,7 @@ import android.preference.PreferenceFragment;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.R;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.widgets.Dialog;
@@ -54,6 +55,7 @@ public class SettingsFragment extends PreferenceFragment{
         addMangaPreference();
         disableVolumeKeyPreference();
         addBackgroundChangeListener();
+        addViewPagerAnimationPreference();
 
         PreferenceCategory functionCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
         Preference goProPreference = new Preference(getActivity());
@@ -101,6 +103,30 @@ public class SettingsFragment extends PreferenceFragment{
             }
         });
 
+    }
+
+    private void addViewPagerAnimationPreference()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("ReadCategory");
+
+        Preference viewPagerAnimationPreference = new Preference(getActivity());
+
+
+        viewPagerAnimationPreference.setKey("BUY_PRO_FILEFORMAT");
+        viewPagerAnimationPreference.setTitle(getString(R.string.page_flip_animation_setting_non_pro));
+        viewPagerAnimationPreference.setDefaultValue(getString(R.string.none));
+
+        viewPagerAnimationPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                showBuyProDialog();
+
+                return true;
+            }
+        });
+
+        targetCategory.addPreference(viewPagerAnimationPreference);
     }
 
     private void addUnhidePreference()

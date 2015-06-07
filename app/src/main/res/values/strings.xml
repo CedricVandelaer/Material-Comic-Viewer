@@ -175,6 +175,14 @@
     <string name="file_format_6">Year, Issue number, Title</string>
     <string name="black">Black</string>
     <string name="white">White</string>
+    <string name="page_flip_animation_setting_non_pro">Page flip animation (PRO)</string>
+    <string name="page_flip_animation_setting">Page flip animation</string>
+    <string name="none">None</string>
+    <string name="accordion">Accordion</string>
+    <string name="cube">Cube</string>
+    <string name="foreground_to_background">Foreground to background</string>
+    <string name="stack">Stack</string>
+    <string name="zoom_out">Zoom out</string>
     <string name="reading_background_color_setting">Background color when reading</string>
     <string name="refresh">Refresh</string>
     <string name="muzei_description">Use your comic covers as wallpaper</string>

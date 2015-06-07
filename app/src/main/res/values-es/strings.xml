@@ -136,8 +136,8 @@
     <string name="page_number_setting_1">Siempre</string>
     <string name="page_number_setting_2">Para cambiar la página</string>
     <string name="page_number_setting_3">Nunca</string>
-    <string name="scroll_animation_setting_1">ninguna</string>
-    <string name="scroll_animation_setting_2">rebote</string>
+    <string name="scroll_animation_setting_1">Ninguna</string>
+    <string name="scroll_animation_setting_2">Rebote</string>
     <string name="scroll_animation_setting_3">Stand up</string>
     <string name="scroll_animation_setting_4">Fusión</string>
     <string name="scroll_animation_setting_5">Tada</string>
@@ -163,5 +163,12 @@
 no se puede borrar"</string>
     <string name="changelog">Registro de cambios</string>
     <string name="synchronization">Sincronización</string>
-
+    <string name="page_flip_animation_setting_non_pro">Gire la página animación (PRO)</string>
+    <string name="page_flip_animation_setting">Gire la página animación</string>
+    <string name="none">Ninguna</string>
+    <string name="accordion">Acordeón</string>
+    <string name="cube">Cubo</string>
+    <string name="foreground_to_background">Primer plano al fondo</string>
+    <string name="stack">Montón</string>
+    <string name="zoom_out">Disminuir el zoom</string>
 </resources>

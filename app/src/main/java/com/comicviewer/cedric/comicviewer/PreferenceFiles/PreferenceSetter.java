@@ -73,9 +73,15 @@ public class PreferenceSetter {
     public static final String UNHIDE_LIST = "unhideListSetting";
     public static final String VOLUME_KEY_OPTION = "volumeKeysOption";
     public static final String READING_BACKGROUND_COLOR = "readingBackgroundColor";
+    public static final String VIEWPAGER_ANIMATION_SETTING="viewPagerAnimationSetting";
 
     public static final String COMIC_VIEWER = "ComicViewer";
 
+
+    public static String getPageFlipAnimationSetting(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(VIEWPAGER_ANIMATION_SETTING, context.getString(R.string.none));
+    }
 
     public static int getReadingBackgroundSetting(Context context)
     {

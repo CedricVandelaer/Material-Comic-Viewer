@@ -162,5 +162,12 @@
     <string name="path_preference_summary">Nota: il path di default \'main storage/ComicViewer\' non può essere rimosso</string>
     <string name="changelog">Registro modifiche</string>
     <string name="synchronization">Sincronizzazione</string>
-
+    <string name="page_flip_animation_setting_non_pro">Animazione pagina (PRO)</string>
+    <string name="page_flip_animation_setting">Animazione pagina</string>
+    <string name="none">Nessuna</string>
+    <string name="accordion">Fisarmonica</string>
+    <string name="cube">Cubo</string>
+    <string name="foreground_to_background">Primo piano allo sfondo</string>
+    <string name="stack">Pila</string>
+    <string name="zoom_out">Diminuire</string>
 </resources>

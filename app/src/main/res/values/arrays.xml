@@ -78,4 +78,12 @@
         <item>@string/file_format_5</item>
         <item>@string/file_format_6</item>
     </string-array>
+    <string-array name="Viewpager_animations">
+        <item>@string/none</item>
+        <item>@string/accordion</item>
+        <item>@string/cube</item>
+        <item>@string/foreground_to_background</item>
+        <item>@string/stack</item>
+        <item>@string/zoom_out</item>
+    </string-array>
 </resources>

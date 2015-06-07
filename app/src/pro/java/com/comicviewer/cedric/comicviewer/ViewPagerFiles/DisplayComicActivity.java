@@ -20,6 +20,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.ToxicBakery.viewpager.transforms.AccordionTransformer;
+import com.ToxicBakery.viewpager.transforms.CubeOutTransformer;
+import com.ToxicBakery.viewpager.transforms.DefaultTransformer;
+import com.ToxicBakery.viewpager.transforms.ForegroundToBackgroundTransformer;
+import com.ToxicBakery.viewpager.transforms.StackTransformer;
+import com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
@@ -123,6 +129,9 @@ public class DisplayComicActivity extends FragmentActivity {
             }
         }
 
+        setPagerAnimation();
+
+
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
 
         if (showInRecentsPref && Build.VERSION.SDK_INT>20) {
@@ -134,6 +143,34 @@ public class DisplayComicActivity extends FragmentActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
+    }
+
+    private void setPagerAnimation()
+    {
+        if (PreferenceSetter.getPageFlipAnimationSetting(this).equals(getString(R.string.accordion)))
+        {
+            mPager.setPageTransformer(true, new AccordionTransformer());
+        }
+        else if(PreferenceSetter.getPageFlipAnimationSetting(this).equals(getString(R.string.cube)))
+        {
+            mPager.setPageTransformer(true, new CubeOutTransformer());
+        }
+        else if(PreferenceSetter.getPageFlipAnimationSetting(this).equals(getString(R.string.zoom_out)))
+        {
+            mPager.setPageTransformer(true, new ZoomOutSlideTransformer());
+        }
+        else if(PreferenceSetter.getPageFlipAnimationSetting(this).equals(getString(R.string.foreground_to_background)))
+        {
+            mPager.setPageTransformer(true, new ForegroundToBackgroundTransformer());
+        }
+        else if(PreferenceSetter.getPageFlipAnimationSetting(this).equals(getString(R.string.stack)))
+        {
+            mPager.setPageTransformer(true, new StackTransformer());
+        }
+        else
+        {
+            mPager.setPageTransformer(true, new DefaultTransformer());
+        }
     }
 
     private class ComicPageChangeListener implements ViewPager.OnPageChangeListener {
@@ -311,6 +348,8 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
         setPageNumber();
+
+        setPagerAnimation();
 
         mPager.setOnPageChangeListener(new ComicPageChangeListener());
 
