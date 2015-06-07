@@ -99,28 +99,14 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         mHandler = new Handler();
 
-        if (PreferenceSetter.getLastUsedGoogleAccount(getActivity())!=null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .addApi(Drive.API)
-                    .addApi(Plus.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-        }
-        else
-        {
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addApi(Drive.API)
                     .addApi(Plus.API)
                     .addScope(Drive.SCOPE_FILE)
                     .addScope(Drive.SCOPE_APPFOLDER)
-                    .setAccountName(PreferenceSetter.getLastUsedGoogleAccount(getActivity()))
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .build();
-        }
-
     }
 
     @Override
@@ -211,7 +197,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     @Override
     public void onConnected(Bundle bundle) {
 
-        DriveFolder driveRoot = Drive.DriveApi.getRootFolder(mGoogleApiClient);
         String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
         String service = getString(R.string.cloud_storage_2);
 
@@ -226,6 +211,8 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         PreferenceSetter.saveLastUsedGoogleAccount(getActivity(), accountName);
 
         mAdapter.refreshCloudServiceList();
+        Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+        mGoogleApiClient.disconnect();
     }
 
     @Override
@@ -247,6 +234,13 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        if (mGoogleApiClient.isConnected())
+            mGoogleApiClient.disconnect();
+    }
 
     private class AddDropboxUserInfoTask extends AsyncTask
     {
@@ -382,10 +376,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         @Override
         protected Object doInBackground(Object[] params) {
-
-            if (PreferenceSetter.getLastUsedGoogleAccount(getActivity())!=null && mGoogleApiClient.isConnected()) {
-                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            }
 
             if (mGoogleApiClient.isConnected())
             {

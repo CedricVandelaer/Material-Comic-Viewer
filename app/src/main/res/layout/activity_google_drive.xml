@@ -5,26 +5,6 @@
     android:layout_height="match_parent"
     tools:context="com.comicviewer.cedric.comicviewer.CloudFiles.DropboxActivity">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/cloud_file_list"
-            android:scrollbars="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent"/>
-
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-    <TextView
-        android:id="@+id/error_text_view"
-        android:text="@string/no_supported_files_found"
-        android:textColor="@color/White"
-        android:layout_centerInParent="true"
-        android:textSize="16sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
 </RelativeLayout>

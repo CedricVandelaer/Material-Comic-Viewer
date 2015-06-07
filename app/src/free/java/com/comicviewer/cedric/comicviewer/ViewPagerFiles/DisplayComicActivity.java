@@ -48,7 +48,6 @@ import java.util.ArrayList;
  */
 public class DisplayComicActivity extends FragmentActivity {
 
-
     //The comic to be displayed
     private Comic mCurrentComic;
 

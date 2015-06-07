@@ -165,8 +165,9 @@
     <string name="card_size_setting_3">Comic cover cards</string>
     <string name="card_size_setting_4">Tiny cards</string>
     <string name="cloud_storage_1">Dropbox</string>
-    <string name="cloud_storage_2">Google Drive (Coming soon!)</string>
+    <string name="cloud_storage_2">Google Drive</string>
     <string name="cloud_storage_3">Microsoft OneDrive</string>
+    <string name="coming_soon">Coming soon!</string>
     <string name="file_format_1">Title, Issue number, Year</string>
     <string name="file_format_2">Title, Year, Issue number </string>
     <string name="file_format_3">Issue number, Year, Title</string>

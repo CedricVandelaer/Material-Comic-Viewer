@@ -145,8 +145,9 @@
     <string name="card_size_setting_3">Cartes avec couverture de BD</string>
     <string name="card_size_setting_4">Cartes minuscules</string>
     <string name="cloud_storage_1">Dropbox</string>
-    <string name="cloud_storage_2">Google Drive (Disponible sous peu!)</string>
+    <string name="cloud_storage_2">Google Drive</string>
     <string name="cloud_storage_3">Microsoft OneDrive</string>
+    <string name="coming_soon">Disponible sous peu!</string>
     <string name="file_format_1">Titre, Numéro d’édition, An</string>
     <string name="file_format_2">Titre, An, Numéro d’édition</string>
     <string name="file_format_3">Numéro d’édition, An, Titre</string>

@@ -146,8 +146,9 @@
     <string name="card_size_setting_3">Cards con copertina</string>
     <string name="card_size_setting_4">Cards minuscole</string>
     <string name="cloud_storage_1">Dropbox</string>
-    <string name="cloud_storage_2">Google Drive (In arrivo!)</string>
+    <string name="cloud_storage_2">Google Drive</string>
     <string name="cloud_storage_3">Microsoft OneDrive</string>
+    <string name="coming_soon">In arrivo!</string>
     <string name="reading_background_color_setting">Colore di sfondo durante la lettura</string>
     <string name="black">Nero</string>
     <string name="white">Bianco</string>

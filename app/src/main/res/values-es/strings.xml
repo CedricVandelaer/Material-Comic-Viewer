@@ -146,8 +146,9 @@
     <string name="card_size_setting_3">Cards de Portada</string>
     <string name="card_size_setting_4">Cards diminutas</string>
     <string name="cloud_storage_1">Dropbox</string>
-    <string name="cloud_storage_2">Google Drive (En breve!)</string>
+    <string name="cloud_storage_2">Google Drive</string>
     <string name="cloud_storage_3">Microsoft OneDrive</string>
+    <string name="coming_soon">En breve!</string>
     <string name="reading_background_color_setting">Color de fondo al leer</string>
     <string name="black">Negro</string>
     <string name="white">Blanco</string>

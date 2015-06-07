@@ -145,8 +145,9 @@
     <string name="card_size_setting_3">Strip-cover kaarten</string>
     <string name="card_size_setting_4">Miniscule kaarten</string>
     <string name="cloud_storage_1">Dropbox</string>
-    <string name="cloud_storage_2">Google Drive (Binnenkort beschikbaar!)</string>
+    <string name="cloud_storage_2">Google Drive</string>
     <string name="cloud_storage_3">Microsoft OneDrive</string>
+    <string name="coming_soon">Binnenkort beschikbaar!</string>
     <string name="reading_background_color_setting">Achtergrondkleur bij het lezen</string>
     <string name="black">Zwart</string>
     <string name="white">Wit</string>
