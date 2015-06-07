@@ -542,7 +542,7 @@ public class CurrentlyReadingFragment extends Fragment {
                     return false;
                 }
             });
-
+            toolbar.removeView(mSearchView);
             toolbar.addView(mSearchView, layoutParamsCollapsed);
         }
         else
@@ -590,7 +590,7 @@ public class CurrentlyReadingFragment extends Fragment {
         //14 dp in pixels
         int vSpace;
 
-        if (PreferenceSetter.getCardAppearanceSetting(mApplicationContext).equals(getString(R.string.card_size_setting_4)))
+        if (PreferenceSetter.getCardAppearanceSetting(getActivity()).equals(getString(R.string.card_size_setting_4)))
             vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, outMetrics);
         else
             vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
