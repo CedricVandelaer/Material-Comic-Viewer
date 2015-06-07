@@ -68,6 +68,8 @@ public class DisplayComicActivity extends FragmentActivity {
         setContentView(R.layout.activity_display_comic);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+        getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
+
         Intent intent = getIntent();
         
         int lastReadPage;

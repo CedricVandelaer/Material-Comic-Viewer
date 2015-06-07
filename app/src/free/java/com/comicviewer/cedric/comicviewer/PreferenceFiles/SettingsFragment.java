@@ -53,7 +53,7 @@ public class SettingsFragment extends PreferenceFragment{
         addFileFormatSettings();
         addMangaPreference();
         disableVolumeKeyPreference();
-
+        addBackgroundChangeListener();
 
         PreferenceCategory functionCategory = (PreferenceCategory) findPreference("FunctionalityCategory");
         Preference goProPreference = new Preference(getActivity());
@@ -68,9 +68,38 @@ public class SettingsFragment extends PreferenceFragment{
         });
         functionCategory.addPreference(goProPreference);
 
-        getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
-        if (Build.VERSION.SDK_INT>20)
-            getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
+        if (PreferenceSetter.getBackgroundColorPreference(getActivity())!= getResources().getColor(R.color.WhiteBG))
+        {
+            PreferenceSetter.setBackgroundColorPreference(getActivity());
+        }
+        else
+        {
+            getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
+            if (Build.VERSION.SDK_INT>20)
+                getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
+        }
+
+    }
+
+    private void addBackgroundChangeListener()
+    {
+        Preference backgroundPref = (Preference) findPreference("backgroundColor");
+        backgroundPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                String color = (String) newValue;
+
+                PreferenceSetter.setBackgroundColorPreference(getActivity(), color);
+                if (PreferenceSetter.getBackgroundColorPreference(getActivity())!= getResources().getColor(R.color.WhiteBG)) {
+                    ((DrawerActivity) getActivity()).setDrawerBackgroundColor(PreferenceSetter.getBackgroundColorPreference(getActivity()));
+                    PreferenceSetter.setBackgroundColorPreference(getActivity());
+                }
+                else
+                    ((DrawerActivity)getActivity()).setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
+
+                return true;
+            }
+        });
 
     }
 

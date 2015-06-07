@@ -246,7 +246,7 @@ public class ComicListFragment extends Fragment {
 
                         if (!filePaths.contains(directory.toString()))
                             filePaths.add(directory.toString());
-                        PreferenceSetter.saveFilePaths(getActivity(),filePaths);
+                        PreferenceSetter.saveFilePaths(getActivity(), filePaths);
                         refresh();
                     }
                 });
@@ -547,7 +547,12 @@ public class ComicListFragment extends Fragment {
         int columnCount = 1;
 
         //14 dp in pixels
-        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
+        int vSpace;
+
+        if (PreferenceSetter.getCardAppearanceSetting(mApplicationContext).equals(getString(R.string.card_size_setting_4)))
+            vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, outMetrics);
+        else
+            vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
 
         Log.d("List fragment:","Device width dp:"+dpWidth);
 
@@ -683,6 +688,8 @@ public class ComicListFragment extends Fragment {
 
         final ArrayList<Comic> comicsToSave = new ArrayList<>();
 
+        boolean hasToLoad = false;
+
         for (String str:treemap.keySet())
         {
             if (mSearchComicsTask!= null && mSearchComicsTask.isCancelled()) {
@@ -707,8 +714,18 @@ public class ComicListFragment extends Fragment {
 
                 if (ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
+                    hasToLoad = true;
                 }
 
+                if (!hasToLoad)
+                {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerView.scrollToPosition(0);
+                        }
+                    });
+                }
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
@@ -737,6 +754,17 @@ public class ComicListFragment extends Fragment {
 
                 if (ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
+                    hasToLoad = true;
+                }
+
+                if (!hasToLoad)
+                {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerView.scrollToPosition(0);
+                        }
+                    });
                 }
 
                 final Comic finalComic = comic;
@@ -763,6 +791,7 @@ public class ComicListFragment extends Fragment {
                 {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
                 }
+                hasToLoad = true;
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
@@ -791,6 +820,8 @@ public class ComicListFragment extends Fragment {
                 PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
             }
         }).run();
+
+
 
         updateLastReadComics();
 
@@ -836,6 +867,8 @@ public class ComicListFragment extends Fragment {
 
         final ArrayList<Comic> comicsToSave = new ArrayList<>();
 
+        boolean hasToLoad = false;
+
         mTotalComicCount = treemap.size();
         mProgress = 0;
 
@@ -863,6 +896,17 @@ public class ComicListFragment extends Fragment {
 
                 if (ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
+                    hasToLoad = true;
+                }
+
+                if (!hasToLoad)
+                {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerView.scrollToPosition(0);
+                        }
+                    });
                 }
 
                 final Comic finalComic = comic;
@@ -908,6 +952,17 @@ public class ComicListFragment extends Fragment {
 
                 if (ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
+                    hasToLoad = true;
+                }
+
+                if (!hasToLoad)
+                {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerView.scrollToPosition(0);
+                        }
+                    });
                 }
 
                 final Comic finalComic = comic;
@@ -936,6 +991,8 @@ public class ComicListFragment extends Fragment {
                 }
 
                 final Comic finalComic = comic;
+
+                hasToLoad = true;
 
                 comicsToSave.add(comic);
 

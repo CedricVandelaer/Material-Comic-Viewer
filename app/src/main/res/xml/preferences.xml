@@ -53,6 +53,12 @@
             android:title="@string/volume_keys_setting"
             android:defaultValue="false"/>
         <ListPreference
+            android:key="readingBackgroundColor"
+            android:title="@string/reading_background_color_setting"
+            android:defaultValue="@string/black"
+            android:entries="@array/Reading_background_options"
+            android:entryValues="@array/Reading_background_options"/>
+        <ListPreference
             android:key="pageNumberSetting"
             android:title="@string/page_number_setting"
             android:defaultValue="@string/page_number_setting_1"

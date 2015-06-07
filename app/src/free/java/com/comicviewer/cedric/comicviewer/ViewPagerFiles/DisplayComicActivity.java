@@ -79,6 +79,8 @@ public class DisplayComicActivity extends FragmentActivity {
         setContentView(R.layout.activity_display_comic);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+        getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
+
         AdBuddiz.setPublisherKey("e5ef796f-a43b-4b25-b15f-ebebcbbcabf4");
         AdBuddiz.cacheAds(this); // this = current Activity
 

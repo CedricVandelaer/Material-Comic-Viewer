@@ -20,6 +20,7 @@
         <item>@string/card_color_setting_3</item>
         <item>@string/card_color_setting_4</item>
         <item>@string/card_color_setting_5</item>
+        <item>@string/app_theme_setting</item>
     </string-array>
     <string-array name="Card_colors_values">
         <item>@string/card_color_setting_1</item>
@@ -27,6 +28,7 @@
         <item>@string/card_color_setting_3</item>
         <item>@string/card_color_setting_4</item>
         <item>@string/card_color_setting_5</item>
+        <item>@string/app_theme_setting</item>
     </string-array>
     <string-array name="Scroll_animations">
         <item>@string/scroll_animation_setting_1</item>
@@ -43,14 +45,20 @@
         <item>@string/scroll_animation_setting_5</item>
     </string-array>
     <string-array name="Card_sizes">
+        <item>@string/card_size_setting_4</item>
         <item>@string/card_size_setting_1</item>
         <item>@string/card_size_setting_2</item>
         <item>@string/card_size_setting_3</item>
     </string-array>
     <string-array name="Card_sizes_values">
+        <item>@string/card_size_setting_4</item>
         <item>@string/card_size_setting_1</item>
         <item>@string/card_size_setting_2</item>
         <item>@string/card_size_setting_3</item>
+    </string-array>
+    <string-array name="Reading_background_options">
+        <item>@string/black</item>
+        <item>@string/white</item>
     </string-array>
     <string-array name="Page_number_settings">
         <item>@string/page_number_setting_1</item>

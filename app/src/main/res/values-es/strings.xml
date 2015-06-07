@@ -1,23 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Common strings for all languages -->
-    <string name="admob_ad_unit_id">ca-app-pub-1913373193124965/9353062734</string>
-    <string name="app_name">Comic Viewer Free</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_display_comic">DisplayComicActivity</string>
-    <string name="dropbox">Dropbox</string>
-    <string name="onedrive">Microsoft OneDrive</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-    <string name="title_activity_about">AboutActivity</string>
-    <string name="title_activity_cloud_browser">CloudBrowserActivity</string>
-    <string name="title_activity_info">InfoActivity</string>
-    <string name="dropbox_app_key">pz24rrsbb0dvzib</string>
-    <string name="dropbox_app_secret">kpdixgm5szbiryj</string>
-    <string name="onedrive_id">000000004C1508EF</string>
-    <string name="onedrive_secret">ZRVOz8PE6ZEKNjYC1Q8b2v3Vl7pw0Jfa</string>
-    <string name="db_scheme">db-pz24rrsbb0dvzib</string>
-    <string name="file_provider_string">com.comicviewer.free.fileprovider</string>
-    <string name="muzei_source">Comic Viewer</string>
 
     <!-- Language specific strings -->
     <string name="unhide">Show</string>
@@ -162,9 +144,13 @@
     <string name="card_size_setting_1">Cards pequeñas</string>
     <string name="card_size_setting_2">Cards normales</string>
     <string name="card_size_setting_3">Cards de Portada</string>
+    <string name="card_size_setting_4">Cards diminutas</string>
     <string name="cloud_storage_1">Dropbox</string>
     <string name="cloud_storage_2">Google Drive (En breve!)</string>
     <string name="cloud_storage_3">Microsoft OneDrive</string>
+    <string name="reading_background_color_setting">Color de fondo al leer</string>
+    <string name="black">Negro</string>
+    <string name="white">Blanco</string>
     <string name="file_format_1">Titulo, Numero edicción, Año</string>
     <string name="file_format_2">Titulo, Año, Numero edicción </string>
     <string name="file_format_3">Numero edicción, Año, Titulo</string>

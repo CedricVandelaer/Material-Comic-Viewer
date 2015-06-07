@@ -13,9 +13,10 @@
     <string name="updates" translatable="false">
         v3.0\n
         - Google Drive support\n
+        - Tiny cards option\n
         - Import/export comic reading data\n
         - New app icon\n
-        - Much faster loading of comics\n
+        - Faster loading speeds\n
         - Small visual tweaks\n
         - Translations for Spanish, Italian and French\n
         - Bugfixes\n\n

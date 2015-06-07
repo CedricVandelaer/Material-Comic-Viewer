@@ -131,6 +131,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 return 0;
             } else if (cardSize.equals(mContext.getString(R.string.card_size_setting_1))) {
                 return 1;
+            } else if(cardSize.equals(mContext.getString(R.string.card_size_setting_4))) {
+                return 4;
             } else {
                 return 2;
             }
@@ -145,12 +147,15 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View v;
 
-        if (viewType<3) {
+        if (viewType!=3) {
             if (viewType == 0) {
                 v = mInflater.inflate(R.layout.comic_card_swipe, null);
             } else if (viewType == 1) {
                 v = mInflater.inflate(R.layout.small_comic_card_swipe, null);
-            } else {
+            } else if (viewType == 4) {
+                v = mInflater.inflate(R.layout.tiny_comic_card, null);
+            }
+            else {
                 v = mInflater.inflate(R.layout.comic_card_image_bg_swipe, null);
             }
 
@@ -371,7 +376,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             comicItemViewHolder.mSwipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
             comicItemViewHolder.mSwipeLayout.addSwipeListener(new SimpleSwipeListener());
 
-            if (cardSize.equals(mContext.getString(R.string.card_size_setting_2))) {
+            if (cardSize.equals(mContext.getString(R.string.card_size_setting_2)) || cardSize.equals(mContext.getString(R.string.card_size_setting_4))) {
                 initialiseNormalCard(comicItemViewHolder, position);
             } else if (cardSize.equals(mContext.getString(R.string.card_size_setting_1))) {
                 initialiseSmallCard(comicItemViewHolder, position);

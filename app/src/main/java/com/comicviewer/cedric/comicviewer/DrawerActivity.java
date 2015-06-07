@@ -57,7 +57,11 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
 
         this.disableLearningPattern();
         this.setBackPattern(BACKPATTERN_CUSTOM);
-        this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
+        if (PreferenceSetter.getBackgroundColorPreference(this)!=getResources().getColor(R.color.WhiteBG))
+            this.setDrawerBackgroundColor(PreferenceSetter.getBackgroundColorPreference(this));
+        else
+            this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
+
         enableToolbarElevation();
         allowArrowAnimation();
 

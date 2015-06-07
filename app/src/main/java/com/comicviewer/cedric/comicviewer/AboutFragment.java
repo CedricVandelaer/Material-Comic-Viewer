@@ -58,7 +58,7 @@ public class AboutFragment extends Fragment {
         ImageView meview = (ImageView)v.findViewById(R.id.me_drawable);
         mTitleTextView = (TextView) v.findViewById(R.id.logo_text);
 
-        mTitleTextView.setText(getActivity().getResources().getString(R.string.app_name)+" v"+ getPackageInfo().versionName);
+        mTitleTextView.setText(getActivity().getResources().getString(R.string.app_name) + " v" + getPackageInfo().versionName);
 
         mChangelogButton = (ButtonFlat) v.findViewById(R.id.updates_button);
 
@@ -81,11 +81,17 @@ public class AboutFragment extends Fragment {
             ImageLoader.getInstance().init(config);
         }
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logohighres,logoview);
-        ImageLoader.getInstance().displayImage("drawable://"+R.drawable.me,meview);
-        
-        getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
-        if (Build.VERSION.SDK_INT>20)
-            getActivity().getWindow().setNavigationBarColor(getActivity().getResources().getColor(R.color.BlueGrey));
+        ImageLoader.getInstance().displayImage("drawable://" + R.drawable.me, meview);
+
+        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG)) {
+            getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
+            if (Build.VERSION.SDK_INT > 20)
+                getActivity().getWindow().setNavigationBarColor(getActivity().getResources().getColor(R.color.BlueGrey));
+        }
+        else
+        {
+            PreferenceSetter.setBackgroundColorPreference(getActivity());
+        }
 
         return v;
     }

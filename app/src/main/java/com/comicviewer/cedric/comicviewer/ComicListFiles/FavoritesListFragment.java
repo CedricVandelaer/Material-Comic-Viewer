@@ -261,6 +261,8 @@ public class FavoritesListFragment extends Fragment {
 
         final ArrayList<Comic> comicsToSave = new ArrayList<>();
 
+        boolean hasToLoad = false;
+
         for (String str:treemap.keySet())
         {
             if (mSearchComicsTask.isCancelled())
@@ -283,8 +285,18 @@ public class FavoritesListFragment extends Fragment {
 
                 if (ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
+                    hasToLoad = true;
                 }
 
+                if (!hasToLoad)
+                {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerView.scrollToPosition(0);
+                        }
+                    });
+                }
 
                 final Comic finalComic = comic;
                 mHandler.post(new Runnable() {
@@ -310,12 +322,23 @@ public class FavoritesListFragment extends Fragment {
 
                 if (ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
+                    hasToLoad = true;
                 }
 
 
                 if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
                 {
                     PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
+                }
+
+                if (!hasToLoad)
+                {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerView.scrollToPosition(0);
+                        }
+                    });
                 }
 
                 final Comic finalComic = comic;
@@ -346,6 +369,8 @@ public class FavoritesListFragment extends Fragment {
                         mAdapter.addObjectSorted(finalComic);
                     }
                 });
+
+                hasToLoad = true;
 
                 comicsToSave.add(comic);
 
@@ -557,9 +582,12 @@ public class FavoritesListFragment extends Fragment {
         int columnCount = 1;
 
         //14 dp in pixels
-        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
+        int vSpace;
 
-        Log.d("List fragment:","Device width dp:"+dpWidth);
+        if (PreferenceSetter.getCardAppearanceSetting(mApplicationContext).equals(getString(R.string.card_size_setting_4)))
+            vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, outMetrics);
+        else
+            vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
 
 
         if (dpWidth>=1280)

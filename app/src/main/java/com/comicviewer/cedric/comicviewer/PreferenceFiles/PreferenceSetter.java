@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.EdgeEffect;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
@@ -71,8 +72,23 @@ public class PreferenceSetter {
     public static final String MANGA_SETTING = "mangaEnabled";
     public static final String UNHIDE_LIST = "unhideListSetting";
     public static final String VOLUME_KEY_OPTION = "volumeKeysOption";
+    public static final String READING_BACKGROUND_COLOR = "readingBackgroundColor";
 
     public static final String COMIC_VIEWER = "ComicViewer";
+
+
+    public static int getReadingBackgroundSetting(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!prefs.getString(READING_BACKGROUND_COLOR, context.getString(R.string.black)).equals(context.getString(R.string.black)))
+        {
+            return context.getResources().getColor(R.color.White);
+        }
+        else
+        {
+            return context.getResources().getColor(R.color.Black);
+        }
+    }
 
     public static boolean importData(Context context, File xmlFile)
     {
@@ -1377,6 +1393,14 @@ public class PreferenceSetter {
                 activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.Black));
         }
         
+    }
+
+    public static void setBackgroundColorPreference(Context context, String value)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(BACKGROUND_COLOR, value);
+        editor.apply();
     }
 
     public static int getBackgroundColorPreference(Context context)

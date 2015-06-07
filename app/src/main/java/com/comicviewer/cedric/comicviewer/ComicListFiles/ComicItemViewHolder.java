@@ -67,7 +67,7 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(itemView.getContext());
         String cardSize = prefs.getString("cardSize", itemView.getContext().getString(R.string.card_size_setting_2));
         
-        if (cardSize.equals(itemView.getContext().getString(R.string.card_size_setting_2)))
+        if (cardSize.equals(itemView.getContext().getString(R.string.card_size_setting_2)) || cardSize.equals(itemView.getContext().getString(R.string.card_size_setting_4)))
             initialiseNormalCard(itemView);
         else if (cardSize.equals(itemView.getContext().getString(R.string.card_size_setting_1)))
             initialiseSmallCard(itemView);

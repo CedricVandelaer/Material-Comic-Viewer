@@ -281,7 +281,11 @@ public class ComicLoader {
                     color = context.getResources().getColor(R.color.BlueGrey);
                     primaryTextColor = context.getResources().getColor(R.color.White);
                     secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
-                } else {
+                } else if (cardColorSetting.equals(context.getString(R.string.app_theme_setting))) {
+                    color = Utilities.darkenColor(PreferenceSetter.getAppThemeColor(context));
+                    primaryTextColor = context.getResources().getColor(R.color.White);
+                    secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
+                }else {
                     color = context.getResources().getColor(R.color.Black);
                     primaryTextColor = context.getResources().getColor(R.color.White);
                     secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
