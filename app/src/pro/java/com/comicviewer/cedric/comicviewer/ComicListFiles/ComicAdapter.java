@@ -768,14 +768,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
             }
 
-            if (PreferenceSetter.getFavoriteComics(mContext).contains(comic.getFileName()))
-            {
-                ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star, comicItemViewHolder.mFavoriteButton);
-            }
-            else
-            {
-                ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star_outline, comicItemViewHolder.mFavoriteButton);
-            }
+
         }
         else
         {
@@ -784,6 +777,15 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 comicItemViewHolder.mLastReadIcon.setBackground(null);
             else
                 comicItemViewHolder.mLastReadIcon.getBackground().setAlpha(0);
+        }
+
+        if (PreferenceSetter.getFavoriteComics(mContext).contains(comic.getFileName()))
+        {
+            ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star, comicItemViewHolder.mFavoriteButton);
+        }
+        else
+        {
+            ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star_outline, comicItemViewHolder.mFavoriteButton);
         }
 
     }
