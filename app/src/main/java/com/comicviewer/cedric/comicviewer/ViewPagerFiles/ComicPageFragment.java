@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -103,10 +104,12 @@ public class ComicPageFragment extends Fragment {
 
                 String imagePath;
                 File archive = new File(mComicArchivePath);
+
                 if (!archive.isDirectory())
                     imagePath = "file:///" + getActivity().getFilesDir().getPath()+"/" + mFolderName + "/" + filename;
                 else
                     imagePath = "file:///" + mComicArchivePath + "/" + filename;
+
                 Log.d("loadImage", imagePath);
 
                 ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, new SimpleImageLoadingListener() {
@@ -134,7 +137,6 @@ public class ComicPageFragment extends Fragment {
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         if (mSpinner != null)
                             mSpinner.setVisibility(View.GONE);
-
                         mBitmap = loadedImage;
 
                         zoomImageView();
@@ -320,7 +322,7 @@ public class ComicPageFragment extends Fragment {
                         File directory = new File(getActivity().getFilesDir().getPath()+"/"+mFolderName);
                         directory.mkdir();
                         File outputPage = new File(directory.getPath(), extractedImageFile);
-                        
+
                         if (!outputPage.exists()) {
                             FileOutputStream osPage = new FileOutputStream(outputPage);
                             arch.extractFile(fileheaders.get(j), osPage);
@@ -356,9 +358,9 @@ public class ComicPageFragment extends Fragment {
 
             try {
                 ZipFile zipFile = new ZipFile(mComicArchivePath);
-                
+
                 List<net.lingala.zip4j.model.FileHeader> fileHeaders = zipFile.getFileHeaders();
-                
+
                 for (int i=0;i<fileHeaders.size();i++)
                 {
                     String extractedImageFile;
@@ -374,10 +376,10 @@ public class ComicPageFragment extends Fragment {
                     if (extractedImageFile.contains("/"))
                         extractedImageFile = extractedImageFile.substring(extractedImageFile.lastIndexOf("/")+1);
 
-                    
+
                     Log.d("ExtractZip",extractedImageFile);
                     Log.d("mImageFileName", mImageFileName);
-                    
+
                     if (extractedImageFile.equals(mImageFileName))
                     {
                         // get rid of special chars
@@ -401,8 +403,8 @@ public class ComicPageFragment extends Fragment {
                         return fileHeaders.get(i).getFileName();
                     }
                 }
-            } 
-            catch (Exception e) 
+            }
+            catch (Exception e)
             {
                 e.printStackTrace();
             }

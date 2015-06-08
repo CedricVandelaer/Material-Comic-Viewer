@@ -152,20 +152,13 @@ public class DisplayComicActivity extends FragmentActivity {
             public void run() {
                 showAd();
             }
-        },1500);
+        },3000);
     }
 
     private void showAd()
     {
         if (AdBuddiz.isReadyToShowAd(DisplayComicActivity.this))
             AdBuddiz.showAd(DisplayComicActivity.this);
-        else
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    showAd();
-                }
-            }, 1500);
     }
 
     @Override
@@ -430,12 +423,18 @@ public class DisplayComicActivity extends FragmentActivity {
     @Override
     public void onBackPressed()
     {
-        removeExtractedFiles();
         if (Build.VERSION.SDK_INT>20) {
             finishAfterTransition();
         }
         else
             finish();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        removeExtractedFiles();
+        super.onDestroy();
     }
 
     @Override
