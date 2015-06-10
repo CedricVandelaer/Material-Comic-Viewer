@@ -19,7 +19,9 @@
     <string name="db_scheme" translatable="false">db-pz24rrsbb0dvzib</string>
     <string name="file_provider_string" translatable="false">com.comicviewer.free.fileprovider</string>
     <string name="muzei_source" translatable="false">Comic Viewer</string>
-
+    <string name="google_plus_community_url" translatable="false">https://plus.google.com/u/0/communities/117118264783586161349</string>
+    <string name="facebook_page_url" translatable="false">https://www.facebook.com/MaterialComicViewer</string>
+    <string name="rate_app" translatable="false">Rate app</string>
     <!-- Language specific strings -->
     <string name="buy_full_version">Buy full version</string>
     <string name="unhide_files">Unhide files</string>

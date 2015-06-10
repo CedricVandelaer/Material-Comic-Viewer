@@ -1,6 +1,8 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -23,7 +26,14 @@ public class AboutFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ButtonFlat mChangelogButton;
+    private ButtonFlat mRateButton;
     private TextView mTitleTextView;
+
+    private ImageView mGooglePlusLogo;
+    private TextView mGooglePlusTextView;
+    private ImageView mFacebookLogo;
+    private TextView mFacebookTextView;
+    private RelativeLayout mFacebookLayout;
 
     public static AboutFragment newInstance() {
         return new AboutFragment();
@@ -57,12 +67,54 @@ public class AboutFragment extends Fragment {
         ImageView logoview = (ImageView)v.findViewById(R.id.logo);
         ImageView meview = (ImageView)v.findViewById(R.id.me_drawable);
         mTitleTextView = (TextView) v.findViewById(R.id.logo_text);
+        mGooglePlusLogo = (ImageView) v.findViewById(R.id.google_plus_logo);
+        mGooglePlusTextView = (TextView) v.findViewById(R.id.google_plus_textview);
+        mFacebookLogo = (ImageView) v.findViewById(R.id.facebook_logo);
+        mFacebookTextView = (TextView) v.findViewById(R.id.facebook_textview);
+        mRateButton = (ButtonFlat) v.findViewById(R.id.rate_button);
+        mChangelogButton = (ButtonFlat) v.findViewById(R.id.updates_button);
+
+
+        View.OnClickListener googlePlusClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(getString(R.string.google_plus_community_url)));
+                startActivity(i);
+            }
+        };
+
+        View.OnClickListener facebookClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(getString(R.string.facebook_page_url)));
+                startActivity(i);
+            }
+        };
+
+        mGooglePlusLogo.setOnClickListener(googlePlusClickListener);
+        mGooglePlusTextView.setOnClickListener(googlePlusClickListener);
+        mFacebookLogo.setOnClickListener(facebookClickListener);
+        mFacebookTextView.setOnClickListener(facebookClickListener);
 
         mTitleTextView.setText(getActivity().getResources().getString(R.string.app_name) + " v" + getPackageInfo().versionName);
 
-        mChangelogButton = (ButtonFlat) v.findViewById(R.id.updates_button);
-
+        mRateButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
         mChangelogButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+
+        mRateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("market://details?id=" + getActivity().getPackageName());
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                try {
+                    startActivity(goToMarket);
+                } catch (ActivityNotFoundException e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + getActivity().getPackageName())));
+                }
+            }
+        });
 
         mChangelogButton.setOnClickListener(new View.OnClickListener() {
             @Override
