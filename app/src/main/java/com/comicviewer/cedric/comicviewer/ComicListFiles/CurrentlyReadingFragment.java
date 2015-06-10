@@ -57,8 +57,6 @@ public class CurrentlyReadingFragment extends Fragment {
     private ComicAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFab;
-    private int mProgress;
-    private int mTotalComicCount;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SearchView mSearchView;
     private ArrayList<Comic> filteredList;
@@ -256,15 +254,12 @@ public class CurrentlyReadingFragment extends Fragment {
 
         Map<String, Integer> readMap = PreferenceSetter.getReadComics(mApplicationContext);
 
-        mTotalComicCount = map.size();
-        mProgress = 0;
-
-        updateProgressDialog(mProgress, mTotalComicCount);
-
         final ArrayList<Comic> comicsToSave = new ArrayList<>();
         final Set<String> comicsToAdd = new HashSet<String>();
 
         boolean hasToLoad = false;
+
+        showProgressSpinner(true);
 
         for (String str:treemap.keySet()) {
             if (mSearchComicsTask.isCancelled())
@@ -306,9 +301,6 @@ public class CurrentlyReadingFragment extends Fragment {
                     });
                 }
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
             }//check if comic is one of the saved comic files and add
             else if (savedComicsFileNames.contains(comicPath)
                     && !(currentComicsFileNames.contains(comicPath))
@@ -345,9 +337,6 @@ public class CurrentlyReadingFragment extends Fragment {
                     });
                 }
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
             }//if it is a newly added comic
             else if (readMap.containsKey(str)
                     && getComicPositionInList(str) == -1
@@ -372,15 +361,10 @@ public class CurrentlyReadingFragment extends Fragment {
 
                 comicsToSave.add(comic);
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
-            } else // if it's not a valid comic file
-            {
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
+
+        showProgressSpinner(false);
 
         new Thread(new Runnable() {
             @Override
@@ -420,33 +404,16 @@ public class CurrentlyReadingFragment extends Fragment {
 
 
 
-    private void updateProgressDialog(int progress, int total)
-    {
-        if (mProgress==0)
-        {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(true);
-                }
-            });
-        }
-
-        if (progress>=total) {
-            onLoadingFinished();
-        }
-    }
-
-    private void onLoadingFinished()
+    private void showProgressSpinner(final boolean enable)
     {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mSwipeRefreshLayout.setRefreshing(false);
+                mSwipeRefreshLayout.setRefreshing(enable);
             }
         });
-        //PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
     }
+
 
     @Override
     public void onSaveInstanceState(Bundle savedState)

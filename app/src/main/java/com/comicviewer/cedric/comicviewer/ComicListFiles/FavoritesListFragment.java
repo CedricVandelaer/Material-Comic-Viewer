@@ -57,8 +57,6 @@ public class FavoritesListFragment extends Fragment {
     private ComicAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFab;
-    private int mProgress;
-    private int mTotalComicCount;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SearchView mSearchView;
     private ArrayList<Comic> filteredList;
@@ -205,7 +203,7 @@ public class FavoritesListFragment extends Fragment {
                         if (!filePaths.contains(directory.toString()))
                             filePaths.add(directory.toString());
 
-                        PreferenceSetter.saveFilePaths(getActivity(),filePaths);
+                        PreferenceSetter.saveFilePaths(getActivity(), filePaths);
                         refresh();
                     }
                 });
@@ -256,10 +254,7 @@ public class FavoritesListFragment extends Fragment {
 
         List<String> favorites = PreferenceSetter.getFavoriteComics(getActivity());
 
-        mTotalComicCount = map.size();
-        mProgress = 0;
-
-        updateProgressDialog(mProgress, mTotalComicCount);
+        showProgressSpinner(true);
 
         final ArrayList<Comic> comicsToSave = new ArrayList<>();
         final Set<String> comicsToAdd = new HashSet<>();
@@ -306,9 +301,6 @@ public class FavoritesListFragment extends Fragment {
                     }
                 });
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
             }//check if comic is one of the saved comic files and add
             else if (savedComicsFileNames.contains(comicPath)
                     && !(currentComicsFileNames.contains(comicPath))
@@ -345,9 +337,6 @@ public class FavoritesListFragment extends Fragment {
                     }
                 });
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
             }//if it is a newly added comic
             else if (favorites.contains(str)
                     && getComicPositionInList(str)==-1
@@ -372,16 +361,10 @@ public class FavoritesListFragment extends Fragment {
 
                 comicsToSave.add(comic);
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
-            }
-            else // if it's not a valid comic file
-            {
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
+
+        showProgressSpinner(false);
 
         new Thread(new Runnable() {
             @Override
@@ -421,32 +404,14 @@ public class FavoritesListFragment extends Fragment {
 
 
 
-    private void updateProgressDialog(int progress, int total)
-    {
-        if (mProgress==0)
-        {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(true);
-                }
-            });
-        }
-
-        if (progress>=total) {
-            onLoadingFinished();
-        }
-    }
-
-    private void onLoadingFinished()
+    private void showProgressSpinner(final boolean enable)
     {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mSwipeRefreshLayout.setRefreshing(false);
+                mSwipeRefreshLayout.setRefreshing(enable);
             }
         });
-        //PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
     }
 
     @Override

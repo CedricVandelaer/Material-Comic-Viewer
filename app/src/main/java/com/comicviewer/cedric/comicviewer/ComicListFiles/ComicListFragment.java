@@ -61,8 +61,6 @@ public class ComicListFragment extends Fragment {
     private ComicAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFab;
-    private int mProgress;
-    private int mTotalComicCount;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SearchView mSearchView;
     private ArrayList<Object> filteredList;
@@ -316,33 +314,16 @@ public class ComicListFragment extends Fragment {
         return -1;
     }
 
-    private void updateProgressDialog(int progress, int total)
+    private void showProgressSpinner(final boolean enable)
     {
-        if (mProgress==0)
-        {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mSwipeRefreshLayout.setRefreshing(true);
-                }
-            });
-        }
-
-        if (progress>=total) {
-            onLoadingFinished();
-        }
-    }
-
-    private void onLoadingFinished()
-    {
-
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mSwipeRefreshLayout.setRefreshing(false);
+                mSwipeRefreshLayout.setRefreshing(enable);
             }
         });
     }
+
 
     @Override
     public void onSaveInstanceState(Bundle savedState)
@@ -684,10 +665,7 @@ public class ComicListFragment extends Fragment {
             currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
         }
 
-        mTotalComicCount = map.size();
-        mProgress = 0;
-
-        updateProgressDialog(mProgress, mTotalComicCount);
+        showProgressSpinner(true);
 
         final ArrayList<Comic> comicsToSave = new ArrayList<>();
         final Set<String> comicsToAdd = new HashSet<>();
@@ -736,9 +714,6 @@ public class ComicListFragment extends Fragment {
                     }
                 });
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
             }//check if comic is one of the saved comic files and add
             else if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
             {
@@ -774,9 +749,6 @@ public class ComicListFragment extends Fragment {
                     }
                 });
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
             }//if it is a newly added comic
             else if (getComicPositionInList(str)==-1
                     && Utilities.checkExtension(str)
@@ -799,17 +771,10 @@ public class ComicListFragment extends Fragment {
                 });
 
                 comicsToSave.add(comic);
-
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
-            }
-            else // if it's not a valid comic file
-            {
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
+
+        showProgressSpinner(false);
 
         new Thread(new Runnable() {
             @Override
@@ -868,10 +833,7 @@ public class ComicListFragment extends Fragment {
 
         boolean hasToLoad = false;
 
-        mTotalComicCount = treemap.size();
-        mProgress = 0;
-
-        updateProgressDialog(mProgress, mTotalComicCount);
+        showProgressSpinner(true);
 
         for (String str:treemap.keySet())
         {
@@ -913,9 +875,6 @@ public class ComicListFragment extends Fragment {
                     }
                 });
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
             }
             else if (file.isDirectory() && !(currentFolderNames.contains(file.getName())) && !(currentComicsFileNames.contains(comicPath))) {
 
@@ -926,9 +885,6 @@ public class ComicListFragment extends Fragment {
                         mRecyclerView.scrollToPosition(0);
                     }
                 });
-
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
 
             }//check if comic is one of the saved comic files and add
             else if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
@@ -965,9 +921,6 @@ public class ComicListFragment extends Fragment {
                     }
                 });
 
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
             }//if it is a newly added comic
             else if (getComicPositionInList(str)==-1
                     && Utilities.checkExtension(str)
@@ -992,17 +945,11 @@ public class ComicListFragment extends Fragment {
                     }
                 });
 
-
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
-
-            }
-            else // if it's not a valid comic file
-            {
-                mProgress++;
-                updateProgressDialog(mProgress, mTotalComicCount);
             }
         }
+
+        showProgressSpinner(false);
+
 
         new Thread(new Runnable() {
             @Override
