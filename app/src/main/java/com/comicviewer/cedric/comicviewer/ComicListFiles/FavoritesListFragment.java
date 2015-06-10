@@ -43,8 +43,10 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 
@@ -260,6 +262,7 @@ public class FavoritesListFragment extends Fragment {
         updateProgressDialog(mProgress, mTotalComicCount);
 
         final ArrayList<Comic> comicsToSave = new ArrayList<>();
+        final Set<String> comicsToAdd = new HashSet<>();
 
         boolean hasToLoad = false;
 
@@ -278,10 +281,7 @@ public class FavoritesListFragment extends Fragment {
 
                 ComicLoader.loadComicSync(mApplicationContext, comic);
 
-                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
-                {
-                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
-                }
+                comicsToAdd.add(comic.getFileName());
 
                 if (ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
@@ -325,11 +325,7 @@ public class FavoritesListFragment extends Fragment {
                     hasToLoad = true;
                 }
 
-
-                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
-                {
-                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
-                }
+                comicsToAdd.add(comic.getFileName());
 
                 if (!hasToLoad)
                 {
@@ -370,6 +366,8 @@ public class FavoritesListFragment extends Fragment {
                     }
                 });
 
+                comicsToAdd.add(comic.getFileName());
+
                 hasToLoad = true;
 
                 comicsToSave.add(comic);
@@ -389,6 +387,7 @@ public class FavoritesListFragment extends Fragment {
             @Override
             public void run() {
                 PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
+                PreferenceSetter.batchAddAddedComics(mApplicationContext, comicsToAdd);
             }
         }).run();
 

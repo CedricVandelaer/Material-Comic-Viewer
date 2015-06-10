@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -863,6 +864,25 @@ public class PreferenceSetter {
         }
 
         return addedComics;
+    }
+
+    public static void batchAddAddedComics(Context context, Set<String> comicsToAdd)
+    {
+        List<String> addedComics = getComicsAdded(context);
+        String stringToAdd = "";
+
+        for (String comic : comicsToAdd) {
+            if (addedComics.contains(comic))
+                continue;
+            stringToAdd += comic + ",";
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String stringToSave = prefs.getString(COMICS_ADDED_LIST,"")+stringToAdd;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(COMICS_ADDED_LIST, stringToSave);
+        editor.apply();
+
     }
 
     public static void addAddedComic(Context context, String filename)

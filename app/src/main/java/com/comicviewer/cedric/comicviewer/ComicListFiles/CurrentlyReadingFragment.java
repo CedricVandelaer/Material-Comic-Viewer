@@ -43,8 +43,10 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 
@@ -260,16 +262,16 @@ public class CurrentlyReadingFragment extends Fragment {
         updateProgressDialog(mProgress, mTotalComicCount);
 
         final ArrayList<Comic> comicsToSave = new ArrayList<>();
+        final Set<String> comicsToAdd = new HashSet<String>();
 
         boolean hasToLoad = false;
 
-        for (String str:treemap.keySet())
-        {
+        for (String str:treemap.keySet()) {
             if (mSearchComicsTask.isCancelled())
                 break;
 
             //open the new found file
-            final String comicPath = map.get(str)+"/"+str;
+            final String comicPath = map.get(str) + "/" + str;
             File file = new File(comicPath);
 
             //check for image folder
@@ -279,18 +281,12 @@ public class CurrentlyReadingFragment extends Fragment {
 
                 ComicLoader.loadComicSync(mApplicationContext, comic);
 
-                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
-                {
-                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
-                }
-
                 if (ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
                     hasToLoad = true;
                 }
 
-                if (!hasToLoad)
-                {
+                if (!hasToLoad) {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -299,7 +295,8 @@ public class CurrentlyReadingFragment extends Fragment {
                     });
                 }
 
-                if (readMap.get(str)<comic.getPageCount()-1) {
+                if (readMap.get(str) < comic.getPageCount() - 1) {
+                    comicsToAdd.add(comic.getFileName());
                     final Comic finalComic = comic;
                     mHandler.post(new Runnable() {
                         @Override
@@ -315,8 +312,7 @@ public class CurrentlyReadingFragment extends Fragment {
             }//check if comic is one of the saved comic files and add
             else if (savedComicsFileNames.contains(comicPath)
                     && !(currentComicsFileNames.contains(comicPath))
-                    && readMap.containsKey(str))
-            {
+                    && readMap.containsKey(str)) {
                 int pos = savedComicsFileNames.indexOf(comicPath);
 
                 Comic comic = savedComics.get(pos);
@@ -328,8 +324,7 @@ public class CurrentlyReadingFragment extends Fragment {
                     hasToLoad = true;
                 }
 
-                if (!hasToLoad)
-                {
+                if (!hasToLoad) {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -338,13 +333,10 @@ public class CurrentlyReadingFragment extends Fragment {
                     });
                 }
 
-                if (!PreferenceSetter.getComicsAdded(mApplicationContext).contains(comic.getFileName()))
-                {
-                    PreferenceSetter.addAddedComic(mApplicationContext, comic.getFileName());
-                }
 
-                if (readMap.get(str)<comic.getPageCount()-1) {
+                if (readMap.get(str) < comic.getPageCount() - 1) {
                     final Comic finalComic = comic;
+                    comicsToAdd.add(comic.getFileName());
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -358,15 +350,15 @@ public class CurrentlyReadingFragment extends Fragment {
 
             }//if it is a newly added comic
             else if (readMap.containsKey(str)
-                    && getComicPositionInList(str)==-1
+                    && getComicPositionInList(str) == -1
                     && Utilities.checkExtension(str)
-                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file)) )
-            {
+                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
                 Comic comic = new Comic(str, map.get(str));
 
-                ComicLoader.loadComicSync( mApplicationContext, comic);
+                ComicLoader.loadComicSync(mApplicationContext, comic);
 
-                if (readMap.get(str)<comic.getPageCount()-1) {
+                if (readMap.get(str) < comic.getPageCount() - 1) {
+                    comicsToAdd.add(comic.getFileName());
                     final Comic finalComic = comic;
                     mHandler.post(new Runnable() {
                         @Override
@@ -383,8 +375,7 @@ public class CurrentlyReadingFragment extends Fragment {
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
 
-            }
-            else // if it's not a valid comic file
+            } else // if it's not a valid comic file
             {
                 mProgress++;
                 updateProgressDialog(mProgress, mTotalComicCount);
@@ -395,6 +386,7 @@ public class CurrentlyReadingFragment extends Fragment {
             @Override
             public void run() {
                 PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
+                PreferenceSetter.batchAddAddedComics(mApplicationContext, comicsToAdd);
             }
         }).run();
 
