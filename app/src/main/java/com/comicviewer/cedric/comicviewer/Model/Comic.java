@@ -48,6 +48,21 @@ public class Comic implements Parcelable
     //The year of the comic
     int mYear;
 
+    public Comic(Comic otherComic)
+    {
+        this.mTitle = otherComic.getTitle();
+        this.mCoverImage = otherComic.getCoverImage();
+        this.mFilePath = otherComic.getFilePath();
+        this.mFileName = otherComic.getFileName();
+        this.mIssueNumber = otherComic.getIssueNumber();
+        this.mPageCount = otherComic.getPageCount();
+        this.mColorSetting = otherComic.getColorSetting();
+        this.mCoverColor = otherComic.getComicColor();
+        this.mPrimaryTextColor = otherComic.getPrimaryTextColor();
+        this.mSecondaryTextColor = otherComic.getSecondaryTextColor();
+        this.mYear = otherComic.getYear();
+    }
+
     public Comic(String filename, String filePath)
     {
         mFileName = filename;

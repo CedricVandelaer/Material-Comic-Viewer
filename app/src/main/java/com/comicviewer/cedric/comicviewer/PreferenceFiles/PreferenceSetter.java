@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -403,11 +404,16 @@ public class PreferenceSetter {
 
     public static void renamePaths(Context context, String originalPath, String newPath)
     {
+        long startTime = System.currentTimeMillis();
+
         if (getHiddenFiles(context).contains(originalPath)) {
             removeHiddenPath(context, originalPath);
             addHiddenPath(context, newPath);
         }
 
+        long endTime = System.currentTimeMillis();
+        Log.d("FOLDER_RENAME", "Hidden files: "+(endTime-startTime));
+        startTime = System.currentTimeMillis();
 
         ArrayList<String> filePaths = getFilePathsFromPreferences(context);
         for (int i=0;i<filePaths.size();i++)
@@ -420,18 +426,32 @@ public class PreferenceSetter {
         }
         saveFilePaths(context, filePaths);
 
+        endTime = System.currentTimeMillis();
+        Log.d("FOLDER_RENAME", "Filepaths: "+(endTime-startTime));
+        startTime = System.currentTimeMillis();
+
         ArrayList<Comic> savedComics = getSavedComics(context);
+        ArrayList<Comic> comicsToSave = new ArrayList<>();
+        Set<Comic> comicsToRemove = new HashSet<>();
 
         for (int i=0;i<savedComics.size();i++)
         {
             if (savedComics.get(i).getFilePath().equals(originalPath))
             {
                 Comic comic = savedComics.get(i);
-                removeSavedComic(context, savedComics.get(i));
-                comic.setFilePath(newPath);
-                saveComic(context, comic);
+                comicsToRemove.add(savedComics.get(i));
+                Comic renamedComic = new Comic(comic);
+                renamedComic.setFilePath(newPath);
+                comicsToSave.add(renamedComic);
             }
         }
+
+        batchRemoveSavedComics(context, comicsToRemove);
+        batchSaveComics(context, comicsToSave);
+
+        endTime = System.currentTimeMillis();
+        Log.d("FOLDER_RENAME", "Saved comics: "+(endTime-startTime));
+        startTime = System.currentTimeMillis();
 
         List<String> mangaComics = getMangaComicList(context);
 
@@ -446,6 +466,10 @@ public class PreferenceSetter {
             }
         }
 
+        endTime = System.currentTimeMillis();
+        Log.d("FOLDER_RENAME", "Manga comics: "+(endTime-startTime));
+        startTime = System.currentTimeMillis();
+
         List<String> normalComics = getNormalComicList(context);
 
         for (int i=0;i<normalComics.size();i++)
@@ -458,6 +482,9 @@ public class PreferenceSetter {
                 saveNormalComic(context, path);
             }
         }
+
+        endTime = System.currentTimeMillis();
+        Log.d("FOLDER_RENAME", "Normal comics: "+(endTime-startTime));
 
     }
 
@@ -1294,6 +1321,33 @@ public class PreferenceSetter {
 
         sharedPreferencesEditor.apply();
 
+    }
+
+    public static void batchRemoveSavedComics(Context context, Set<Comic> comicsToRemove)
+    {
+        List<Comic> currentComicList = getSavedComics(context);
+        List<Comic> comicsToKeep = new ArrayList<>();
+
+        for (int i=0;i<currentComicList.size();i++)
+        {
+            boolean found = false;
+            Iterator<Comic> iterator = comicsToRemove.iterator();
+            while(!found && iterator.hasNext())
+            {
+                Comic comicToRemove = iterator.next();
+                if (comicToRemove.getFileName().equals(currentComicList.get(i).getFileName())
+                        && comicToRemove.getFilePath().equals(currentComicList.get(i).getFilePath()))
+                {
+                    found =true;
+                }
+            }
+
+            if (!found)
+            {
+                comicsToKeep.add(currentComicList.get(i));
+            }
+        }
+        saveComicList(context, comicsToKeep);
     }
 
     public static ArrayList<Comic> getSavedComics(Context context)
