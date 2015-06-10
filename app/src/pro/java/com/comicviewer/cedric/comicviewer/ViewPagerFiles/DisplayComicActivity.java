@@ -410,9 +410,15 @@ public class DisplayComicActivity extends FragmentActivity {
     }
 
     @Override
-    public void onBackPressed()
+    public void onDestroy()
     {
         removeExtractedFiles();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
         if (Build.VERSION.SDK_INT>20)
             finishAfterTransition();
         else
