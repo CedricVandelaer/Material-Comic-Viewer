@@ -298,10 +298,10 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        switch (requestCode) {
-            case CloudFragment.RESOLVE_CONNECTION_REQUEST_CODE:
-                CloudFragment.getInstance().onActivityResult(requestCode,resultCode,data);
-                break;
+        if (requestCode == CloudFragment.REQUEST_CODE_PICK_ACCOUNT
+                || requestCode == CloudFragment.REQUEST_CODE_RECOVER_FROM_AUTH_ERROR
+                || requestCode == CloudFragment.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR) {
+            CloudFragment.getInstance().onActivityResult(requestCode,resultCode,data);
         }
     }
 }

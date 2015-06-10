@@ -1,6 +1,8 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.net.Uri;
@@ -31,14 +33,12 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveApi;
-import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.plus.Plus;
 import com.melnykov.fab.FloatingActionButton;
 import com.microsoft.live.LiveAuthClient;
 import com.microsoft.live.LiveAuthException;
@@ -53,12 +53,13 @@ import com.microsoft.live.LiveStatus;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
 
 
-public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LiveAuthListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LiveAuthListener{
 
     private static CloudFragment mSingleton;
 
@@ -68,7 +69,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private LiveAuthClient mOneDriveAuth;
     private LiveConnectClient mOneDriveClient;
 
-    private GoogleApiClient mGoogleApiClient;
+    //private GoogleApiClient mGoogleApiClient;
 
     private RecyclerView mRecyclerView;
     private CloudListAdapter mAdapter;
@@ -79,6 +80,14 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private OnFragmentInteractionListener mListener;
 
     public static final int RESOLVE_CONNECTION_REQUEST_CODE = 8;
+    public static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
+    public static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
+    public static final int REQUEST_CODE_RECOVER_FROM_AUTH_ERROR  = 1002;
+
+
+    private final static String DRIVE_API_SCOPE_FILES = "https://www.googleapis.com/auth/drive.readonly";
+    private final static String DRIVE_API_SCOPE_METADATA = "https://www.googleapis.com/auth/drive.metadata.readonly";
+
 
     public static CloudFragment getInstance() {
 
@@ -99,6 +108,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         mHandler = new Handler();
 
+        /*
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addApi(Drive.API)
                     .addApi(Plus.API)
@@ -107,6 +117,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .build();
+                    */
     }
 
     @Override
@@ -194,8 +205,10 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         Toast.makeText(getActivity(), "Something went wrong signing into OneDrive", Toast.LENGTH_LONG).show();
     }
 
+    /*
     @Override
     public void onConnected(Bundle bundle) {
+
 
         String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
         String service = getString(R.string.cloud_storage_2);
@@ -213,6 +226,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mAdapter.refreshCloudServiceList();
         Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
         mGoogleApiClient.disconnect();
+
     }
 
     @Override
@@ -222,6 +236,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+
         if (connectionResult.hasResolution()) {
             try {
                 connectionResult.startResolutionForResult(getActivity(), RESOLVE_CONNECTION_REQUEST_CODE);
@@ -232,14 +247,17 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         } else {
             GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), getActivity(), 0).show();
         }
-    }
 
+    }
+    */
     @Override
     public void onStop()
     {
         super.onStop();
+        /*
         if (mGoogleApiClient.isConnected())
             mGoogleApiClient.disconnect();
+            */
     }
 
     private class AddDropboxUserInfoTask extends AsyncTask
@@ -267,20 +285,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     {
                         e.printStackTrace();
                     }
-
-                    ArrayList<CloudService> savedCloudServices = PreferenceSetter.getCloudServices(getActivity());
-
-
-                    for (int i=0;i<savedCloudServices.size();i++)
-                    {
-                        if (savedCloudServices.get(i).getEmail().equals(email) &&
-                                savedCloudServices.get(i).getName().equals(service))
-                        {
-                            PreferenceSetter.removeCloudService(getActivity(),
-                                    email, service);
-                        }
-                    }
-
 
                     String accessToken = mDBApi.getSession().getOAuth2AccessToken();
                     CloudService cloudService = new CloudService(service, accessToken, userName, email);
@@ -352,14 +356,12 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                             public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                                 if (text.equals(getString(R.string.cloud_storage_1)))
                                     addDropboxAccount();
-                                else if (text.equals(getString(R.string.cloud_storage_3)))
-                                {
-                                    Iterable<String> scopes = Arrays.asList("wl.signin", "wl.offline_access", "wl.basic","wl.skydrive", "wl.emails");
+                                else if (text.equals(getString(R.string.cloud_storage_3))) {
+                                    Iterable<String> scopes = Arrays.asList("wl.signin", "wl.offline_access", "wl.basic", "wl.skydrive", "wl.emails");
                                     mOneDriveAuth.login(getActivity(), scopes, CloudFragment.this);
-                                }
-                                else if (text.equals(getString(R.string.cloud_storage_2)))
-                                {
-                                    new ConnectGoogleAccountTask().execute();
+                                } else if (text.equals(getString(R.string.cloud_storage_2))) {
+                                    //new ConnectGoogleAccountTask().execute();
+                                    pickUserAccount();
                                 }
                             }
                         })
@@ -371,6 +373,15 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         });
     }
 
+
+    private void pickUserAccount() {
+        String[] accountTypes = new String[]{"com.google"};
+        Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                accountTypes, false, null, null, null, null);
+        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+    }
+
+    /*
     private class ConnectGoogleAccountTask extends AsyncTask
     {
 
@@ -390,7 +401,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             return null;
         }
     }
-
+    */
     private void addDropboxAccount() {
         AppKeyPair appKeys = new AppKeyPair(getResources().getString(R.string.dropbox_app_key), getResources().getString(R.string.dropbox_app_secret));
         AndroidAuthSession session = new AndroidAuthSession(appKeys);
@@ -407,6 +418,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        /*
         switch (requestCode) {
             case RESOLVE_CONNECTION_REQUEST_CODE:
                 if (resultCode == Activity.RESULT_OK) {
@@ -414,6 +426,112 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 }
                 break;
         }
+        */
+
+        if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+            // Receiving a result from the AccountPicker
+            if (resultCode == Activity.RESULT_OK) {
+                String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                String scope = "oauth2:" + DRIVE_API_SCOPE_FILES + " " + DRIVE_API_SCOPE_METADATA;
+                // With the account name acquired, go get the auth token
+                new GetGoogleUsernameTask(getActivity(), email, scope).execute();
+            }
+        } else if ((requestCode == REQUEST_CODE_RECOVER_FROM_AUTH_ERROR ||
+                requestCode == REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR)
+                && resultCode == Activity.RESULT_OK) {
+            // Receiving a result that follows a GoogleAuthException, try auth again
+            pickUserAccount();
+        }
+    }
+
+
+
+    public class GetGoogleUsernameTask extends AsyncTask{
+        Activity mActivity;
+        String mScope;
+        String mEmail;
+
+        GetGoogleUsernameTask(Activity activity, String name, String scope) {
+            this.mActivity = activity;
+            this.mScope = scope;
+            this.mEmail = name;
+        }
+
+        @Override
+        protected Void doInBackground(Object... params) {
+            try {
+                String token = fetchToken();
+                if (token != null) {
+                    // **Insert the good stuff here.**
+                    // Use the token to access the user's Google data.
+                    Log.d("Google Drive", "Token: "+token);
+                    CloudService driveCloudService = new CloudService(getString(R.string.cloud_storage_2),
+                            token,
+                            mEmail,
+                            mEmail);
+                    PreferenceSetter.saveCloudService(mActivity,driveCloudService);
+
+                }
+            } catch (IOException e) {
+                // The fetchToken() method handles Google-specific exceptions,
+                // so this indicates something went wrong at a higher level.
+                // TIP: Check for network connectivity before starting the AsyncTask.
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object object)
+        {
+            mAdapter.refreshCloudServiceList();
+        }
+
+        /**
+         * Gets an authentication token from Google and handles any
+         * GoogleAuthException that may occur.
+         */
+        protected String fetchToken() throws IOException {
+            try {
+                return GoogleAuthUtil.getToken(mActivity, mEmail, mScope);
+            } catch (Exception e) {
+                handleException(e);
+            }
+            return null;
+        }
+
+    }
+
+    public void handleException(final Exception e) {
+        // Because this call comes from the AsyncTask, we must ensure that the following
+        // code instead executes on the UI thread.
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (e instanceof GooglePlayServicesAvailabilityException) {
+                    // The Google Play services APK is old, disabled, or not present.
+                    // Show a dialog created by Google Play services that allows
+                    // the user to update the APK
+                    int statusCode = ((GooglePlayServicesAvailabilityException) e)
+                            .getConnectionStatusCode();
+                    Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
+                            getActivity(),
+                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                    dialog.show();
+                } else if (e instanceof UserRecoverableAuthException) {
+                    // Unable to authenticate, such as when the user has not yet granted
+                    // the app access to the account, but the user can fix this.
+                    // Forward the user to an activity in Google Play services.
+                    Intent intent = ((UserRecoverableAuthException) e).getIntent();
+                    startActivityForResult(intent,
+                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                }
+                else
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
