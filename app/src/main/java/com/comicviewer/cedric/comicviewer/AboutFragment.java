@@ -12,6 +12,7 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,7 +34,6 @@ public class AboutFragment extends Fragment {
     private TextView mGooglePlusTextView;
     private ImageView mFacebookLogo;
     private TextView mFacebookTextView;
-    private RelativeLayout mFacebookLayout;
 
     public static AboutFragment newInstance() {
         return new AboutFragment();
@@ -73,6 +73,7 @@ public class AboutFragment extends Fragment {
         mFacebookTextView = (TextView) v.findViewById(R.id.facebook_textview);
         mRateButton = (ButtonFlat) v.findViewById(R.id.rate_button);
         mChangelogButton = (ButtonFlat) v.findViewById(R.id.updates_button);
+
 
 
         View.OnClickListener googlePlusClickListener = new View.OnClickListener() {

@@ -157,6 +157,7 @@
     <orderEntry type="library" exported="" name="MaterialDesign-1.5" level="project" />
     <orderEntry type="library" exported="" name="google-http-client-jackson2-1.20.0" level="project" />
     <orderEntry type="library" exported="" name="google-oauth-client-java6-1.20.0" level="project" />
+    <orderEntry type="library" exported="" name="textjustify-android-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="AdBuddiz-3.0.0" level="project" />
     <orderEntry type="library" exported="" name="robototextview-2.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-plus-7.5.0" level="project" />
