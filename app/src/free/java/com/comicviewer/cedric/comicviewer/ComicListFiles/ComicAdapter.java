@@ -736,7 +736,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                         int pos = mComicList.indexOf(comic);
                         notifyItemChanged(pos);
                     }
-                },300);
+                }, 300);
             }
         });
 
@@ -749,12 +749,9 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PreferenceSetter.getFavoriteComics(mContext).contains(vh.getComic().getFileName()))
-                {
+                if (PreferenceSetter.getFavoriteComics(mContext).contains(vh.getComic().getFileName())) {
                     PreferenceSetter.removeFavoriteComic(mContext, vh.getComic().getFileName());
-                }
-                else
-                {
+                } else {
                     PreferenceSetter.saveFavoriteComic(mContext, vh.getComic().getFileName());
                 }
                 notifyItemChanged(vh.getPosition());
@@ -839,20 +836,30 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         comicItemViewHolder.mCoverPicture.setImageBitmap(null);
 
-        if (comic.getIssueNumber()!=-1)
-            comicItemViewHolder.mIssueNumber.setText(mContext.getString(R.string.issue_number)+": "+comic.getIssueNumber());
-        else
-            comicItemViewHolder.mIssueNumber.setText("");
+        if (comic.getIssueNumber()!=-1) {
+            comicItemViewHolder.mIssueNumber.setVisibility(View.VISIBLE);
+            comicItemViewHolder.mIssueNumber.setText(mContext.getString(R.string.issue_number) + ": " + comic.getIssueNumber());
+        }
+        else {
+            comicItemViewHolder.mIssueNumber.setVisibility(View.GONE);
+        }
 
-        if (comic.getYear()!=-1)
-            comicItemViewHolder.mYear.setText(mContext.getString(R.string.year)+": "+comic.getYear());
-        else
-            comicItemViewHolder.mYear.setText("");
+        if (comic.getYear()!=-1) {
+            comicItemViewHolder.mYear.setVisibility(View.VISIBLE);
+            comicItemViewHolder.mYear.setText(mContext.getString(R.string.year) + ": " + comic.getYear());
+        }
+        else {
+            comicItemViewHolder.mYear.setVisibility(View.GONE);
+        }
 
-        if (comic.getPageCount()!=-1)
-            comicItemViewHolder.mPageCount.setText(mContext.getString(R.string.pages)+": "+comic.getPageCount());
-        else
+        if (comic.getPageCount()!=-1) {
+            comicItemViewHolder.mPageCount.setVisibility(View.VISIBLE);
+            comicItemViewHolder.mPageCount.setText(mContext.getString(R.string.pages) + ": " + comic.getPageCount());
+        }
+        else {
+            comicItemViewHolder.mPageCount.setVisibility(View.GONE);
             comicItemViewHolder.mPageCount.setText("");
+        }
 
         setAnimation(comicItemViewHolder.mCardView, i);
 

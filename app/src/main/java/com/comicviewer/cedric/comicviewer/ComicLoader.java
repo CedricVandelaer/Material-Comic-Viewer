@@ -318,7 +318,10 @@ public class ComicLoader {
                     String title = generateTitle(filename);
                     if (title != null)
                         comic.setTitle(title);
-                    filename = Utilities.removeFirstText(filename);
+                    if (isNumberedTitle(title))
+                        filename = Utilities.removeFirstDigits(filename);
+                    else
+                        filename = Utilities.removeFirstText(filename);
                 } else if (parts[i].trim().equals("Issue number")) {
                     int issueNumber = generateIssueNumber(filename);
                     if (issueNumber != -1)
@@ -341,12 +344,6 @@ public class ComicLoader {
             if (comic.getFilePath().contains("mangarock")) {
                 comic.setTitle("MangaRock Comic");
                 try {
-                    String folderNumber = "";
-                    for (int i=0;i<comic.getFileName().length();i++)
-                    {
-                        if (Character.isDigit(comic.getFileName().charAt(i)))
-                            folderNumber+=comic.getFileName().charAt(i);
-                    }
                     comic.setIssueNumber(Integer.parseInt(comic.getFileName()));
                     comic.setYear(-1);
                 }
@@ -355,11 +352,36 @@ public class ComicLoader {
                     e.printStackTrace();
                 }
             }
-            else
-                comic.setTitle(context.getString(R.string.untitled));
+            else {
+                if (comic.getIssueNumber()!=-1) {
+                    comic.setTitle(""+comic.getIssueNumber());
+                    comic.setIssueNumber(-1);
+                }
+                else {
+                    comic.setTitle(context.getString(R.string.untitled));
+                }
+            }
+        }
+
+        if (comic.getIssueNumber() == comic.getYear())
+        {
+            comic.setIssueNumber(-1);
         }
     }
 
+    public static boolean isNumberedTitle(String title)
+    {
+        int i=0;
+
+        while (i<title.length())
+        {
+            if (!Character.isDigit(title.charAt(i)))
+                return false;
+            i++;
+        }
+
+        return true;
+    }
 
     public static String generateTitle(String filename)
     {
@@ -398,6 +420,19 @@ public class ComicLoader {
 
             if (title.endsWith("-")) {
                 title = title.substring(0, title.length() - 1);
+            }
+
+            // check for numbered title
+            if (title.replaceAll(delimiter,"").trim().equals(""))
+            {
+                String numberTitle = "";
+                int i=0;
+                while (Character.isDigit(filename.charAt(i)))
+                {
+                    numberTitle += filename.charAt(i);
+                    i++;
+                }
+                return numberTitle;
             }
 
             title = title.trim();
