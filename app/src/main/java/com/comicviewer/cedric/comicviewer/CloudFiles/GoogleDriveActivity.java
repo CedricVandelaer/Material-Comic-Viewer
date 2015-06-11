@@ -2,49 +2,55 @@ package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.content.IntentSender;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.View;
 import android.widget.TextView;
 
+import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.Utilities;
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.session.AppKeyPair;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URLEncoder;
+import java.util.Collections;
 
 /**
  * Created by CV on 7/06/2015.
  * pick a google drive comic
  */
-public class GoogleDriveActivity extends Activity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
+public class GoogleDriveActivity extends Activity{
 
     private CloudService mCloudService;
-    private GoogleApiClient mGoogleApiClient;
+    private TextView mErrorTextView;
 
-    public static final int REQUEST_DRIVE_FILE = 12;
+    private final static String DRIVE_API_SCOPE_FILES = "https://www.googleapis.com/auth/drive.readonly";
+    private final static String DRIVE_API_SCOPE_METADATA = "https://www.googleapis.com/auth/drive.metadata.readonly";
+    private final static String SCOPE_PROFILE_INFO = "https://www.googleapis.com/auth/userinfo.profile";
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -53,16 +59,17 @@ public class GoogleDriveActivity extends Activity implements GoogleApiClient.OnC
 
         setContentView(R.layout.activity_google_drive);
 
+        mErrorTextView = (TextView) findViewById(R.id.error_text_view);
+
         new SetTaskDescriptionTask().execute();
 
         mCloudService = (CloudService) getIntent().getSerializableExtra("CloudService");
 
         getActionBar().setTitle(getString(R.string.cloud_storage_2));
-
         getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
-
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
+        PreferenceSetter.setBackgroundColorPreference(this);
 
         NavigationManager.getInstance().resetCloudStack();
 
@@ -71,40 +78,52 @@ public class GoogleDriveActivity extends Activity implements GoogleApiClient.OnC
                 + mCloudService.getEmail() + "\n"
                 + mCloudService.getToken());
 
+        mErrorTextView.setVisibility(View.GONE);
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Drive.API)
-                .addScope(Drive.SCOPE_FILE)
-                .setAccountName(mCloudService.getEmail())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
 
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        IntentSender intentSender = Drive.DriveApi
-                .newOpenFileActivityBuilder()
-//                these mimetypes enable these folders/files types to be selected
-                .setMimeType(new String[] { DriveFolder.MIME_TYPE, "application/zip", "application/x-rar-compressed"})
-                .build(mGoogleApiClient);
-        try {
-            startIntentSenderForResult(
-                    intentSender, REQUEST_DRIVE_FILE, null, 0, 0, 0);
-        } catch (IntentSender.SendIntentException e) {
-            e.printStackTrace();
+        if (HttpUtilities.isConnected(this))
+        {
+            try {
+                new GetDriveFilesTask().execute("https://www.googleapis.com/drive/v2/files"+
+                "?q=%22%27root%27%20in%20parents%20and%20trashed%20=%20false%22");
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            mErrorTextView.setVisibility(View.VISIBLE);
+            mErrorTextView.setText("No internet connection...");
         }
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
 
-    }
+    private class GetDriveFilesTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                String token= GoogleAuthUtil.getToken(GoogleDriveActivity.this, mCloudService.getEmail(),
+                        "oauth2:" + DRIVE_API_SCOPE_FILES + " " + DRIVE_API_SCOPE_METADATA + " " + SCOPE_PROFILE_INFO);
+                mCloudService.setToken(token);
+                PreferenceSetter.saveCloudService(GoogleDriveActivity.this, mCloudService);
+                return HttpUtilities.GET(urls[0]+"&access_token="+token);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                return "Authentication error";
+            }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            mErrorTextView.setVisibility(View.VISIBLE);
+            mErrorTextView.setText(result);
+        }
 
     }
 

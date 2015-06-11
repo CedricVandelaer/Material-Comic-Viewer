@@ -140,6 +140,7 @@
     <orderEntry type="library" exported="" name="cardview-v7-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-wallet-7.5.0" level="project" />
     <orderEntry type="library" exported="" name="dropbox-android-sdk-1.6.3" level="project" />
+    <orderEntry type="library" exported="" name="google-http-client-android-1.20.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-drive-7.5.0" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="json_simple-1.1" level="project" />

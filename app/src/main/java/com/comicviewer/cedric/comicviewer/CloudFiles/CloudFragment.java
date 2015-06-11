@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.FileDialog;
+import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
@@ -87,6 +88,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     private final static String DRIVE_API_SCOPE_FILES = "https://www.googleapis.com/auth/drive.readonly";
     private final static String DRIVE_API_SCOPE_METADATA = "https://www.googleapis.com/auth/drive.metadata.readonly";
+    private final static String SCOPE_PROFILE_INFO = "https://www.googleapis.com/auth/userinfo.profile";
 
 
     public static CloudFragment getInstance() {
@@ -432,9 +434,9 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             // Receiving a result from the AccountPicker
             if (resultCode == Activity.RESULT_OK) {
                 String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                String scope = "oauth2:" + DRIVE_API_SCOPE_FILES + " " + DRIVE_API_SCOPE_METADATA;
+                String scope = "oauth2:" + DRIVE_API_SCOPE_FILES + " " + DRIVE_API_SCOPE_METADATA + " "+ SCOPE_PROFILE_INFO;
                 // With the account name acquired, go get the auth token
-                new GetGoogleUsernameTask(getActivity(), email, scope).execute();
+                new GetGoogleTokenTask(getActivity(), email, scope).execute();
             }
         } else if ((requestCode == REQUEST_CODE_RECOVER_FROM_AUTH_ERROR ||
                 requestCode == REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR)
@@ -444,14 +446,52 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    private class GetGoogleUserNameTask extends AsyncTask<Void, Void, String> {
 
+        private String mToken;
+        private String mEmail;
 
-    public class GetGoogleUsernameTask extends AsyncTask{
+        public GetGoogleUserNameTask(String token, String email)
+        {
+            mToken = token;
+            mEmail = email;
+        }
+
+        @Override
+        protected String doInBackground(Void... aVoid) {
+
+            return HttpUtilities.GET("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="+mToken);
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            try {
+                JSONObject json = new JSONObject(result);
+                String name = json.getString("name");
+
+                CloudService driveCloudService = new CloudService(getString(R.string.cloud_storage_2),
+                        mToken,
+                        name,
+                        mEmail);
+
+                PreferenceSetter.saveCloudService(getActivity(),driveCloudService);
+                mAdapter.refreshCloudServiceList();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public class GetGoogleTokenTask extends AsyncTask{
         Activity mActivity;
         String mScope;
         String mEmail;
 
-        GetGoogleUsernameTask(Activity activity, String name, String scope) {
+        GetGoogleTokenTask(Activity activity, String name, String scope) {
             this.mActivity = activity;
             this.mScope = scope;
             this.mEmail = name;
@@ -464,12 +504,9 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 if (token != null) {
                     // **Insert the good stuff here.**
                     // Use the token to access the user's Google data.
-                    Log.d("Google Drive", "Token: "+token);
-                    CloudService driveCloudService = new CloudService(getString(R.string.cloud_storage_2),
-                            token,
-                            mEmail,
-                            mEmail);
-                    PreferenceSetter.saveCloudService(mActivity,driveCloudService);
+                    Log.d("Google Drive", "Token: " + token);
+
+                    new GetGoogleUserNameTask(token, mEmail).execute();
 
                 }
             } catch (IOException e) {
@@ -479,12 +516,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
             }
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Object object)
-        {
-            mAdapter.refreshCloudServiceList();
         }
 
         /**
@@ -501,6 +532,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         }
 
     }
+
 
     public void handleException(final Exception e) {
         // Because this call comes from the AsyncTask, we must ensure that the following
