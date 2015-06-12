@@ -32,6 +32,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -82,7 +83,7 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
         NavigationManager.getInstance().resetCloudStackWithString("root");
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new GoogleDriveAdapter(this);
+        mAdapter = new GoogleDriveAdapter(this, mCloudService);
         mRecyclerView.setAdapter(mAdapter);
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -136,7 +137,12 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
 
     @Override
     public void onRefresh() {
+        refresh();
+    }
 
+    public void refresh()
+    {
+        new GetDriveFilesTask().execute(NavigationManager.getInstance().getPathFromCloudStack());
     }
 
     private class GetDriveFilesTask extends AsyncTask<String, Void, String> {
@@ -184,9 +190,23 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
                 for (int i=0;i<filesList.length();i++)
                 {
                     JSONObject file = filesList.getJSONObject(i);
-                    GoogleDriveObject driveObject = new GoogleDriveObject(file.getString("title"),file.getString("id"),file.getString("mimeType"));
-                    if (driveObject.getType()!= ObjectType.UNKNOWN)
+                    String downloadUrl = null;
+                    try
+                    {
+                        downloadUrl = file.getString("downloadUrl");
+                    }
+                    catch (JSONException e)
+                    {
+                        Log.d("Google Drive","Download url is null");
+                    }
+                    GoogleDriveObject driveObject = new GoogleDriveObject(file.getString("title"),
+                            file.getString("id"),
+                            file.getString("mimeType"),
+                            downloadUrl);
+                    if ((driveObject.getType()== ObjectType.FILE && Utilities.checkExtension(driveObject.getName()))
+                            || driveObject.getType() == ObjectType.FOLDER) {
                         driveObjects.add(driveObject);
+                    }
                 }
 
                 Collections.sort(driveObjects, new Comparator<GoogleDriveObject>() {
@@ -207,6 +227,16 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
                     if (driveObjects.get(i).getType() == ObjectType.FILE)
                         mAdapter.addDriveObject(driveObjects.get(i));
                 }
+
+                if (driveObjects.size()<1)
+                {
+                    mErrorTextView.setVisibility(View.VISIBLE);
+                    mErrorTextView.setText(getString(R.string.no_supported_files_found));
+                }
+                else
+                {
+                    mErrorTextView.setVisibility(View.GONE);
+                }
             }
             catch (Exception e)
             {
@@ -218,6 +248,22 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
 
         }
 
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        NavigationManager.getInstance().popFromCloudStack();
+        if (NavigationManager.getInstance().cloudStackEmpty())
+            finish();
+        else
+            refresh();
+    }
+
+    public void navigateToPath(String fileId)
+    {
+        NavigationManager.getInstance().pushPathToCloudStack(fileId);
+        new GetDriveFilesTask().execute(NavigationManager.getInstance().getPathFromCloudStack());
     }
 
     private class SetTaskDescriptionTask extends AsyncTask

@@ -10,8 +10,9 @@ public class GoogleDriveObject implements Serializable{
     private ObjectType mObjectType = ObjectType.UNKNOWN;
     private String mName;
     private String mID;
+    private String mDownloadUrl;
 
-    public GoogleDriveObject(String name, String id, String mimeType)
+    public GoogleDriveObject(String name, String id, String mimeType, String downloadUrl)
     {
         mName = name;
         mID = id;
@@ -19,6 +20,7 @@ public class GoogleDriveObject implements Serializable{
             mObjectType = ObjectType.FOLDER;
         else
             mObjectType = ObjectType.FILE;
+        mDownloadUrl = downloadUrl;
     }
 
     public String getName()
@@ -35,4 +37,6 @@ public class GoogleDriveObject implements Serializable{
     {
         return mObjectType;
     }
+
+    public String getDownloadUrl(){return mDownloadUrl;}
 }

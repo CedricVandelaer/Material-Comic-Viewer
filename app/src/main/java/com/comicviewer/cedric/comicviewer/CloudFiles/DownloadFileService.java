@@ -17,6 +17,7 @@ import android.view.View;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.Model.GoogleDriveObject;
 import com.comicviewer.cedric.comicviewer.Model.ObjectType;
 import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
@@ -43,8 +44,13 @@ import com.microsoft.live.LiveStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -59,6 +65,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
     private static final String ACTION_DROPBOX_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.DROPBOXDOWNLOAD";
     private static final String ACTION_ONEDRIVE_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.ONEDRIVEDOWNLOAD";
+    private static final String ACTION_GOOGLEDRIVE_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.GOOGLEDRIVEDOWNLOAD";
 
 
     private LiveConnectClient mLiveConnectClient = null;
@@ -79,6 +86,16 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
         Intent intent = new Intent(context, DownloadFileService.class);
         intent.setAction(ACTION_ONEDRIVE_DOWNLOAD);
         intent.putExtra("ONEDRIVE_OBJECT", oneDriveObject);
+        intent.putExtra("CLOUD_SERVICE", cloudService);
+        context.startService(intent);
+    }
+
+    public static void startActionDownload(Context context, GoogleDriveObject googleDriveObject, CloudService cloudService) {
+
+        mRand.setSeed(System.currentTimeMillis());
+        Intent intent = new Intent(context, DownloadFileService.class);
+        intent.setAction(ACTION_GOOGLEDRIVE_DOWNLOAD);
+        intent.putExtra("GOOGLEDRIVE_OBJECT", googleDriveObject);
         intent.putExtra("CLOUD_SERVICE", cloudService);
         context.startService(intent);
     }
@@ -106,7 +123,99 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
                 handleActionDownload(oneDriveObject, cloudService);
             }
+            else if (ACTION_GOOGLEDRIVE_DOWNLOAD.equals(action))
+            {
+                final CloudService cloudService = (CloudService) intent.getSerializableExtra("CLOUD_SERVICE");
+                final GoogleDriveObject googleDriveObject = (GoogleDriveObject) intent.getSerializableExtra("GOOGLEDRIVE_OBJECT");
+                handleActionDownload(googleDriveObject.getName(), googleDriveObject.getDownloadUrl(), cloudService);
+            }
         }
+    }
+
+    private void handleActionDownload(final String fileName, final String url, final CloudService cloudService)
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                googleDriveDownload(fileName, url, cloudService);
+            }
+        }).run();
+    }
+
+    private void googleDriveDownload(String fileName, String urlString, CloudService cloudService) {
+        int count;
+
+        long totalPercentage = 0;
+
+        final int notificationId = mRand.nextInt();
+
+        createStartNotification(fileName, notificationId);
+
+        try {
+            URL url = new URL(urlString+"&access_token="+cloudService.getToken());
+            URLConnection conection = url.openConnection();
+            conection.connect();
+
+            // this will be useful so that you can show a typical 0-100%
+            // progress bar
+            int lenghtOfFile = conection.getContentLength();
+
+            // download the file
+            InputStream input = new BufferedInputStream(url.openStream(),
+                    8192);
+
+            File googleDriveDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Google Drive");
+            if (!googleDriveDir.exists())
+                googleDriveDir.mkdir();
+            File output = new File(googleDriveDir.getAbsolutePath()+"/"+fileName);
+            File renamedOutput = new File(output.getAbsolutePath()+".mcvdownload");
+
+            // Output stream
+            OutputStream outputStream = new FileOutputStream(renamedOutput);
+
+            byte data[] = new byte[1024];
+
+            long total = 0;
+
+            while ((count = input.read(data)) != -1) {
+                total += count;
+                // publishing the progress....
+                // After this onProgressUpdate will be called
+                if (total>totalPercentage+1000000) {
+                    totalPercentage = total;
+                    setNotificationProgress(total, lenghtOfFile, fileName, notificationId);
+                }
+
+
+                // writing data to file
+                outputStream.write(data, 0, count);
+            }
+
+            // flushing output
+            outputStream.flush();
+
+            // closing streams
+            outputStream.close();
+            input.close();
+
+
+            //rename file
+            renamedOutput.renameTo(output);
+
+            ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+
+            if (!filepaths.contains(googleDriveDir.getAbsolutePath())) {
+                filepaths.add(googleDriveDir.getAbsolutePath());
+                PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+            }
+
+            setEndNotification(fileName, output.getAbsolutePath(), notificationId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setErrorNotification(fileName, notificationId);
+        }
+
     }
 
     private void handleActionDownload(final String fileUrl, final CloudService cloudService) {
@@ -171,7 +280,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
                     if (! (oneDriveObject.getType() == ObjectType.FOLDER)) {
 
-                        createStartNotification(filePath, title, notificationId);
+                        createStartNotification(title, notificationId);
 
                         mLiveConnectClient.downloadAsync(oneDriveObject.getId()+"/content", renamedOutput, new LiveDownloadOperationListener() {
 
@@ -326,7 +435,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                     if (!entry.isDir) {
                         FileOutputStream outputStream = new FileOutputStream(renamedOutput);
 
-                        createStartNotification(filePath, title, notificationId);
+                        createStartNotification(title, notificationId);
 
                         DropboxAPI.DropboxFileInfo info = dbApi.getFile(fileUrl, null, outputStream, new ProgressListener() {
                             @Override
@@ -461,7 +570,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
         notificationManager.notify(id, mNotification.build());
     }
 
-    private void createStartNotification(String filePath, String title, int id)
+    private void createStartNotification(String title, int id)
     {
         mNotification = new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_recents)
