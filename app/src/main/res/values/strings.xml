@@ -12,6 +12,7 @@
     <string name="title_activity_about" translatable="false">AboutActivity</string>
     <string name="title_activity_cloud_browser" translatable="false">CloudBrowserActivity</string>
     <string name="title_activity_info" translatable="false">InfoActivity</string>
+    <string name="title_activity_google_drive" translatable="false">GoogleDriveActivity</string>
     <string name="dropbox_app_key" translatable="false">pz24rrsbb0dvzib</string>
     <string name="dropbox_app_secret" translatable="false">kpdixgm5szbiryj</string>
     <string name="onedrive_id" translatable="false">000000004C1508EF</string>
@@ -190,12 +191,9 @@
     <string name="refresh">Refresh</string>
     <string name="muzei_description">Use your comic covers as wallpaper</string>
     <string name="path_preference_summary">Note: the default path \'main storage/ComicViewer\' can\'t be removed</string>
-    <string name="title_activity_google_drive">GoogleDriveActivity</string>
     <string name="changelog">Changelog</string>
     <string name="synchronization">Synchronization</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
