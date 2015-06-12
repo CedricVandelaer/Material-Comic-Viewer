@@ -405,6 +405,7 @@ public class ComicListFragment extends Fragment {
 
         if (enable && getActivity()!=null) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+            toolbar.removeView(mFolderViewToggleButton);
             mFolderViewToggleButton = new ImageButton(getActivity());
             mFolderViewToggleButton.setAlpha(0.75f);
             if (Build.VERSION.SDK_INT>15)
@@ -439,7 +440,6 @@ public class ComicListFragment extends Fragment {
             });
 
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
-            toolbar.removeView(mFolderViewToggleButton);
             toolbar.addView(mFolderViewToggleButton, layoutParamsCollapsed);
         }
         else
@@ -455,6 +455,7 @@ public class ComicListFragment extends Fragment {
     {
         if (enabled && getActivity()!=null) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+            toolbar.removeView(mSearchView);
             mSearchView = new SearchView(getActivity());
 
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
@@ -481,7 +482,6 @@ public class ComicListFragment extends Fragment {
                     return false;
                 }
             });
-            toolbar.removeView(mSearchView);
             toolbar.addView(mSearchView, layoutParamsCollapsed);
         }
         else

@@ -474,6 +474,7 @@ public class FavoritesListFragment extends Fragment {
     {
         if (enabled) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+            toolbar.removeView(mSearchView);
             mSearchView = new SearchView(getActivity());
 
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
@@ -500,7 +501,6 @@ public class FavoritesListFragment extends Fragment {
                     return false;
                 }
             });
-            toolbar.removeView(mSearchView);
             toolbar.addView(mSearchView, layoutParamsCollapsed);
         }
         else
