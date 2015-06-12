@@ -2,51 +2,55 @@ package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
 import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.Model.GoogleDriveObject;
+import com.comicviewer.cedric.comicviewer.Model.ObjectType;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by CV on 7/06/2015.
  * pick a google drive comic
  */
-public class GoogleDriveActivity extends Activity{
+public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener{
 
     private CloudService mCloudService;
     private TextView mErrorTextView;
+
+    private Handler mHandler;
+    private RecyclerView mRecyclerView;
+    private GoogleDriveAdapter mAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private final static String DRIVE_API_SCOPE_FILES = "https://www.googleapis.com/auth/drive.readonly";
     private final static String DRIVE_API_SCOPE_METADATA = "https://www.googleapis.com/auth/drive.metadata.readonly";
@@ -60,6 +64,10 @@ public class GoogleDriveActivity extends Activity{
         setContentView(R.layout.activity_google_drive);
 
         mErrorTextView = (TextView) findViewById(R.id.error_text_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.cloud_file_list);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mHandler = new Handler();
 
         new SetTaskDescriptionTask().execute();
 
@@ -71,7 +79,25 @@ public class GoogleDriveActivity extends Activity{
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
         PreferenceSetter.setBackgroundColorPreference(this);
 
-        NavigationManager.getInstance().resetCloudStack();
+        NavigationManager.getInstance().resetCloudStackWithString("root");
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter = new GoogleDriveAdapter(this);
+        mRecyclerView.setAdapter(mAdapter);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        float density  = getResources().getDisplayMetrics().density;
+        float dpHeight = outMetrics.heightPixels / density;
+        float dpWidth  = outMetrics.widthPixels / density;
+
+        //in pixels
+        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
+        int hSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, outMetrics);
+
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace));
+
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
@@ -84,8 +110,7 @@ public class GoogleDriveActivity extends Activity{
         if (HttpUtilities.isConnected(this))
         {
             try {
-                new GetDriveFilesTask().execute("https://www.googleapis.com/drive/v2/files"+
-                "?q=%22%27root%27%20in%20parents%20and%20trashed%20=%20false%22");
+                new GetDriveFilesTask().execute("root");
             }
             catch (Exception e)
             {
@@ -99,16 +124,43 @@ public class GoogleDriveActivity extends Activity{
         }
     }
 
+    private void showProgressSpinner(final boolean enable)
+    {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(enable);
+            }
+        });
+    }
+
+    @Override
+    public void onRefresh() {
+
+    }
 
     private class GetDriveFilesTask extends AsyncTask<String, Void, String> {
+
         @Override
-        protected String doInBackground(String... urls) {
+        protected void onPreExecute()
+        {
+            mAdapter.clear();
+            showProgressSpinner(true);
+        }
+
+        @Override
+        protected String doInBackground(String... folderId) {
             try {
                 String token= GoogleAuthUtil.getToken(GoogleDriveActivity.this, mCloudService.getEmail(),
                         "oauth2:" + DRIVE_API_SCOPE_FILES + " " + DRIVE_API_SCOPE_METADATA + " " + SCOPE_PROFILE_INFO);
                 mCloudService.setToken(token);
                 PreferenceSetter.saveCloudService(GoogleDriveActivity.this, mCloudService);
-                return HttpUtilities.GET(urls[0]+"&access_token="+token);
+
+                String url = "https://www.googleapis.com/drive/v2/files"+
+                        "?q=%27" + folderId[0] +
+                        "%27%20in%20parents%20and%20trashed=false"+"&access_token="+token;
+
+                return HttpUtilities.GET(url);
             }
             catch (Exception e)
             {
@@ -121,8 +173,49 @@ public class GoogleDriveActivity extends Activity{
         @Override
         protected void onPostExecute(String result)
         {
-            mErrorTextView.setVisibility(View.VISIBLE);
-            mErrorTextView.setText(result);
+            showProgressSpinner(false);
+            try
+            {
+                JSONObject queryResults = new JSONObject(result);
+                JSONArray filesList = queryResults.getJSONArray("items");
+
+                ArrayList<GoogleDriveObject> driveObjects = new ArrayList<>();
+
+                for (int i=0;i<filesList.length();i++)
+                {
+                    JSONObject file = filesList.getJSONObject(i);
+                    GoogleDriveObject driveObject = new GoogleDriveObject(file.getString("title"),file.getString("id"),file.getString("mimeType"));
+                    if (driveObject.getType()!= ObjectType.UNKNOWN)
+                        driveObjects.add(driveObject);
+                }
+
+                Collections.sort(driveObjects, new Comparator<GoogleDriveObject>() {
+                    @Override
+                    public int compare(GoogleDriveObject lhs, GoogleDriveObject rhs) {
+                        return lhs.getName().compareToIgnoreCase(rhs.getName());
+                    }
+                });
+
+                for (int i=0;i<driveObjects.size();i++)
+                {
+                    if (driveObjects.get(i).getType() == ObjectType.FOLDER)
+                        mAdapter.addDriveObject(driveObjects.get(i));
+                }
+
+                for (int i=0;i<driveObjects.size();i++)
+                {
+                    if (driveObjects.get(i).getType() == ObjectType.FILE)
+                        mAdapter.addDriveObject(driveObjects.get(i));
+                }
+            }
+            catch (Exception e)
+            {
+                mAdapter.clear();
+                e.printStackTrace();
+                mErrorTextView.setVisibility(View.VISIBLE);
+                mErrorTextView.setText(getString(R.string.error));
+            }
+
         }
 
     }
