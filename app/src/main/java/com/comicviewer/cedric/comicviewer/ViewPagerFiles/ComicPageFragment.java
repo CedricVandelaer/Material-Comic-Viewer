@@ -29,8 +29,6 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;

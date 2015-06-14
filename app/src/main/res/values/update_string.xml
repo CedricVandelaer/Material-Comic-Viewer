@@ -9,11 +9,15 @@
     </string>
     <string name="thanks_to_text" translatable="false">
         Special thanks to:\n\n
+        Gábor Szellő - Hungarian translations\n
         Laura Welkenhuyzen - French translations\n
         Fabrizio - Italian translations\n
         Matteo - Spanish translations
     </string>
     <string name="updates" translatable="false">
+        v3.0.1\n
+        - Major bugfix for older Android versions\n
+        - Hungarian translations added (Thanks Gábor!)\n\n
         v3.0\n
         - Google Drive support\n
         - Tiny cards option\n

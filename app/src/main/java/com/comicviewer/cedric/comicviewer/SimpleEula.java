@@ -9,6 +9,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 /**
  * Created by Cédric on 26/04/2015.
  */
