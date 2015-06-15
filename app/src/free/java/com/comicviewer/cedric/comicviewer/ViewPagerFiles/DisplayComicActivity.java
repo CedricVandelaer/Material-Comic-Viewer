@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -18,12 +19,16 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -34,6 +39,7 @@ import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.devspark.robototextview.widget.RobotoTextView;
+import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
@@ -71,6 +77,9 @@ public class DisplayComicActivity extends FragmentActivity {
 
     private boolean mMangaComic = false;
 
+    private FloatingActionButton mFab;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,11 +89,19 @@ public class DisplayComicActivity extends FragmentActivity {
 
         getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
 
+        mHandler = new Handler();
+
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+
+
         AdBuddiz.setPublisherKey("e5ef796f-a43b-4b25-b15f-ebebcbbcabf4");
         AdBuddiz.cacheAds(this); // this = current Activity
 
         Intent intent = getIntent();
-        
+
+        hideSystemUI();
+
+
         int lastReadPage;
 
         if (intent.getAction()!= null && intent.getAction().equals(Intent.ACTION_VIEW))
@@ -132,6 +149,55 @@ public class DisplayComicActivity extends FragmentActivity {
             }
         }
 
+        if (Build.VERSION.SDK_INT>18) {
+
+            setLayoutParams(getResources().getConfiguration());
+
+            getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+                @Override
+                public void onSystemUiVisibilityChange(int visibility) {
+                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                        // The system bars are visible. Make any desired
+                        // adjustments to your UI, such as showing the action bar or
+                        // other navigational controls.
+                        mFab.setVisibility(View.VISIBLE);
+                        mFab.show(true);
+
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                hideSystemUI();
+                            }
+                        }, 5000);
+                    }
+                    //else {
+                    // The system bars are NOT visible. Make any desired
+                    // adjustments to your UI, such as hiding the action bar or
+                    // other navigational controls.
+                    //}
+                }
+            });
+
+            if (mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_1))
+                    || mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_2)))
+            {
+                mFab.setColorNormal(mCurrentComic.getComicColor());
+                mFab.setColorPressed(Utilities.darkenColor(mCurrentComic.getComicColor()));
+                mFab.setColorRipple(Utilities.lightenColor(mCurrentComic.getComicColor()));
+            }
+            else
+            {
+                mFab.setColorNormal(PreferenceSetter.getAppThemeColor(this));
+                mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
+                mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAppThemeColor(this)));
+            }
+
+            if (Build.VERSION.SDK_INT>18)
+            {
+                setFabClickListener();
+            }
+        }
+
         mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
 
         boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
@@ -141,7 +207,6 @@ public class DisplayComicActivity extends FragmentActivity {
         }
 
 
-        mHandler = new Handler();
 
         if (PreferenceSetter.getScreenOnSetting(this))
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -153,6 +218,93 @@ public class DisplayComicActivity extends FragmentActivity {
                 showAd();
             }
         },3000);
+    }
+
+    private void setFabClickListener() {
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSystemUI();
+
+                CharSequence[] pages = new CharSequence[mPageCount];
+
+                for (int i=0;i<mPageCount;i++)
+                {
+                    pages[i] = ""+(i+1);
+                }
+
+                MaterialDialog dialog = new MaterialDialog.Builder(DisplayComicActivity.this)
+                        .title("Go to page")
+                        .negativeColor(PreferenceSetter.getAppThemeColor(DisplayComicActivity.this))
+                        .negativeText("Cancel")
+                        .items(pages)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                materialDialog.dismiss();
+                                mPager.setCurrentItem(i);
+                            }
+                        }).show();
+            }
+        });
+    }
+
+    // This snippet hides the system bars.
+    private void hideSystemUI() {
+        // Set the IMMERSIVE flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        mFab.hide(true);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration configuration)
+    {
+
+        mFab.setVisibility(View.INVISIBLE);
+        hideSystemUI();
+        setLayoutParams(configuration);
+
+        if (mFab.isVisible())
+            mFab.hide(true);
+
+        super.onConfigurationChanged(configuration);
+
+    }
+
+    private void setLayoutParams(Configuration configuration)
+    {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        Display display = this.getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+        float sixteenDP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, outMetrics);
+        float fortysixDP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 64, outMetrics);
+
+
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+        {
+            params.setMargins(0, 0, (int)fortysixDP, (int)sixteenDP);
+        }
+        else if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            params.setMargins(0, 0, (int)sixteenDP, (int)fortysixDP);
+        }
+        params.addRule(RelativeLayout.ALIGN_PARENT_END);
+        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        mFab.setLayoutParams(params);
     }
 
     private void showAd()
@@ -251,24 +403,6 @@ public class DisplayComicActivity extends FragmentActivity {
             }
 
             return null;
-        }
-    }
-
-
-    //Function to initialise immersive mode
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (Build.VERSION.SDK_INT>18) {
-            if (hasFocus) {
-                getWindow().getDecorView().setSystemUiVisibility(
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-            }
         }
     }
 

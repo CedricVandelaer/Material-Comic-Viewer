@@ -402,9 +402,16 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 if (PreferenceSetter.isNormalComic(mContext, comicItemViewHolder.getComic()))
                 {
                     comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
-                    Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
-                    if(Build.VERSION.SDK_INT>15)
-                        comicItemViewHolder.mMangaPicture.setBackground(circle);
+                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+                        Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+                        if (Build.VERSION.SDK_INT > 15)
+                            comicItemViewHolder.mMangaPicture.setBackground(circle);
+                    }
+                    else
+                    {
+                        if (Build.VERSION.SDK_INT > 15)
+                            comicItemViewHolder.mMangaPicture.setBackground(null);
+                    }
 
                     ImageLoader.getInstance().displayImage("drawable://" + R.drawable.ic_fire, comicItemViewHolder.mMangaPicture);
                 }
@@ -414,9 +421,16 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 if (PreferenceSetter.isMangaComic(mContext, comicItemViewHolder.getComic()))
                 {
                     comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
-                    Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
-                    if(Build.VERSION.SDK_INT>15)
-                        comicItemViewHolder.mMangaPicture.setBackground(circle);
+                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+                        Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+                        if (Build.VERSION.SDK_INT > 15)
+                            comicItemViewHolder.mMangaPicture.setBackground(circle);
+                    }
+                    else
+                    {
+                        if (Build.VERSION.SDK_INT > 15)
+                            comicItemViewHolder.mMangaPicture.setBackground(null);
+                    }
 
                     ImageLoader.getInstance().displayImage("drawable://" + R.drawable.ic_fish, comicItemViewHolder.mMangaPicture);
                 }
@@ -875,10 +889,27 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
             comicItemViewHolder.mCardView.setCardBackgroundColor(comic.getComicColor());
         }
+        else
+        {
+            comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
 
+            comicItemViewHolder.mIssueNumber.setTextColor(mContext.getResources().getColor(R.color.White));
+            comicItemViewHolder.mPageCount.setTextColor(mContext.getResources().getColor(R.color.White));
+            comicItemViewHolder.mYear.setTextColor(mContext.getResources().getColor(R.color.White));
+
+            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mContext));
+        }
         Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
-        if(Build.VERSION.SDK_INT>15)
-            comicItemViewHolder.mFavoriteButton.setBackground(circle);
+
+        if (comic.getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+            if (Build.VERSION.SDK_INT > 15)
+                comicItemViewHolder.mFavoriteButton.setBackground(circle);
+        }
+        else
+        {
+            if (Build.VERSION.SDK_INT > 15)
+                comicItemViewHolder.mFavoriteButton.setBackground(null);
+        }
 
         if (PreferenceSetter.getFavoriteComics(mContext).contains(comic.getFileName()))
         {
@@ -892,21 +923,27 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         if (PreferenceSetter.getReadComics(mContext).containsKey(comic.getFileName()))
         {
             //comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
-            if (Build.VERSION.SDK_INT>15)
-                comicItemViewHolder.mLastReadIcon.setBackground(circle);
-            if (PreferenceSetter.getReadComics(mContext).get((comic.getFileName()))+1==comic.getPageCount())
+            if (comic.getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+                if (Build.VERSION.SDK_INT>15)
+                    comicItemViewHolder.mLastReadIcon.setBackground(circle);
+            }
+            else
             {
+                if (Build.VERSION.SDK_INT>15)
+                    comicItemViewHolder.mFavoriteButton.setBackground(null);
+            }
+
+            if (PreferenceSetter.getReadComics(mContext).get((comic.getFileName()))+1==comic.getPageCount()) {
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
             else
             {
                 ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
             }
-        }
-        else
+        } else
         {
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
-            if (Build.VERSION.SDK_INT>15)
+            if (Build.VERSION.SDK_INT > 15)
                 comicItemViewHolder.mLastReadIcon.setBackground(null);
         }
 
@@ -922,7 +959,6 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         else
         {
             ImageLoader.getInstance().displayImage(comic.getCoverImage(), comicItemViewHolder.mCoverPicture, mImageOptions);
-
         }
 
     }
