@@ -128,13 +128,13 @@ public class ComicPageFragment extends Fragment {
                     @Override
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                         if (mSpinner != null)
-                            mSpinner.setVisibility(View.GONE);
+                            mSpinner.setVisibility(View.INVISIBLE);
                     }
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         if (mSpinner != null)
-                            mSpinner.setVisibility(View.GONE);
+                            mSpinner.setVisibility(View.INVISIBLE);
                         mBitmap = loadedImage;
 
                         zoomImageView();
@@ -189,8 +189,8 @@ public class ComicPageFragment extends Fragment {
     @Override
     public void onConfigurationChanged(Configuration config)
     {
-        super.onConfigurationChanged(config);
         zoomImageView();
+        super.onConfigurationChanged(config);
     }
 
 

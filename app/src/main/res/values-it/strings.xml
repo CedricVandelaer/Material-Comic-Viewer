@@ -56,7 +56,7 @@
     <string name="width_auto_fit_setting">In orizzontale adatta pagina alla dimensione dello schermo</string>
     <string name="rotate_landscape_pages_setting">Ruota pagine orizzontali</string>
     <string name="volume_keys_setting">Usa i tasti volume per voltare pagina</string>
-    <string name="page_number_setting">Visualizza nomeri di pagina</string>
+    <string name="page_number_setting">Visualizza numeri di pagina</string>
     <string name="other_settings">Altre opzioni</string>
     <string name="error">Errore</string>
     <string name="already_exists">esiste già</string>

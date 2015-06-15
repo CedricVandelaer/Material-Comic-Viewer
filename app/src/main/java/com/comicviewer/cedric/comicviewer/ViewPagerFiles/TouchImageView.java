@@ -470,6 +470,7 @@ public class TouchImageView extends ImageView {
      * then makes sure the image is centered correctly within the view.
      */
     private void fixScaleTrans() {
+
         fixTrans();
         matrix.getValues(m);
         if (getImageWidth() < viewWidth) {
@@ -480,6 +481,7 @@ public class TouchImageView extends ImageView {
             m[Matrix.MTRANS_Y] = (viewHeight - getImageHeight()) / 2;
         }
         matrix.setValues(m);
+
     }
 
     private float getFixTrans(float trans, float viewSize, float contentSize) {
@@ -699,6 +701,7 @@ public class TouchImageView extends ImageView {
      * @param drawableSize width/height of drawable
      */
     private void translateMatrixAfterRotate(int axis, float trans, float prevImageSize, float imageSize, int prevViewSize, int viewSize, int drawableSize) {
+
         if (imageSize < viewSize) {
             //
             // The width/height of image is less than the view's width/height. Center it.
@@ -720,6 +723,7 @@ public class TouchImageView extends ImageView {
             float percentage = (Math.abs(trans) + (0.5f * prevViewSize)) / prevImageSize;
             m[axis] = -((percentage * imageSize) - (viewSize * 0.5f));
         }
+
     }
 
     private void setState(State state) {
