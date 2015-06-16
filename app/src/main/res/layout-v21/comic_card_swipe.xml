@@ -33,10 +33,10 @@
                 <ImageView
                     android:transitionName="cover"
                     android:id="@+id/cover"
-                    android:layout_height="200dp"
-                    android:layout_width="130dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"/>
+                    android:scaleType="centerCrop"
+                    android:layout_height="match_parent"
+                    android:layout_width="143dp"
+                    android:layout_centerVertical="true"/>
 
                 <com.devspark.robototextview.widget.RobotoTextView
                     android:text="Title"
@@ -47,8 +47,12 @@
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:textSize="24sp"
-                    android:padding="10dp"
-
+                    android:paddingTop="24dp"
+                    android:paddingLeft="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="8dp"
                     />
                 <com.devspark.robototextview.widget.RobotoTextView
                     android:id="@+id/issue_number"
@@ -58,9 +62,12 @@
                     android:layout_below="@id/title"
                     android:layout_toEndOf="@id/cover"
                     android:textColor="#000000"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="6dp"
-                    android:layout_marginStart="10dp"/>
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingStart="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingRight="10dp"/>
                 <com.devspark.robototextview.widget.RobotoTextView
                     android:id="@+id/page_count"
                     android:text="Pages: "
@@ -70,7 +77,8 @@
                     android:layout_toEndOf="@id/cover"
                     android:textColor="#000000"
                     android:layout_marginStart="10dp"
-                    android:paddingBottom="6dp"/>
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"/>
                 <com.devspark.robototextview.widget.RobotoTextView
                     android:id="@+id/year"
                     android:text="Year: "
@@ -80,14 +88,16 @@
                     android:layout_toEndOf="@id/cover"
                     android:textColor="#000000"
                     android:layout_marginStart="10dp"
-                    android:paddingBottom="6dp"/>
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"/>
                 <ImageView
                     android:id="@+id/normal_favorite_button"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:padding="8dp"
                     android:layout_alignParentEnd="true"
-                    android:layout_margin="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
                     android:src="@drawable/star_outline"
                     android:layout_alignParentBottom="true"/>
                 <ImageView
@@ -95,25 +105,18 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:padding="8dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginBottom="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="64dp"
-                    android:layout_alignParentBottom="true"/>
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_toStartOf="@id/normal_favorite_button"
+                    android:layout_alignParentBottom="true"
+                    />
                 <ImageView
                     android:id="@+id/manga_indicator"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:padding="8dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginBottom="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginEnd="108dp"
-                    android:layout_marginRight="108dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="8dp"                    android:padding="8dp"
+                    android:layout_toStartOf="@id/last_read_indicator"
                     android:layout_alignParentBottom="true"/>
             </RelativeLayout>
 

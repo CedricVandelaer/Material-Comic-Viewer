@@ -537,22 +537,9 @@ public class FavoritesListFragment extends Fragment {
         DisplayMetrics outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
         float density  = getResources().getDisplayMetrics().density;
-        float dpHeight = outMetrics.heightPixels / density;
         float dpWidth  = outMetrics.widthPixels / density;
 
-        //in pixels
-        float dpWidthPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpWidth, outMetrics);
-        float cardWidthPixels = getResources().getDimension(R.dimen.list_width);
         int columnCount = 1;
-
-        //14 dp in pixels
-        int vSpace;
-
-        if (PreferenceSetter.getCardAppearanceSetting(getActivity()).equals(getString(R.string.card_size_setting_4)))
-            vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, outMetrics);
-        else
-            vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
-
 
         if (dpWidth>=1280)
         {
@@ -570,7 +557,8 @@ public class FavoritesListFragment extends Fragment {
         }
 
         //in pixels
-        int hSpace = (int) Math.abs((dpWidthPixels-cardWidthPixels)/(columnCount+1));
+        int hSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, outMetrics);
+        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, outMetrics);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace, columnCount));
 

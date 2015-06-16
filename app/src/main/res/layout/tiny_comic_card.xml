@@ -46,7 +46,7 @@
                     android:textColor="#000000"
                     android:textSize="20sp"
                     android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
+                    android:paddingBottom="2dp"
                     android:paddingLeft="8dp"
                     />
                 <com.devspark.robototextview.widget.RobotoTextView

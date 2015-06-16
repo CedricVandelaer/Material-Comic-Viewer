@@ -149,14 +149,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         if (viewType!=3) {
             if (viewType == 0) {
-                v = mInflater.inflate(R.layout.comic_card_swipe, null);
+                v = mInflater.inflate(R.layout.comic_card_swipe, viewGroup, false);
             } else if (viewType == 1) {
-                v = mInflater.inflate(R.layout.small_comic_card_swipe, null);
+                v = mInflater.inflate(R.layout.small_comic_card_swipe, viewGroup, false);
             } else if (viewType == 4) {
-                v = mInflater.inflate(R.layout.tiny_comic_card, null);
+                v = mInflater.inflate(R.layout.tiny_comic_card, viewGroup, false);
             }
             else {
-                v = mInflater.inflate(R.layout.comic_card_image_bg_swipe, null);
+                v = mInflater.inflate(R.layout.comic_card_image_bg_swipe, viewGroup, false);
             }
 
             ComicItemViewHolder comicItemViewHolder = new ComicItemViewHolder(v);
@@ -171,7 +171,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
         else
         {
-            v = mInflater.inflate(R.layout.folder_card, null);
+            v = mInflater.inflate(R.layout.folder_card, viewGroup, false);
             FolderItemViewHolder folderItemViewHolder = new FolderItemViewHolder(v);
             addFolderClickListener(folderItemViewHolder);
             addFolderDeleteClickListener(folderItemViewHolder);
@@ -815,20 +815,30 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         comicItemViewHolder.mCoverPicture.setImageBitmap(null);
 
-        if (comic.getIssueNumber()!=-1)
-            comicItemViewHolder.mIssueNumber.setText(mContext.getString(R.string.issue_number)+": "+comic.getIssueNumber());
-        else
-            comicItemViewHolder.mIssueNumber.setText("");
+        if (comic.getIssueNumber()!=-1) {
+            comicItemViewHolder.mIssueNumber.setVisibility(View.VISIBLE);
+            comicItemViewHolder.mIssueNumber.setText(mContext.getString(R.string.issue_number) + ": " + comic.getIssueNumber());
+        }
+        else {
+            comicItemViewHolder.mIssueNumber.setVisibility(View.GONE);
+        }
 
-        if (comic.getYear()!=-1)
-            comicItemViewHolder.mYear.setText(mContext.getString(R.string.year)+": "+comic.getYear());
-        else
-            comicItemViewHolder.mYear.setText("");
+        if (comic.getYear()!=-1) {
+            comicItemViewHolder.mYear.setVisibility(View.VISIBLE);
+            comicItemViewHolder.mYear.setText(mContext.getString(R.string.year) + ": " + comic.getYear());
+        }
+        else {
+            comicItemViewHolder.mYear.setVisibility(View.GONE);
+        }
 
-        if (comic.getPageCount()!=-1)
-            comicItemViewHolder.mPageCount.setText(mContext.getString(R.string.pages)+": "+comic.getPageCount());
-        else
+        if (comic.getPageCount()!=-1) {
+            comicItemViewHolder.mPageCount.setVisibility(View.VISIBLE);
+            comicItemViewHolder.mPageCount.setText(mContext.getString(R.string.pages) + ": " + comic.getPageCount());
+        }
+        else {
+            comicItemViewHolder.mPageCount.setVisibility(View.GONE);
             comicItemViewHolder.mPageCount.setText("");
+        }
 
         setAnimation(comicItemViewHolder.mCardView, i);
 
@@ -836,13 +846,23 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         if (comic.getComicColor()!=-1)
         {
 
-            comicItemViewHolder.mTitle.setTextColor(comic.getPrimaryTextColor());
+            comicItemViewHolder.mTitle.setTextColor(Utilities.lightenColor(comic.getPrimaryTextColor()));
 
             comicItemViewHolder.mIssueNumber.setTextColor(comic.getPrimaryTextColor());
             comicItemViewHolder.mPageCount.setTextColor(comic.getPrimaryTextColor());
             comicItemViewHolder.mYear.setTextColor(comic.getPrimaryTextColor());
 
             comicItemViewHolder.mCardView.setCardBackgroundColor(comic.getComicColor());
+        }
+        else
+        {
+            comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
+
+            comicItemViewHolder.mIssueNumber.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
+            comicItemViewHolder.mPageCount.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
+            comicItemViewHolder.mYear.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
+
+            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mContext));
         }
 
         Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
@@ -973,13 +993,23 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         if (comic.getComicColor()!=-1)
         {
 
-            comicItemViewHolder.mTitle.setTextColor(comic.getPrimaryTextColor());
+            comicItemViewHolder.mTitle.setTextColor(Utilities.lightenColor(comic.getPrimaryTextColor()));
 
             comicItemViewHolder.mIssueNumber.setTextColor(comic.getPrimaryTextColor());
             comicItemViewHolder.mPageCount.setTextColor(comic.getPrimaryTextColor());
             comicItemViewHolder.mYear.setTextColor(comic.getPrimaryTextColor());
 
             comicItemViewHolder.mCardView.setCardBackgroundColor(comic.getComicColor());
+        }
+        else
+        {
+            comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
+
+            comicItemViewHolder.mIssueNumber.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
+            comicItemViewHolder.mPageCount.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
+            comicItemViewHolder.mYear.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
+
+            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mContext));
         }
 
     }
