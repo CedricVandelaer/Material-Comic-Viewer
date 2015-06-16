@@ -51,6 +51,7 @@ public class SettingsFragment extends PreferenceFragment{
         addRemovePathsPreference();
         addUnhidePreference();
         addAppThemeSettings();
+        addAccentColorSetting();
         addFileFormatSettings();
         addMangaPreference();
         disableVolumeKeyPreference();
@@ -81,6 +82,30 @@ public class SettingsFragment extends PreferenceFragment{
                 getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
         }
 
+    }
+
+    private void addAccentColorSetting()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("LayoutCategory");
+
+        Preference accentColorPreference = new Preference(getActivity());
+
+
+        accentColorPreference.setKey("BUY_PRO_FILEFORMAT");
+        accentColorPreference.setTitle(getString(R.string.app_accent_color_setting_non_pro));
+        accentColorPreference.setDefaultValue(getString(R.string.none));
+
+        accentColorPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                showBuyProDialog();
+
+                return true;
+            }
+        });
+
+        targetCategory.addPreference(accentColorPreference);
     }
 
     private void addBackgroundChangeListener()

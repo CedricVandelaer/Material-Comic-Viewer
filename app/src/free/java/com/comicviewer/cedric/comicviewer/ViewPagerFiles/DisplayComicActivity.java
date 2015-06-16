@@ -187,9 +187,9 @@ public class DisplayComicActivity extends FragmentActivity {
             }
             else
             {
-                mFab.setColorNormal(PreferenceSetter.getAppThemeColor(this));
-                mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
-                mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAppThemeColor(this)));
+                mFab.setColorNormal(PreferenceSetter.getAccentColor(this));
+                mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAccentColor(this)));
+                mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAccentColor(this)));
             }
 
             if (Build.VERSION.SDK_INT>18)

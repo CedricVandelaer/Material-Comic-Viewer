@@ -813,7 +813,7 @@ public class PreferenceSetter {
     public static int getAccentColor(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String color = prefs.getString(ACCENT_COLOR, "" + context.getResources().getColor(R.color.Teal));
+        String color = prefs.getString(ACCENT_COLOR, "" + getAppThemeColor(context));
         return Integer.parseInt(color);
     }
 
