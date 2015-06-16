@@ -172,4 +172,7 @@ no se puede borrar"</string>
     <string name="foreground_to_background">Primer plano al fondo</string>
     <string name="stack">Montón</string>
     <string name="zoom_out">Disminuir el zoom</string>
+    <string name="app_accent_color_setting">Color de acento</string>
+    <string name="app_accent_color_setting_non_pro">Color de acento(PRO)</string>
+    <string name="choose_accent_color">Elije el color de acento</string>
 </resources>

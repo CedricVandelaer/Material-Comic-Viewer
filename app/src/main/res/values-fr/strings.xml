@@ -170,4 +170,7 @@
     <string name="foreground_to_background">Premier plan de fond</string>
     <string name="stack">Cheminée</string>
     <string name="zoom_out">Dézoomer</string>
+    <string name="app_accent_color_setting">Couleur d\'accent</string>
+    <string name="app_accent_color_setting_non_pro">Couleur d\'accent(PRO)</string>
+    <string name="choose_accent_color">Choissisez la couleur d\'accent</string>
 </resources>

@@ -169,4 +169,7 @@
     <string name="path_preference_summary">Megjegyzés: az alapértelmezett \'main storage/ComicViewer\' elérési út nem távolítható el</string>
     <string name="changelog">Újdonságok</string>
     <string name="synchronization">Szinkronizáció</string>
+    <string name="app_accent_color_setting">Kiemelő szín</string>
+    <string name="app_accent_color_setting_non_pro">Kiemelő szín(PRO)</string>
+    <string name="choose_accent_color">Válaszd akcentussal színe</string>
 </resources>

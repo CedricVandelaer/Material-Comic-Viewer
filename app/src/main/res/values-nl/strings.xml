@@ -170,4 +170,7 @@
     <string name="foreground_to_background">Voorgrond naar achtergrond</string>
     <string name="stack">Stapel</string>
     <string name="zoom_out">Uitzoomen</string>
+    <string name="app_accent_color_setting">Accentkleur</string>
+    <string name="app_accent_color_setting_non_pro">Accentkleur(PRO)</string>
+    <string name="choose_accent_color">Kies de accentkleur</string>
 </resources>

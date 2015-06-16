@@ -70,6 +70,7 @@ public class PreferenceSetter {
     private static final String LAST_USED_GOOGLE_ACCOUNT = "lastUsedGoogleAccount";
 
     public static final String APP_THEME_COLOR = "appThemeColor";
+    public static final String ACCENT_COLOR = "accentColor";
     public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
     public static final String MANGA_SETTING = "mangaEnabled";
     public static final String UNHIDE_LIST = "unhideListSetting";
@@ -809,12 +810,28 @@ public class PreferenceSetter {
         return Integer.parseInt(color);
     }
 
+    public static int getAccentColor(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String color = prefs.getString(ACCENT_COLOR, "" + context.getResources().getColor(R.color.Teal));
+        return Integer.parseInt(color);
+    }
+
     public static void saveAppThemeColor(Context context, CharSequence color)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putString(APP_THEME_COLOR, color.toString());
+        editor.apply();
+    }
+
+    public static void saveAppAccentColor(Context context, CharSequence color)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putString(ACCENT_COLOR, color.toString());
         editor.apply();
     }
 

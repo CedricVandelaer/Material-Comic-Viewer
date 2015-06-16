@@ -46,6 +46,7 @@ public class SettingsFragment extends PreferenceFragment{
         addUnhidePreference();
         addRemovePathsPreference();
         addAppThemeSettings();
+        addFabColorPreference();
         addMangaPreference();
         addBackgroundChangeListener();
         addViewPagerAnimationPreference();
@@ -60,6 +61,60 @@ public class SettingsFragment extends PreferenceFragment{
             if (Build.VERSION.SDK_INT>20)
                 getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
         }
+    }
+
+    private void addFabColorPreference()
+    {
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("LayoutCategory");
+
+        final ListPreference accentColorListPreference = new ListPreference(getActivity());
+        accentColorListPreference.setKey(PreferenceSetter.ACCENT_COLOR);
+
+        CharSequence[] entries = {
+                getString(R.string.app_theme_setting),
+                getString(R.string.teal),
+                getString(R.string.red),
+                getString(R.string.orange),
+                getString(R.string.blue),
+                getString(R.string.pink),
+                getString(R.string.purple),
+                getString(R.string.deep_purple),
+                getString(R.string.green),
+                getString(R.string.yellow),
+                getString(R.string.gold),
+                getString(R.string.indigo)};
+        CharSequence[] entryValues = {
+                ""+PreferenceSetter.getAppThemeColor(getActivity()),
+                ""+getResources().getColor(R.color.Teal),
+                ""+getResources().getColor(R.color.Red),
+                ""+getResources().getColor(R.color.Orange),
+                ""+getResources().getColor(R.color.Blue),
+                ""+getResources().getColor(R.color.Pink),
+                ""+getResources().getColor(R.color.Purple),
+                ""+getResources().getColor(R.color.DeepPurple),
+                ""+getResources().getColor(R.color.Green),
+                ""+getResources().getColor(R.color.Yellow),
+                ""+getResources().getColor(R.color.Gold),
+                ""+getResources().getColor(R.color.Indigo)};
+
+        accentColorListPreference.setEntries(entries);
+        accentColorListPreference.setEntryValues(entryValues);
+        accentColorListPreference.setDefaultValue("" + PreferenceSetter.getAppThemeColor(getActivity()));
+
+        accentColorListPreference.setTitle(getString(R.string.app_accent_color_setting));
+        accentColorListPreference.setDialogTitle(getString(R.string.choose_accent_color));
+
+        accentColorListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, final Object newValue) {
+
+                PreferenceSetter.saveAppAccentColor(getActivity(), (CharSequence) newValue);
+                return false;
+            }
+        });
+
+        targetCategory.addPreference(accentColorListPreference);
+
     }
 
     private void addViewPagerAnimationPreference()

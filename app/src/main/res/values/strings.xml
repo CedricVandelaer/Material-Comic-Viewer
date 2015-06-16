@@ -193,7 +193,7 @@
     <string name="path_preference_summary">Note: the default path \'main storage/ComicViewer\' can\'t be removed</string>
     <string name="changelog">Changelog</string>
     <string name="synchronization">Synchronization</string>
-
-
-
+    <string name="app_accent_color_setting">App accent color</string>
+    <string name="app_accent_color_setting_non_pro">App accent color (PRO)</string>
+    <string name="choose_accent_color">Choose accent color</string>
 </resources>
