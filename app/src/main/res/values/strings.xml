@@ -196,4 +196,5 @@
     <string name="app_accent_color_setting">App accent color</string>
     <string name="app_accent_color_setting_non_pro">App accent color (PRO)</string>
     <string name="choose_accent_color">Choose accent color</string>
+    <string name="go_to_page">Go to page</string>
 </resources>

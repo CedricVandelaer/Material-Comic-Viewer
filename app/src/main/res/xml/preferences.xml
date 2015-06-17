@@ -52,6 +52,10 @@
             android:key="volumeKeysOption"
             android:title="@string/volume_keys_setting"
             android:defaultValue="false"/>
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="toolbarOption"
+            android:title="Show toolbar for options"
+            android:defaultValue="false"/>
         <ListPreference
             android:key="readingBackgroundColor"
             android:title="@string/reading_background_color_setting"

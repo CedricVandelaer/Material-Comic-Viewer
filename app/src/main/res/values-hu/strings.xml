@@ -172,4 +172,6 @@
     <string name="app_accent_color_setting">Kiemelő szín</string>
     <string name="app_accent_color_setting_non_pro">Kiemelő szín(PRO)</string>
     <string name="choose_accent_color">Válaszd akcentussal színe</string>
+    <string name="go_to_page">Menj az oldalra</string>
+
 </resources>

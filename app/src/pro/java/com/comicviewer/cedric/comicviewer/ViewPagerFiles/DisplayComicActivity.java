@@ -16,12 +16,18 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
@@ -50,7 +56,7 @@ import java.util.ArrayList;
 /**
  * The activity to display a fullscreen comic
  */
-public class DisplayComicActivity extends FragmentActivity {
+public class DisplayComicActivity extends AppCompatActivity {
 
 
     //The comic to be displayed
@@ -88,9 +94,27 @@ public class DisplayComicActivity extends FragmentActivity {
 
         mHandler = new Handler();
 
-        hideSystemUI();
+        Intent intent = getIntent();
+        
+        int lastReadPage;
 
-        if (Build.VERSION.SDK_INT>18) {
+
+        if (intent.getAction()!= null && intent.getAction().equals(Intent.ACTION_VIEW))
+        {
+            Uri uri = intent.getData();
+            File file = new File(uri.getPath());
+            Comic comic = new Comic(file.getName(), new File(file.getParent()).getPath());
+            ComicLoader.loadComicSync(this, comic);
+            mCurrentComic = comic;
+        }
+        else {
+            mCurrentComic = intent.getParcelableExtra("Comic");
+        }
+
+
+        if (Build.VERSION.SDK_INT>18 &&!PreferenceSetter.getToolbarOption(this)) {
+
+            hideSystemUI();
 
             setLayoutParams(getResources().getConfiguration());
 
@@ -111,30 +135,19 @@ public class DisplayComicActivity extends FragmentActivity {
                             }
                         }, 5000);
                     }
-                    //else {
-                    // The system bars are NOT visible. Make any desired
-                    // adjustments to your UI, such as hiding the action bar or
-                    // other navigational controls.
-                    //}
                 }
             });
         }
-
-        Intent intent = getIntent();
-        
-        int lastReadPage;
-
-
-        if (intent.getAction()!= null && intent.getAction().equals(Intent.ACTION_VIEW))
+        else if (PreferenceSetter.getToolbarOption(this))
         {
-            Uri uri = intent.getData();
-            File file = new File(uri.getPath());
-            Comic comic = new Comic(file.getName(), new File(file.getParent()).getPath());
-            ComicLoader.loadComicSync(this, comic);
-            mCurrentComic = comic;
-        }
-        else {
-            mCurrentComic = intent.getParcelableExtra("Comic");
+            //toolbar
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            toolbar.setVisibility(View.VISIBLE);
+            setSupportActionBar(toolbar);
+            toolbar.showOverflowMenu();
+            getSupportActionBar().setTitle(mCurrentComic.getTitle());
+            if (PreferenceSetter.getReadingBackgroundSetting(this)==getResources().getColor(R.color.White))
+                toolbar.setBackgroundColor(getResources().getColor(R.color.Black));
         }
 
         mPageCount = mCurrentComic.getPageCount();
@@ -211,27 +224,50 @@ public class DisplayComicActivity extends FragmentActivity {
             public void onClick(View v) {
                 hideSystemUI();
 
-                CharSequence[] pages = new CharSequence[mPageCount];
-
-                for (int i=0;i<mPageCount;i++)
-                {
-                    pages[i] = ""+(i+1);
-                }
-
-                MaterialDialog dialog = new MaterialDialog.Builder(DisplayComicActivity.this)
-                        .title("Go to page")
-                        .negativeColor(PreferenceSetter.getAppThemeColor(DisplayComicActivity.this))
-                        .negativeText("Cancel")
-                        .items(pages)
-                        .itemsCallback(new MaterialDialog.ListCallback() {
-                            @Override
-                            public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                                materialDialog.dismiss();
-                                mPager.setCurrentItem(i);
-                            }
-                        }).show();
+                showGoToPageDialog();
             }
         });
+    }
+
+    public void showGoToPageDialog()
+    {
+
+        CharSequence[] pages = new CharSequence[mPageCount];
+
+        for (int i = 0; i < mPageCount; i++) {
+            pages[i] = "" + (i + 1);
+        }
+        MaterialDialog dialog = new MaterialDialog.Builder(DisplayComicActivity.this)
+                .title("Go to page")
+                .negativeColor(PreferenceSetter.getAppThemeColor(DisplayComicActivity.this))
+                .negativeText("Cancel")
+                .items(pages)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        materialDialog.dismiss();
+                        mPager.setCurrentItem(i);
+                    }
+                }).show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.read_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        switch (menuItem.getItemId()) {
+            case R.id.go_to_page_menu_item:
+                showGoToPageDialog();
+                return true;
+        }
+        return false;
     }
 
     // This snippet hides the system bars.
@@ -254,8 +290,14 @@ public class DisplayComicActivity extends FragmentActivity {
     {
 
         mFab.setVisibility(View.INVISIBLE);
-        hideSystemUI();
-        setLayoutParams(configuration);
+
+
+        if (Build.VERSION.SDK_INT>18 && !PreferenceSetter.getToolbarOption(this))
+        {
+            hideSystemUI();
+            setLayoutParams(configuration);
+        }
+
 
         if (mFab.isVisible())
             mFab.hide(true);
@@ -383,17 +425,20 @@ public class DisplayComicActivity extends FragmentActivity {
 
         if (mPageNumberSetting.equals(getString(R.string.page_number_setting_1)) && mPageCount>0)
         {
-            mPageIndicator.setText(""+pageNumber+" "+getString(R.string.of)+" "+mPageCount);
+            mPageIndicator.setVisibility(View.VISIBLE);
+            mPageIndicator.setText(" "+pageNumber+" "+getString(R.string.of)+" "+mPageCount+" ");
         }
         else if (mPageNumberSetting.equals(getString(R.string.page_number_setting_2)) && mPageCount>0)
         {
-            final String currentPageText = ""+pageNumber+" "+getString(R.string.of)+" "+mPageCount;
+            final String currentPageText = " "+pageNumber+" "+getString(R.string.of)+" "+mPageCount+" ";
+            mPageIndicator.setVisibility(View.VISIBLE);
             mPageIndicator.setText(currentPageText);
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     if (mPageIndicator.getText().equals(currentPageText))
                     {
+                        mPageIndicator.setVisibility(View.INVISIBLE);
                         mPageIndicator.setText("");
                     }
                 }
@@ -401,6 +446,7 @@ public class DisplayComicActivity extends FragmentActivity {
         }
         else
         {
+            mPageIndicator.setVisibility(View.INVISIBLE);
             mPageIndicator.setText("");
         }
     }

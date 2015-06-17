@@ -175,4 +175,5 @@ no se puede borrar"</string>
     <string name="app_accent_color_setting">Color de acento</string>
     <string name="app_accent_color_setting_non_pro">Color de acento(PRO)</string>
     <string name="choose_accent_color">Elije el color de acento</string>
+    <string name="go_to_page">Ir a la página</string>
 </resources>

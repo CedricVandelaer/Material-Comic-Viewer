@@ -77,9 +77,14 @@ public class PreferenceSetter {
     public static final String VOLUME_KEY_OPTION = "volumeKeysOption";
     public static final String READING_BACKGROUND_COLOR = "readingBackgroundColor";
     public static final String VIEWPAGER_ANIMATION_SETTING="viewPagerAnimationSetting";
+    public static final String TOOLBAR_OPTION = "toolbarOption";
 
     public static final String COMIC_VIEWER = "ComicViewer";
 
+    public static boolean getToolbarOption(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(TOOLBAR_OPTION, false);
+    }
 
     public static String getPageFlipAnimationSetting(Context context)
     {
