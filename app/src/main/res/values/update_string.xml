@@ -9,6 +9,7 @@
     </string>
     <string name="thanks_to_text" translatable="false">
         Special thanks to:\n\n
+        Cindy Hubinon - Chinese and Korean translations\n
         Gábor Szellő - Hungarian translations\n
         Laura Welkenhuyzen - French translations\n
         Fabrizio - Italian translations\n
@@ -17,8 +18,9 @@
     <string name="updates" translatable="false">
         v3.1\n
         - Jump to a certain page\n
-        - Choose Floating action button color/n
-        - Small design tweaks\n\n
+        - Choose Floating action button color\n
+        - Small design tweaks\n
+        - Korean translations (Thanks Cindy!)\n\n
         v3.0.1\n
         - Major bugfix for older Android versions\n
         - Hungarian translations added (Thanks Gábor!)\n\n

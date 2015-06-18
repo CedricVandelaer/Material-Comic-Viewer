@@ -32,7 +32,8 @@
                 <ImageView
                     android:transitionName="cover"
                     android:id="@+id/cover"
-                    android:layout_height="102dp"
+                    android:scaleType="centerCrop"
+                    android:layout_height="100dp"
                     android:layout_width="65dp"
                     android:layout_centerVertical="true"/>
 

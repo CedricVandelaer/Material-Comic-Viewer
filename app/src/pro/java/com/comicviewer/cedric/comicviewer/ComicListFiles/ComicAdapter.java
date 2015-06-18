@@ -963,14 +963,28 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star_outline, comicItemViewHolder.mFavoriteButton);
         }
 
-        if (Build.VERSION.SDK_INT>15)
-            comicItemViewHolder.mFavoriteButton.setBackground(circle);
+        if (comic.getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+            if (Build.VERSION.SDK_INT > 15)
+                comicItemViewHolder.mFavoriteButton.setBackground(circle);
+        }
+        else
+        {
+            if (Build.VERSION.SDK_INT > 15)
+                comicItemViewHolder.mFavoriteButton.setBackground(null);
+        }
 
         if (PreferenceSetter.getReadComics(mContext).containsKey((comic.getFileName())))
         {
             comicItemViewHolder.mLastReadIcon.setVisibility(View.VISIBLE);
-            if (Build.VERSION.SDK_INT>15)
-                comicItemViewHolder.mLastReadIcon.setBackground(circle);
+            if (comic.getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+                if (Build.VERSION.SDK_INT > 15)
+                    comicItemViewHolder.mLastReadIcon.setBackground(circle);
+            }
+            else
+            {
+                if (Build.VERSION.SDK_INT > 15)
+                    comicItemViewHolder.mLastReadIcon.setBackground(null);
+            }
 
             if (PreferenceSetter.getReadComics(mContext).get((comic.getFileName()))+1==comic.getPageCount())
             {
