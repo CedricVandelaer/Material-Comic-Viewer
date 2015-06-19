@@ -258,7 +258,10 @@ public class DisplayComicActivity extends AppCompatActivity {
                     @Override
                     public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                         materialDialog.dismiss();
-                        mPager.setCurrentItem(i);
+                        int pos = i;
+                        if (mMangaComic)
+                            pos = (mPageCount-1) - i;
+                        mPager.setCurrentItem(pos);
                     }
                 }).show();
     }
