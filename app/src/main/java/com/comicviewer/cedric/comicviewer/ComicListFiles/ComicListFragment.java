@@ -56,7 +56,6 @@ import java.util.TreeMap;
 
 public class ComicListFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
     private ComicAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -166,22 +165,6 @@ public class ComicListFragment extends Fragment {
         else
             Log.d("OnAttach", "Activity is not null");
         mApplicationContext = activity;
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
     }
 
 

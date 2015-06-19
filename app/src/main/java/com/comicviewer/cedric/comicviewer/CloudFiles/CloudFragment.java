@@ -78,8 +78,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private OnFragmentInteractionListener mListener;
-
     public static final int RESOLVE_CONNECTION_REQUEST_CODE = 8;
     public static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     public static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
@@ -412,12 +410,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         /*
@@ -566,26 +558,5 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         });
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
-    }
 
 }

@@ -25,8 +25,6 @@ import java.util.Map;
 
 public class StatisticsFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-
     private TextView mComicsStartedTextView;
     private TextView mComicsReadTextView;
     private TextView mCompletedPercentageTextView;
@@ -199,28 +197,6 @@ public class StatisticsFragment extends Fragment {
         mLongestReadTitleTextView.setText(PreferenceSetter.getLongestReadComicTitle(getActivity()));
         mLongestReadPagesTextView.setText(""+PreferenceSetter.getLongestReadComicPages(getActivity()));
 
-    }
-
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
     }
 
     public void setTextViewTextColors(int color)

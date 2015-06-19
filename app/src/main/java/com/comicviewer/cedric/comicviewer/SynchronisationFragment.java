@@ -193,8 +193,5 @@ public class SynchronisationFragment extends Fragment {
         }
     }
 
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
-    }
 
 }

@@ -25,7 +25,6 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class AboutFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
     private ButtonFlat mChangelogButton;
     private ButtonFlat mRateButton;
     private TextView mTitleTextView;
@@ -147,33 +146,6 @@ public class AboutFragment extends Fragment {
         }
 
         return v;
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
     }
 
 }

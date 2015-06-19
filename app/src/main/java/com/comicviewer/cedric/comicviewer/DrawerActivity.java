@@ -36,9 +36,7 @@ import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionLis
  * Created by Cédric on 5/03/2015.
  * The drawer activity*
  */
-public class DrawerActivity extends MaterialNavigationDrawer implements ComicListFragment.OnFragmentInteractionListener,
-AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInteractionListener, StatisticsFragment.OnFragmentInteractionListener,
-        CloudFragment.OnFragmentInteractionListener, CurrentlyReadingFragment.OnFragmentInteractionListener, SynchronisationFragment.OnFragmentInteractionListener
+public class DrawerActivity extends MaterialNavigationDrawer
 {
 
     MaterialSection[] mSectionsArray;
@@ -290,10 +288,6 @@ AboutFragment.OnFragmentInteractionListener, FavoritesListFragment.OnFragmentInt
         }
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
