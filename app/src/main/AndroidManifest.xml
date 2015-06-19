@@ -8,11 +8,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
-    <supports-screens android:resizeable="true"
-    android:smallScreens="true"
-    android:normalScreens="true"
-    android:largeScreens="true"
-    android:xlargeScreens="true"/>
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
 
     <application
         android:allowBackup="true"
@@ -21,8 +22,8 @@
         android:largeHeap="true"
         android:maxRecents="4"
         android:theme="@style/AppTheme" >
-
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
@@ -58,13 +59,16 @@
         <!-- end AdBuddiz -->
 
 
-        <!-- AdMob -->
+        <!--
+        AdMob
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
-        <!-- end AdMob -->
+        end AdMob
+        -->
 
+        <activity android:name="com.box.androidsdk.content.auth.OAuthActivity" />
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
             android:configChanges="orientation|keyboard"
@@ -126,6 +130,10 @@
         <activity
             android:name=".CloudFiles.GoogleDriveActivity"
             android:label="@string/title_activity_google_drive" >
+        </activity>
+        <activity
+            android:name=".CloudFiles.BoxActivity"
+            android:label="@string/title_activity_box" >
         </activity>
     </application>
 

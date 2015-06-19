@@ -57,7 +57,7 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         View v;
 
         if (viewType==0) {
-            v = mInflater.inflate(R.layout.cloud_folder_card, null);
+            v = mInflater.inflate(R.layout.cloud_folder_card, parent, false);
             CloudFolderViewHolder cloudFolderViewHolder = new CloudFolderViewHolder(v);
             cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mActivity)));
             if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
@@ -67,7 +67,7 @@ public class DropboxAdapter extends RecyclerView.Adapter {
             return cloudFolderViewHolder;
         }
         else {
-            v = mInflater.inflate(R.layout.file_card, null);
+            v = mInflater.inflate(R.layout.file_card, parent, false);
             CloudFileViewHolder cloudFileViewHolder = new CloudFileViewHolder(v);
             if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
                 cloudFileViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));

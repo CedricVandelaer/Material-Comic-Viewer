@@ -51,10 +51,7 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent" />
+        <activity android:name="com.box.androidsdk.content.auth.OAuthActivity" />
 
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"

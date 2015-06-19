@@ -70,7 +70,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_dropbox);
+        setContentView(R.layout.activity_onedrive);
 
         new SetTaskDescriptionTask().execute();
 
@@ -116,8 +116,8 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
         float dpWidth  = outMetrics.widthPixels / density;
 
         //in pixels
-        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
-        int hSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, outMetrics);
+        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, outMetrics);
+        int hSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, outMetrics);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace));
 

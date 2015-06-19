@@ -24,6 +24,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.box.androidsdk.content.BoxConfig;
+import com.box.androidsdk.content.auth.BoxAuthentication;
+import com.box.androidsdk.content.models.BoxSession;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
@@ -70,15 +73,12 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private LiveAuthClient mOneDriveAuth;
     private LiveConnectClient mOneDriveClient;
 
-    //private GoogleApiClient mGoogleApiClient;
-
     private RecyclerView mRecyclerView;
     private CloudListAdapter mAdapter;
     private Handler mHandler;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public static final int RESOLVE_CONNECTION_REQUEST_CODE = 8;
     public static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     public static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
     public static final int REQUEST_CODE_RECOVER_FROM_AUTH_ERROR  = 1002;
@@ -108,16 +108,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         mHandler = new Handler();
 
-        /*
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .addApi(Drive.API)
-                    .addApi(Plus.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addScope(Drive.SCOPE_APPFOLDER)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-                    */
     }
 
     @Override
@@ -205,60 +195,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         Toast.makeText(getActivity(), "Something went wrong signing into OneDrive", Toast.LENGTH_LONG).show();
     }
 
-    /*
-    @Override
-    public void onConnected(Bundle bundle) {
 
-
-        String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
-        String service = getString(R.string.cloud_storage_2);
-
-        CloudService cloudService = new CloudService(
-                service,
-                "No token",
-                accountName,
-                accountName
-        );
-
-        PreferenceSetter.saveCloudService(getActivity(), cloudService);
-        PreferenceSetter.saveLastUsedGoogleAccount(getActivity(), accountName);
-
-        mAdapter.refreshCloudServiceList();
-        Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-        mGoogleApiClient.disconnect();
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(getActivity(), RESOLVE_CONNECTION_REQUEST_CODE);
-            } catch (IntentSender.SendIntentException e) {
-                // Unable to resolve, message user appropriately
-                e.printStackTrace();
-            }
-        } else {
-            GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), getActivity(), 0).show();
-        }
-
-    }
-    */
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-        /*
-        if (mGoogleApiClient.isConnected())
-            mGoogleApiClient.disconnect();
-            */
-    }
 
     private class AddDropboxUserInfoTask extends AsyncTask
     {
@@ -328,7 +265,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
-        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, outMetrics);
+        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, outMetrics);
         int hSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, outMetrics);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace));
@@ -362,6 +299,8 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                 } else if (text.equals(getString(R.string.cloud_storage_2))) {
                                     //new ConnectGoogleAccountTask().execute();
                                     pickUserAccount();
+                                } else if (text.equals(getString(R.string.cloud_storage_4))) {
+                                    authenticateBoxAccount();
                                 }
                             }
                         })
@@ -373,6 +312,47 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         });
     }
 
+    private void authenticateBoxAccount()
+    {
+        BoxConfig.CLIENT_ID = getString(R.string.box_client_id);
+        BoxConfig.CLIENT_SECRET = getString(R.string.box_client_secret);
+        BoxConfig.REDIRECT_URL = getString(R.string.box_redirect_url);
+        final BoxSession session = new BoxSession(getActivity(), null);
+
+        session.setSessionAuthListener(new BoxAuthentication.AuthListener() {
+            @Override
+            public void onRefreshed(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo) {
+
+            }
+
+            @Override
+            public void onAuthCreated(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo) {
+                String id = session.getClientId();
+                String name = session.getAuthInfo().getUser().getName();
+                String token = session.getAuthInfo().refreshToken();
+                CloudService cloudService = new CloudService(getString(R.string.cloud_storage_4),
+                        token, name, id);
+                PreferenceSetter.saveCloudService(getActivity(),cloudService);
+                mAdapter.refreshCloudServiceList();
+                session.logout();
+            }
+
+            @Override
+            public void onAuthFailure(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo, Exception e) {
+                Toast.makeText(getActivity(),getString(R.string.error_while_authenticating),Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onLoggedOut(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo, Exception e) {
+
+            }
+        });
+
+        session.authenticate();
+
+
+    }
+
 
     private void pickUserAccount() {
         String[] accountTypes = new String[]{"com.google"};
@@ -381,27 +361,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
     }
 
-    /*
-    private class ConnectGoogleAccountTask extends AsyncTask
-    {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            if (mGoogleApiClient.isConnected())
-            {
-                mGoogleApiClient.disconnect();
-                mGoogleApiClient.connect();
-            }
-            else
-            {
-                mGoogleApiClient.connect();
-            }
-
-            return null;
-        }
-    }
-    */
     private void addDropboxAccount() {
         AppKeyPair appKeys = new AppKeyPair(getResources().getString(R.string.dropbox_app_key), getResources().getString(R.string.dropbox_app_secret));
         AndroidAuthSession session = new AndroidAuthSession(appKeys);
@@ -412,15 +371,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        /*
-        switch (requestCode) {
-            case RESOLVE_CONNECTION_REQUEST_CODE:
-                if (resultCode == Activity.RESULT_OK) {
-                    mGoogleApiClient.connect();
-                }
-                break;
-        }
-        */
 
         if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             // Receiving a result from the AccountPicker

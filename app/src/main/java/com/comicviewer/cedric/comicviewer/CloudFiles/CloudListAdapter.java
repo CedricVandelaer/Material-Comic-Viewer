@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.box.androidsdk.content.auth.BoxAuthentication;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
@@ -51,7 +52,7 @@ public class CloudListAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = mInflater.inflate(R.layout.cloud_service_card, null);
+        View v = mInflater.inflate(R.layout.cloud_service_card, parent, false);
 
         CloudServiceViewHolder cloudServiceViewHolder = new CloudServiceViewHolder(v);
 
@@ -105,6 +106,11 @@ public class CloudListAdapter extends RecyclerView.Adapter {
                     intent = new Intent(mContext, GoogleDriveActivity.class);
                     intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
                 }
+                else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_4)))
+                {
+                    intent = new Intent(mContext, BoxActivity.class);
+                    intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
+                }
 
                 mContext.startActivity(intent);
 
@@ -128,7 +134,7 @@ public class CloudListAdapter extends RecyclerView.Adapter {
 
         if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_1)))
         {
-            ImageLoader.getInstance().displayImage("Drawable://"+R.drawable.dropbox_icon,cloudServiceViewHolder.mLogoImageView);
+            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.dropbox_icon,cloudServiceViewHolder.mLogoImageView);
         }
         else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_3)))
         {
@@ -137,6 +143,10 @@ public class CloudListAdapter extends RecyclerView.Adapter {
         else  if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_2)))
         {
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.drive_icon, cloudServiceViewHolder.mLogoImageView);
+        }
+        else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_4)))
+        {
+            ImageLoader.getInstance().displayImage("drawable://"+R.drawable.box_icon,cloudServiceViewHolder.mLogoImageView);
         }
     }
 

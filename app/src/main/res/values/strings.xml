@@ -22,7 +22,12 @@
     <string name="muzei_source" translatable="false">Comic Viewer</string>
     <string name="google_plus_community_url" translatable="false">https://plus.google.com/u/0/communities/117118264783586161349</string>
     <string name="facebook_page_url" translatable="false">https://www.facebook.com/MaterialComicViewer</string>
+    <string name="cloud_storage_4" translatable="false">BOX</string>
     <string name="rate_app" translatable="false">Rate app</string>
+    <string name="box_client_id" translatable="false">a8f6tsc2oq3dvsxhmr13w0hobkqlpcsx</string>
+    <string name="box_client_secret" translatable="false">tXojRoqQm8y0pbtS92raqprQTgcTKSbI</string>
+    <string name="box_redirect_url" translatable="false">https://plus.google.com/u/0/communities/117118264783586161349</string>
+    
     <!-- Language specific strings -->
     <string name="buy_full_version">Buy full version</string>
     <string name="unhide_files">Unhide files</string>
@@ -197,4 +202,7 @@
     <string name="app_accent_color_setting_non_pro">App accent color (PRO)</string>
     <string name="choose_accent_color">Choose accent color</string>
     <string name="go_to_page">Go to page</string>
+    <string name="title_activity_box">BoxActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
