@@ -327,14 +327,13 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
             @Override
             public void onAuthCreated(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo) {
-                String id = session.getClientId();
+                String id = boxAuthenticationInfo.getUser().getId();
                 String name = session.getAuthInfo().getUser().getName();
-                String token = session.getAuthInfo().refreshToken();
+                String token = boxAuthenticationInfo.toJson();
                 CloudService cloudService = new CloudService(getString(R.string.cloud_storage_4),
                         token, name, id);
                 PreferenceSetter.saveCloudService(getActivity(),cloudService);
                 mAdapter.refreshCloudServiceList();
-                session.logout();
             }
 
             @Override

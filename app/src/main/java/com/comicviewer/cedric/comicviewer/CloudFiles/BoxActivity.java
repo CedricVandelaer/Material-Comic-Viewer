@@ -22,9 +22,11 @@ import android.widget.TextView;
 
 import com.box.androidsdk.content.BoxApiFolder;
 import com.box.androidsdk.content.BoxConfig;
+import com.box.androidsdk.content.BoxFutureTask;
 import com.box.androidsdk.content.auth.BoxAuthentication;
 import com.box.androidsdk.content.models.BoxListItems;
 import com.box.androidsdk.content.models.BoxSession;
+import com.box.androidsdk.content.requests.BoxResponse;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -45,6 +47,8 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private TextView mErrorTextView;
     private RecyclerView mRecyclerView;
+    private BoxSession mSession;
+    private BoxApiFolder mBoxApiFolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,54 +111,21 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
         BoxConfig.CLIENT_SECRET = getString(R.string.box_client_secret);
         BoxConfig.REDIRECT_URL = getString(R.string.box_redirect_url);
 
-        final BoxSession session = new BoxSession(this, mCloudService.getEmail());
-        session.getAuthInfo().setRefreshToken(mCloudService.getToken());
-
-        session.setSessionAuthListener(new BoxAuthentication.AuthListener() {
+        final BoxSession mSession = new BoxSession(this, mCloudService.getEmail());
+        mSession.authenticate().addOnCompletedListener(new BoxFutureTask.OnCompletedListener<BoxSession>() {
             @Override
-            public void onRefreshed(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo) {
-
-            }
-
-            @Override
-            public void onAuthCreated(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo) {
-                String id = boxAuthenticationInfo.getClientId();
-                String name = boxAuthenticationInfo.getUser().getName();
-                String token = boxAuthenticationInfo.refreshToken();
-                mCloudService = new CloudService(getString(R.string.cloud_storage_4),
-                        token, name, id);
-                PreferenceSetter.saveCloudService(BoxActivity.this, mCloudService);
-
-                BoxApiFolder boxApiFolder = new BoxApiFolder(session);
-                try {
-                    BoxListItems boxListItems = boxApiFolder.getItemsRequest("0").send();
-                    for (int i=0;i<boxListItems.size();i++)
-                    {
-                        Log.d("Box", "File: "+boxListItems.get(i).getName());
-                    }
-                    mErrorTextView.setVisibility(View.GONE);
+            public void onCompleted(BoxResponse<BoxSession> boxResponse) {
+                if (boxResponse.isSuccess()) {
+                    mBoxApiFolder = new BoxApiFolder(mSession);
+                    new GetBoxFilesTask().execute("0");
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    mErrorTextView.setVisibility(View.VISIBLE);
-                    mErrorTextView.setText(getString(R.string.error));
+                else {
+                    boxResponse.getException().printStackTrace();
                 }
-            }
-
-            @Override
-            public void onAuthFailure(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo, Exception e) {
-                e.printStackTrace();
-                mErrorTextView.setVisibility(View.VISIBLE);
-                mErrorTextView.setText(getString(R.string.error_while_authenticating));
-            }
-
-            @Override
-            public void onLoggedOut(BoxAuthentication.BoxAuthenticationInfo boxAuthenticationInfo, Exception e) {
-
             }
         });
-        session.authenticate();
+
+
     }
 
     @Override
@@ -167,6 +138,44 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
     @Override
     public void onRefresh() {
 
+    }
+
+    private class GetBoxFilesTask extends AsyncTask
+    {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            String id = (String) params[0];
+
+            try {
+                BoxListItems boxListItems = mBoxApiFolder.getItemsRequest(id).send();
+                for (int i=0;i<boxListItems.size();i++)
+                {
+                    Log.d("Box", "File: "+boxListItems.get(i).getName());
+                }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mErrorTextView.setVisibility(View.GONE);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mErrorTextView.setVisibility(View.VISIBLE);
+                        mErrorTextView.setText(getString(R.string.error));
+                    }
+                });
+
+            }
+
+            return null;
+        }
     }
 
     private class SetTaskDescriptionTask extends AsyncTask
