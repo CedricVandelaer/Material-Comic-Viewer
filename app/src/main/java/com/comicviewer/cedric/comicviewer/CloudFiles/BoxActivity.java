@@ -24,6 +24,7 @@ import com.box.androidsdk.content.BoxApiFolder;
 import com.box.androidsdk.content.BoxConfig;
 import com.box.androidsdk.content.BoxFutureTask;
 import com.box.androidsdk.content.auth.BoxAuthentication;
+import com.box.androidsdk.content.models.BoxItem;
 import com.box.androidsdk.content.models.BoxListItems;
 import com.box.androidsdk.content.models.BoxSession;
 import com.box.androidsdk.content.requests.BoxResponse;
@@ -38,7 +39,10 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener{
 
@@ -47,6 +51,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private TextView mErrorTextView;
     private RecyclerView mRecyclerView;
+    private BoxAdapter mAdapter;
     private BoxSession mSession;
     private BoxApiFolder mBoxApiFolder;
 
@@ -78,7 +83,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
 
-        NavigationManager.getInstance().resetCloudStackWithString("me/skydrive/files");
+        NavigationManager.getInstance().resetCloudStackWithString("0");
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
@@ -88,8 +93,8 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
         mRecyclerView = (RecyclerView) findViewById(R.id.cloud_file_list);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //mAdapter = new OneDriveAdapter(this, mCloudService);
-        //mRecyclerView.setAdapter(mAdapter);
+        mAdapter = new BoxAdapter(this, mCloudService);
+        mRecyclerView.setAdapter(mAdapter);
 
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -149,11 +154,48 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
             String id = (String) params[0];
 
             try {
-                BoxListItems boxListItems = mBoxApiFolder.getItemsRequest(id).send();
+                final BoxListItems boxListItems = mBoxApiFolder.getItemsRequest(id).send();
+
+                ArrayList<BoxItem> boxItems = new ArrayList<>();
+
                 for (int i=0;i<boxListItems.size();i++)
                 {
-                    Log.d("Box", "File: "+boxListItems.get(i).getName());
+                    if (boxListItems.get(i).getType().equals("folder") || Utilities.checkExtension(boxListItems.get(i).getName()))
+                        boxItems.add(boxListItems.get(i));
                 }
+
+                Collections.sort(boxItems, new Comparator<BoxItem>() {
+                    @Override
+                    public int compare(BoxItem lhs, BoxItem rhs) {
+                        return lhs.getName().compareToIgnoreCase(rhs.getName());
+                    }
+                });
+
+                for (int i=0;i<boxItems.size();i++)
+                {
+                    if (boxListItems.get(i).getType().equals("folder")) {
+                        final int finalI = i;
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAdapter.addBoxObject(boxListItems.get(finalI));
+                            }
+                        });
+                    }
+                }
+                for (int i=0;i<boxItems.size();i++)
+                {
+                    if (Utilities.checkExtension(boxListItems.get(i).getName())) {
+                        final int finalI = i;
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAdapter.addBoxObject(boxListItems.get(finalI));
+                            }
+                        });
+                    }
+                }
+
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {

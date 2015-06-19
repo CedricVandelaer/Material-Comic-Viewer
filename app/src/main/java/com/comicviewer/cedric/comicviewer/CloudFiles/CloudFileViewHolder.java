@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.box.androidsdk.content.models.BoxItem;
 import com.comicviewer.cedric.comicviewer.Model.GoogleDriveObject;
 import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
 import com.comicviewer.cedric.comicviewer.R;
@@ -27,6 +28,8 @@ public class CloudFileViewHolder extends RecyclerView.ViewHolder {
     private OneDriveObject mOneDriveEntry = null;
 
     private GoogleDriveObject mGoogleDriveEntry = null;
+
+    private BoxItem mBoxEntry = null;
 
     public CloudFileViewHolder(View itemView) {
         super(itemView);
@@ -65,5 +68,15 @@ public class CloudFileViewHolder extends RecyclerView.ViewHolder {
     public GoogleDriveObject getGoogleDriveEntry()
     {
         return mGoogleDriveEntry;
+    }
+
+    public void setBoxEntry(BoxItem boxEntry)
+    {
+        mBoxEntry = boxEntry;
+    }
+
+    public BoxItem getBoxEntry()
+    {
+        return mBoxEntry;
     }
 }
