@@ -83,7 +83,6 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
 
-        NavigationManager.getInstance().resetCloudStackWithString("0");
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
@@ -121,8 +120,9 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
             @Override
             public void onCompleted(BoxResponse<BoxSession> boxResponse) {
                 if (boxResponse.isSuccess()) {
+                    NavigationManager.getInstance().resetCloudStackWithString("0");
                     mBoxApiFolder = new BoxApiFolder(mSession);
-                    new GetBoxFilesTask().execute("0");
+                    new GetBoxFilesTask().execute();
                 }
                 else {
                     boxResponse.getException().printStackTrace();
@@ -142,7 +142,23 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
 
     @Override
     public void onRefresh() {
+        refresh();
+    }
 
+    @Override
+    public void onBackPressed()
+    {
+        NavigationManager.getInstance().popFromCloudStack();
+        if (NavigationManager.getInstance().cloudStackEmpty())
+            finish();
+        else
+            refresh();
+    }
+
+    public void refresh()
+    {
+        mAdapter.clear();
+        new GetBoxFilesTask().execute();
     }
 
     private class GetBoxFilesTask extends AsyncTask
@@ -151,12 +167,18 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
         @Override
         protected Object doInBackground(Object[] params) {
 
-            String id = (String) params[0];
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            });
+            String id = NavigationManager.getInstance().getPathFromCloudStack();
 
             try {
                 final BoxListItems boxListItems = mBoxApiFolder.getItemsRequest(id).send();
 
-                ArrayList<BoxItem> boxItems = new ArrayList<>();
+                final ArrayList<BoxItem> boxItems = new ArrayList<>();
 
                 for (int i=0;i<boxListItems.size();i++)
                 {
@@ -173,12 +195,12 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
 
                 for (int i=0;i<boxItems.size();i++)
                 {
-                    if (boxListItems.get(i).getType().equals("folder")) {
+                    if (boxItems.get(i).getType().equals("folder")) {
                         final int finalI = i;
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                mAdapter.addBoxObject(boxListItems.get(finalI));
+                                mAdapter.addBoxObject(boxItems.get(finalI));
                             }
                         });
                     }
@@ -190,7 +212,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                mAdapter.addBoxObject(boxListItems.get(finalI));
+                                mAdapter.addBoxObject(boxItems.get(finalI));
                             }
                         });
                     }
@@ -199,7 +221,13 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mErrorTextView.setVisibility(View.GONE);
+                        if (boxItems.size()<1) {
+                            mErrorTextView.setVisibility(View.VISIBLE);
+                            mErrorTextView.setText(getString(R.string.no_supported_files_found));
+                        }
+                        else
+                            mErrorTextView.setVisibility(View.GONE);
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
                 });
             }
@@ -211,6 +239,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
                     public void run() {
                         mErrorTextView.setVisibility(View.VISIBLE);
                         mErrorTextView.setText(getString(R.string.error));
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
                 });
 

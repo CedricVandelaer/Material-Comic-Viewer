@@ -15,6 +15,14 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.View;
 
+import com.box.androidsdk.content.BoxApiFile;
+import com.box.androidsdk.content.BoxApiFolder;
+import com.box.androidsdk.content.BoxConfig;
+import com.box.androidsdk.content.BoxFutureTask;
+import com.box.androidsdk.content.models.BoxDownload;
+import com.box.androidsdk.content.models.BoxItem;
+import com.box.androidsdk.content.models.BoxSession;
+import com.box.androidsdk.content.requests.BoxResponse;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.GoogleDriveObject;
@@ -66,6 +74,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
     private static final String ACTION_DROPBOX_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.DROPBOXDOWNLOAD";
     private static final String ACTION_ONEDRIVE_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.ONEDRIVEDOWNLOAD";
     private static final String ACTION_GOOGLEDRIVE_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.GOOGLEDRIVEDOWNLOAD";
+    private static final String ACTION_BOX_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.BOXDOWNLOAD";
 
 
     private LiveConnectClient mLiveConnectClient = null;
@@ -76,6 +85,16 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
         Intent intent = new Intent(context, DownloadFileService.class);
         intent.setAction(ACTION_DROPBOX_DOWNLOAD);
         intent.putExtra("FILE_URL", fileUrl);
+        intent.putExtra("CLOUD_SERVICE", cloudService);
+        context.startService(intent);
+    }
+
+    public static void startActionDownload(Context context, BoxItem boxItem, CloudService cloudService) {
+
+        mRand.setSeed(System.currentTimeMillis());
+        Intent intent = new Intent(context, DownloadFileService.class);
+        intent.setAction(ACTION_BOX_DOWNLOAD);
+        intent.putExtra("BOX_ITEM", boxItem);
         intent.putExtra("CLOUD_SERVICE", cloudService);
         context.startService(intent);
     }
@@ -129,7 +148,60 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                 final GoogleDriveObject googleDriveObject = (GoogleDriveObject) intent.getSerializableExtra("GOOGLEDRIVE_OBJECT");
                 handleActionDownload(googleDriveObject.getName(), googleDriveObject.getDownloadUrl(), cloudService);
             }
+            else if (ACTION_BOX_DOWNLOAD.equals(action))
+            {
+                final CloudService cloudService = (CloudService) intent.getSerializableExtra("CLOUD_SERVICE");
+                final BoxItem boxItem = (BoxItem) intent.getSerializableExtra("BOX_ITEM");
+                handleActionDownload(boxItem, cloudService);
+            }
         }
+    }
+
+    private void handleActionDownload(final BoxItem boxItem, final CloudService cloudService)
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boxFileDownload(boxItem, cloudService);
+            }
+        }).run();
+    }
+
+    private void boxFileDownload(final BoxItem boxItem, final CloudService cloudService)
+    {
+        BoxConfig.CLIENT_ID = getString(R.string.box_client_id);
+        BoxConfig.CLIENT_SECRET = getString(R.string.box_client_secret);
+        BoxConfig.REDIRECT_URL = getString(R.string.box_redirect_url);
+
+        final BoxSession session = new BoxSession(this, cloudService.getEmail());
+        /*
+        session.authenticate().addOnCompletedListener(new BoxFutureTask.OnCompletedListener<BoxSession>() {
+            @Override
+            public void onCompleted(BoxResponse<BoxSession> boxResponse) {
+
+                final int notificationId = mRand.nextInt();
+
+                createStartNotification(boxItem.getName(), notificationId);
+
+                if (boxResponse.isSuccess()) {
+                    BoxApiFile fileApi = new BoxApiFile(session);
+                    BoxDownload fileDownload = fileApi.getDownloadRequest(file, "fileId")
+                            // Optional: Set a listener to track download progress.
+                            .setProgressListener(new ProgressListener() {
+                                @Override
+                                public void onProgress(long l, long l1) {
+
+                                }
+
+                            })
+                            .send();
+                }
+                else {
+                    boxResponse.getException().printStackTrace();
+                }
+            }
+        });
+        */
     }
 
     private void handleActionDownload(final String fileName, final String url, final CloudService cloudService)
