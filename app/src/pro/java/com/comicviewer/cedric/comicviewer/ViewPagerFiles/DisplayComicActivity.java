@@ -198,8 +198,8 @@ public class DisplayComicActivity extends AppCompatActivity {
         if (PreferenceSetter.getScreenOnSetting(this))
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        if (mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_1))
-                || mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_2)))
+        if ((mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_1))
+                || mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_2))) && mCurrentComic.getComicColor()!=-1)
         {
             mFab.setColorNormal(mCurrentComic.getComicColor());
             mFab.setColorPressed(Utilities.darkenColor(mCurrentComic.getComicColor()));

@@ -108,8 +108,8 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace));
 
-        mSwipeRefreshLayout.setRefreshing(true);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setRefreshing(true);
 
         BoxConfig.CLIENT_ID = getString(R.string.box_client_id);
         BoxConfig.CLIENT_SECRET = getString(R.string.box_client_secret);
@@ -207,7 +207,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
                 }
                 for (int i=0;i<boxItems.size();i++)
                 {
-                    if (Utilities.checkExtension(boxListItems.get(i).getName())) {
+                    if (Utilities.checkExtension(boxItems.get(i).getName())) {
                         final int finalI = i;
                         mHandler.post(new Runnable() {
                             @Override

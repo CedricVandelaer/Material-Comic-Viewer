@@ -79,6 +79,8 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
         PreferenceSetter.setBackgroundColorPreference(this);
+        if (PreferenceSetter.getBackgroundColorPreference(this)==getResources().getColor(R.color.WhiteBG))
+            mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
         NavigationManager.getInstance().resetCloudStackWithString("root");
 

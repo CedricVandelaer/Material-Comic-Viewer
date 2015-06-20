@@ -133,7 +133,7 @@
         </activity>
         <activity
             android:name=".CloudFiles.BoxActivity"
-            android:label="@string/title_activity_box" >
+            android:label="@string/cloud_storage_4" >
         </activity>
     </application>
 

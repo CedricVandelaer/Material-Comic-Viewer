@@ -10,6 +10,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
@@ -19,6 +20,8 @@ import com.box.androidsdk.content.BoxApiFile;
 import com.box.androidsdk.content.BoxApiFolder;
 import com.box.androidsdk.content.BoxConfig;
 import com.box.androidsdk.content.BoxFutureTask;
+import com.box.androidsdk.content.auth.BoxAuthentication;
+import com.box.androidsdk.content.listeners.DownloadStartListener;
 import com.box.androidsdk.content.models.BoxDownload;
 import com.box.androidsdk.content.models.BoxItem;
 import com.box.androidsdk.content.models.BoxSession;
@@ -64,7 +67,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 
-public class DownloadFileService extends IntentService implements LiveAuthListener {
+public class DownloadFileService extends IntentService implements LiveAuthListener{
 
     final static private String NOTIFICATION_KEY="ComicViewerNotifGroup";
 
@@ -76,8 +79,11 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
     private static final String ACTION_GOOGLEDRIVE_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.GOOGLEDRIVEDOWNLOAD";
     private static final String ACTION_BOX_DOWNLOAD = "com.comicviewer.cedric.comicviewer.CloudFiles.action.BOXDOWNLOAD";
 
+    private BoxApiFile mBoxFileApi;
+    private BoxSession mSession;
 
     private LiveConnectClient mLiveConnectClient = null;
+
 
     public static void startActionDownload(Context context, String fileUrl, CloudService cloudService) {
 
@@ -159,49 +165,93 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
     private void handleActionDownload(final BoxItem boxItem, final CloudService cloudService)
     {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boxFileDownload(boxItem, cloudService);
-            }
-        }).run();
+        BoxConfig.CLIENT_ID = getString(R.string.box_client_id);
+        BoxConfig.CLIENT_SECRET = getString(R.string.box_client_secret);
+        BoxConfig.REDIRECT_URL = getString(R.string.box_redirect_url);
+        BoxConfig.IS_LOG_ENABLED = true;
+
+        mSession = new BoxSession(this, cloudService.getEmail());
+        mSession.authenticate();
+        boxFileDownload(boxItem,cloudService);
     }
 
     private void boxFileDownload(final BoxItem boxItem, final CloudService cloudService)
     {
-        BoxConfig.CLIENT_ID = getString(R.string.box_client_id);
-        BoxConfig.CLIENT_SECRET = getString(R.string.box_client_secret);
-        BoxConfig.REDIRECT_URL = getString(R.string.box_redirect_url);
+        mBoxFileApi = new BoxApiFile(mSession);
 
-        final BoxSession session = new BoxSession(this, cloudService.getEmail());
-        /*
-        session.authenticate().addOnCompletedListener(new BoxFutureTask.OnCompletedListener<BoxSession>() {
-            @Override
-            public void onCompleted(BoxResponse<BoxSession> boxResponse) {
+        final int notificationId = mRand.nextInt();
 
-                final int notificationId = mRand.nextInt();
+        createStartNotification(boxItem.getName(), notificationId);
 
-                createStartNotification(boxItem.getName(), notificationId);
+        File boxDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Box");
+        if (!boxDir.exists())
+            boxDir.mkdir();
+        File output = new File(boxDir.getAbsolutePath() + "/" + boxItem.getName());
+        File renamedOutput = new File(output.getAbsolutePath() + ".mcvdownload");
 
-                if (boxResponse.isSuccess()) {
-                    BoxApiFile fileApi = new BoxApiFile(session);
-                    BoxDownload fileDownload = fileApi.getDownloadRequest(file, "fileId")
+        if (!output.exists())
+        {
+            if (renamedOutput.exists())
+                renamedOutput.delete();
+            OutputStream outputStream = null;
+            try {
+                outputStream = new FileOutputStream(renamedOutput);
+            } catch (Exception e) {
+                System.out.println("Outputstream exception");
+                e.printStackTrace(System.out);
+                setErrorNotification(boxItem.getName(), notificationId);
+            }
+
+            if (outputStream!=null) {
+                try {
+                    BoxDownload fileDownload = mBoxFileApi.getDownloadRequest(outputStream, boxItem.getId())
                             // Optional: Set a listener to track download progress.
-                            .setProgressListener(new ProgressListener() {
+                            .setProgressListener(new com.box.androidsdk.content.listeners.ProgressListener() {
+
+                                long progress = 0;
+
                                 @Override
-                                public void onProgress(long l, long l1) {
-
+                                public void onProgressChanged(long l, long l1) {
+                                    if (l > progress + 1000000) {
+                                        progress += l;
+                                        setNotificationProgress(l, l1, boxItem.getName(), notificationId);
+                                    }
                                 }
-
                             })
                             .send();
                 }
-                else {
-                    boxResponse.getException().printStackTrace();
+                catch (Exception e)
+                {
+                    System.out.println("fileDownload exception");
+                    e.printStackTrace(System.out);
                 }
+
+                renamedOutput.renameTo(output);
+
+                try {
+                    outputStream.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+
+                if (!filepaths.contains(boxDir.getAbsolutePath())) {
+                    filepaths.add(boxDir.getAbsolutePath());
+                    PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                }
+
+                setEndNotification(boxItem.getName(), output.getAbsolutePath(), notificationId);
             }
-        });
-        */
+
+        }
+        else
+        {
+            createFileExistsNotification(boxItem.getName(),notificationId);
+        }
+
     }
 
     private void handleActionDownload(final String fileName, final String url, final CloudService cloudService)
@@ -589,6 +639,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
     private void createFileExistsNotification(String title, int id)
     {
         mNotification = new NotificationCompat.Builder(this)
+                .setColor(PreferenceSetter.getAppThemeColor(this))
                 .setSmallIcon(R.drawable.ic_recents)
                 .setContentTitle("Material Comic Viewer")
                 .setContentText(getString(R.string.error)+": "+title + " "+getString(R.string.already_exists));
@@ -607,6 +658,11 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
         resultIntent.setData(uri);
         resultIntent.setAction(Intent.ACTION_VIEW);
+        if (PreferenceSetter.usesRecents(this))
+        {
+            resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+            resultIntent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        }
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
         // This ensures that navigating backward from the Activity leads out of
@@ -621,9 +677,11 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                         0,
                         PendingIntent.FLAG_ONE_SHOT
                 );
+
         mNotification.setContentIntent(resultPendingIntent);
         mNotification.setContentText(getString(R.string.finished_downloading) + ": " + title);
         mNotification.setProgress(0, 0, false);
+        mNotification.setSmallIcon(R.drawable.ic_check);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -691,4 +749,5 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
     public void onAuthError(LiveAuthException exception, Object userState) {
 
     }
+
 }
