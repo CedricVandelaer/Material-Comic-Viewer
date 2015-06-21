@@ -50,7 +50,10 @@ import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.purplebrain.adbuddiz.sdk.AdBuddiz;
 
 import java.io.File;
+import java.lang.Math;
+import java.lang.System;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 /**
@@ -219,15 +222,17 @@ public class DisplayComicActivity extends AppCompatActivity {
         if (PreferenceSetter.getScreenOnSetting(this))
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        Random random = new Random(System.currentTimeMillis());
+        int randInt = random.nextInt(9);
 
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                showAd();
-            }
-        },3000);
-
-
+        if (randInt<3) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showAd();
+                }
+            }, 3000);
+        }
     }
 
     private void setFabClickListener() {

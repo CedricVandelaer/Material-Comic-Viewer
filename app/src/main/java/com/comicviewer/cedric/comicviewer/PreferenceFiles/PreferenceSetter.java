@@ -1451,7 +1451,8 @@ public class PreferenceSetter {
         {
             if (!pair.isEmpty()) {
                 int splitPosition = pair.lastIndexOf(":");
-                lastReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
+                if (splitPosition>=0 && splitPosition<=pair.length())
+                    lastReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
             }
         }
 
