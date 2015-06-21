@@ -175,5 +175,13 @@
     <string name="choose_accent_color">악센트 색상을 선택</string>
     <string name="go_to_page">페이지로 이동</string>
     <string name="collections">컬렉션</string>
+    <string name="show_toolbar">옵션 도구 모음을 표시</string>
+    <string name="add_cloud_storage_account">클라우드 스토리지를 추가</string>
+    <string name="force_portrait_setting">당당한 세로 모드</string>
+    <string name="device">장치</string>
+    <string name="export_data">수출 데이터</string>
+    <string name="import_data">데이터 가져 오기</string>
+    <string name="rate_app">속도 응용 프로그램</string>
+    <string name="find_comic_viewer_on">우리를 찾기 :</string>
 
 </resources>

@@ -176,11 +176,11 @@ public class StatisticsFragment extends Fragment {
 
         for (String key:seriesReadMap.keySet())
         {
-            int pagesForSerie = seriesReadMap.get(key);
+            int pagesForSeries = seriesReadMap.get(key);
 
-            if ( pagesForSerie > seriesPages)
+            if ( pagesForSeries > seriesPages)
             {
-                seriesPages = pagesForSerie;
+                seriesPages = pagesForSeries;
                 seriesName = key;
             }
         }

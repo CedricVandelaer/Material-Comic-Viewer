@@ -4,6 +4,7 @@ package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -89,6 +90,10 @@ public class DisplayComicActivity extends AppCompatActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
+
+        if (PreferenceSetter.getForcePortraitSetting(this))
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 
         mFab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -238,9 +243,9 @@ public class DisplayComicActivity extends AppCompatActivity {
             pages[i] = "" + (i + 1);
         }
         MaterialDialog dialog = new MaterialDialog.Builder(DisplayComicActivity.this)
-                .title("Go to page")
+                .title(getString(R.string.go_to_page))
                 .negativeColor(PreferenceSetter.getAppThemeColor(DisplayComicActivity.this))
-                .negativeText("Cancel")
+                .negativeText(getString(R.string.cancel))
                 .items(pages)
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override

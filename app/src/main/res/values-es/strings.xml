@@ -177,5 +177,13 @@ no se puede borrar"</string>
     <string name="choose_accent_color">Elije el color de acento</string>
     <string name="go_to_page">Ir a la página</string>
     <string name="collections">Colecciones</string>
+    <string name="add_cloud_storage_account">Añadir perfil almacenamiento en la nube</string>
+    <string name="show_toolbar">Muestre la barra de herramientas para las opciones</string>
+    <string name="force_portrait_setting">Modo vertical obligatoria</string>
+    <string name="device">Dispositivo</string>
+    <string name="export_data">Exportar datos</string>
+    <string name="import_data">Importar datos</string>
+    <string name="rate_app">Calificar aplicacion</string>
+    <string name="find_comic_viewer_on">Encontrar Comic Viewer en:</string>
 
 </resources>

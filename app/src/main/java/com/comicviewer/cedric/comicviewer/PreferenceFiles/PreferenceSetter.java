@@ -14,6 +14,9 @@ import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -79,8 +82,54 @@ public class PreferenceSetter {
     public static final String VIEWPAGER_ANIMATION_SETTING="viewPagerAnimationSetting";
     public static final String TOOLBAR_OPTION = "toolbarOption";
     public static final String COLLECTIONS_LIST = "collectionsList";
+    public static final String FORCE_PORTRAIT_SETTING = "forcePortrait";
 
     public static final String COMIC_VIEWER = "ComicViewer";
+
+    public static boolean getForcePortraitSetting(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(FORCE_PORTRAIT_SETTING, false);
+    }
+
+    public static void createCollection(Context context, String collectionName)
+    {
+
+        JSONObject collections = getCollectionList(context);
+        try {
+            collections.put(collectionName, new JSONArray());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(COLLECTIONS_LIST, collections.toString());
+        editor.apply();
+    }
+
+    public static JSONObject getCollectionList(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String collectionListString = prefs.getString(COLLECTIONS_LIST, null);
+
+        if (collectionListString == null)
+        {
+            return new JSONObject();
+        }
+        else
+        {
+            try
+            {
+                return new JSONObject(collectionListString);
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+                return new JSONObject();
+            }
+        }
+    }
 
 
     public static boolean getToolbarOption(Context context)
@@ -340,21 +389,6 @@ public class PreferenceSetter {
         }
     }
 
-
-    public static String getLastUsedGoogleAccount(Context context)
-    {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(LAST_USED_GOOGLE_ACCOUNT, null);
-    }
-
-    public static void saveLastUsedGoogleAccount(Context context, String id)
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        editor.putString(LAST_USED_GOOGLE_ACCOUNT, id);
-
-        editor.apply();
-    }
 
     public static boolean getVolumeKeyPreference(Context context)
     {
@@ -883,7 +917,7 @@ public class PreferenceSetter {
         }
         else
         {
-            return "None";
+            return context.getString(R.string.none);
         }
     }
 

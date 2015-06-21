@@ -23,7 +23,6 @@
     <string name="google_plus_community_url" translatable="false">https://plus.google.com/u/0/communities/117118264783586161349</string>
     <string name="facebook_page_url" translatable="false">https://www.facebook.com/MaterialComicViewer</string>
     <string name="cloud_storage_4" translatable="false">BOX</string>
-    <string name="rate_app" translatable="false">Rate app</string>
     <string name="box_client_id" translatable="false">a8f6tsc2oq3dvsxhmr13w0hobkqlpcsx</string>
     <string name="box_client_secret" translatable="false">tXojRoqQm8y0pbtS92raqprQTgcTKSbI</string>
     <string name="box_redirect_url" translatable="false">https://plus.google.com/u/0/communities/117118264783586161349</string>
@@ -203,7 +202,12 @@
     <string name="choose_accent_color">Choose accent color</string>
     <string name="go_to_page">Go to page</string>
     <string name="collections">Collections</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="show_toolbar">Show toolbar for options</string>
+    <string name="force_portrait_setting">Force portrait mode</string>
+    <string name="add_cloud_storage_account">Add cloud storage account</string>
+    <string name="device">Device</string>
+    <string name="export_data">Export data</string>
+    <string name="import_data">Import data</string>
+    <string name="rate_app">Rate app</string>
+    <string name="find_comic_viewer_on">Find Comic Viewer on:</string>
 </resources>

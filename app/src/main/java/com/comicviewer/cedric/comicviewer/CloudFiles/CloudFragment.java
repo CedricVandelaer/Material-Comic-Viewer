@@ -286,7 +286,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             public void onClick(View v) {
 
                 new MaterialDialog.Builder(getActivity())
-                        .title("Add cloud storage account")
+                        .title(getString(R.string.add_cloud_storage_account))
                         .items(R.array.Cloud_storage_services)
                         .itemsCallback(new MaterialDialog.ListCallback() {
                             @Override
@@ -304,7 +304,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                 }
                             }
                         })
-                        .negativeText("Cancel")
+                        .negativeText(getString(R.string.cancel))
                         .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
                         .show();
 

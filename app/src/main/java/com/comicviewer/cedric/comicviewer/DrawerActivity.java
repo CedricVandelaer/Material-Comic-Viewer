@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -117,9 +118,13 @@ public class DrawerActivity extends MaterialNavigationDrawer
             section.setOnClickListener(new MaterialSectionListener() {
                 @Override
                 public void onClick(MaterialSection materialSection) {
+                    for (MaterialSection sec : mSectionsArray) {
+                        sec.unSelect();
+                    }
                     NavigationManager.getInstance().pushToSectionStack(materialSection);
                     setSection(materialSection);
-                    setFragment(getFragment(materialSection),materialSection.getTitle());
+                    setFragment(getFragment(materialSection), materialSection.getTitle());
+
                 }
             });
         }
@@ -213,6 +218,10 @@ public class DrawerActivity extends MaterialNavigationDrawer
                 }
                 else
                 {
+                    for (MaterialSection sec:mSectionsArray)
+                    {
+                        sec.unSelect();
+                    }
                     setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
                             NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
                     setSection(NavigationManager.getInstance().getSectionFromSectionStack());
@@ -228,6 +237,10 @@ public class DrawerActivity extends MaterialNavigationDrawer
             }
             else
             {
+                for (MaterialSection sec:mSectionsArray)
+                {
+                    sec.unSelect();
+                }
                 setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
                         NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
                 setSection(NavigationManager.getInstance().getSectionFromSectionStack());

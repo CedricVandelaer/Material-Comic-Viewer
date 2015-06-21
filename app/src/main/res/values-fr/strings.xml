@@ -173,7 +173,14 @@
     <string name="app_accent_color_setting">Couleur d\'accent</string>
     <string name="app_accent_color_setting_non_pro">Couleur d\'accent(PRO)</string>
     <string name="choose_accent_color">Choissisez la couleur d\'accent</string>
+    <string name="add_cloud_storage_account">Ajoute de stockage en nuage</string>
     <string name="go_to_page">Allez à la page</string>
+    <string name="show_toolbar">Montrez la barre d\'outils pour les options</string>
+    <string name="force_portrait_setting">Impose mode portrait</string>
     <string name="collections">Collections</string>
-
+    <string name="device">Dispositif</string>
+    <string name="export_data">Exporter des données</string>
+    <string name="import_data">Importer des données</string>
+    <string name="rate_app">Évaluez app</string>
+    <string name="find_comic_viewer_on">Trouvez Comic Viewer sur:</string>
 </resources>

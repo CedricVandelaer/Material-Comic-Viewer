@@ -96,6 +96,9 @@ public class DisplayComicActivity extends AppCompatActivity {
 
         getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
 
+        if (PreferenceSetter.getForcePortraitSetting(this))
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         mHandler = new Handler();
 
         mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -255,9 +258,9 @@ public class DisplayComicActivity extends AppCompatActivity {
             pages[i] = "" + (i + 1);
         }
         MaterialDialog dialog = new MaterialDialog.Builder(DisplayComicActivity.this)
-                .title("Go to page")
+                .title(getString(R.string.go_to_page))
                 .negativeColor(PreferenceSetter.getAppThemeColor(DisplayComicActivity.this))
-                .negativeText("Cancel")
+                .negativeText(getString(R.string.cancel))
                 .items(pages)
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override

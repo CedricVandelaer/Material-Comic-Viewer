@@ -54,7 +54,11 @@
             android:defaultValue="false"/>
         <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
             android:key="toolbarOption"
-            android:title="Show toolbar for options"
+            android:title="@string/show_toolbar"
+            android:defaultValue="false"/>
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="forcePortrait"
+            android:title="@string/force_portrait_setting"
             android:defaultValue="false"/>
         <ListPreference
             android:key="readingBackgroundColor"
@@ -68,6 +72,7 @@
             android:defaultValue="@string/page_number_setting_1"
             android:entries="@array/Page_number_settings"
             android:entryValues="@array/Page_number_settings"/>
+
     </com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory>
 
     <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory

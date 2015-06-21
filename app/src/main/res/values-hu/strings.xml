@@ -157,7 +157,7 @@
     <string name="white">Fehér</string>
     <string name="page_flip_animation_setting_non_pro">Lapozás animáció (PRO)</string>
     <string name="page_flip_animation_setting">Lapozás animáció</string>
-    <string name="none">Nincs</string>
+    <string name="none">Még nincs</string>
     <string name="accordion">Harmonika</string>
     <string name="cube">Kocka</string>
     <string name="foreground_to_background">Előtérből háttérbe</string>
@@ -170,10 +170,17 @@
     <string name="changelog">Újdonságok</string>
     <string name="synchronization">Szinkronizáció</string>
     <string name="app_accent_color_setting">Kiemelő szín</string>
-    <string name="app_accent_color_setting_non_pro">Kiemelő szín(PRO)</string>
-    <string name="choose_accent_color">Válaszd akcentussal színe</string>
-    <string name="go_to_page">Menj az oldalra</string>
+    <string name="app_accent_color_setting_non_pro">Kiemelő szín (PRO)</string>
+    <string name="choose_accent_color">Válassz kiemelõ színt</string>
+    <string name="go_to_page">Ugrás az oldalra</string>
+    <string name="add_cloud_storage_account">Felhõtárhely fiók hozzáadása</string>
+    <string name="force_portrait_setting">Impozáns portré mód</string>
+    <string name="show_toolbar">Eszköztár mutatása</string>
     <string name="collections">Gyűjtemények</string>
-
+    <string name="device">Eszköz</string>
+    <string name="export_data">Adat exportálás</string>
+    <string name="import_data">Adat importálás</string>
+    <string name="rate_app">Értékelés</string>
+    <string name="find_comic_viewer_on">Comic Viewer felkeresése:</string>
 
 </resources>

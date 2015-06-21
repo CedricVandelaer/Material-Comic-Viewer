@@ -68,7 +68,7 @@ public class SynchronisationFragment extends Fragment {
                 dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
                     public void directorySelected(final File directory) {
                         Log.d(getClass().getName(), "Selected directory: " + directory.toString());
-                        new MaterialDialog.Builder(getActivity()).title("Export data")
+                        new MaterialDialog.Builder(getActivity()).title(getString(R.string.export_data))
                                 .content("The data will be exported to the folder \n\"" + directory.toString() + "\"\nDo you want to continue?")
                                 .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
                                 .positiveText(getString(R.string.confirm))
@@ -98,7 +98,7 @@ public class SynchronisationFragment extends Fragment {
                     @Override
                     public void fileSelected(final File file) {
                         Log.d(getClass().getName(), "Selected file: " + file.toString());
-                        new MaterialDialog.Builder(getActivity()).title("Import data")
+                        new MaterialDialog.Builder(getActivity()).title(getString(R.string.import_data))
                                 .content("The data of \"" + file.getName() + "\" will be imported.\nDo you want to continue?")
                                 .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
                                 .positiveText(getString(R.string.confirm))
