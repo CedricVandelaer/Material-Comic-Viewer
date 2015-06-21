@@ -175,5 +175,7 @@
     <string name="app_accent_color_setting_non_pro">Accento di colore(PRO)</string>
     <string name="choose_accent_color">Scegli il colore accento</string>
     <string name="go_to_page">Vai alla pagina</string>
+    <string name="collections">Collezioni</string>
+
 
 </resources>

@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CurrentlyReadingFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
@@ -51,7 +52,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
         new SimpleEula(this).show();
         new SetTaskDescriptionTask().execute();
 
-        mSectionsArray = new MaterialSection[8];
+        mSectionsArray = new MaterialSection[9];
 
         this.disableLearningPattern();
         this.setBackPattern(BACKPATTERN_CUSTOM);
@@ -79,29 +80,33 @@ public class DrawerActivity extends MaterialNavigationDrawer
         mSectionsArray[1] = currentlyReadingSection;
         addSection(currentlyReadingSection);
 
+        MaterialSection collectionsSection = newSection(getString(R.string.collections), R.drawable.castle, CollectionsFragment.getInstance());
+        mSectionsArray[2] = collectionsSection;
+        addSection(collectionsSection);
+
         MaterialSection favoritesSection = newSection(getString(R.string.favorites), R.drawable.star, FavoritesListFragment.getInstance());
-        mSectionsArray[2] = favoritesSection;
+        mSectionsArray[3] = favoritesSection;
         addSection(favoritesSection);
 
         CloudFragment.getInstance().setRetainInstance(true);
         MaterialSection cloudSection = newSection(getString(R.string.cloud_storage), R.drawable.cloud, CloudFragment.getInstance());
-        mSectionsArray[3] = cloudSection;
+        mSectionsArray[4] = cloudSection;
         addSection(cloudSection);
 
         MaterialSection statsSection = newSection(getString(R.string.statistics), R.drawable.stats, StatisticsFragment.newInstance());
-        mSectionsArray[4] = statsSection;
+        mSectionsArray[5] = statsSection;
         addSection(statsSection);
 
         MaterialSection syncSection = newSection(getString(R.string.synchronization), R.drawable.sync, SynchronisationFragment.newInstance());
-        mSectionsArray[5] = syncSection;
+        mSectionsArray[6] = syncSection;
         addSection(syncSection);
 
         MaterialSection settingsSection = newSection(getString(R.string.settings), R.drawable.settings, SettingsFragment.newInstance());
-        mSectionsArray[6] = settingsSection;
+        mSectionsArray[7] = settingsSection;
         addBottomSection(settingsSection);
         
         MaterialSection aboutSection = newSection(getString(R.string.about), R.drawable.about, AboutFragment.newInstance());
-        mSectionsArray[7] = aboutSection;
+        mSectionsArray[8] = aboutSection;
         addBottomSection(aboutSection);
 
         NavigationManager.getInstance().pushToSectionStack(mSectionsArray[0]);
@@ -139,6 +144,8 @@ public class DrawerActivity extends MaterialNavigationDrawer
             return AboutFragment.newInstance();
         else if (materialSection.getTitle().equals(getString(R.string.synchronization)))
             return SynchronisationFragment.newInstance();
+        else if (materialSection.getTitle().equals(getString(R.string.collections)))
+            return CollectionsFragment.getInstance();
         else
             return ComicListFragment.getInstance();
     }
@@ -235,14 +242,8 @@ public class DrawerActivity extends MaterialNavigationDrawer
         changeToolbarColor(PreferenceSetter.getAppThemeColor(this),darkenColor(PreferenceSetter.getAppThemeColor(this)));
         if (!NavigationManager.getInstance().sectionStackEmpty())
         {
-            if (NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.all_comics))
-                    || NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.currently_reading))
-                    || NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.favorites))
-                    || NavigationManager.getInstance().getSectionFromSectionStack().getTitle().equals(getString(R.string.cloud_storage))) {
-                setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
-                        NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
-            }
-
+            setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                    NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
         }
     }
 

@@ -202,4 +202,8 @@
     <string name="app_accent_color_setting_non_pro">App accent color (PRO)</string>
     <string name="choose_accent_color">Choose accent color</string>
     <string name="go_to_page">Go to page</string>
+    <string name="collections">Collections</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

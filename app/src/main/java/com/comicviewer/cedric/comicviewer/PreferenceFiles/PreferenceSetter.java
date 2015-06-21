@@ -78,8 +78,10 @@ public class PreferenceSetter {
     public static final String READING_BACKGROUND_COLOR = "readingBackgroundColor";
     public static final String VIEWPAGER_ANIMATION_SETTING="viewPagerAnimationSetting";
     public static final String TOOLBAR_OPTION = "toolbarOption";
+    public static final String COLLECTIONS_LIST = "collectionsList";
 
     public static final String COMIC_VIEWER = "ComicViewer";
+
 
     public static boolean getToolbarOption(Context context)
     {

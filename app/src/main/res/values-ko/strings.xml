@@ -174,4 +174,6 @@
     <string name="app_accent_color_setting_non_pro">컬러 프로)</string>
     <string name="choose_accent_color">악센트 색상을 선택</string>
     <string name="go_to_page">페이지로 이동</string>
+    <string name="collections">컬렉션</string>
+
 </resources>

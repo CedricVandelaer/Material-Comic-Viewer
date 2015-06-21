@@ -174,5 +174,6 @@
     <string name="app_accent_color_setting_non_pro">Accentkleur(PRO)</string>
     <string name="choose_accent_color">Kies de accentkleur</string>
     <string name="go_to_page">Ga naar pagina</string>
+    <string name="collections">Verzamelingen</string>
 
 </resources>
