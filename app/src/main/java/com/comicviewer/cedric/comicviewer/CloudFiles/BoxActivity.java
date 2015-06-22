@@ -54,6 +54,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
     private BoxAdapter mAdapter;
     private BoxSession mSession;
     private BoxApiFolder mBoxApiFolder;
+    private NavigationManager mNavigationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +121,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
             @Override
             public void onCompleted(BoxResponse<BoxSession> boxResponse) {
                 if (boxResponse.isSuccess()) {
-                    NavigationManager.getInstance().resetCloudStackWithString("0");
+                    mNavigationManager.resetCloudStackWithString("0");
                     mBoxApiFolder = new BoxApiFolder(mSession);
                     new GetBoxFilesTask().execute();
                 }
@@ -131,6 +132,11 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
         });
 
 
+    }
+
+    public NavigationManager getNavigationManager()
+    {
+        return mNavigationManager;
     }
 
     @Override
@@ -148,8 +154,8 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
     @Override
     public void onBackPressed()
     {
-        NavigationManager.getInstance().popFromCloudStack();
-        if (NavigationManager.getInstance().cloudStackEmpty())
+        mNavigationManager.popFromCloudStack();
+        if (mNavigationManager.cloudStackEmpty())
             finish();
         else
             refresh();
@@ -173,7 +179,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
                     mSwipeRefreshLayout.setRefreshing(true);
                 }
             });
-            String id = NavigationManager.getInstance().getPathFromCloudStack();
+            String id = mNavigationManager.getPathFromCloudStack();
 
             try {
                 final BoxListItems boxListItems = mBoxApiFolder.getItemsRequest(id).send();

@@ -25,6 +25,7 @@
             card_view:cardUseCompatPadding="true"
             android:id="@+id/card"
             android:clickable="true"
+            android:foreground="@drawable/ripple"
             >
 
             <RelativeLayout
@@ -36,12 +37,12 @@
                     android:layout_height="100dp"
                     android:layout_width="100dp"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"/>
+                    android:layout_marginStart="10dp"/>
                 <com.devspark.robototextview.widget.RobotoTextView
                     android:id="@+id/collection_title_text_view"
                     android:maxLines="3"
                     android:ellipsize="end"
-                    android:layout_toRightOf="@id/collection_image_view"
+                    android:layout_toEndOf="@id/collection_image_view"
                     android:layout_centerInParent="true"
                     android:padding="10dp"
                     android:text="Collection name"

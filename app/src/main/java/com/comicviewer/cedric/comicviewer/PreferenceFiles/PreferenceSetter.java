@@ -95,9 +95,11 @@ public class PreferenceSetter {
     public static void createCollection(Context context, String collectionName)
     {
 
-        JSONObject collections = getCollectionList(context);
+        JSONArray collections = getCollectionList(context);
         try {
-            collections.put(collectionName, new JSONArray());
+            JSONObject newCollection = new JSONObject();
+            newCollection.put(collectionName, new JSONArray());
+            collections.put(newCollection);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -108,25 +110,25 @@ public class PreferenceSetter {
         editor.apply();
     }
 
-    public static JSONObject getCollectionList(Context context)
+    public static JSONArray getCollectionList(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String collectionListString = prefs.getString(COLLECTIONS_LIST, null);
 
         if (collectionListString == null)
         {
-            return new JSONObject();
+            return new JSONArray();
         }
         else
         {
             try
             {
-                return new JSONObject(collectionListString);
+                return new JSONArray(collectionListString);
             }
             catch (JSONException e)
             {
                 e.printStackTrace();
-                return new JSONObject();
+                return new JSONArray();
             }
         }
     }
@@ -1579,16 +1581,16 @@ public class PreferenceSetter {
         String csvList = prefs.getString(FILEPATHS, defaultPath);
         String[] parts = csvList.split(",");
 
-        String newList = "";
+        StringBuilder newList = new StringBuilder();
 
         for (int i=0;i<parts.length;i++)
         {
             if (!parts[i].equals(path) || parts[i].equals(defaultPath))
-                newList+= path + ",";
+                newList.append(parts[i] + ",");
         }
 
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(FILEPATHS, newList);
+        editor.putString(FILEPATHS, newList.toString());
         editor.apply();
     }
 

@@ -183,5 +183,6 @@
     <string name="import_data">데이터 가져 오기</string>
     <string name="rate_app">속도 응용 프로그램</string>
     <string name="find_comic_viewer_on">우리를 찾기 :</string>
+    <string name="page_flip">페이지 플립</string>
 
 </resources>

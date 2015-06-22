@@ -14,8 +14,10 @@ public class NavigationManager {
     private Stack<String> mFileNavigationStack;
     private Stack<MaterialSection> mSectionNavigationStack;
     private Stack<String> mCloudStack;
+    private Stack<String> mFavoritesStack;
     public final static String ROOT = "root";
 
+    /*
     public static NavigationManager getInstance()
     {
         if (mSingleton==null)
@@ -24,7 +26,7 @@ public class NavigationManager {
         }
         return mSingleton;
     }
-
+    */
     public NavigationManager()
     {
         mFileNavigationStack = new Stack<>();

@@ -138,7 +138,7 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavigationManager.getInstance().pushPathToCloudStack(cloudFolderViewHolder.getDropboxEntry().path);
+                mActivity.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getDropboxEntry().path);
                 mActivity.refresh();
             }
         });

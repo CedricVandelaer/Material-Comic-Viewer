@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -55,14 +54,14 @@ import java.util.List;
 public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> {
 
     private List<Object> mComicList;
-    private Context mContext;
+    private AbstractComicListFragment mListFragment;
     private LayoutInflater mInflater;
     private int lastPosition=-1;
     private DisplayImageOptions mImageOptions;
     private ComicAdapter mRootAdapterReference = null;
     private Handler mHandler;
 
-    public ComicAdapter(Context context, List<Comic> comics, boolean dummy)
+    public ComicAdapter(AbstractComicListFragment listFragment, List<Comic> comics, boolean dummy)
     {
         setHasStableIds(true);
 
@@ -73,7 +72,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             comicList.add(comics.get(i));
         }
         mComicList=comicList;
-        mContext=context;
+        mListFragment=listFragment;
         mHandler = new Handler();
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
@@ -82,14 +81,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
 
-        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mInflater = (LayoutInflater) listFragment.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public ComicAdapter(Context context, List<Object> comics)
+    public ComicAdapter(AbstractComicListFragment context, List<Object> comics)
     {
         setHasStableIds(true);
         mComicList=comics;
-        mContext=context;
+        mListFragment=context;
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
@@ -97,14 +96,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
         mHandler = new Handler();
-        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mInflater = (LayoutInflater) context.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public ComicAdapter(Context context)
+    public ComicAdapter(AbstractComicListFragment context)
     {
         setHasStableIds(true);
         mComicList= Collections.synchronizedList(new ArrayList<Object>());
-        mContext=context;
+        mListFragment=context;
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
@@ -112,7 +111,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
         mHandler = new Handler();
-        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mInflater = (LayoutInflater) context.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     public void setRootAdapter(ComicAdapter comicAdapter)
@@ -124,14 +123,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
     public int getItemViewType(int position)
     {
         if (mComicList.get(position) instanceof Comic) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            String cardSize = prefs.getString("cardSize", mContext.getString(R.string.card_size_setting_2));
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mListFragment.getActivity());
+            String cardSize = prefs.getString("cardSize", mListFragment.getActivity().getString(R.string.card_size_setting_2));
 
-            if (cardSize.equals(mContext.getString(R.string.card_size_setting_2))) {
+            if (cardSize.equals(mListFragment.getActivity().getString(R.string.card_size_setting_2))) {
                 return 0;
-            } else if (cardSize.equals(mContext.getString(R.string.card_size_setting_1))) {
+            } else if (cardSize.equals(mListFragment.getActivity().getString(R.string.card_size_setting_1))) {
                 return 1;
-            } else if(cardSize.equals(mContext.getString(R.string.card_size_setting_4))) {
+            } else if(cardSize.equals(mListFragment.getActivity().getString(R.string.card_size_setting_4))) {
                 return 4;
             } else {
                 return 2;
@@ -190,19 +189,19 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
                 if (folderItemViewHolder.getFile().getName().equals("ComicViewer"))
                 {
-                    Toast.makeText(mContext, mContext.getString(R.string.folder_rename_error), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mListFragment.getActivity(), mListFragment.getActivity().getString(R.string.folder_rename_error), Toast.LENGTH_LONG).show();
                     return;
                 }
 
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                                .title(mContext.getString(R.string.rename_folder))
-                                .negativeText(mContext.getString(R.string.cancel))
-                                .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
-                                .positiveText(mContext.getString(R.string.confirm))
-                                .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
+                        MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
+                                .title(mListFragment.getActivity().getString(R.string.rename_folder))
+                                .negativeText(mListFragment.getActivity().getString(R.string.cancel))
+                                .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                                .positiveText(mListFragment.getActivity().getString(R.string.confirm))
+                                .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
                                 .inputType(InputType.TYPE_CLASS_TEXT)
                                 .input("Folder name",
                                         folderItemViewHolder.getFile().getName(), new MaterialDialog.InputCallback() {
@@ -222,7 +221,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                                                     new RenameTask().execute(oldPath, newPath, folderItemViewHolder.getFile());
 
                                                 } else {
-                                                    Toast.makeText(mContext, mContext.getString(R.string.folder_exists_notice), Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(mListFragment.getActivity(), mListFragment.getActivity().getString(R.string.folder_exists_notice), Toast.LENGTH_LONG).show();
                                                 }
 
                                             }
@@ -243,8 +242,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         @Override
         protected void onPreExecute()
         {
-            mDialog = new MaterialDialog.Builder(mContext).title(mContext.getString(R.string.renaming_folder))
-                    .content(mContext.getString(R.string.updating_folder_name_notice))
+            mDialog = new MaterialDialog.Builder(mListFragment.getActivity()).title(mListFragment.getActivity().getString(R.string.renaming_folder))
+                    .content(mListFragment.getActivity().getString(R.string.updating_folder_name_notice))
                     .cancelable(false)
                     .progress(true,1,false)
                     .show();
@@ -257,7 +256,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             String newPath = (String) params[1];
             File folder = (File) params[2];
 
-            PreferenceSetter.renamePaths(mContext, oldPath, newPath);
+            PreferenceSetter.renamePaths(mListFragment.getActivity(), oldPath, newPath);
             folder.renameTo(new File(newPath));
 
             return null;
@@ -268,6 +267,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         {
             if (mDialog!=null)
                 mDialog.dismiss();
+            //ComicListFragment.getInstance().refresh();
             ComicListFragment.getInstance().refresh();
         }
     }
@@ -278,8 +278,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 final Comic comic = comicItemViewHolder.getComic();
-                PreferenceSetter.saveMangaComic(mContext, comic);
-                PreferenceSetter.removeNormalComic(mContext, comic);
+                PreferenceSetter.saveMangaComic(mListFragment.getActivity(), comic);
+                PreferenceSetter.removeNormalComic(mListFragment.getActivity(), comic);
                 comicItemViewHolder.mSwipeLayout.close();
                 mHandler.postDelayed(new Runnable() {
                     @Override
@@ -301,15 +301,15 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 Log.d("ItemClick", "Delete " + folderItemViewHolder.getFile().getAbsolutePath());
                 final String path = folderItemViewHolder.getFile().getAbsolutePath();
 
-                MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                        .title(mContext.getString(R.string.warning))
-                        .content(mContext.getString(R.string.delete_folder_notice_1)+"\n\""+folderItemViewHolder.getFile().getName()
-                                +"\"\n"+ mContext.getString(R.string.delete_folder_notice_2) +" "+
-                                mContext.getString(R.string.sure_prompt))
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
-                        .positiveText(mContext.getString(R.string.accept))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
-                        .negativeText(mContext.getString(R.string.cancel))
+                MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
+                        .title(mListFragment.getActivity().getString(R.string.warning))
+                        .content(mListFragment.getActivity().getString(R.string.delete_folder_notice_1)+"\n\""+folderItemViewHolder.getFile().getName()
+                                +"\"\n"+ mListFragment.getActivity().getString(R.string.delete_folder_notice_2) +" "+
+                                mListFragment.getActivity().getString(R.string.sure_prompt))
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                        .positiveText(mListFragment.getActivity().getString(R.string.accept))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                        .negativeText(mListFragment.getActivity().getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
@@ -329,8 +329,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             public void onClick(View v) {
                 Log.d("ItemClick", folderItemViewHolder.getFile().getAbsolutePath());
                 String path = folderItemViewHolder.getFile().getAbsolutePath();
-                NavigationManager.getInstance().pushPathToFileStack(path);
-                ComicListFragment.getInstance().refresh();
+                mListFragment.getNavigationManager().pushPathToFileStack(path);
+                mListFragment.refresh();
             }
         });
     }
@@ -342,23 +342,23 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, DisplayComicActivity.class);
+                Intent intent = new Intent(mListFragment.getActivity(), DisplayComicActivity.class);
                 Comic clickedComic = (Comic) vh.getComic();
 
-                InputMethodManager imm = (InputMethodManager)mContext.getSystemService(
+                InputMethodManager imm = (InputMethodManager)mListFragment.getActivity().getSystemService(
                         Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                 Log.d("ItemClick", clickedComic.getTitle());
                 intent.putExtra("Comic", clickedComic);
 
-                if (PreferenceSetter.usesRecents(mContext))
+                if (PreferenceSetter.usesRecents(mListFragment.getActivity()))
                 {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                     intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                 }
 
-                mContext.startActivity(intent);
+                mListFragment.getActivity().startActivity(intent);
             }
         });
 
@@ -370,15 +370,15 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         if (mComicList.get(position) instanceof Comic) {
 
             ComicItemViewHolder comicItemViewHolder = (ComicItemViewHolder) itemViewHolder;
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            String cardSize = prefs.getString("cardSize", mContext.getString(R.string.card_size_setting_2));
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mListFragment.getActivity());
+            String cardSize = prefs.getString("cardSize", mListFragment.getActivity().getString(R.string.card_size_setting_2));
 
             comicItemViewHolder.mSwipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
             comicItemViewHolder.mSwipeLayout.addSwipeListener(new SimpleSwipeListener());
 
-            if (cardSize.equals(mContext.getString(R.string.card_size_setting_2)) || cardSize.equals(mContext.getString(R.string.card_size_setting_4))) {
+            if (cardSize.equals(mListFragment.getActivity().getString(R.string.card_size_setting_2)) || cardSize.equals(mListFragment.getActivity().getString(R.string.card_size_setting_4))) {
                 initialiseNormalCard(comicItemViewHolder, position);
-            } else if (cardSize.equals(mContext.getString(R.string.card_size_setting_1))) {
+            } else if (cardSize.equals(mListFragment.getActivity().getString(R.string.card_size_setting_1))) {
                 initialiseSmallCard(comicItemViewHolder, position);
             } else {
                 initialiseCardBg(comicItemViewHolder, position);
@@ -386,10 +386,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
 
 
-            if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG)) {
-                comicItemViewHolder.mMarkReadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mOptionsTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
-                comicItemViewHolder.mMangaTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            if (PreferenceSetter.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
+                comicItemViewHolder.mMarkReadTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
+                comicItemViewHolder.mOptionsTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
+                comicItemViewHolder.mMangaTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
             }
 
             comicItemViewHolder.setComic((Comic) mComicList.get(position));
@@ -398,13 +398,13 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             if (Build.VERSION.SDK_INT>15)
                 comicItemViewHolder.mMangaPicture.setBackground(null);
             comicItemViewHolder.mMangaPicture.setImageDrawable(null);
-            if (PreferenceSetter.getMangaSetting(mContext))
+            if (PreferenceSetter.getMangaSetting(mListFragment.getActivity()))
             {
-                if (PreferenceSetter.isNormalComic(mContext, comicItemViewHolder.getComic()))
+                if (PreferenceSetter.isNormalComic(mListFragment.getActivity(), comicItemViewHolder.getComic()))
                 {
                     comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
-                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
-                        Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
+                        Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
                         if (Build.VERSION.SDK_INT > 15)
                             comicItemViewHolder.mMangaPicture.setBackground(circle);
                     }
@@ -418,11 +418,11 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             }
             else
             {
-                if (PreferenceSetter.isMangaComic(mContext, comicItemViewHolder.getComic()))
+                if (PreferenceSetter.isMangaComic(mListFragment.getActivity(), comicItemViewHolder.getComic()))
                 {
                     comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
-                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
-                        Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
+                        Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
                         if (Build.VERSION.SDK_INT > 15)
                             comicItemViewHolder.mMangaPicture.setBackground(circle);
                     }
@@ -449,13 +449,13 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         File folder = (File) mComicList.get(i);
         folderItemViewHolder.mFolderTitleTextView.setText(folder.getName());
-        folderItemViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mContext)));
+        folderItemViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity())));
 
-        if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG)) {
+        if (PreferenceSetter.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
 
-            folderItemViewHolder.mDeleteTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
-            folderItemViewHolder.mRenameTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
-            folderItemViewHolder.mHideTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            folderItemViewHolder.mDeleteTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
+            folderItemViewHolder.mRenameTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
+            folderItemViewHolder.mHideTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
 
         }
 
@@ -485,7 +485,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
 
-                PreferenceSetter.addHiddenPath(mContext, vh.getFile().getAbsolutePath());
+                PreferenceSetter.addHiddenPath(mListFragment.getActivity(), vh.getFile().getAbsolutePath());
                 int pos = mComicList.indexOf(vh.getFile());
                 mComicList.remove(vh.getFile());
                 notifyItemRemoved(pos);
@@ -503,10 +503,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                                .title(mContext.getString(R.string.options))
-                                .positiveText(mContext.getString(R.string.cancel))
-                                .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
+                        MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
+                                .title(mListFragment.getActivity().getString(R.string.options))
+                                .positiveText(mListFragment.getActivity().getString(R.string.cancel))
+                                .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
                                 .customView(R.layout.options_menu_layout, true)
                                 .show();
 
@@ -537,7 +537,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             public void onClick(View v) {
 
                 dialog.dismiss();
-                PreferenceSetter.addHiddenPath(mContext, comic.getFilePath() + "/" + comic.getFileName());
+                PreferenceSetter.addHiddenPath(mListFragment.getActivity(), comic.getFilePath() + "/" + comic.getFileName());
                 int pos = mComicList.indexOf(comic);
                 mComicList.remove(comic);
                 notifyItemRemoved(pos);
@@ -563,8 +563,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         @Override
         public void onPreExecute()
         {
-            mDialog = new MaterialDialog.Builder(mContext).title(mContext.getString(R.string.reloading_comic))
-                    .content(mContext.getString(R.string.updating_data_notice))
+            mDialog = new MaterialDialog.Builder(mListFragment.getActivity()).title(mListFragment.getActivity().getString(R.string.reloading_comic))
+                    .content(mListFragment.getActivity().getString(R.string.updating_data_notice))
                     .cancelable(false)
                     .progress(true,1,false)
                     .show();
@@ -576,7 +576,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             Comic comic = (Comic) params[0];
             Integer pos = mComicList.indexOf(comic);
 
-            ComicLoader.loadComicSync(mContext, comic);
+            ComicLoader.loadComicSync(mListFragment.getActivity(), comic);
 
             return pos;
         }
@@ -598,8 +598,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             public void onClick(View v) {
 
                 dialog.dismiss();
-                PreferenceSetter.removeMangaComic(mContext, comic);
-                PreferenceSetter.saveNormalComic(mContext, comic);
+                PreferenceSetter.removeMangaComic(mListFragment.getActivity(), comic);
+                PreferenceSetter.saveNormalComic(mListFragment.getActivity(), comic);
                 int pos = mComicList.indexOf(comic);
                 notifyItemChanged(pos);
             }
@@ -616,14 +616,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        Intent intent = new Intent(mContext, InfoActivity.class);
+                        Intent intent = new Intent(mListFragment.getActivity(), InfoActivity.class);
                         intent.putExtra("Comic", comic);
                         if (Build.VERSION.SDK_INT > 20) {
-                            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ComicListFragment.getInstance().getActivity(),
+                            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(mListFragment.getActivity(),
                                     vh.mCoverPicture, "cover");
-                            mContext.startActivity(intent, options.toBundle());
+                            mListFragment.getActivity().startActivity(intent, options.toBundle());
                         } else {
-                            mContext.startActivity(intent);
+                            mListFragment.getActivity().startActivity(intent);
                         }
                     }
                 }, 100);
@@ -641,17 +641,17 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
                 dialog.dismiss();
 
-                if (PreferenceSetter.getReadComics(mContext).containsKey((comic.getFileName()))) {
+                if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey((comic.getFileName()))) {
 
 
-                    ComicActions.markComicUnread(mContext, comic);
+                    ComicActions.markComicUnread(mListFragment.getActivity(), comic);
                     int pos = mComicList.indexOf(comic);
                     notifyItemChanged(pos);
                 }
                 else
                 {
                     //Do nothing, already marked as unread
-                    Toast message = Toast.makeText(mContext, mContext.getString(R.string.not_started_toast), Toast.LENGTH_SHORT);
+                    Toast message = Toast.makeText(mListFragment.getActivity(), mListFragment.getActivity().getString(R.string.not_started_toast), Toast.LENGTH_SHORT);
                     message.show();
                 }
             }
@@ -680,11 +680,11 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 final String finalMessage = message;
                 final String fileName = comic.getFileName();
 
-                new AlertDialog.Builder(mContext)
-                        .setTitle(mContext.getString(R.string.confirm_delete))
-                        .setMessage(mContext.getString(R.string.sure_delete_prompt)+" "+finalMessage+"?\n" +
-                                mContext.getString(R.string.will_also_remove_file)+" \""+fileName+"\".")
-                        .setPositiveButton(mContext.getString(R.string.yes), new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(mListFragment.getActivity())
+                        .setTitle(mListFragment.getActivity().getString(R.string.confirm_delete))
+                        .setMessage(mListFragment.getActivity().getString(R.string.sure_delete_prompt)+" "+finalMessage+"?\n" +
+                                mListFragment.getActivity().getString(R.string.will_also_remove_file)+" \""+fileName+"\".")
+                        .setPositiveButton(mListFragment.getActivity().getString(R.string.yes), new DialogInterface.OnClickListener() {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -692,7 +692,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                             }
 
                         })
-                        .setNegativeButton(mContext.getString(R.string.no), null)
+                        .setNegativeButton(mListFragment.getActivity().getString(R.string.no), null)
                         .show();
             }
         });
@@ -709,7 +709,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        ComicActions.markComicRead(mContext, comic);
+                        ComicActions.markComicRead(mListFragment.getActivity(), comic);
                         int pos = mComicList.indexOf(comic);
                         notifyItemChanged(pos);
                     }
@@ -726,10 +726,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PreferenceSetter.getFavoriteComics(mContext).contains(vh.getComic().getFileName())) {
-                    PreferenceSetter.removeFavoriteComic(mContext, vh.getComic().getFileName());
+                if (PreferenceSetter.getFavoriteComics(mListFragment.getActivity()).contains(vh.getComic().getFileName())) {
+                    PreferenceSetter.removeFavoriteComic(mListFragment.getActivity(), vh.getComic().getFileName());
                 } else {
-                    PreferenceSetter.saveFavoriteComic(mContext, vh.getComic().getFileName());
+                    PreferenceSetter.saveFavoriteComic(mListFragment.getActivity(), vh.getComic().getFileName());
                 }
                 notifyItemChanged(vh.getPosition());
             }
@@ -760,23 +760,23 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 comicItemViewHolder.mCardView.setCardBackgroundColor(comic.getComicColor());
             }
             if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mListFragment.getActivity()).build();
                 ImageLoader.getInstance().init(config);
             }
 
             ImageLoader.getInstance().displayImage(comic.getCoverImage(), comicItemViewHolder.mCoverPicture, mImageOptions);
         }
-        Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+        Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
         if (Build.VERSION.SDK_INT>15)
             comicItemViewHolder.mFavoriteButton.setBackground(circle);
 
-        if (PreferenceSetter.getReadComics(mContext).containsKey(comic.getFileName()))
+        if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey(comic.getFileName()))
         {
 
             if (Build.VERSION.SDK_INT>15)
                 comicItemViewHolder.mLastReadIcon.setBackground(circle);
 
-            if (PreferenceSetter.getReadComics(mContext).get(comic.getFileName())+1==comic.getPageCount())
+            if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get(comic.getFileName())+1==comic.getPageCount())
             {
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
@@ -796,7 +796,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 comicItemViewHolder.mLastReadIcon.getBackground().setAlpha(0);
         }
 
-        if (PreferenceSetter.getFavoriteComics(mContext).contains(comic.getFileName()))
+        if (PreferenceSetter.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
         {
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star, comicItemViewHolder.mFavoriteButton);
         }
@@ -817,7 +817,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         if (comic.getIssueNumber()!=-1) {
             comicItemViewHolder.mIssueNumber.setVisibility(View.VISIBLE);
-            comicItemViewHolder.mIssueNumber.setText(mContext.getString(R.string.issue_number) + ": " + comic.getIssueNumber());
+            comicItemViewHolder.mIssueNumber.setText(mListFragment.getActivity().getString(R.string.issue_number) + ": " + comic.getIssueNumber());
         }
         else {
             comicItemViewHolder.mIssueNumber.setVisibility(View.GONE);
@@ -825,7 +825,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         if (comic.getYear()!=-1) {
             comicItemViewHolder.mYear.setVisibility(View.VISIBLE);
-            comicItemViewHolder.mYear.setText(mContext.getString(R.string.year) + ": " + comic.getYear());
+            comicItemViewHolder.mYear.setText(mListFragment.getActivity().getString(R.string.year) + ": " + comic.getYear());
         }
         else {
             comicItemViewHolder.mYear.setVisibility(View.GONE);
@@ -833,7 +833,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         if (comic.getPageCount()!=-1) {
             comicItemViewHolder.mPageCount.setVisibility(View.VISIBLE);
-            comicItemViewHolder.mPageCount.setText(mContext.getString(R.string.pages) + ": " + comic.getPageCount());
+            comicItemViewHolder.mPageCount.setText(mListFragment.getActivity().getString(R.string.pages) + ": " + comic.getPageCount());
         }
         else {
             comicItemViewHolder.mPageCount.setVisibility(View.GONE);
@@ -856,17 +856,17 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
         else
         {
-            comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
+            comicItemViewHolder.mTitle.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.White));
 
-            comicItemViewHolder.mIssueNumber.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
-            comicItemViewHolder.mPageCount.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
-            comicItemViewHolder.mYear.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
+            comicItemViewHolder.mIssueNumber.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
+            comicItemViewHolder.mPageCount.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
+            comicItemViewHolder.mYear.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
 
-            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mContext));
+            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()));
         }
 
-        Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
-        if (comic.getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+        Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
+        if (comic.getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
             if (Build.VERSION.SDK_INT > 15)
                 comicItemViewHolder.mFavoriteButton.setBackground(circle);
         }
@@ -876,7 +876,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 comicItemViewHolder.mFavoriteButton.setBackground(null);
         }
 
-        if (PreferenceSetter.getFavoriteComics(mContext).contains(comic.getFileName()))
+        if (PreferenceSetter.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
         {
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star, comicItemViewHolder.mFavoriteButton);
         }
@@ -885,10 +885,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star_outline, comicItemViewHolder.mFavoriteButton);
         }
 
-        if (PreferenceSetter.getReadComics(mContext).containsKey(comic.getFileName()))
+        if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey(comic.getFileName()))
         {
             //comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
-            if (comic.getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+            if (comic.getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
                 if (Build.VERSION.SDK_INT > 15)
                     comicItemViewHolder.mLastReadIcon.setBackground(circle);
             }
@@ -897,7 +897,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 if (Build.VERSION.SDK_INT > 15)
                     comicItemViewHolder.mLastReadIcon.setBackground(null);
             }
-            if (PreferenceSetter.getReadComics(mContext).get((comic.getFileName()))+1==comic.getPageCount())
+            if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
             {
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
@@ -914,7 +914,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
 
         if (!ImageLoader.getInstance().isInited()) {
-            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext).build();
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mListFragment.getActivity()).build();
             ImageLoader.getInstance().init(config);
         }
 
@@ -936,25 +936,25 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
         comicItemViewHolder.mTitle.setText(comic.getTitle());
         if (comic.getIssueNumber()!= -1)
-            comicItemViewHolder.mIssueNumber.setText(mContext.getString(R.string.issue_number)+": "+comic.getIssueNumber());
+            comicItemViewHolder.mIssueNumber.setText(mListFragment.getActivity().getString(R.string.issue_number)+": "+comic.getIssueNumber());
         else
             comicItemViewHolder.mIssueNumber.setText("");
 
         if (comic.getYear()!=-1)
-            comicItemViewHolder.mYear.setText(mContext.getString(R.string.year)+": "+comic.getYear());
+            comicItemViewHolder.mYear.setText(mListFragment.getActivity().getString(R.string.year)+": "+comic.getYear());
         else
             comicItemViewHolder.mYear.setText("");
 
         if (comic.getPageCount()!=-1)
-            comicItemViewHolder.mPageCount.setText(""+comic.getPageCount()+" "+mContext.getString(R.string.pages_no_capital));
+            comicItemViewHolder.mPageCount.setText(""+comic.getPageCount()+" "+mListFragment.getActivity().getString(R.string.pages_no_capital));
         else
             comicItemViewHolder.mPageCount.setText("");
 
         setAnimation(comicItemViewHolder.mCardView,i);
 
-        Drawable circle = mContext.getResources().getDrawable(R.drawable.dark_circle);
+        Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
 
-        if (PreferenceSetter.getFavoriteComics(mContext).contains(comic.getFileName()))
+        if (PreferenceSetter.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
         {
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star, comicItemViewHolder.mFavoriteButton);
         }
@@ -963,7 +963,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star_outline, comicItemViewHolder.mFavoriteButton);
         }
 
-        if (comic.getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+        if (comic.getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
             if (Build.VERSION.SDK_INT > 15)
                 comicItemViewHolder.mFavoriteButton.setBackground(circle);
         }
@@ -973,10 +973,10 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 comicItemViewHolder.mFavoriteButton.setBackground(null);
         }
 
-        if (PreferenceSetter.getReadComics(mContext).containsKey((comic.getFileName())))
+        if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey((comic.getFileName())))
         {
             comicItemViewHolder.mLastReadIcon.setVisibility(View.VISIBLE);
-            if (comic.getColorSetting().equals(mContext.getString(R.string.card_color_setting_3))) {
+            if (comic.getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
                 if (Build.VERSION.SDK_INT > 15)
                     comicItemViewHolder.mLastReadIcon.setBackground(circle);
             }
@@ -986,7 +986,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                     comicItemViewHolder.mLastReadIcon.setBackground(null);
             }
 
-            if (PreferenceSetter.getReadComics(mContext).get((comic.getFileName()))+1==comic.getPageCount())
+            if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
             {
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
@@ -1017,13 +1017,13 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
         else
         {
-            comicItemViewHolder.mTitle.setTextColor(mContext.getResources().getColor(R.color.White));
+            comicItemViewHolder.mTitle.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.White));
 
-            comicItemViewHolder.mIssueNumber.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
-            comicItemViewHolder.mPageCount.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
-            comicItemViewHolder.mYear.setTextColor(Utilities.darkenColor(mContext.getResources().getColor(R.color.White)));
+            comicItemViewHolder.mIssueNumber.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
+            comicItemViewHolder.mPageCount.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
+            comicItemViewHolder.mYear.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
 
-            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mContext));
+            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()));
         }
 
     }
@@ -1132,32 +1132,32 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
     private void setAnimation(View viewToAnimate, int position)
     {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String scrollAnimPref = prefs.getString("scrollAnimation", mContext.getString(R.string.scroll_animation_setting_1));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mListFragment.getActivity());
+        String scrollAnimPref = prefs.getString("scrollAnimation", mListFragment.getActivity().getString(R.string.scroll_animation_setting_1));
 
-        if (scrollAnimPref.equals(mContext.getString(R.string.scroll_animation_setting_1)))
+        if (scrollAnimPref.equals(mListFragment.getActivity().getString(R.string.scroll_animation_setting_1)))
         {
             //No animation
         }
-        else if (scrollAnimPref.equals(mContext.getString(R.string.scroll_animation_setting_2)))
+        else if (scrollAnimPref.equals(mListFragment.getActivity().getString(R.string.scroll_animation_setting_2)))
         {
             YoYo.with(Techniques.BounceIn)
                     .duration(400)
                     .playOn(viewToAnimate);
         }
-        else if (scrollAnimPref.equals(mContext.getString(R.string.scroll_animation_setting_3)))
+        else if (scrollAnimPref.equals(mListFragment.getActivity().getString(R.string.scroll_animation_setting_3)))
         {
             YoYo.with(Techniques.StandUp)
                     .duration(700)
                     .playOn(viewToAnimate);
         }
-        else if (scrollAnimPref.equals(mContext.getString(R.string.scroll_animation_setting_4)))
+        else if (scrollAnimPref.equals(mListFragment.getActivity().getString(R.string.scroll_animation_setting_4)))
         {
             YoYo.with(Techniques.FadeIn)
                     .duration(300)
                     .playOn(viewToAnimate);
         }
-        else if (scrollAnimPref.equals(mContext.getString(R.string.scroll_animation_setting_5)))
+        else if (scrollAnimPref.equals(mListFragment.getActivity().getString(R.string.scroll_animation_setting_5)))
         {
             YoYo.with(Techniques.Tada)
                     .duration(400)
@@ -1199,7 +1199,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                PreferenceSetter.removeSavedComic(mContext, comic);
+                PreferenceSetter.removeSavedComic(mListFragment.getActivity(), comic);
                 int pos = mComicList.indexOf(comic);
                 mComicList.remove(comic);
                 notifyItemRemoved(pos);
@@ -1224,7 +1224,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             File directory = (File) params[0];
 
 
-            Utilities.deleteDirectory(mContext, directory);
+            Utilities.deleteDirectory(mListFragment.getActivity(), directory);
 
             return null;
         }

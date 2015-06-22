@@ -1,610 +1,74 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Point;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.SearchView;
 
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.DrawerActivity;
-import com.comicviewer.cedric.comicviewer.FileDialog;
+import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
-import com.comicviewer.cedric.comicviewer.R;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PauseOnScrollListener;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PreCachingLayoutManager;
-import com.comicviewer.cedric.comicviewer.Utilities;
-
-import com.melnykov.fab.FloatingActionButton;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.comicviewer.cedric.comicviewer.SearchFilter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+
+/**
+ * Created by CV on 22/06/2015.
+ */
+public class CurrentlyReadingFragment extends AbstractComicListFragment {
+
+    public static CurrentlyReadingFragment mSingleton;
 
 
-public class CurrentlyReadingFragment extends Fragment {
-
-    private RecyclerView mRecyclerView;
-    private ComicAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private FloatingActionButton mFab;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private SearchView mSearchView;
-    private ArrayList<Comic> filteredList;
-    private boolean isFiltered;
-    private static CurrentlyReadingFragment mSingleton = null;
-    private Context mApplicationContext;
-    private Handler mHandler;
-    private SearchComicsTask mSearchComicsTask=null;
-
-    public static CurrentlyReadingFragment getInstance() {
-        if(mSingleton == null) {
-            mSingleton = newInstance();
-        }
+    public static CurrentlyReadingFragment getInstance()
+    {
+        if (mSingleton == null)
+            mSingleton = new CurrentlyReadingFragment();
         return mSingleton;
     }
 
-    public static CurrentlyReadingFragment newInstance() {
-        CurrentlyReadingFragment fragment = new CurrentlyReadingFragment();
-
-        return fragment;
-    }
-
-    public CurrentlyReadingFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setHasOptionsMenu(false);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
-
-
-        isFiltered = false;
-        mHandler = new Handler();
-
-        PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
-
-        createRecyclerView(v);
-        createFab(v);
-
-        initialiseRefresh(v);
-
-        initialiseAdapter(savedInstanceState);
-
-        // Inflate the layout for this fragment
-        return v;
-
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState)
+    public CurrentlyReadingFragment()
     {
-        super.onActivityCreated(savedInstanceState);
-        mApplicationContext = getActivity().getApplicationContext();
-    }
-
-    private class SearchComicsTask extends AsyncTask{
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            searchComics();
-            mSearchComicsTask = null;
-
-            return null;
-        }
 
     }
 
-
-    private void initialiseRefresh(View v)
-    {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
-
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+    @Override
+    void setSearchFilters() {
+        mFilters.add(new SearchFilter(PreferenceSetter.getReadComics(mApplicationContext)) {
             @Override
+            public boolean compare(Object object) {
 
-            public void onRefresh() {
-                if (!isFiltered)
-                    refresh();
-            }
-        });
-    }
-
-    private void refresh()
-    {
-        mAdapter.clearList();
-
-        mAdapter.notifyDataSetChanged();
-
-        if (mSearchComicsTask == null)
-        {
-            mSearchComicsTask = new SearchComicsTask();
-            mSearchComicsTask.execute();
-        }
-    }
-
-    private void createFab(View v) {
-        mFab = (FloatingActionButton)v.findViewById(R.id.fab);
-        mFab.setColorNormal(PreferenceSetter.getAccentColor(getActivity()));
-        mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAccentColor(getActivity())));
-        mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAccentColor(getActivity())));
-        mFab.attachToRecyclerView(mRecyclerView);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                File path = new File(Environment.getExternalStorageDirectory().getPath());
-                FileDialog dialog = new FileDialog(getActivity(), path);
-                dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
-                    public void directorySelected(File directory) {
-                        Log.d(getClass().getName(), "selected dir " + directory.toString());
-
-                        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
-
-                        if (!filePaths.contains(directory.toString()))
-                            filePaths.add(directory.toString());
-
-                        PreferenceSetter.saveFilePaths(getActivity(), filePaths);
-                        refresh();
+                if (object instanceof Comic) {
+                    Comic comic = (Comic) object;
+                    if (mCompareMap.containsKey(comic.getFileName())) {
+                        if ((Integer) mCompareMap.get(comic.getFileName()) < (comic.getPageCount() - 1))
+                            return true;
                     }
-                });
-                dialog.setSelectDirectoryOption(true);
-                dialog.showDialog();
-
+                }
+                return false;
             }
         });
-    }
 
-    private void setPreferences() {
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
-
-        if (prefs.getString("cardSize", "Normal cards").equals(getString(R.string.card_size_setting_3)))
-        {
-            mRecyclerView.setItemViewCacheSize(10);
-        }
-    }
-
-    private void searchComics() {
-
-
-        //map of <filename, filepath>
-        Map<String,String> map = FileLoader.searchComics(getActivity());
-
-        TreeMap<String, String> treemap = new TreeMap<>(map);
-
-        long startTime = System.currentTimeMillis();
-
-        List<Comic> currentComics = mAdapter.getComics();
-        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(getActivity());
-        List<String> savedComicsFileNames = new ArrayList<>();
-
-        for (int i=0;i<savedComics.size();i++)
-        {
-            savedComicsFileNames.add(savedComics.get(i).getFilePath()+"/"+savedComics.get(i).getFileName());
-        }
-
-        List<String> currentComicsFileNames = new ArrayList<>();
-
-        for (int i=0;i<currentComics.size();i++)
-        {
-            currentComicsFileNames.add(currentComics.get(i).getFilePath()+"/"+currentComics.get(i).getFileName());
-        }
-
-        Map<String, Integer> readMap = PreferenceSetter.getReadComics(mApplicationContext);
-
-        final ArrayList<Comic> comicsToSave = new ArrayList<>();
-        final Set<String> comicsToAdd = new HashSet<String>();
-
-        boolean hasToLoad = false;
-
-        showProgressSpinner(true);
-
-        for (String str:treemap.keySet()) {
-            if (mSearchComicsTask.isCancelled())
-                break;
-
-            //open the new found file
-            final String comicPath = map.get(str) + "/" + str;
-            File file = new File(comicPath);
-
-            //check for image folder
-            if (file.isDirectory() && Utilities.checkImageFolder(file) && !(currentComicsFileNames.contains(comicPath))
-                    && readMap.containsKey(str)) {
-                Comic comic = new Comic(file.getName(), file.getParentFile().getAbsolutePath());
-
-                ComicLoader.loadComicSync(mApplicationContext, comic);
-
-                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
-                    comicsToSave.add(comic);
-                    hasToLoad = true;
-                }
-
-                if (!hasToLoad) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerView.scrollToPosition(0);
-                        }
-                    });
-                }
-
-                if (readMap.get(str) < comic.getPageCount() - 1) {
-                    comicsToAdd.add(comic.getFileName());
-                    final Comic finalComic = comic;
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.addObjectSorted(finalComic);
-                        }
-                    });
-                }
-
-            }//check if comic is one of the saved comic files and add
-            else if (savedComicsFileNames.contains(comicPath)
-                    && !(currentComicsFileNames.contains(comicPath))
-                    && readMap.containsKey(str)) {
-                int pos = savedComicsFileNames.indexOf(comicPath);
-
-                Comic comic = savedComics.get(pos);
-
-                ComicLoader.generateComicInfo(mApplicationContext, comic);
-
-                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
-                    comicsToSave.add(comic);
-                    hasToLoad = true;
-                }
-
-                if (!hasToLoad) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerView.scrollToPosition(0);
-                        }
-                    });
-                }
-
-
-                if (readMap.get(str) < comic.getPageCount() - 1) {
-                    final Comic finalComic = comic;
-                    comicsToAdd.add(comic.getFileName());
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.addObjectSorted(finalComic);
-                        }
-                    });
-                }
-
-            }//if it is a newly added comic
-            else if (readMap.containsKey(str)
-                    && getComicPositionInList(str) == -1
-                    && Utilities.checkExtension(str)
-                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
-                Comic comic = new Comic(str, map.get(str));
-
-                ComicLoader.loadComicSync(mApplicationContext, comic);
-
-                if (readMap.get(str) < comic.getPageCount() - 1) {
-                    comicsToAdd.add(comic.getFileName());
-                    final Comic finalComic = comic;
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.addObjectSorted(finalComic);
-                        }
-                    });
-                }
-
-                hasToLoad = true;
-
-                comicsToSave.add(comic);
-
-            }
-        }
-
-        showProgressSpinner(false);
-
-        new Thread(new Runnable() {
+        mFilters.add(new SearchFilter() {
             @Override
-            public void run() {
-                PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
-                PreferenceSetter.batchAddAddedComics(mApplicationContext, comicsToAdd);
-            }
-        }).run();
-
-        updateLastReadComics();
-
-        long endTime = System.currentTimeMillis();
-
-        Log.d("search comics in list", "time: "+(endTime-startTime));
-    }
-
-    private void updateLastReadComics()
-    {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mAdapter.notifyDataSetChanged();
+            public boolean compare(Object object) {
+                if (object instanceof File)
+                    return PreferenceSetter.getFolderEnabledSetting(getActivity());
+                return true;
             }
         });
-    }
 
-    private int getComicPositionInList(String filename)
-    {
-        List<Comic> currentComics = mAdapter.getComics();
-        for (int pos=0;pos<currentComics.size();pos++)
-        {
-            if (currentComics.get(pos).getFileName().equals(filename))
-                return pos;
-        }
-        return -1;
-    }
-
-
-
-    private void showProgressSpinner(final boolean enable)
-    {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(enable);
-            }
-        });
     }
 
 
     @Override
-    public void onSaveInstanceState(Bundle savedState)
-    {
-        super.onSaveInstanceState(savedState);
+    void addShowFolderViewButton(boolean enable) {
 
-        List<Comic> currentComics = mAdapter.getComics();
-
-        for (int i=0;i<currentComics.size();i++)
-        {
-            savedState.putParcelable("Comic "+ (i+1), currentComics.get(i));
-        }
-
-
-        savedState.putBoolean("isRefreshing", mSwipeRefreshLayout.isRefreshing());
     }
 
     @Override
-    public void onPause()
-    {
-        super.onPause();
-        enableSearchBar(false);
-
-        if (mSearchComicsTask != null)
-        {
-            mSearchComicsTask.cancel(false);
-        }
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-        //Don't save the list! The list consists only of favorite comics!
-        //PreferenceSetter.saveComicList(getActivity(), mAdapter.getComics());
-    }
-
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        setPreferences();
-
-        enableSearchBar(true);
-
-
-        if (isFiltered)
-            filterList("");
-
-        if (mSearchComicsTask == null)
-        {
-            mSearchComicsTask = new SearchComicsTask();
-            mSearchComicsTask.execute();
-        }
-    }
-
-    private void enableSearchBar(boolean enabled)
-    {
-        if (enabled) {
-            final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
-            toolbar.removeView(mSearchView);
-            mSearchView = new SearchView(getActivity());
-
-            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
-
-            mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
-                @Override
-                public boolean onClose() {
-                    filterList("");
-                    return false;
-                }
-            });
-
-            mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    filterList(query);
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-
-                    filterList(newText);
-                    return false;
-                }
-            });
-            toolbar.addView(mSearchView, layoutParamsCollapsed);
-        }
-        else
-        {
-            Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
-            toolbar.removeView(mSearchView);
-        }
-    }
-
-    private void createRecyclerView(View v)
-    {
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.comic_list_recyclerview);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        int height;
-
-        if (PreferenceSetter.getCardAppearanceSetting(getActivity()).equals(getActivity().getString(R.string.card_size_setting_3))) {
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            height = size.y;
-            Log.d("Layoutmanager", "Extra height: " + height);
-        }
-        else
-        {
-            height = 0;
-        }
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
-        float density  = getResources().getDisplayMetrics().density;
-        float dpWidth  = outMetrics.widthPixels / density;
-
-        int columnCount = 1;
-
-
-        if (dpWidth>=1280)
-        {
-            columnCount = 3;
-            mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
-        }
-        else if (dpWidth>=598)
-        {
-            columnCount = 2;
-            mLayoutManager = new GridLayoutManager(getActivity(), columnCount);
-        }
-        else
-        {
-            mLayoutManager = new PreCachingLayoutManager(getActivity(), height);
-        }
-
-        //in pixels
-        int hSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, outMetrics);
-        int vSpace = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, outMetrics);
-
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace, columnCount));
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
-
-        mRecyclerView.setOnScrollListener(scrollListener);
-
-    }
-
-    private void initialiseAdapter(Bundle savedInstanceState)
-    {
-
-        if (savedInstanceState==null)
-        {
-            mAdapter = new ComicAdapter(getActivity());
-            mRecyclerView.setAdapter(mAdapter);
-        }
-        else
-        {
-            mAdapter = new ComicAdapter(getActivity());
-
-            for (int i=0;i<savedInstanceState.size();i++)
-            {
-                if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null)
-                    mAdapter.addObject((Comic) savedInstanceState.getParcelable("Comic " + (i + 1)));
-            }
-            mRecyclerView.setAdapter(mAdapter);
-        }
-    }
-
-    private void filterList(String query)
-    {
-        if (!query.equals("")) {
-            isFiltered = true;
-
-            filteredList = new ArrayList<>();
-            List<Comic> currentComics = mAdapter.getComics();
-
-            for (int i = 0; i < currentComics.size(); i++) {
-
-                boolean found = false;
-
-                if (currentComics.get(i).getFileName().toLowerCase().contains(query.toLowerCase())) {
-                    found = true;
-                }
-                else if ((currentComics.get(i).getTitle().toLowerCase()+" "+currentComics.get(i).getIssueNumber()).contains(query.toLowerCase()))
-                {
-                    found=true;
-                }
-                if (found)
-                    filteredList.add(currentComics.get(i));
-            }
-            ComicAdapter tempAdapter = new ComicAdapter(getActivity(), filteredList, false);
-            tempAdapter.setRootAdapter(mAdapter);
-            mRecyclerView.swapAdapter(tempAdapter,false);
-        }
-        else
-        {
-            mRecyclerView.setAdapter(mAdapter);
-            isFiltered = false;
-        }
-
+    public Map<String, String> getFiles() {
+        return FileLoader.searchComics(mApplicationContext);
     }
 
 }

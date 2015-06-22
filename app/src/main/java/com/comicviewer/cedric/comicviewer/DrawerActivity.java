@@ -1,34 +1,30 @@
 package com.comicviewer.cedric.comicviewer;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CurrentlyReadingFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
-import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
-import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.io.File;
 import java.util.Map;
-import java.util.Stack;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
@@ -48,7 +44,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
     @Override
     public void init(Bundle savedInstanceState) {
 
-        mNavigationManager = NavigationManager.getInstance();
+        mNavigationManager = new NavigationManager();
 
         new SimpleEula(this).show();
         new SetTaskDescriptionTask().execute();
@@ -81,13 +77,13 @@ public class DrawerActivity extends MaterialNavigationDrawer
         mSectionsArray[1] = currentlyReadingSection;
         addSection(currentlyReadingSection);
 
-        MaterialSection collectionsSection = newSection(getString(R.string.collections), R.drawable.castle, CollectionsFragment.getInstance());
-        mSectionsArray[2] = collectionsSection;
-        addSection(collectionsSection);
-
         MaterialSection favoritesSection = newSection(getString(R.string.favorites), R.drawable.star, FavoritesListFragment.getInstance());
-        mSectionsArray[3] = favoritesSection;
+        mSectionsArray[2] = favoritesSection;
         addSection(favoritesSection);
+
+        MaterialSection collectionsSection = newSection(getString(R.string.collections), R.drawable.castle, CollectionsFragment.getInstance());
+        mSectionsArray[3] = collectionsSection;
+        addSection(collectionsSection);
 
         CloudFragment.getInstance().setRetainInstance(true);
         MaterialSection cloudSection = newSection(getString(R.string.cloud_storage), R.drawable.cloud, CloudFragment.getInstance());
@@ -110,7 +106,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
         mSectionsArray[8] = aboutSection;
         addBottomSection(aboutSection);
 
-        NavigationManager.getInstance().pushToSectionStack(mSectionsArray[0]);
+        mNavigationManager.pushToSectionStack(mSectionsArray[0]);
         for (final MaterialSection section:mSectionsArray)
         {
             section.setSectionColor(PreferenceSetter.getAppThemeColor(this));
@@ -121,10 +117,9 @@ public class DrawerActivity extends MaterialNavigationDrawer
                     for (MaterialSection sec : mSectionsArray) {
                         sec.unSelect();
                     }
-                    NavigationManager.getInstance().pushToSectionStack(materialSection);
+                    mNavigationManager.pushToSectionStack(materialSection);
                     setSection(materialSection);
                     setFragment(getFragment(materialSection), materialSection.getTitle());
-
                 }
             });
         }
@@ -201,18 +196,19 @@ public class DrawerActivity extends MaterialNavigationDrawer
     @Override
     public void onBackPressed()
     {
-        if (getCurrentSection() == mSectionsArray[0])
+        if (getCurrentSection().getTargetFragment() instanceof AbstractComicListFragment)
         {
-            NavigationManager.getInstance().popFromFileStack();
+            AbstractComicListFragment fragment = (AbstractComicListFragment) getCurrentSection().getTargetFragment();
+            fragment.getNavigationManager().popFromFileStack();
 
-            if (!NavigationManager.getInstance().fileStackEmpty())
+            if (!fragment.getNavigationManager().fileStackEmpty())
             {
-                ComicListFragment.getInstance().refresh();
+                fragment.refresh();
             }
             else
             {
-                NavigationManager.getInstance().popFromSectionStack();
-                if (NavigationManager.getInstance().sectionStackEmpty())
+                mNavigationManager.popFromSectionStack();
+                if (mNavigationManager.sectionStackEmpty())
                 {
                     finish();
                 }
@@ -222,16 +218,16 @@ public class DrawerActivity extends MaterialNavigationDrawer
                     {
                         sec.unSelect();
                     }
-                    setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
-                            NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
-                    setSection(NavigationManager.getInstance().getSectionFromSectionStack());
+                    setFragment(getFragment(mNavigationManager.getSectionFromSectionStack()),
+                            mNavigationManager.getSectionFromSectionStack().getTitle());
+                    setSection(mNavigationManager.getSectionFromSectionStack());
                 }
             }
         }
         else
         {
-            NavigationManager.getInstance().popFromSectionStack();
-            if (NavigationManager.getInstance().sectionStackEmpty())
+            mNavigationManager.popFromSectionStack();
+            if (mNavigationManager.sectionStackEmpty())
             {
                 finish();
             }
@@ -241,9 +237,9 @@ public class DrawerActivity extends MaterialNavigationDrawer
                 {
                     sec.unSelect();
                 }
-                setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
-                        NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
-                setSection(NavigationManager.getInstance().getSectionFromSectionStack());
+                setFragment(getFragment(mNavigationManager.getSectionFromSectionStack()),
+                        mNavigationManager.getSectionFromSectionStack().getTitle());
+                setSection(mNavigationManager.getSectionFromSectionStack());
             }
         }
     }
@@ -253,10 +249,10 @@ public class DrawerActivity extends MaterialNavigationDrawer
     {
         super.onResume();
         changeToolbarColor(PreferenceSetter.getAppThemeColor(this),darkenColor(PreferenceSetter.getAppThemeColor(this)));
-        if (!NavigationManager.getInstance().sectionStackEmpty())
+        if (!mNavigationManager.sectionStackEmpty())
         {
-            setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
-                    NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+            setFragment(getFragment(mNavigationManager.getSectionFromSectionStack()),
+                    mNavigationManager.getSectionFromSectionStack().getTitle());
         }
     }
 

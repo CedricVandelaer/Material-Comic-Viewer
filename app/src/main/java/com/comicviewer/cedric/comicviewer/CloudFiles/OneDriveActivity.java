@@ -63,6 +63,8 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
     private OneDriveAdapter mAdapter;
     private Handler mHandler;
 
+    private NavigationManager mNavigationManager;
+
     private LiveAuthClient mOneDriveAuth;
     private LiveConnectClient mOneDriveClient;
 
@@ -82,6 +84,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
 
         mErrorTextView = (TextView) findViewById(R.id.error_text_view);
 
+        mNavigationManager = new NavigationManager();
 
         if (PreferenceSetter.getBackgroundColorPreference(this)==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
@@ -95,7 +98,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
 
-        NavigationManager.getInstance().resetCloudStackWithString("me/skydrive/files");
+        mNavigationManager.resetCloudStackWithString("me/skydrive/files");
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
@@ -138,11 +141,16 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
         readFolder();
     }
 
+    public NavigationManager getNavigationManager()
+    {
+        return mNavigationManager;
+    }
+
     @Override
     public void onBackPressed()
     {
-        NavigationManager.getInstance().popFromCloudStack();
-        if (NavigationManager.getInstance().cloudStackEmpty())
+        mNavigationManager.popFromCloudStack();
+        if (mNavigationManager.cloudStackEmpty())
             finish();
         else
             refresh();
@@ -174,7 +182,7 @@ public class OneDriveActivity extends Activity implements LiveAuthListener, Swip
             }
         });
 
-        mOneDriveClient.getAsync(NavigationManager.getInstance().getPathFromCloudStack(), new LiveOperationListener() {
+        mOneDriveClient.getAsync(mNavigationManager.getPathFromCloudStack(), new LiveOperationListener() {
             public void onComplete(LiveOperation operation) {
                 JSONObject result = operation.getResult();
                 Log.d("Result", result.toString());

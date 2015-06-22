@@ -53,6 +53,8 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
     private GoogleDriveAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
+    protected NavigationManager mNavigationManager;
+
     private final static String DRIVE_API_SCOPE_FILES = "https://www.googleapis.com/auth/drive.readonly";
     private final static String DRIVE_API_SCOPE_METADATA = "https://www.googleapis.com/auth/drive.metadata.readonly";
     private final static String SCOPE_PROFILE_INFO = "https://www.googleapis.com/auth/userinfo.profile";
@@ -69,6 +71,7 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mHandler = new Handler();
+        mNavigationManager = new NavigationManager();
 
         new SetTaskDescriptionTask().execute();
 
@@ -82,7 +85,7 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
         if (PreferenceSetter.getBackgroundColorPreference(this)==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
-        NavigationManager.getInstance().resetCloudStackWithString("root");
+        mNavigationManager.resetCloudStackWithString("root");
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new GoogleDriveAdapter(this, mCloudService);
@@ -144,7 +147,7 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
 
     public void refresh()
     {
-        new GetDriveFilesTask().execute(NavigationManager.getInstance().getPathFromCloudStack());
+        new GetDriveFilesTask().execute(mNavigationManager.getPathFromCloudStack());
     }
 
     private class GetDriveFilesTask extends AsyncTask<String, Void, String> {
@@ -255,8 +258,8 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
     @Override
     public void onBackPressed()
     {
-        NavigationManager.getInstance().popFromCloudStack();
-        if (NavigationManager.getInstance().cloudStackEmpty())
+        mNavigationManager.popFromCloudStack();
+        if (mNavigationManager.cloudStackEmpty())
             finish();
         else
             refresh();
@@ -264,8 +267,8 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
 
     public void navigateToPath(String fileId)
     {
-        NavigationManager.getInstance().pushPathToCloudStack(fileId);
-        new GetDriveFilesTask().execute(NavigationManager.getInstance().getPathFromCloudStack());
+        mNavigationManager.pushPathToCloudStack(fileId);
+        new GetDriveFilesTask().execute(mNavigationManager.getPathFromCloudStack());
     }
 
     private class SetTaskDescriptionTask extends AsyncTask

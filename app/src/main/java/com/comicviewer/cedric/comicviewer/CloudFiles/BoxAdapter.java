@@ -84,7 +84,7 @@ public class BoxAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavigationManager.getInstance().pushPathToCloudStack(cloudFolderViewHolder.getBoxEntry().getId());
+                mActivity.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getBoxEntry().getId());
                 mActivity.refresh();
             }
         });

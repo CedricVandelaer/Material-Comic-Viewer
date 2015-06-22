@@ -185,5 +185,6 @@ no se puede borrar"</string>
     <string name="import_data">Importar datos</string>
     <string name="rate_app">Calificar aplicacion</string>
     <string name="find_comic_viewer_on">Encontrar Comic Viewer en:</string>
+    <string name="page_flip">Tirón de la página</string>
 
 </resources>

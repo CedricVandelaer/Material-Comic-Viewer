@@ -6,6 +6,11 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
+
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -23,6 +28,7 @@ public class FileDialog {
     private final String TAG = getClass().getName();
     private String[] fileList;
     private File currentPath;
+
     public interface FileSelectedListener {
         void fileSelected(File file);
     }
@@ -48,35 +54,37 @@ public class FileDialog {
     /**
      * @return file dialog
      */
-    public Dialog createFileDialog() {
-        Dialog dialog = null;
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    public MaterialDialog createFileDialog() {
+        MaterialDialog dialog = null;
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(activity);
 
-        builder.setTitle(currentPath.getPath());
+        builder.title(currentPath.getPath());
         if (selectDirectoryOption) {
-            builder.setPositiveButton(activity.getString(R.string.select_directory), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
+            builder.positiveText(activity.getString(R.string.select_directory))
+            .callback(new MaterialDialog.ButtonCallback() {
+                @Override
+                public void onPositive(MaterialDialog dialog) {
                     Log.d(TAG, currentPath.getPath());
                     fireDirectorySelectedEvent(currentPath);
                 }
             });
-            builder.setNegativeButton(activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            builder.positiveColor(PreferenceSetter.getAppThemeColor(activity));
 
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+            builder.negativeText(activity.getString(R.string.cancel));
+            builder.negativeColor(PreferenceSetter.getAppThemeColor(activity));
         }
 
-        builder.setItems(fileList, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                String fileChosen = fileList[which];
+        builder.items(fileList);
+
+        builder.itemsCallback(new MaterialDialog.ListCallback() {
+            @Override
+            public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                String fileChosen = fileList[i];
                 File chosenFile = getChosenFile(fileChosen);
                 if (chosenFile.isDirectory()) {
                     loadFileList(chosenFile);
-                    dialog.cancel();
-                    dialog.dismiss();
+                    materialDialog.cancel();
+                    materialDialog.dismiss();
                     showDialog();
                 } else fireFileSelectedEvent(chosenFile);
             }

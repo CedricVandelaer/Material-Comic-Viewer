@@ -48,6 +48,8 @@ public class DropboxActivity extends Activity {
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
 
+    private NavigationManager mNavigationManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +58,7 @@ public class DropboxActivity extends Activity {
 
         new SetTaskDescriptionTask().execute();
 
+        mNavigationManager = new NavigationManager();
         mCloudService = (CloudService) getIntent().getSerializableExtra("CloudService");
 
         mHandler = new Handler();
@@ -77,7 +80,7 @@ public class DropboxActivity extends Activity {
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
 
-        NavigationManager.getInstance().resetCloudStack();
+        mNavigationManager.resetCloudStack();
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
@@ -132,11 +135,16 @@ public class DropboxActivity extends Activity {
     @Override
     public void onBackPressed()
     {
-        NavigationManager.getInstance().popFromCloudStack();
-        if (NavigationManager.getInstance().cloudStackEmpty())
+        mNavigationManager.popFromCloudStack();
+        if (mNavigationManager.cloudStackEmpty())
             finish();
         else
             refresh();
+    }
+
+    public NavigationManager getNavigationManager()
+    {
+        return mNavigationManager;
     }
 
     @Override
@@ -166,7 +174,7 @@ public class DropboxActivity extends Activity {
             DropboxAPI.Entry existingEntry = null;
 
             try {
-                existingEntry = mDBApi.metadata(NavigationManager.getInstance().getPathFromCloudStack(), 1000, null, true, null);
+                existingEntry = mDBApi.metadata(mNavigationManager.getPathFromCloudStack(), 1000, null, true, null);
             }
             catch (Exception e)
             {

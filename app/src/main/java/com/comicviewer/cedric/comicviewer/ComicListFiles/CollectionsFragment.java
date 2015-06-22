@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -19,7 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.FileDialog;
+import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -35,14 +38,20 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CollectionsFragment extends Fragment {
+public class CollectionsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private static CollectionsFragment mSingleton;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+    private CollectionsAdapter mAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private FloatingActionButton mFab;
+
+    private NavigationManager mNavigationManager;
+
+    private Handler mHandler;
 
     public static CollectionsFragment getInstance()
     {
@@ -61,11 +70,18 @@ public class CollectionsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_collections, container, false);
 
-
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mHandler = new Handler();
         PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
+
+        PreferenceSetter.setBackgroundColorPreference(getActivity());
 
         createRecyclerView(v);
         createFab(v);
+
+        mAdapter = new CollectionsAdapter(getActivity());
+        mRecyclerView.setAdapter(mAdapter);
 
         // Inflate the layout for this fragment
         return v;
@@ -142,10 +158,40 @@ public class CollectionsFragment extends Fragment {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                        .title("Add new collection")
+                        .input("Name", "", false, new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                                materialDialog.dismiss();
+                                PreferenceSetter.createCollection(getActivity(), charSequence.toString());
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        })
+                        .positiveText(getString(R.string.confirm))
+                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .negativeText(getString(R.string.cancel))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .show();
+            }
+        });
+    }
 
+    public void setProgressSpinner(final boolean enable)
+    {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(enable);
             }
         });
     }
 
 
+    @Override
+    public void onRefresh() {
+        setProgressSpinner(true);
+        mAdapter.notifyDataSetChanged();
+        setProgressSpinner(false);
+    }
 }

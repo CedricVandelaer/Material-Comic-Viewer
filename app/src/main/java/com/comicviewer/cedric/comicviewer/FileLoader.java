@@ -264,4 +264,33 @@ public class FileLoader {
         return allFoldersInPaths;
     }
 
+    public static ArrayList<String> searchSubFoldersAndFiles(String root)
+    {
+        ArrayList<String> rootList = new ArrayList<>();
+        rootList.add(root);
+        return searchSubFoldersAndFiles(rootList);
+    }
+
+    public static ArrayList<String> searchSubFoldersAndFiles(ArrayList<String> paths)
+    {
+        ArrayList<String> allFilesInPaths = new ArrayList<>();
+
+        for (int i=0;i<paths.size();i++)
+        {
+            File root = new File(paths.get(i));
+
+            allFilesInPaths.add(paths.get(i));
+            File[] subFiles = root.listFiles();
+            if (subFiles!=null) {
+                ArrayList<String> subFolders = new ArrayList<>();
+
+                for (int j = 0; j < subFiles.length; j++) {
+                    subFolders.add(subFiles[j].toString());
+                }
+                allFilesInPaths.addAll(searchSubFoldersAndFiles(subFolders));
+            }
+        }
+
+        return allFilesInPaths;
+    }
 }
