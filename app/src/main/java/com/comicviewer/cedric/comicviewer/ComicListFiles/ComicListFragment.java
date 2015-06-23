@@ -38,6 +38,20 @@ public class ComicListFragment extends AbstractComicListFragment {
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext))
+        {
+            if (NavigationManager.getInstance().fileStackEmpty())
+            {
+                mAdapter.clearList();
+                NavigationManager.getInstance().resetFileStack();
+            }
+        }
+    }
+
+    @Override
     void setSearchFilters() {
 
         mFilters.add(new SearchFilter() {
@@ -76,15 +90,14 @@ public class ComicListFragment extends AbstractComicListFragment {
                 public void onClick(View v) {
                     if (PreferenceSetter.getFolderEnabledSetting(getActivity())) {
                         PreferenceSetter.setFolderEnabledSetting(getActivity(), false);
-                        mNavigationManager.resetFileStack();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_folder));
-                        refresh();
                     } else {
                         PreferenceSetter.setFolderEnabledSetting(getActivity(), true);
-                        mNavigationManager.resetFileStack();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
-                        refresh();
                     }
+                    NavigationManager.getInstance().resetFileStack();
+                    refresh();
+
                 }
             });
 
@@ -103,7 +116,7 @@ public class ComicListFragment extends AbstractComicListFragment {
     @Override
     public Map<String, String> getFiles() {
         if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext))
-            return FileLoader.searchComicsAndFolders(mApplicationContext, mNavigationManager.getPathFromFileStack());
+            return FileLoader.searchComicsAndFolders(mApplicationContext, NavigationManager.getInstance().getPathFromFileStack());
         else
             return FileLoader.searchComics(mApplicationContext);
     }

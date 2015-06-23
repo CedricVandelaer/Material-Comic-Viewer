@@ -1,5 +1,9 @@
 package com.comicviewer.cedric.comicviewer;
 
+import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
+
 import java.util.Stack;
 
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
@@ -17,7 +21,7 @@ public class NavigationManager {
     private Stack<String> mFavoritesStack;
     public final static String ROOT = "root";
 
-    /*
+
     public static NavigationManager getInstance()
     {
         if (mSingleton==null)
@@ -26,21 +30,38 @@ public class NavigationManager {
         }
         return mSingleton;
     }
-    */
+
     public NavigationManager()
     {
         mFileNavigationStack = new Stack<>();
         mSectionNavigationStack = new Stack<>();
         mCloudStack = new Stack<>();
+        mFavoritesStack = new Stack<>();
 
+        mFavoritesStack.push(ROOT);
         mFileNavigationStack.push(ROOT);
         mCloudStack.push("/");
     }
+
+    public void pushPathToStack(String path, AbstractComicListFragment fragment)
+    {
+        if (fragment instanceof ComicListFragment)
+            pushPathToFileStack(path);
+        else if (fragment instanceof FavoritesListFragment)
+            pushPathToFavoriteStack(path);
+    }
+
 
     public void resetFileStack()
     {
         mFileNavigationStack.clear();
         mFileNavigationStack.push(ROOT);
+    }
+
+    public void resetFavoriteStack()
+    {
+        mFavoritesStack.clear();
+        mFavoritesStack.push(ROOT);
     }
 
     public void resetSectionStack()
@@ -60,10 +81,25 @@ public class NavigationManager {
         mCloudStack.push(root);
     }
 
+    public String popFromStack(AbstractComicListFragment fragment)
+    {
+        if (fragment instanceof ComicListFragment)
+            return popFromFileStack();
+        else if (fragment instanceof FavoritesListFragment)
+            return popFromFavoriteStack();
+        else
+            return null;
+    }
+
 
     public void pushPathToFileStack(String path)
     {
         mFileNavigationStack.push(path);
+    }
+
+    public void pushPathToFavoriteStack(String path)
+    {
+        mFavoritesStack.push(path);
     }
 
     public void pushToSectionStack(MaterialSection section)
@@ -83,12 +119,30 @@ public class NavigationManager {
             return null;
     }
 
+    public String popFromFavoriteStack()
+    {
+        if (!mFavoritesStack.empty())
+            return mFavoritesStack.pop();
+        else
+            return null;
+    }
+
     public MaterialSection popFromSectionStack()
     {
         if (!mSectionNavigationStack.empty())
             return mSectionNavigationStack.pop();
         else
             return null;
+    }
+
+    public boolean stackEmpty(AbstractComicListFragment fragment)
+    {
+        if (fragment instanceof ComicListFragment)
+            return fileStackEmpty();
+        else if (fragment instanceof FavoritesListFragment)
+            return favoriteStackEmpty();
+        else
+            return true;
     }
 
     public String popFromCloudStack()
@@ -104,6 +158,11 @@ public class NavigationManager {
         return mFileNavigationStack.peek();
     }
 
+    public String getPathFromFavoriteStack()
+    {
+        return mFavoritesStack.peek();
+    }
+
     public MaterialSection getSectionFromSectionStack()
     {
         return mSectionNavigationStack.peek();
@@ -117,6 +176,11 @@ public class NavigationManager {
     public boolean fileStackEmpty()
     {
         return mFileNavigationStack.empty();
+    }
+
+    public boolean favoriteStackEmpty()
+    {
+        return mFavoritesStack.empty();
     }
 
     public boolean sectionStackEmpty()

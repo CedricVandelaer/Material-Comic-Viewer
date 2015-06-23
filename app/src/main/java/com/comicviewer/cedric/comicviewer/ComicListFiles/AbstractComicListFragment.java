@@ -70,7 +70,6 @@ abstract public class AbstractComicListFragment extends Fragment {
     protected SearchComicsTask mSearchComicsTask=null;
     protected ImageButton mFolderViewToggleButton;
     protected ArrayList<SearchFilter> mFilters;
-    protected NavigationManager mNavigationManager;
 
     public AbstractComicListFragment() {
         // Required empty public constructor
@@ -89,7 +88,6 @@ abstract public class AbstractComicListFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
 
-        mNavigationManager = new NavigationManager();
 
         mFilters = new ArrayList<>();
         setSearchFilters();
@@ -320,14 +318,6 @@ abstract public class AbstractComicListFragment extends Fragment {
         super.onResume();
         setPreferences();
 
-        if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext))
-        {
-            if (mNavigationManager.fileStackEmpty())
-            {
-                mAdapter.clearList();
-                mNavigationManager.resetFileStack();
-            }
-        }
 
         addShowFolderViewButton(true);
         enableSearchBar(true);
@@ -341,10 +331,6 @@ abstract public class AbstractComicListFragment extends Fragment {
         }
     }
 
-    public NavigationManager getNavigationManager()
-    {
-        return mNavigationManager;
-    }
 
     public Handler getHandler()
     {

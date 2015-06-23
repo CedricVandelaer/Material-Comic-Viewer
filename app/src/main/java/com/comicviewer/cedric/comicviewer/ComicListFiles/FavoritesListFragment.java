@@ -18,6 +18,7 @@ import com.comicviewer.cedric.comicviewer.SearchFilter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Created by CV on 22/06/2015.
@@ -26,7 +27,6 @@ import java.util.Map;
 public class FavoritesListFragment extends AbstractComicListFragment {
 
     private static FavoritesListFragment mSingleton;
-
 
     public static FavoritesListFragment getInstance()
     {
@@ -38,6 +38,20 @@ public class FavoritesListFragment extends AbstractComicListFragment {
     public FavoritesListFragment()
     {
 
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext))
+        {
+            if (NavigationManager.getInstance().favoriteStackEmpty())
+            {
+                mAdapter.clearList();
+                NavigationManager.getInstance().resetFavoriteStack();
+            }
+        }
     }
 
     @Override
@@ -102,12 +116,12 @@ public class FavoritesListFragment extends AbstractComicListFragment {
                 public void onClick(View v) {
                     if (PreferenceSetter.getFolderEnabledSetting(getActivity())) {
                         PreferenceSetter.setFolderEnabledSetting(getActivity(), false);
-                        mNavigationManager.resetFileStack();
+                        NavigationManager.getInstance().resetFavoriteStack();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_folder));
                         refresh();
                     } else {
                         PreferenceSetter.setFolderEnabledSetting(getActivity(), true);
-                        mNavigationManager.resetFileStack();
+                        NavigationManager.getInstance().resetFavoriteStack();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
                         refresh();
                     }
@@ -129,7 +143,7 @@ public class FavoritesListFragment extends AbstractComicListFragment {
     @Override
     public Map<String, String> getFiles() {
         if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
-            return FileLoader.searchComicsAndFolders(getActivity(), mNavigationManager.getPathFromFileStack());
+            return FileLoader.searchComicsAndFolders(getActivity(), NavigationManager.getInstance().getPathFromFavoriteStack());
         else
             return FileLoader.searchComics(mApplicationContext);
     }

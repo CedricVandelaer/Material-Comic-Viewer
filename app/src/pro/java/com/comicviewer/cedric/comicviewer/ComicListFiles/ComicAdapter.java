@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -41,6 +42,7 @@ import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -162,9 +164,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
             addFavoriteClickListener(comicItemViewHolder);
             addClickListener(comicItemViewHolder);
-            addMarkReadClickListener(comicItemViewHolder);
             addOptionsClickListener(comicItemViewHolder);
-            addMangaClickListener(comicItemViewHolder);
 
             return comicItemViewHolder;
         }
@@ -272,6 +272,26 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
     }
 
+    private void addNormalClickListener(final ComicItemViewHolder comicItemViewHolder) {
+
+        comicItemViewHolder.mMangaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Comic comic = comicItemViewHolder.getComic();
+                PreferenceSetter.removeMangaComic(mListFragment.getActivity(), comic);
+                PreferenceSetter.saveNormalComic(mListFragment.getActivity(), comic);
+                comicItemViewHolder.mSwipeLayout.close();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        int pos = mComicList.indexOf(comic);
+                        notifyItemChanged(pos);
+                    }
+                },300);
+            }
+        });
+    }
+
     private void addMangaClickListener(final ComicItemViewHolder comicItemViewHolder) {
 
         comicItemViewHolder.mMangaButton.setOnClickListener(new View.OnClickListener() {
@@ -329,7 +349,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             public void onClick(View v) {
                 Log.d("ItemClick", folderItemViewHolder.getFile().getAbsolutePath());
                 String path = folderItemViewHolder.getFile().getAbsolutePath();
-                mListFragment.getNavigationManager().pushPathToFileStack(path);
+                NavigationManager.getInstance().pushPathToStack(path, mListFragment);
                 mListFragment.refresh();
             }
         });
@@ -345,15 +365,14 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 Intent intent = new Intent(mListFragment.getActivity(), DisplayComicActivity.class);
                 Comic clickedComic = (Comic) vh.getComic();
 
-                InputMethodManager imm = (InputMethodManager)mListFragment.getActivity().getSystemService(
+                InputMethodManager imm = (InputMethodManager) mListFragment.getActivity().getSystemService(
                         Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                 Log.d("ItemClick", clickedComic.getTitle());
                 intent.putExtra("Comic", clickedComic);
 
-                if (PreferenceSetter.usesRecents(mListFragment.getActivity()))
-                {
+                if (PreferenceSetter.usesRecents(mListFragment.getActivity())) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                     intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                 }
@@ -398,12 +417,35 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             if (Build.VERSION.SDK_INT>15)
                 comicItemViewHolder.mMangaPicture.setBackground(null);
             comicItemViewHolder.mMangaPicture.setImageDrawable(null);
+
+            if (PreferenceSetter.isMangaComic(mListFragment.getActivity(), comicItemViewHolder.getComic())) {
+                // Change button
+                comicItemViewHolder.mMangaButton.setImageResource(R.drawable.ic_fire);
+                comicItemViewHolder.mMangaButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                comicItemViewHolder.mMangaButton.setColorNormal(mListFragment.getResources().getColor(R.color.LightGreen));
+                comicItemViewHolder.mMangaButton.setColorPressed(mListFragment.getResources().getColor(R.color.LightGreenDark));
+                comicItemViewHolder.mMangaButton.setColorRipple(mListFragment.getResources().getColor(R.color.LightGreenLight));
+                comicItemViewHolder.mMangaTextView.setText(mListFragment.getString(R.string.normal_comic));
+                addNormalClickListener(comicItemViewHolder);
+                ///////////
+            }
+            else
+            {
+                comicItemViewHolder.mMangaButton.setImageResource(R.drawable.ic_fish);
+                comicItemViewHolder.mMangaButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                comicItemViewHolder.mMangaButton.setColorNormal(mListFragment.getResources().getColor(R.color.Orange));
+                comicItemViewHolder.mMangaButton.setColorPressed(mListFragment.getResources().getColor(R.color.OrangeDark));
+                comicItemViewHolder.mMangaButton.setColorRipple(mListFragment.getResources().getColor(R.color.OrangeLight));
+                comicItemViewHolder.mMangaTextView.setText(mListFragment.getString(R.string.manga_comic));
+                addMangaClickListener(comicItemViewHolder);
+            }
             if (PreferenceSetter.getMangaSetting(mListFragment.getActivity()))
             {
                 if (PreferenceSetter.isNormalComic(mListFragment.getActivity(), comicItemViewHolder.getComic()))
                 {
                     comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
-                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
+                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))
+                            || cardSize.equals(mListFragment.getString(R.string.card_size_setting_3))) {
                         Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
                         if (Build.VERSION.SDK_INT > 15)
                             comicItemViewHolder.mMangaPicture.setBackground(circle);
@@ -421,7 +463,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                 if (PreferenceSetter.isMangaComic(mListFragment.getActivity(), comicItemViewHolder.getComic()))
                 {
                     comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
-                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
+                    if (((Comic) mComicList.get(position)).getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))
+                            || cardSize.equals(mListFragment.getString(R.string.card_size_setting_3))) {
                         Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
                         if (Build.VERSION.SDK_INT > 15)
                             comicItemViewHolder.mMangaPicture.setBackground(circle);
@@ -442,6 +485,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             initialiseFolderCard(folderItemViewHolder, position);
             folderItemViewHolder.setFile((File) mComicList.get(position));
         }
+
+
     }
 
     private void initialiseFolderCard(final FolderItemViewHolder folderItemViewHolder, int i)
@@ -511,15 +556,11 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
                                 .show();
 
                         FloatingActionButton deleteButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.delete_button);
-                        FloatingActionButton markUnreadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.mark_unread_button);
-                        FloatingActionButton normalButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.normal_button);
                         FloatingActionButton infoButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.info_button);
                         FloatingActionButton hideButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.hide_button);
                         FloatingActionButton reloadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.reload_button);
 
                         addDeleteButtonClickListener(dialog, deleteButton, vh.getComic());
-                        addNormalComicClickListener(dialog, normalButton, vh.getComic());
-                        addMarkUnreadClickListener(dialog, markUnreadButton, vh.getComic());
                         addInfoClickListener(dialog, infoButton, vh, vh.getComic());
                         addReloadClickListener(dialog, reloadButton, vh.getComic());
                         addHideClickListener(dialog, hideButton, vh.getComic());
@@ -639,7 +680,8 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
 
-                dialog.dismiss();
+                if (dialog!=null)
+                    dialog.dismiss();
 
                 if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey((comic.getFileName()))) {
 
@@ -658,6 +700,35 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         });
 
     }
+
+    private void addMarkUnreadClickListener(final ComicItemViewHolder vh) {
+
+
+        vh.mMarkReadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                vh.mSwipeLayout.close(true);
+
+                if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey((vh.getComic().getFileName()))) {
+                    ComicActions.markComicUnread(mListFragment.getActivity(), vh.getComic());
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            int pos = mComicList.indexOf(vh.getComic());
+                            notifyItemChanged(pos);
+                        }
+                    }, 300);
+                } else {
+                    //Do nothing, already marked as unread
+                    Toast message = Toast.makeText(mListFragment.getActivity(), mListFragment.getActivity().getString(R.string.not_started_toast), Toast.LENGTH_SHORT);
+                    message.show();
+                }
+            }
+        });
+
+    }
+
 
     private void addDeleteButtonClickListener(final MaterialDialog dialog, final View v, final Comic comic)
     {
@@ -701,6 +772,7 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
     private void addMarkReadClickListener(final ComicItemViewHolder vh)
     {
+
         vh.mMarkReadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -778,10 +850,28 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
             if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get(comic.getFileName())+1==comic.getPageCount())
             {
+                // Change button
+                comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);
+                comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Blue));
+                comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.BlueDark));
+                comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.BlueLight));
+                comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_unread));
+                addMarkUnreadClickListener(comicItemViewHolder);
+                ///////////
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
             else
             {
+                // Change button
+                comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_check);
+                comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Teal));
+                comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.TealDark));
+                comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.TealLight));
+                comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_read));
+                addMarkReadClickListener(comicItemViewHolder);
+                ///////////
                 ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
             }
 
@@ -789,6 +879,15 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
         }
         else
         {
+            // Change button
+            comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_check);
+            comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Teal));
+            comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.TealDark));
+            comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.TealLight));
+            comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_read));
+            addMarkReadClickListener(comicItemViewHolder);
+            ///////////
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
             if (Build.VERSION.SDK_INT>15)
                 comicItemViewHolder.mLastReadIcon.setBackground(null);
@@ -899,15 +998,44 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
             }
             if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
             {
+                // Change button
+                comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);
+                comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Blue));
+                comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.BlueDark));
+                comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.BlueLight));
+                comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_unread));
+                addMarkUnreadClickListener(comicItemViewHolder);
+                ///////////
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
             else
             {
+
+                // Change button
+                comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_check);
+                comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Teal));
+                comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.TealDark));
+                comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.TealLight));
+                comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_read));
+                addMarkReadClickListener(comicItemViewHolder);
+                ///////////
                 ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
             }
         }
         else
         {
+            // Change button
+            comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_check);
+            comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Teal));
+            comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.TealDark));
+            comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.TealLight));
+            comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_read));
+            addMarkReadClickListener(comicItemViewHolder);
+            ///////////
+
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
             if (Build.VERSION.SDK_INT>15)
                 comicItemViewHolder.mLastReadIcon.setBackground(null);
@@ -988,16 +1116,44 @@ public class ComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> 
 
             if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
             {
+                // Change button
+                comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);
+                comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Blue));
+                comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.BlueDark));
+                comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.BlueLight));
+                comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_unread));
+                addMarkUnreadClickListener(comicItemViewHolder);
+                ///////////
                 ImageLoader.getInstance().displayImage("drawable://"+R.drawable.ic_check,comicItemViewHolder.mLastReadIcon);
             }
             else
             {
                 ImageLoader.getInstance().displayImage("drawable://" + R.drawable.last_read, comicItemViewHolder.mLastReadIcon);
+                // Change button
+                comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_check);
+                comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Teal));
+                comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.TealDark));
+                comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.TealLight));
+                comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_read));
+                addMarkReadClickListener(comicItemViewHolder);
+                ///////////
             }
 
         }
         else
         {
+            // Change button
+            comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_check);
+            comicItemViewHolder.mMarkReadButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            comicItemViewHolder.mMarkReadButton.setColorNormal(mListFragment.getResources().getColor(R.color.Teal));
+            comicItemViewHolder.mMarkReadButton.setColorPressed(mListFragment.getResources().getColor(R.color.TealDark));
+            comicItemViewHolder.mMarkReadButton.setColorRipple(mListFragment.getResources().getColor(R.color.TealLight));
+            comicItemViewHolder.mMarkReadTextView.setText(mListFragment.getString(R.string.mark_read));
+            addMarkReadClickListener(comicItemViewHolder);
+            ///////////
+
             comicItemViewHolder.mLastReadIcon.setVisibility(View.GONE);
             comicItemViewHolder.mLastReadIcon.setImageBitmap(null);
             if (Build.VERSION.SDK_INT>15)

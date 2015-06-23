@@ -44,7 +44,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
     @Override
     public void init(Bundle savedInstanceState) {
 
-        mNavigationManager = new NavigationManager();
+        mNavigationManager = NavigationManager.getInstance();
 
         new SimpleEula(this).show();
         new SetTaskDescriptionTask().execute();
@@ -199,16 +199,16 @@ public class DrawerActivity extends MaterialNavigationDrawer
         if (getCurrentSection().getTargetFragment() instanceof AbstractComicListFragment)
         {
             AbstractComicListFragment fragment = (AbstractComicListFragment) getCurrentSection().getTargetFragment();
-            fragment.getNavigationManager().popFromFileStack();
+            NavigationManager.getInstance().popFromStack(fragment);
 
-            if (!fragment.getNavigationManager().fileStackEmpty())
+            if (!NavigationManager.getInstance().stackEmpty(fragment))
             {
                 fragment.refresh();
             }
             else
             {
-                mNavigationManager.popFromSectionStack();
-                if (mNavigationManager.sectionStackEmpty())
+                NavigationManager.getInstance().popFromSectionStack();
+                if (NavigationManager.getInstance().sectionStackEmpty())
                 {
                     finish();
                 }
@@ -218,16 +218,16 @@ public class DrawerActivity extends MaterialNavigationDrawer
                     {
                         sec.unSelect();
                     }
-                    setFragment(getFragment(mNavigationManager.getSectionFromSectionStack()),
-                            mNavigationManager.getSectionFromSectionStack().getTitle());
-                    setSection(mNavigationManager.getSectionFromSectionStack());
+                    setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                            NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+                    setSection(NavigationManager.getInstance().getSectionFromSectionStack());
                 }
             }
         }
         else
         {
-            mNavigationManager.popFromSectionStack();
-            if (mNavigationManager.sectionStackEmpty())
+            NavigationManager.getInstance().popFromSectionStack();
+            if (NavigationManager.getInstance().sectionStackEmpty())
             {
                 finish();
             }
@@ -237,9 +237,9 @@ public class DrawerActivity extends MaterialNavigationDrawer
                 {
                     sec.unSelect();
                 }
-                setFragment(getFragment(mNavigationManager.getSectionFromSectionStack()),
-                        mNavigationManager.getSectionFromSectionStack().getTitle());
-                setSection(mNavigationManager.getSectionFromSectionStack());
+                setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                        NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+                setSection(NavigationManager.getInstance().getSectionFromSectionStack());
             }
         }
     }
@@ -249,10 +249,10 @@ public class DrawerActivity extends MaterialNavigationDrawer
     {
         super.onResume();
         changeToolbarColor(PreferenceSetter.getAppThemeColor(this),darkenColor(PreferenceSetter.getAppThemeColor(this)));
-        if (!mNavigationManager.sectionStackEmpty())
+        if (!NavigationManager.getInstance().sectionStackEmpty())
         {
-            setFragment(getFragment(mNavigationManager.getSectionFromSectionStack()),
-                    mNavigationManager.getSectionFromSectionStack().getTitle());
+            setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                    NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
         }
     }
 
