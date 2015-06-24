@@ -237,6 +237,13 @@ public class FileLoader {
         return map;
     }
 
+    public static ArrayList<String> searchSubFolders(String root)
+    {
+        ArrayList<String> rootPath = new ArrayList<>();
+        rootPath.add(root);
+        return searchSubFolders(rootPath);
+    }
+
     public static ArrayList<String> searchSubFolders(ArrayList<String> paths)
     {
         ArrayList<String> allFoldersInPaths = new ArrayList<>();
@@ -264,14 +271,36 @@ public class FileLoader {
         return allFoldersInPaths;
     }
 
+    public static ArrayList<String> getDirectSubFolders(String path)
+    {
+        File folder = new File(path);
+        ArrayList<String> subFolders = new ArrayList<>();
+        try
+        {
+            File[] subFiles = folder.listFiles();
+
+            for (File file:subFiles)
+            {
+                if (file.isDirectory())
+                    subFolders.add(file.getAbsolutePath());
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return subFolders;
+    }
+
     public static ArrayList<String> searchSubFoldersAndFiles(String root)
     {
         ArrayList<String> rootList = new ArrayList<>();
         rootList.add(root);
-        return searchSubFoldersAndFiles(rootList);
+        return searchSubFoldersAndFilesRecursive(rootList);
     }
 
-    public static ArrayList<String> searchSubFoldersAndFiles(ArrayList<String> paths)
+    public static ArrayList<String> searchSubFoldersAndFilesRecursive(ArrayList<String> paths)
     {
         ArrayList<String> allFilesInPaths = new ArrayList<>();
 
@@ -287,10 +316,46 @@ public class FileLoader {
                 for (int j = 0; j < subFiles.length; j++) {
                     subFolders.add(subFiles[j].toString());
                 }
-                allFilesInPaths.addAll(searchSubFoldersAndFiles(subFolders));
+                allFilesInPaths.addAll(searchSubFoldersAndFilesRecursive(subFolders));
             }
         }
 
         return allFilesInPaths;
+    }
+
+    public static ArrayList<String> searchSubFilesRecursive(String root)
+    {
+        File file = new File(root);
+        if (!file.isDirectory())
+            return null;
+        else
+        {
+            ArrayList<String> rootPath = new ArrayList<>();
+            rootPath.add(root);
+            return searchSubFilesRecursive(rootPath);
+        }
+    }
+
+    public static ArrayList<String> searchSubFilesRecursive(ArrayList<String> foldersToSearch)
+    {
+        ArrayList<String> filesFound = new ArrayList<>();
+        for (int i=0;i<foldersToSearch.size();i++)
+        {
+            File folder = new File(foldersToSearch.get(i));
+            File[] subFiles = folder.listFiles();
+            ArrayList<String> subFoldersToSearch = new ArrayList<>();
+
+            for (int j=0;j<subFiles.length;j++)
+            {
+                if (subFiles[j].isDirectory())
+                    subFoldersToSearch.add(subFiles[j].getAbsolutePath());
+                else
+                    filesFound.add(subFiles[j].getAbsolutePath());
+            }
+
+            if (subFoldersToSearch.size()>0)
+                filesFound.addAll(searchSubFilesRecursive(subFoldersToSearch));
+        }
+        return filesFound;
     }
 }

@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
@@ -131,13 +132,6 @@ abstract public class AbstractComicListFragment extends Fragment {
         @Override
         protected Object doInBackground(Object[] params) {
 
-            /*
-            if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext)) {
-                searchComicsAndFolders();
-            } else {
-                searchComics();
-            }
-            */
             searchComics();
 
             mSearchComicsTask = null;
@@ -200,19 +194,51 @@ abstract public class AbstractComicListFragment extends Fragment {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File path = new File(Environment.getExternalStorageDirectory().getPath());
+                final File path = new File(Environment.getExternalStorageDirectory().getPath());
 
                 FileDialog dialog = new FileDialog(getActivity(), path);
                 dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
-                    public void directorySelected(File directory) {
+                    public void directorySelected(final File directory) {
                         Log.d(getClass().getName(), "Selected directory: " + directory.toString());
 
-                        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+                        MaterialDialog rootPrompt = new MaterialDialog.Builder(getActivity())
+                                .title("Add folder")
+                                .content("Do you wish to include the root folder?")
+                                .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .positiveText(getString(R.string.yes))
+                                .negativeText(getString(R.string.no))
+                                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        super.onPositive(dialog);
+                                        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 
-                        if (!filePaths.contains(directory.toString()))
-                            filePaths.add(directory.toString());
-                        PreferenceSetter.saveFilePaths(getActivity(), filePaths);
-                        refresh();
+                                        if (!filePaths.contains(directory.toString()))
+                                            filePaths.add(directory.toString());
+                                        PreferenceSetter.saveFilePaths(getActivity(), filePaths);
+                                        refresh();
+                                    }
+
+                                    @Override
+                                    public void onNegative(MaterialDialog dialog) {
+                                        super.onNegative(dialog);
+                                        ArrayList<String> paths = FileLoader.getDirectSubFolders(directory.toString());
+                                        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+
+                                        for (int i = 0; i <paths.size();i++)
+                                        {
+                                            if (!filePaths.contains(paths.get(i)))
+                                            {
+                                                filePaths.add(paths.get(i));
+                                            }
+                                        }
+                                        PreferenceSetter.saveFilePaths(getActivity(), filePaths);
+                                        refresh();
+                                    }
+                                }).show();
+
+
                     }
                 });
                 dialog.setSelectDirectoryOption(true);

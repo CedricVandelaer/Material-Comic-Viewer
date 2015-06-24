@@ -18,16 +18,20 @@ import java.io.File;
  */
 public class FolderItemViewHolder extends RecyclerView.ViewHolder {
 
+    protected CardView mCardView;
     protected ImageView mFolderImage;
     protected TextView mFolderTitleTextView;
+
     protected SwipeLayout mSwipeLayout;
-    protected CardView mCardView;
+
     protected TextView mDeleteTextView;
     protected FloatingActionButton mDeleteButton;
+
     protected TextView mRenameTextView;
     protected FloatingActionButton mRenameButton;
-    protected FloatingActionButton mHideButton;
-    protected TextView mHideTextView;
+
+    protected FloatingActionButton mOptionsButton;
+    protected TextView mOptionsTextView;
 
     protected File mFile = null;
 
@@ -42,8 +46,8 @@ public class FolderItemViewHolder extends RecyclerView.ViewHolder {
         mFolderTitleTextView = (TextView) itemView.findViewById(R.id.folder_title_text_view);
         mRenameTextView = (TextView) itemView.findViewById(R.id.rename_text);
         mRenameButton = (FloatingActionButton) itemView.findViewById(R.id.rename_button);
-        mHideButton = (FloatingActionButton) itemView.findViewById(R.id.hide_button);
-        mHideTextView = (TextView) itemView.findViewById(R.id.hide_text);
+        mOptionsButton = (FloatingActionButton) itemView.findViewById(R.id.more_button);
+        mOptionsTextView = (TextView) itemView.findViewById(R.id.more_text);
     }
 
     public void setFile(File file)

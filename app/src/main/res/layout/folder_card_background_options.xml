@@ -7,87 +7,10 @@
     android:gravity="center"
     android:layout_height="match_parent">
     <!--What you want to show-->
-    <LinearLayout
-        android:id="@+id/delete_button_layout"
-        android:orientation="vertical"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:gravity="center"
-        android:layout_height="match_parent">
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/delete_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete"
-            android:adjustViewBounds="true"
-            android:layout_margin="16dp"
-            fab:fab_type="normal"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Red"
-            fab:fab_colorPressed="@color/RedDark"
-            fab:fab_colorRipple="@color/RedLight" />
-        <TextView
-            android:gravity="center"
-            android:id="@+id/delete_text"
-            android:text="@string/delete"
-            android:textAllCaps="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/rename_layout"
-        android:orientation="vertical"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:gravity="center"
-        android:layout_height="match_parent">
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/rename_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_pencil"
-            android:adjustViewBounds="true"
-            android:layout_margin="16dp"
-            fab:fab_type="normal"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Gold"
-            fab:fab_colorPressed="@color/GoldDark"
-            fab:fab_colorRipple="@color/YellowLight" />
-        <TextView
-            android:gravity="center"
-            android:id="@+id/rename_text"
-            android:text="@string/rename"
-            android:textAllCaps="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+    <include layout="@layout/delete_option_layout"/>
 
-    <LinearLayout
-        android:id="@+id/hide_layout"
-        android:orientation="vertical"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:gravity="center"
-        android:layout_height="match_parent">
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/hide_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_eye_off"
-            android:adjustViewBounds="true"
-            android:layout_margin="16dp"
-            fab:fab_type="normal"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="#222222"
-            fab:fab_colorPressed="#000000"
-            fab:fab_colorRipple="#444444"/>
-        <TextView
-            android:gravity="center"
-            android:id="@+id/hide_text"
-            android:text="@string/hide"
-            android:textAllCaps="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+    <include layout="@layout/rename_option_layout"/>
+
+    <include layout="@layout/options_option_layout"/>
 
 </LinearLayout>

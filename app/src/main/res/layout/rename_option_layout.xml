@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:layout_weight="1"
     android:gravity="center"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    android:layout_weight="1"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/mark_unread_button"
+        android:id="@+id/rename_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_close"
+        android:src="@drawable/ic_pencil"
+        android:layout_gravity="center"
         android:adjustViewBounds="true"
         android:layout_margin="16dp"
-        android:layout_gravity="center"
         fab:fab_type="normal"
         fab:fab_shadow="true"
-        fab:fab_colorNormal="@color/Blue"
-        fab:fab_colorPressed="@color/BlueDark"
-        fab:fab_colorRipple="@color/BlueLight" />
+        fab:fab_colorNormal="@color/Gold"
+        fab:fab_colorPressed="@color/GoldDark"
+        fab:fab_colorRipple="@color/YellowLight" />
     <TextView
         android:layout_gravity="center"
         android:gravity="center"
-        android:id="@+id/mark_unread_text"
-        android:text="@string/mark_unread"
+        android:id="@+id/rename_text"
+        android:text="@string/rename"
         android:textAllCaps="false"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
 

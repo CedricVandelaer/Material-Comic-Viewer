@@ -58,6 +58,32 @@ public class ComicLoader {
         }
     }
 
+    public static void loadComicSyncNoColor(Context context, Comic comic)
+    {
+        try {
+            File file = new File(comic.getFilePath() + "/" + comic.getFileName());
+
+            generateComicInfo(context, comic);
+
+            if (file.isDirectory())
+            {
+                initialiseImageFolderComic(comic);
+            }
+            else if (Utilities.isZipArchive(file)) {
+                extractZipComic(comic, context);
+            } else {
+                extractRarComic(context, comic);
+            }
+
+            comic.setColorSetting("None");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.e("ComicLoader", "Error loading comic: " + comic.getFileName());
+        }
+    }
+
     private static void initialiseImageFolderComic(Comic comic)
     {
         File folder = new File(comic.getFilePath()+"/"+comic.getFileName());
