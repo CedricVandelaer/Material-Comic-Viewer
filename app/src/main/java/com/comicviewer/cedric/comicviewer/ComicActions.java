@@ -16,6 +16,32 @@ import java.util.ArrayList;
 public class ComicActions {
 
 
+    public static void addFolderToCollection(Context context, String collectionName, String folderPath)
+    {
+        ArrayList<String> rootPath = new ArrayList<>();
+        rootPath.add(folderPath);
+        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(rootPath);
+
+        ArrayList<String> comicsToAdd = new ArrayList<>();
+
+        for (int i=0;i<subFilesAndFolders.size();i++)
+        {
+            Comic comic;
+            File file = new File(subFilesAndFolders.get(i));
+            if (Utilities.checkImageFolder(file))
+            {
+                comicsToAdd.add(file.getName());
+            }
+            else if (Utilities.checkExtension(subFilesAndFolders.get(i))
+                    && (Utilities.isRarArchive(file) || Utilities.isZipArchive(file)))
+            {
+                comicsToAdd.add(file.getName());
+            }
+        }
+
+        PreferenceSetter.addToCollection(context, collectionName, comicsToAdd, false);
+    }
+
     public static void markFolderUnread(Context context, String folderPath)
     {
         ArrayList<String> rootPath = new ArrayList<>();

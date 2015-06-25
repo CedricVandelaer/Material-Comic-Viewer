@@ -44,6 +44,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,12 +71,73 @@ public class ComicAdapter extends AbstractComicAdapter {
     }
 
     @Override
+    protected void addFolderAddToCollectionClickListener(final MaterialDialog dialog, View v, final FolderItemViewHolder vh) {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null)
+                    dialog.dismiss();
+                vh.mSwipeLayout.close();
+                showChooseCollectionDialog(vh.getFile().getAbsolutePath());
+            }
+        });
+    }
+
+    public void showChooseCollectionDialog(final String folderPath)
+    {
+        JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
+        CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+
+        for (int i=0;i<collections.length();i++)
+        {
+            try {
+                collectionNames[i] = collections.getJSONObject(i).keys().next();
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        final String newCollection = "Add new collection";
+        collectionNames[collectionNames.length-1] = newCollection;
+
+        MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
+                .title("Choose collection")
+                .items(collectionNames)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        if (charSequence.equals(newCollection))
+                        {
+                            MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
+                                    .title("Create new collection")
+                                    .input("Collection name", "", false, new MaterialDialog.InputCallback() {
+                                        @Override
+                                        public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                                            PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
+                                            ComicActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
+                                        }
+                                    })
+                                    .show();
+                        }
+                        else {
+                            ComicActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
+                        }
+                    }
+                })
+                .show();
+
+    }
+
+    @Override
     void addFolderHideClickListener(final MaterialDialog dialog, View v, final FolderItemViewHolder vh) {
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                dialog.dismiss();
+                if (dialog!=null)
+                    dialog.dismiss();
                 vh.mSwipeLayout.close();
                 PreferenceSetter.addHiddenPath(mListFragment.getActivity(), vh.getFile().getAbsolutePath());
                 mHandler.postDelayed(new Runnable() {

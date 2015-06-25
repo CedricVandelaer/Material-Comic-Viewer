@@ -7,10 +7,6 @@
     android:gravity="center"
     android:layout_height="match_parent">
     <!--What you want to show-->
-    <include layout="@layout/collection_add_option_layout"/>
-
-    <include layout="@layout/rename_option_layout"/>
-
-    <include layout="@layout/options_option_layout"/>
+    <include layout="@layout/delete_option_layout"/>
 
 </LinearLayout>

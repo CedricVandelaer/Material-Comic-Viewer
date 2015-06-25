@@ -2,28 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:gravity="center"
+    android:id="@+id/add_collection_layout"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_weight="1"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/hide_button"
+        android:id="@+id/add_collection_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_eye_off"
+        android:src="@drawable/ic_playlist_plus"
         android:adjustViewBounds="true"
         android:layout_margin="16dp"
         android:layout_gravity="center"
         fab:fab_type="normal"
         fab:fab_shadow="true"
-        fab:fab_colorNormal="#222222"
-        fab:fab_colorPressed="#000000"
-        fab:fab_colorRipple="#444444" />
+        fab:fab_colorNormal="@color/Lime"
+        fab:fab_colorPressed="@color/LimeDark"
+        fab:fab_colorRipple="@color/LimeLight" />
     <TextView
         android:layout_gravity="center"
         android:gravity="center"
-        android:id="@+id/hide_text"
-        android:text="@string/hide"
+        android:id="@+id/add_collection_text"
+        android:text="Add to collection"
         android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

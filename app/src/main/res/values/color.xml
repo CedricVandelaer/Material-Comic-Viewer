@@ -39,4 +39,7 @@
     <color name="YellowDark">#FBC02D</color>
     <color name="Gold">#E5C100</color>
     <color name="GoldDark">#C5B100</color>
+    <color name="Lime">#CDDC39</color>
+    <color name="LimeDark">#AFB42B</color>
+    <color name="LimeLight">#DCE775</color>
 </resources>

@@ -92,6 +92,82 @@ public class PreferenceSetter {
         return prefs.getBoolean(FORCE_PORTRAIT_SETTING, false);
     }
 
+    public static void addToCollection(Context context, String collectionName, ArrayList<String> filenames, boolean dummy)
+    {
+        JSONArray collections = getCollectionList(context);
+
+        JSONArray collection = new JSONArray();
+        int index = -1;
+        try {
+            for (int i=0;i<collections.length();i++)
+            {
+                if (collections.getJSONObject(i).keys().next().equals(collectionName))
+                {
+                    index = i;
+                    collection = collections.getJSONObject(i).getJSONArray(collectionName);
+                }
+            }
+
+            for (int i=0;i<filenames.size();i++)
+            {
+                collection.put(filenames.get(i));
+            }
+
+            if (index!=-1) {
+                JSONObject newCollection = new JSONObject();
+                newCollection.put(collectionName, collection);
+                collections.put(index, newCollection);
+            }
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(COLLECTIONS_LIST, collections.toString());
+            editor.apply();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void addToCollection(Context context, String collectionName, ArrayList<Comic> comics)
+    {
+        JSONArray collections = getCollectionList(context);
+
+        JSONArray collection = new JSONArray();
+        int index = -1;
+        try {
+            for (int i=0;i<collections.length();i++)
+            {
+                if (collections.getJSONObject(i).keys().next().equals(collectionName))
+                {
+                    index = i;
+                    collection = collections.getJSONObject(i).getJSONArray(collectionName);
+                }
+            }
+
+            for (int i=0;i<comics.size();i++)
+            {
+                collection.put(comics.get(i).getFileName());
+            }
+
+            if (index!=-1) {
+                JSONObject newCollection = new JSONObject();
+                newCollection.put(collectionName, collection);
+                collections.put(index, newCollection);
+            }
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(COLLECTIONS_LIST, collections.toString());
+            editor.apply();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static void createCollection(Context context, String collectionName)
     {
 

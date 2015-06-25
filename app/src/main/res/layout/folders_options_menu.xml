@@ -7,14 +7,15 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <include layout="@layout/hide_option_layout"></include>
-        <include layout="@layout/mark_read_option_layout"></include>
+        <include layout="@layout/mark_read_option_layout"/>
+        <include layout="@layout/unread_option_layout"/>
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <include layout="@layout/unread_option_layout"></include>
+        <include layout="@layout/hide_option_layout"/>
+        <include layout="@layout/delete_option_layout"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -88,11 +88,19 @@ public class CollectionsListFragment extends AbstractComicListFragment{
     }
 
     @Override
+    public void onDetach()
+    {
+        NavigationManager.getInstance().resetCollectionStack();
+        super.onDetach();
+    }
+
+    @Override
     public void refresh()
     {
         if (NavigationManager.getInstance().getPathFromCollectionStack().equals(NavigationManager.ROOT))
         {
-            ((DrawerActivity)getActivity()).setFragment(CollectionsFragment.getInstance(),getString(R.string.collections));
+            if (isAdded())
+                ((DrawerActivity)getActivity()).setFragment(CollectionsFragment.getInstance(),getString(R.string.collections));
         }
         else
         {

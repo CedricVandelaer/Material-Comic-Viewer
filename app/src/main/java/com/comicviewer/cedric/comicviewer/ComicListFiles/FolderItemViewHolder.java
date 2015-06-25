@@ -24,8 +24,8 @@ public class FolderItemViewHolder extends RecyclerView.ViewHolder {
 
     protected SwipeLayout mSwipeLayout;
 
-    protected TextView mDeleteTextView;
-    protected FloatingActionButton mDeleteButton;
+    protected TextView mAddToCollectionTextView;
+    protected FloatingActionButton mAddToCollectionButton;
 
     protected TextView mRenameTextView;
     protected FloatingActionButton mRenameButton;
@@ -38,10 +38,10 @@ public class FolderItemViewHolder extends RecyclerView.ViewHolder {
     public FolderItemViewHolder(View itemView) {
         super(itemView);
 
-        mDeleteButton = (FloatingActionButton) itemView.findViewById(R.id.delete_button);
+        mAddToCollectionButton = (FloatingActionButton) itemView.findViewById(R.id.add_collection_button);
         mCardView = (CardView) itemView.findViewById(R.id.card);
         mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
-        mDeleteTextView = (TextView) itemView.findViewById(R.id.delete_text);
+        mAddToCollectionTextView = (TextView) itemView.findViewById(R.id.add_collection_text);
         mFolderImage = (ImageView) itemView.findViewById(R.id.folder_image_view);
         mFolderTitleTextView = (TextView) itemView.findViewById(R.id.folder_title_text_view);
         mRenameTextView = (TextView) itemView.findViewById(R.id.rename_text);

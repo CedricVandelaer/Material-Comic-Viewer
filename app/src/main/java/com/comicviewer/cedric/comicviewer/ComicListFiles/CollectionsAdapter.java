@@ -67,6 +67,8 @@ public class CollectionsAdapter extends RecyclerView.Adapter{
             }
         });
 
+        if (PreferenceSetter.getBackgroundColorPreference(mCollectionsFragment.getActivity())== mCollectionsFragment.getResources().getColor(R.color.WhiteBG))
+            vh.mDeleteTextView.setTextColor(mCollectionsFragment.getResources().getColor(R.color.Black));
 
     }
 

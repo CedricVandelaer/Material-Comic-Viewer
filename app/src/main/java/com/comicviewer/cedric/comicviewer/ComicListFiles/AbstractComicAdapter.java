@@ -1,7 +1,7 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 /**
- * Created by Cédric on 24/06/2015.
+ * Created by CV on 24/06/2015.
  */
 
 import android.app.ActivityOptions;
@@ -54,7 +54,7 @@ import java.util.List;
 
 
 /**
- * Created by Cédric on 23/01/2015.
+ * Created by CV on 23/01/2015.
  * Class to show a comic in the comiclist
  */
 public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<RecyclerView.ViewHolder> {
@@ -177,13 +177,14 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             v = mInflater.inflate(R.layout.folder_card, viewGroup, false);
             FolderItemViewHolder folderItemViewHolder = new FolderItemViewHolder(v);
             addFolderClickListener(folderItemViewHolder);
-            addFolderDeleteClickListener(folderItemViewHolder);
+            addFolderAddToCollectionClickListener(null, folderItemViewHolder.mAddToCollectionButton, folderItemViewHolder);
             addFolderRenameClickListener(folderItemViewHolder);
             addFolderOptionsClickListener(folderItemViewHolder);
             return folderItemViewHolder;
         }
     }
 
+    protected abstract void addFolderAddToCollectionClickListener(MaterialDialog dialog,  View v, FolderItemViewHolder folderItemViewHolder);
 
 
     private void addFolderRenameClickListener(final FolderItemViewHolder folderItemViewHolder) {
@@ -318,36 +319,6 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         });
     }
 
-    private void addFolderDeleteClickListener(final FolderItemViewHolder folderItemViewHolder) {
-
-        folderItemViewHolder.mDeleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                folderItemViewHolder.mSwipeLayout.close();
-                Log.d("ItemClick", "Delete " + folderItemViewHolder.getFile().getAbsolutePath());
-                final String path = folderItemViewHolder.getFile().getAbsolutePath();
-
-                MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
-                        .title(mListFragment.getActivity().getString(R.string.warning))
-                        .content(mListFragment.getActivity().getString(R.string.delete_folder_notice_1)+"\n\""+folderItemViewHolder.getFile().getName()
-                                +"\"\n"+ mListFragment.getActivity().getString(R.string.delete_folder_notice_2) +" "+
-                                mListFragment.getActivity().getString(R.string.sure_prompt))
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
-                        .positiveText(mListFragment.getActivity().getString(R.string.accept))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
-                        .negativeText(mListFragment.getActivity().getString(R.string.cancel))
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                super.onPositive(dialog);
-                                removeItem(folderItemViewHolder.getFile());
-                            }
-                        })
-                        .show();
-
-            }
-        });
-    }
 
     private void addFolderClickListener(final FolderItemViewHolder folderItemViewHolder) {
         folderItemViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
@@ -504,7 +475,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
         if (PreferenceSetter.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
 
-            folderItemViewHolder.mDeleteTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
+            folderItemViewHolder.mAddToCollectionTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
             folderItemViewHolder.mRenameTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
             folderItemViewHolder.mOptionsTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
 
@@ -534,6 +505,39 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
     abstract void addFolderMarkUnreadClickListener(MaterialDialog dialog, View v, final FolderItemViewHolder vh);
     abstract void addFolderMarkReadClickListener(MaterialDialog dialog, View v, final FolderItemViewHolder vh);
 
+    private void addFolderDeleteClickListener(final MaterialDialog dialog, View v, final FolderItemViewHolder folderItemViewHolder) {
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog!=null)
+                    dialog.dismiss();
+                folderItemViewHolder.mSwipeLayout.close();
+                Log.d("ItemClick", "Delete " + folderItemViewHolder.getFile().getAbsolutePath());
+                final String path = folderItemViewHolder.getFile().getAbsolutePath();
+
+                MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
+                        .title(mListFragment.getActivity().getString(R.string.warning))
+                        .content(mListFragment.getActivity().getString(R.string.delete_folder_notice_1)+"\n\""+folderItemViewHolder.getFile().getName()
+                                +"\"\n"+ mListFragment.getActivity().getString(R.string.delete_folder_notice_2) +" "+
+                                mListFragment.getActivity().getString(R.string.sure_prompt))
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                        .positiveText(mListFragment.getActivity().getString(R.string.accept))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                        .negativeText(mListFragment.getActivity().getString(R.string.cancel))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                removeItem(folderItemViewHolder.getFile());
+                            }
+                        })
+                        .show();
+
+            }
+        });
+    }
+
     private void addFolderOptionsClickListener(final FolderItemViewHolder vh) {
         vh.mOptionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -550,10 +554,12 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                                 .customView(R.layout.folders_options_menu, true)
                                 .show();
 
+                        FloatingActionButton deleteButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.delete_button);
                         FloatingActionButton markUnreadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.mark_unread_button);
                         FloatingActionButton markReadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.mark_read_button);
                         FloatingActionButton hideButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.hide_button);
 
+                        addFolderDeleteClickListener(dialog, deleteButton, vh);
                         addFolderMarkUnreadClickListener(dialog, markUnreadButton, vh);
                         addFolderHideClickListener(dialog, hideButton, vh);
                         addFolderMarkReadClickListener(dialog, markReadButton, vh);
