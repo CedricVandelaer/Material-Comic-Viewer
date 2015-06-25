@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 
+import android.app.FragmentTransaction;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -80,8 +82,10 @@ public class CollectionsFragment extends Fragment implements SwipeRefreshLayout.
         createRecyclerView(v);
         createFab(v);
 
-        mAdapter = new CollectionsAdapter(getActivity());
+        NavigationManager.getInstance().resetCollectionStack();
+        mAdapter = new CollectionsAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
+
 
         // Inflate the layout for this fragment
         return v;
@@ -190,8 +194,32 @@ public class CollectionsFragment extends Fragment implements SwipeRefreshLayout.
 
     @Override
     public void onRefresh() {
-        setProgressSpinner(true);
-        mAdapter.notifyDataSetChanged();
-        setProgressSpinner(false);
+        refresh();
+    }
+
+    public void refresh()
+    {
+        if (NavigationManager.getInstance().getPathFromCollectionStack().equals(NavigationManager.ROOT)) {
+            setProgressSpinner(true);
+            mAdapter.notifyDataSetChanged();
+            setProgressSpinner(false);
+        }
+        else
+        {
+            /*
+            // Create new fragment and transaction
+            Fragment newFragment = new CollectionsListFragment();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack if needed
+            transaction.replace(((ViewGroup)getView().getParent()).getId(), newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
+            */
+            ((DrawerActivity)getActivity()).setFragment(CollectionsListFragment.getInstance(), NavigationManager.getInstance().getPathFromCollectionStack());
+        }
     }
 }

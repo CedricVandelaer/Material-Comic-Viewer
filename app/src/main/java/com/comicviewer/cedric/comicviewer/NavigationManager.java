@@ -1,6 +1,7 @@
 package com.comicviewer.cedric.comicviewer;
 
 import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
 
@@ -19,6 +20,7 @@ public class NavigationManager {
     private Stack<MaterialSection> mSectionNavigationStack;
     private Stack<String> mCloudStack;
     private Stack<String> mFavoritesStack;
+    private Stack<String> mCollectionStack;
     public final static String ROOT = "root";
 
 
@@ -37,7 +39,9 @@ public class NavigationManager {
         mSectionNavigationStack = new Stack<>();
         mCloudStack = new Stack<>();
         mFavoritesStack = new Stack<>();
+        mCollectionStack = new Stack<>();
 
+        mCollectionStack.push(ROOT);
         mFavoritesStack.push(ROOT);
         mFileNavigationStack.push(ROOT);
         mCloudStack.push("/");
@@ -75,6 +79,12 @@ public class NavigationManager {
         mCloudStack.push("/");
     }
 
+    public void resetCollectionStack()
+    {
+        mCollectionStack.clear();
+        mCollectionStack.push(ROOT);
+    }
+
     public void resetCloudStackWithString(String root)
     {
         mCloudStack.clear();
@@ -87,10 +97,13 @@ public class NavigationManager {
             return popFromFileStack();
         else if (fragment instanceof FavoritesListFragment)
             return popFromFavoriteStack();
+        else if (fragment instanceof CollectionsListFragment)
+            return popFromCollectionStack();
         else
             return null;
     }
 
+    public void pushToCollectionStack(String path) {mCollectionStack.push(path);}
 
     public void pushPathToFileStack(String path)
     {
@@ -111,6 +124,15 @@ public class NavigationManager {
     {
         mCloudStack.push(path);
     }
+
+    public String popFromCollectionStack()
+    {
+        if (!mCollectionStack.empty())
+            return mCollectionStack.pop();
+        else
+            return null;
+    }
+
     public String popFromFileStack()
     {
         if (!mFileNavigationStack.empty())
@@ -158,6 +180,8 @@ public class NavigationManager {
         return mFileNavigationStack.peek();
     }
 
+    public String getPathFromCollectionStack() {return mCollectionStack.peek();}
+
     public String getPathFromFavoriteStack()
     {
         return mFavoritesStack.peek();
@@ -192,6 +216,8 @@ public class NavigationManager {
     {
         return mCloudStack.empty();
     }
+
+    public boolean collectionStackEmpty() {return mCollectionStack.empty();}
 
     public String getFileStackString()
     {

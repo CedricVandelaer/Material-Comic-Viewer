@@ -1,8 +1,15 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.view.ViewGroup;
+
+import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
+import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
 
 import org.json.JSONArray;
@@ -22,20 +29,18 @@ public class CollectionsListFragment extends AbstractComicListFragment{
     public static CollectionsListFragment mSingleton;
     private String mCollectionName;
 
-    public CollectionsListFragment getInstance()
+    public static CollectionsListFragment getInstance()
     {
         if (mSingleton == null)
             mSingleton = new CollectionsListFragment();
         return mSingleton;
     }
 
-    public void setCollectionName(String name)
-    {
-        mCollectionName = name;
-    }
 
     @Override
     void setSearchFilters() {
+
+        mCollectionName = NavigationManager.getInstance().getPathFromCollectionStack();
 
         JSONArray collections = PreferenceSetter.getCollectionList(mApplicationContext);
         JSONObject collection = null;
@@ -79,6 +84,19 @@ public class CollectionsListFragment extends AbstractComicListFragment{
                     return false;
                 }
             });
+        }
+    }
+
+    @Override
+    public void refresh()
+    {
+        if (NavigationManager.getInstance().getPathFromCollectionStack().equals(NavigationManager.ROOT))
+        {
+            ((DrawerActivity)getActivity()).setFragment(CollectionsFragment.getInstance(),getString(R.string.collections));
+        }
+        else
+        {
+            super.refresh();
         }
     }
 

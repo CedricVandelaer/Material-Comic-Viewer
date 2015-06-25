@@ -14,6 +14,7 @@ import android.util.Log;
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CurrentlyReadingFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
@@ -196,7 +197,30 @@ public class DrawerActivity extends MaterialNavigationDrawer
     @Override
     public void onBackPressed()
     {
-        if (getCurrentSection().getTargetFragment() instanceof AbstractComicListFragment)
+        if (!NavigationManager.getInstance().getPathFromCollectionStack().equals(NavigationManager.ROOT))
+        {
+            NavigationManager.getInstance().popFromCollectionStack();
+            if (NavigationManager.getInstance().collectionStackEmpty())
+            {
+                NavigationManager.getInstance().popFromSectionStack();
+                if (NavigationManager.getInstance().sectionStackEmpty())
+                {
+                    finish();
+                }
+                else
+                {
+                    for (MaterialSection sec:mSectionsArray)
+                    {
+                        sec.unSelect();
+                    }
+                    setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                            NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+                    setSection(NavigationManager.getInstance().getSectionFromSectionStack());
+                }
+            }
+            CollectionsListFragment.getInstance().refresh();
+        }
+        else if (getCurrentSection().getTargetFragment() instanceof AbstractComicListFragment)
         {
             AbstractComicListFragment fragment = (AbstractComicListFragment) getCurrentSection().getTargetFragment();
             NavigationManager.getInstance().popFromStack(fragment);
