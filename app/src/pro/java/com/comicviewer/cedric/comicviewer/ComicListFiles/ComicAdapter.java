@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bignerdranch.android.multiselector.MultiSelector;
 import com.comicviewer.cedric.comicviewer.ComicActions;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Info.InfoActivity;
@@ -58,16 +59,12 @@ import java.util.List;
  */
 public class ComicAdapter extends AbstractComicAdapter {
 
-    public ComicAdapter(AbstractComicListFragment listFragment, List<Comic> comics, boolean dummy) {
-        super(listFragment, comics, dummy);
+    public ComicAdapter(AbstractComicListFragment context, List<Object> comics, MultiSelector multiSelector) {
+        super(context, comics, multiSelector);
     }
 
-    public ComicAdapter(AbstractComicListFragment context, List<Object> comics) {
-        super(context, comics);
-    }
-
-    public ComicAdapter(AbstractComicListFragment context) {
-        super(context);
+    public ComicAdapter(AbstractComicListFragment context, MultiSelector multiSelector) {
+        super(context, multiSelector);
     }
 
     @Override

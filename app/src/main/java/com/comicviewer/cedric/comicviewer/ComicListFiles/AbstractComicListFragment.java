@@ -28,6 +28,7 @@ import android.widget.ImageButton;
 import android.widget.SearchView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bignerdranch.android.multiselector.MultiSelector;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
@@ -72,6 +73,8 @@ abstract public class AbstractComicListFragment extends Fragment {
     protected ImageButton mFolderViewToggleButton;
     protected ArrayList<SearchFilter> mFilters;
 
+    protected MultiSelector mMultiSelector;
+
     public AbstractComicListFragment() {
         // Required empty public constructor
     }
@@ -89,6 +92,7 @@ abstract public class AbstractComicListFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
 
+        mMultiSelector = new MultiSelector();
 
         mFilters = new ArrayList<>();
         setSearchFilters();
@@ -473,7 +477,7 @@ abstract public class AbstractComicListFragment extends Fragment {
 
     protected void initialiseVariables(Bundle savedInstanceState)
     {
-        mAdapter = new ComicAdapter(this);
+        mAdapter = new ComicAdapter(this, mMultiSelector);
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -529,7 +533,7 @@ abstract public class AbstractComicListFragment extends Fragment {
                 if (found)
                     filteredList.add(currentComics.get(i));
             }
-            ComicAdapter tempAdapter = new ComicAdapter(this, filteredList);
+            ComicAdapter tempAdapter = new ComicAdapter(this, filteredList, mMultiSelector);
             tempAdapter.setRootAdapter(mAdapter);
             mRecyclerView.swapAdapter(tempAdapter,false);
         }

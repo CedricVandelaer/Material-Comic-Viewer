@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bignerdranch.android.multiselector.MultiSelector;
 import com.comicviewer.cedric.comicviewer.ComicActions;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Info.InfoActivity;
@@ -72,34 +73,14 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
     protected ComicAdapter mRootAdapterReference = null;
     protected Handler mHandler;
 
-    public AbstractComicAdapter(AbstractComicListFragment listFragment, List<Comic> comics, boolean dummy)
-    {
-        setHasStableIds(true);
+    protected MultiSelector mMultiSelector;
 
-        ArrayList<Object> comicList = new ArrayList<>();
-
-        for (int i=0;i<comics.size();i++)
-        {
-            comicList.add(comics.get(i));
-        }
-        mComicList=comicList;
-        mListFragment=listFragment;
-        mHandler = new Handler();
-        mImageOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisc(true)
-                .considerExifParams(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .build();
-
-        this.mInflater = (LayoutInflater) listFragment.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-
-    public AbstractComicAdapter(AbstractComicListFragment context, List<Object> comics)
+    public AbstractComicAdapter(AbstractComicListFragment context, List<Object> comics, MultiSelector multiSelector)
     {
         setHasStableIds(true);
         mComicList=comics;
         mListFragment=context;
+        mMultiSelector = multiSelector;
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
@@ -110,11 +91,12 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         this.mInflater = (LayoutInflater) context.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public AbstractComicAdapter(AbstractComicListFragment context)
+    public AbstractComicAdapter(AbstractComicListFragment context, MultiSelector multiSelector)
     {
         setHasStableIds(true);
         mComicList= Collections.synchronizedList(new ArrayList<Object>());
         mListFragment=context;
+        mMultiSelector = multiSelector;
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
@@ -169,7 +151,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 v = mInflater.inflate(R.layout.comic_card_image_bg_swipe, viewGroup, false);
             }
 
-            ComicItemViewHolder comicItemViewHolder = new ComicItemViewHolder(v);
+            ComicItemViewHolder comicItemViewHolder = new ComicItemViewHolder(v, mMultiSelector);
 
             addFavoriteClickListener(comicItemViewHolder);
             addClickListener(comicItemViewHolder);
@@ -188,6 +170,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             return folderItemViewHolder;
         }
     }
+
+
 
     protected abstract void addFolderAddToCollectionClickListener(MaterialDialog dialog,  View v, FolderItemViewHolder folderItemViewHolder);
 
@@ -344,22 +328,41 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mListFragment.getActivity(), DisplayComicActivity.class);
-                Comic clickedComic = (Comic) vh.getComic();
+                if (!mMultiSelector.tapSelection(vh)) {
+                    Intent intent = new Intent(mListFragment.getActivity(), DisplayComicActivity.class);
+                    Comic clickedComic = (Comic) vh.getComic();
 
-                InputMethodManager imm = (InputMethodManager) mListFragment.getActivity().getSystemService(
-                        Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    InputMethodManager imm = (InputMethodManager) mListFragment.getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
-                Log.d("ItemClick", clickedComic.getTitle());
-                intent.putExtra("Comic", clickedComic);
+                    Log.d("ItemClick", clickedComic.getTitle());
+                    intent.putExtra("Comic", clickedComic);
 
-                if (PreferenceSetter.usesRecents(mListFragment.getActivity())) {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                    if (PreferenceSetter.usesRecents(mListFragment.getActivity())) {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                    }
+
+                    mListFragment.getActivity().startActivity(intent);
                 }
+                else
+                {
+                    vh.showSelectedLayout(vh.isActivated());
 
-                mListFragment.getActivity().startActivity(intent);
+                    if (mMultiSelector.getSelectedPositions().size() < 1)
+                        mMultiSelector.setSelectable(false);
+                }
+            }
+        });
+
+        v.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mMultiSelector.setSelectable(true);
+                mMultiSelector.setSelected(vh, true);
+                vh.showSelectedLayout(vh.isActivated());
+                return true;
             }
         });
 
@@ -371,6 +374,9 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         if (mComicList.get(position) instanceof Comic) {
 
             ComicItemViewHolder comicItemViewHolder = (ComicItemViewHolder) itemViewHolder;
+
+            comicItemViewHolder.showSelectedLayout(comicItemViewHolder.isActivated());
+
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mListFragment.getActivity());
             String cardSize = prefs.getString("cardSize", mListFragment.getActivity().getString(R.string.card_size_setting_2));
 

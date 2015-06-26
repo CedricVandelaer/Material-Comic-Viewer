@@ -1,7 +1,9 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -11,8 +13,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bignerdranch.android.multiselector.MultiSelector;
+import com.bignerdranch.android.multiselector.SwappingHolder;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.swipe.SwipeLayout;
@@ -25,7 +30,7 @@ import org.w3c.dom.Text;
  * Created by Cédric on 23/01/2015.
  * The viewholder for the comiclist
  */
-public class ComicItemViewHolder extends RecyclerView.ViewHolder{
+public class ComicItemViewHolder extends SwappingHolder{
 
     protected ImageView mCoverPicture;
     protected TextView mTitle;
@@ -49,6 +54,8 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
     protected LinearLayout mOptionsLayout;
     protected LinearLayout mMangaLayout;
 
+    protected RelativeLayout mSelectedLayout;
+
     protected Comic mComic = null;
 
     public void setComic(Comic comic)
@@ -61,8 +68,8 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         return mComic;
     }
 
-    public ComicItemViewHolder(View itemView) {
-        super(itemView);
+    public ComicItemViewHolder(View itemView, MultiSelector multiSelector) {
+        super(itemView, multiSelector);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(itemView.getContext());
         String cardSize = prefs.getString("cardSize", itemView.getContext().getString(R.string.card_size_setting_2));
@@ -80,8 +87,26 @@ public class ComicItemViewHolder extends RecyclerView.ViewHolder{
         mMangaLayout = (LinearLayout) itemView.findViewById(R.id.manga_layout);
         mMangaTextView = (TextView) itemView.findViewById(R.id.manga_text);
 
+        mSelectedLayout = (RelativeLayout) itemView.findViewById(R.id.selected_layout);
+
+
         initSwipeLayout(itemView);
 
+        setDefaultModeStateListAnimator(R.drawable.no_state_drawable);
+        setSelectionModeStateListAnimator(R.drawable.no_state_drawable);
+        setSelectionModeBackgroundDrawable(null);
+    }
+
+    public void showSelectedLayout(boolean enable)
+    {
+        if (enable)
+        {
+            mSelectedLayout.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            mSelectedLayout.setVisibility(View.GONE);
+        }
     }
 
     private void initSwipeLayout(View itemView) {
