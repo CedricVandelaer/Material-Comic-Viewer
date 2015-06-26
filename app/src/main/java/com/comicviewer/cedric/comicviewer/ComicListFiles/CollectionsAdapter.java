@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
@@ -37,7 +38,36 @@ public class CollectionsAdapter extends RecyclerView.Adapter{
 
         View v = mInflater.inflate(R.layout.collection_card,parent,false);
         CollectionViewHolder vh = new CollectionViewHolder(v);
+
+        addDeleteClickListener(vh.mDeleteButton, vh);
+
         return vh;
+    }
+
+    public void addDeleteClickListener(View v, final CollectionViewHolder vh)
+    {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                vh.mSwipeLayout.close();
+                MaterialDialog dialog = new MaterialDialog.Builder(mCollectionsFragment.getActivity())
+                        .title(mCollectionsFragment.getString(R.string.confirm_delete))
+                        .content("This will delete the collection \""+vh.getCollectionName()+"\".\n"+
+                                "Are you sure you wish to continue?")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mCollectionsFragment.getActivity()))
+                        .positiveText(mCollectionsFragment.getString(R.string.confirm))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mCollectionsFragment.getActivity()))
+                        .negativeText(mCollectionsFragment.getString(R.string.cancel))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                PreferenceSetter.removeCollection(mCollectionsFragment.getActivity(), vh.getCollectionName());
+                                mCollectionsFragment.refresh();
+                            }
+                        }).show();
+            }
+        });
     }
 
     @Override

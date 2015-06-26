@@ -17,7 +17,7 @@
     </string>
     <string name="updates" translatable="false">
         v3.3\n
-        - Create collections\n
+        - Collections\n
         - Added force portrait mode option\n
         - Mark folders as read/unread (PRO)\n
         - Fixed remove filepaths bug\n

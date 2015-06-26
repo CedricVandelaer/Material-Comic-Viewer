@@ -7,15 +7,22 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <include layout="@layout/info_layout"></include>
-        <include layout="@layout/reload_option_layout"></include>
+        <include layout="@layout/info_layout"/>
+        <include layout="@layout/reload_option_layout"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <include layout="@layout/hide_option_layout"></include>
-        <include layout="@layout/delete_option_layout"></include>
+        <include layout="@layout/hide_option_layout"/>
+        <include layout="@layout/delete_option_layout"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <include layout="@layout/collection_add_option_layout"/>
+        <include layout="@layout/collection_remove_option_layout"/>
     </LinearLayout>
 
 </LinearLayout>

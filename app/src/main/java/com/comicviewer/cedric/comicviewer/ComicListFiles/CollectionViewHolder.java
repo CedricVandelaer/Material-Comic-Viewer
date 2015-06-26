@@ -7,12 +7,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.R;
+import com.daimajia.swipe.SwipeLayout;
 import com.melnykov.fab.FloatingActionButton;
 
 /**
  * Created by CV on 21/06/2015.
  */
 public class CollectionViewHolder extends RecyclerView.ViewHolder {
+
+    protected SwipeLayout mSwipeLayout;
 
     protected TextView mTitleTextView;
     protected ImageView mIconImageView;
@@ -26,6 +29,7 @@ public class CollectionViewHolder extends RecyclerView.ViewHolder {
     public CollectionViewHolder(View itemView) {
         super(itemView);
 
+        mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe_layout);
         mTitleTextView = (TextView) itemView.findViewById(R.id.collection_title_text_view);
         mIconImageView = (ImageView) itemView.findViewById(R.id.collection_image_view);
         mCard = (CardView) itemView.findViewById(R.id.card);

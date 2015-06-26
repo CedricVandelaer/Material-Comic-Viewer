@@ -6,6 +6,10 @@ import android.widget.Toast;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -15,6 +19,41 @@ import java.util.ArrayList;
  */
 public class ComicActions {
 
+
+    public static ArrayList<String> getContainingCollections(Context context, Comic comic)
+    {
+        JSONArray collections = PreferenceSetter.getCollectionList(context);
+        ArrayList<String> containingCollections = new ArrayList<>();
+
+        for (int i=0;i<collections.length();i++)
+        {
+            try {
+                JSONObject collection = collections.getJSONObject(i);
+                String collectionName = collection.keys().next();
+                JSONArray collectionArray = collection.getJSONArray(collectionName);
+                boolean inArray = false;
+                for (int j=0;j<collectionArray.length();j++)
+                {
+                    if (collectionArray.getString(i).equals(comic.getFileName()))
+                        inArray = true;
+                }
+                if (inArray)
+                    containingCollections.add(collectionName);
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return containingCollections;
+    }
+
+    public static void addComicToCollection(Context context, String collectionName, Comic comic)
+    {
+        ArrayList<String> comicsToAdd = new ArrayList<>();
+        comicsToAdd.add(comic.getFileName());
+        PreferenceSetter.addToCollection(context, collectionName, comicsToAdd, false);
+    }
 
     public static void addFolderToCollection(Context context, String collectionName, String folderPath)
     {

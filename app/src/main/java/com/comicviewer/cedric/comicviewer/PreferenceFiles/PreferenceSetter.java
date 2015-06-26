@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.EdgeEffect;
+import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
@@ -184,6 +185,77 @@ public class PreferenceSetter {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(COLLECTIONS_LIST, collections.toString());
         editor.apply();
+    }
+
+    public static void removeComicFromCollection(Context context, String collectionName, Comic comic)
+    {
+        JSONArray collections = getCollectionList(context);
+        JSONObject collection = null;
+        JSONArray collectionArray = null;
+        int pos = -1;
+        for (int i=0;i<collections.length();i++)
+        {
+            try {
+                if (collections.getJSONObject(i).keys().next().equals(collectionName))
+                {
+                    pos = i;
+                    collection = collections.getJSONObject(i);
+                    collectionArray = collection.getJSONArray(collectionName);
+                }
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        if (pos!=-1)
+        {
+            JSONArray newCollection = new JSONArray();
+            try {
+                for (int i=0;i<collectionArray.length();i++)
+                {
+                    if (!collectionArray.get(i).equals(comic.getFileName())) {
+                        newCollection.put(collectionArray.get(i));
+                    }
+                }
+
+                collection.put(collectionName, newCollection);
+                collections.put(pos, collection);
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(COLLECTIONS_LIST, collections.toString());
+                editor.apply();
+
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void removeCollection(Context context, String collectionName)
+    {
+        JSONArray collections = getCollectionList(context);
+        JSONArray newCollections = new JSONArray();
+        try {
+            for (int i=0;i<collections.length();i++)
+            {
+                if (!collections.getJSONObject(i).keys().next().equals(collectionName))
+                {
+                    newCollections.put(collections.getJSONObject(i));
+                }
+            }
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(COLLECTIONS_LIST, newCollections.toString());
+            editor.apply();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public static JSONArray getCollectionList(Context context)
@@ -1694,15 +1766,27 @@ public class PreferenceSetter {
     public static void saveFilePaths(Context context, ArrayList<String> filePaths)
     {
         StringBuilder csvList = new StringBuilder();
+        boolean containsComma = false;
         for(int i=0;i<filePaths.size();i++){
-            csvList.append(filePaths.get(i));
-            csvList.append(",");
+            String path = filePaths.get(i);
+            if (path.contains(","))
+                containsComma = true;
+            else {
+                csvList.append(filePaths.get(i));
+                csvList.append(",");
+            }
         }
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
-        sharedPreferencesEditor.putString(FILEPATHS, csvList.toString());
+        if (!containsComma) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
+            sharedPreferencesEditor.putString(FILEPATHS, csvList.toString());
 
-        sharedPreferencesEditor.apply();
+            sharedPreferencesEditor.apply();
+        }
+        else
+        {
+            Toast.makeText(context, "Warning: filepaths should not contain commas", Toast.LENGTH_LONG).show();
+        }
     }
 
 }

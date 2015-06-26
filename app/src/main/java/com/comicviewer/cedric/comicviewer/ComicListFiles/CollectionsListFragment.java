@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
@@ -11,6 +12,7 @@ import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
+import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +38,12 @@ public class CollectionsListFragment extends AbstractComicListFragment{
         return mSingleton;
     }
 
+    @Override
+    protected void createFab(View v) {
+
+        mFab = (FloatingActionButton) v.findViewById(R.id.fab);
+        mFab.setVisibility(View.GONE);
+    }
 
     @Override
     void setSearchFilters() {

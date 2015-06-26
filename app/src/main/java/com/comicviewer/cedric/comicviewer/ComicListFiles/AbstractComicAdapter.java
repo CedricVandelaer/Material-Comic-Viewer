@@ -25,6 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -46,6 +48,9 @@ import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -314,7 +319,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                         int pos = mComicList.indexOf(comic);
                         notifyItemChanged(pos);
                     }
-                },300);
+                }, 300);
             }
         });
     }
@@ -591,14 +596,111 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                         FloatingActionButton infoButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.info_button);
                         FloatingActionButton hideButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.hide_button);
                         FloatingActionButton reloadButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.reload_button);
+                        FloatingActionButton addToCollectionButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.add_collection_button);
+
+                        FloatingActionButton removeFromCollectionButton = (FloatingActionButton) dialog.getCustomView().findViewById(R.id.remove_collection_button);
+                        LinearLayout removeFromCollectionLayout = (LinearLayout) dialog.getCustomView().findViewById(R.id.remove_collection_layout);
 
                         addDeleteButtonClickListener(dialog, deleteButton, vh.getComic());
                         addInfoClickListener(dialog, infoButton, vh, vh.getComic());
                         addReloadClickListener(dialog, reloadButton, vh.getComic());
                         addHideClickListener(dialog, hideButton, vh.getComic());
+                        addAddToCollectionClickListener(dialog, addToCollectionButton, vh.getComic());
+                        addRemoveFromCollectionClickListener(dialog, removeFromCollectionButton, removeFromCollectionLayout, vh.getComic());
                     }
                 }, 300);
 
+            }
+        });
+    }
+
+    protected void addRemoveFromCollectionClickListener(final MaterialDialog dialog, View button, View layout, final Comic comic)
+    {
+        final ArrayList<String> containingCollections = ComicActions.getContainingCollections(mListFragment.getActivity(), comic);
+        if (containingCollections.size()>0) {
+            button.setVisibility(View.VISIBLE);
+            layout.setVisibility(View.VISIBLE);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (dialog != null)
+                        dialog.dismiss();
+
+                    CharSequence[] collections = new CharSequence[containingCollections.size()];
+                    for (int i=0;i<containingCollections.size();i++)
+                    {
+                        collections[i] = containingCollections.get(i);
+                    }
+                    new MaterialDialog.Builder(mListFragment.getActivity())
+                            .title("Choose collection")
+                            .items(collections)
+                            .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                            .negativeText(mListFragment.getString(R.string.cancel))
+                            .itemsCallback(new MaterialDialog.ListCallback() {
+                                @Override
+                                public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                    PreferenceSetter.removeComicFromCollection(mListFragment.getActivity(),charSequence.toString(),comic);
+                                }
+                            }).show();
+
+                }
+            });
+        }
+        else
+        {
+            layout.setVisibility(View.GONE);
+        }
+    }
+
+    protected void addAddToCollectionClickListener(final MaterialDialog dialog, View v, final Comic comic)
+    {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog!=null)
+                    dialog.dismiss();
+                JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
+                CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+
+                for (int i=0;i<collections.length();i++)
+                {
+                    try {
+                        collectionNames[i] = collections.getJSONObject(i).keys().next();
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                final String newCollection = "Add new collection";
+                collectionNames[collectionNames.length-1] = newCollection;
+
+                new MaterialDialog.Builder(mListFragment.getActivity())
+                        .title("Choose collection")
+                        .items(collectionNames)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                if (charSequence.equals(newCollection))
+                                {
+                                    MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
+                                            .title("Create new collection")
+                                            .input("Collection name", "", false, new MaterialDialog.InputCallback() {
+                                                @Override
+                                                public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                                                    PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
+                                                    ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                                }
+                                            })
+                                            .show();
+                                }
+                                else {
+                                    ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                }
+                            }
+                        })
+                        .show();
             }
         });
     }
