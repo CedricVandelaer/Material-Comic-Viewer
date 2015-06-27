@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
@@ -332,4 +333,6 @@ public class DrawerActivity extends MaterialNavigationDrawer
             CloudFragment.getInstance().onActivityResult(requestCode,resultCode,data);
         }
     }
+
+
 }

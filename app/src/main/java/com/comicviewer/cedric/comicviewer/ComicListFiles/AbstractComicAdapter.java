@@ -20,13 +20,15 @@ import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -74,6 +76,79 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
     protected Handler mHandler;
 
     protected MultiSelector mMultiSelector;
+    protected ActionMode mActionMode;
+
+    protected ComicListActionModeCallback mEditModeCallback = new ComicListActionModeCallback(mMultiSelector) {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            mListFragment.getActivity().getMenuInflater().inflate(R.menu.edit_menu, menu);
+
+            return true;
+        }
+
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch (menuItem.getItemId()) {
+                case R.id.delete_menu_action:
+                    List<Integer> selectedItems = mMultiSelector.getSelectedPositions();
+                    multiDelete(selectedItems);
+                    return true;
+                default:
+                    break;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode)
+        {
+            List<Integer> selectedItems = mMultiSelector.getSelectedPositions();
+
+            super.onDestroyActionMode(actionMode);
+
+            for (Integer pos:selectedItems)
+            {
+                notifyItemChanged(pos);
+            }
+
+        }
+
+    };
+
+    public void multiDelete(final List<Integer> comicPositions)
+    {
+        new MaterialDialog.Builder(mListFragment.getActivity())
+                .title(mListFragment.getString(R.string.confirm_delete))
+                .content("Are you sure you want to delete "+comicPositions.size()+" items?")
+                .positiveText(mListFragment.getString(R.string.confirm))
+                .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                .negativeText(mListFragment.getString(R.string.cancel))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        ArrayList<Object> comicsToRemove = new ArrayList<>();
+                        for (Integer pos:comicPositions)
+                        {
+                            comicsToRemove.add(mComicList.get(pos));
+                        }
+
+                        for (int i=0;i<comicsToRemove.size();i++)
+                        {
+                            removeItem(comicsToRemove.get(i));
+                        }
+                    }
+
+                    @Override
+                    public void onAny(MaterialDialog dialog)
+                    {
+                        mActionMode.finish();
+                    }
+                }).show();
+    }
 
     public AbstractComicAdapter(AbstractComicListFragment context, List<Object> comics, MultiSelector multiSelector)
     {
@@ -81,6 +156,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         mComicList=comics;
         mListFragment=context;
         mMultiSelector = multiSelector;
+        mEditModeCallback.setMultiSelector(multiSelector);
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
@@ -97,6 +173,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         mComicList= Collections.synchronizedList(new ArrayList<Object>());
         mListFragment=context;
         mMultiSelector = multiSelector;
+        mEditModeCallback.setMultiSelector(multiSelector);
         mImageOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
@@ -350,8 +427,10 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 {
                     vh.showSelectedLayout(vh.isActivated());
 
-                    if (mMultiSelector.getSelectedPositions().size() < 1)
+                    if (mMultiSelector.getSelectedPositions().size() < 1) {
                         mMultiSelector.setSelectable(false);
+                        mActionMode.finish();
+                    }
                 }
             }
         });
@@ -362,6 +441,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 mMultiSelector.setSelectable(true);
                 mMultiSelector.setSelected(vh, true);
                 vh.showSelectedLayout(vh.isActivated());
+                mActionMode = mListFragment.getActivity().startActionMode(mEditModeCallback);
                 return true;
             }
         });

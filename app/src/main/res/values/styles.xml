@@ -31,6 +31,9 @@
         <item name="colorPrimaryDark">@color/TealDark</item>
         <item name="colorAccent">@color/Teal</item>
         <item name="drawerType">@integer/DRAWERTYPE_IMAGE</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/Widget.AppCompat.ActionMode</item>
+        <item name="android:actionModeBackground">@color/BlueGrey</item>
     </style>
 
 </resources>

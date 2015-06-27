@@ -111,6 +111,8 @@
                     android:layout_marginLeft="6dp"
                     android:layout_marginRight="78dp"
                     android:layout_alignParentBottom="true"/>
+                <include layout="@layout/selected_layout"/>
+
             </RelativeLayout>
 
         </android.support.v7.widget.CardView>

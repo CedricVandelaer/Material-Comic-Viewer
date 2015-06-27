@@ -42,6 +42,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.Extractor;
+import com.comicviewer.cedric.comicviewer.PageFlipPageTransformer;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -364,6 +365,10 @@ public class DisplayComicActivity extends AppCompatActivity {
         else if(PreferenceSetter.getPageFlipAnimationSetting(this).equals(getString(R.string.stack)))
         {
             mPager.setPageTransformer(true, new StackTransformer());
+        }
+        else if(PreferenceSetter.getPageFlipAnimationSetting(this).equals(getString(R.string.page_flip)))
+        {
+            mPager.setPageTransformer(true, new PageFlipPageTransformer());
         }
         else
         {

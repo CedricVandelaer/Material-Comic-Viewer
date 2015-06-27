@@ -86,5 +86,6 @@
         <item>@string/foreground_to_background</item>
         <item>@string/stack</item>
         <item>@string/zoom_out</item>
+        <item>@string/page_flip</item>
     </string-array>
 </resources>
