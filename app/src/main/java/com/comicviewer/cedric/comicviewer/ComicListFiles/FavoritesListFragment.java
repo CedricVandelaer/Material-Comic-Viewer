@@ -57,11 +57,13 @@ public class FavoritesListFragment extends AbstractComicListFragment {
     @Override
     void setSearchFilters() {
 
-        mFilters.add(new SearchFilter() {
+        mFilters.clear();
+
+        mFilters.add(new SearchFilter(PreferenceSetter.getFolderEnabledSetting(getActivity())) {
             @Override
             public boolean compare(Object object) {
                 if (object instanceof File)
-                    return PreferenceSetter.getFolderEnabledSetting(getActivity());
+                    return mCompareSetting;
                 return true;
             }
         });
@@ -138,6 +140,7 @@ public class FavoritesListFragment extends AbstractComicListFragment {
                 toolbar.removeView(mFolderViewToggleButton);
             }
         }
+        setSearchFilters();
     }
 
     @Override

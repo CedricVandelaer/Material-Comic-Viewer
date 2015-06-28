@@ -34,6 +34,9 @@ public class CurrentlyReadingFragment extends AbstractComicListFragment {
 
     @Override
     void setSearchFilters() {
+
+        mFilters.clear();
+
         mFilters.add(new SearchFilter(PreferenceSetter.getReadComics(mApplicationContext)) {
             @Override
             public boolean compare(Object object) {
@@ -49,14 +52,6 @@ public class CurrentlyReadingFragment extends AbstractComicListFragment {
             }
         });
 
-        mFilters.add(new SearchFilter() {
-            @Override
-            public boolean compare(Object object) {
-                if (object instanceof File)
-                    return PreferenceSetter.getFolderEnabledSetting(getActivity());
-                return true;
-            }
-        });
 
     }
 

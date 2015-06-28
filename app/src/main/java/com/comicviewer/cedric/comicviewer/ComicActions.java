@@ -34,7 +34,7 @@ public class ComicActions {
                 boolean inArray = false;
                 for (int j=0;j<collectionArray.length();j++)
                 {
-                    if (collectionArray.getString(i).equals(comic.getFileName()))
+                    if (collectionArray.getString(j).equals(comic.getFileName()))
                         inArray = true;
                 }
                 if (inArray)

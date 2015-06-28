@@ -132,7 +132,6 @@ abstract public class AbstractComicListFragment extends Fragment {
         @Override
         protected void onPreExecute()
         {
-            showProgressSpinner(true);
             enableSearchBar(false);
             addShowFolderViewButton(false);
         }
@@ -150,7 +149,6 @@ abstract public class AbstractComicListFragment extends Fragment {
         @Override
         protected void onPostExecute(Object object)
         {
-            showProgressSpinner(false);
             addShowFolderViewButton(true);
             enableSearchBar(true);
         }
@@ -648,6 +646,7 @@ abstract public class AbstractComicListFragment extends Fragment {
                 if (mustSave || ComicLoader.setComicColor(mApplicationContext, comic)) {
                     comicsToSave.add(comic);
                     hasToLoad = true;
+                    showProgressSpinner(true);
                 }
 
                 if (!hasToLoad) {
@@ -662,6 +661,8 @@ abstract public class AbstractComicListFragment extends Fragment {
                 addToAdapter(comic);
             }
         }
+
+        showProgressSpinner(false);
 
         new Thread(new Runnable() {
             @Override

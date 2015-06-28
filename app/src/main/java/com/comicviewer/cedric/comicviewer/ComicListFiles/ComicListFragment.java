@@ -54,12 +54,12 @@ public class ComicListFragment extends AbstractComicListFragment {
     @Override
     void setSearchFilters() {
 
-        mFilters.add(new SearchFilter() {
+        mFilters.clear();
+
+        mFilters.add(new SearchFilter(PreferenceSetter.getFolderEnabledSetting(getActivity())) {
             @Override
             public boolean compare(Object object) {
-                if (object instanceof File)
-                    return PreferenceSetter.getFolderEnabledSetting(getActivity());
-                return true;
+                return !(object instanceof File) || mCompareSetting;
             }
         });
     }
@@ -111,6 +111,7 @@ public class ComicListFragment extends AbstractComicListFragment {
                 toolbar.removeView(mFolderViewToggleButton);
             }
         }
+        setSearchFilters();
     }
 
     @Override

@@ -14,6 +14,7 @@ public abstract class SearchFilter<T, K> {
 
     protected List<T> mCompareList = new ArrayList<>();
     protected Map<T, K> mCompareMap = new HashMap<>();
+    protected boolean mCompareSetting;
 
     public SearchFilter()
     {
@@ -28,6 +29,11 @@ public abstract class SearchFilter<T, K> {
     public SearchFilter(Map<T, K> compareMap)
     {
         mCompareMap = compareMap;
+    }
+
+    public SearchFilter(boolean compareSetting)
+    {
+        mCompareSetting = compareSetting;
     }
 
 
