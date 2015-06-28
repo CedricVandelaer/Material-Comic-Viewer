@@ -1,11 +1,9 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 
-import android.app.FragmentTransaction;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,11 +17,9 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
-import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
@@ -34,37 +30,19 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.io.File;
-import java.util.ArrayList;
-
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CollectionsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public abstract class AbstractCollectionsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
-    private static CollectionsFragment mSingleton;
+    protected RecyclerView mRecyclerView;
+    protected RecyclerView.LayoutManager mLayoutManager;
+    protected CollectionsAdapter mAdapter;
+    protected SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private CollectionsAdapter mAdapter;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    protected FloatingActionButton mFab;
 
-    private FloatingActionButton mFab;
-
-    private NavigationManager mNavigationManager;
-
-    private Handler mHandler;
-
-    public static CollectionsFragment getInstance()
-    {
-        if (mSingleton == null)
-            mSingleton = new CollectionsFragment();
-        return mSingleton;
-    }
-
-    public CollectionsFragment() {
-        // Required empty public constructor
-    }
+    protected Handler mHandler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -84,7 +62,6 @@ public class CollectionsFragment extends Fragment implements SwipeRefreshLayout.
         NavigationManager.getInstance().resetCollectionStack();
         mAdapter = new CollectionsAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
-
 
         // Inflate the layout for this fragment
         return v;
@@ -152,33 +129,7 @@ public class CollectionsFragment extends Fragment implements SwipeRefreshLayout.
 
     }
 
-    private void createFab(View v) {
-        mFab = (FloatingActionButton)v.findViewById(R.id.fab);
-        mFab.setColorNormal(PreferenceSetter.getAccentColor(getActivity()));
-        mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAccentColor(getActivity())));
-        mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAccentColor(getActivity())));
-        mFab.attachToRecyclerView(mRecyclerView);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                        .title("Add new collection")
-                        .input("Name", "", false, new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                materialDialog.dismiss();
-                                PreferenceSetter.createCollection(getActivity(), charSequence.toString());
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        })
-                        .positiveText(getString(R.string.confirm))
-                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .negativeText(getString(R.string.cancel))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .show();
-            }
-        });
-    }
+    abstract protected void createFab(View v);
 
     public void setProgressSpinner(final boolean enable)
     {
@@ -205,19 +156,6 @@ public class CollectionsFragment extends Fragment implements SwipeRefreshLayout.
         }
         else
         {
-            /*
-            // Create new fragment and transaction
-            Fragment newFragment = new CollectionsListFragment();
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment,
-            // and add the transaction to the back stack if needed
-            transaction.replace(((ViewGroup)getView().getParent()).getId(), newFragment);
-            transaction.addToBackStack(null);
-
-            // Commit the transaction
-            transaction.commit();
-            */
             ((DrawerActivity)getActivity()).setFragment(CollectionsListFragment.getInstance(), NavigationManager.getInstance().getPathFromCollectionStack());
         }
     }

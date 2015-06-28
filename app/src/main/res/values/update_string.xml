@@ -18,6 +18,7 @@
     <string name="updates" translatable="false">
         v3.3\n
         - Collections\n
+        - Multi select comics\n
         - Added force portrait mode option\n
         - Mark folders as read/unread (PRO)\n
         - New page animation (PRO)\n

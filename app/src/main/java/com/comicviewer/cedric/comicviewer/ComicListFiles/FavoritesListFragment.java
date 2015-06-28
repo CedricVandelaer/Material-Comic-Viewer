@@ -76,7 +76,7 @@ public class FavoritesListFragment extends AbstractComicListFragment {
                 else if (object instanceof File)
                 {
                     File folder = (File) object;
-                    ArrayList<String> subfiles = FileLoader.searchSubFoldersAndFiles(folder.getAbsolutePath());
+                    ArrayList<String> subfiles = FileLoader.searchSubFoldersAndFilesRecursive(folder.getAbsolutePath());
                     for (int i=0;i<subfiles.size();i++)
                     {
                         File file = new File(subfiles.get(i));

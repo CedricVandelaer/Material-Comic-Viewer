@@ -143,15 +143,13 @@ public class ComicActions {
 
     public static void addFolderToCollection(Context context, String collectionName, String folderPath)
     {
-        ArrayList<String> rootPath = new ArrayList<>();
-        rootPath.add(folderPath);
-        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(rootPath);
+        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(folderPath);
 
         ArrayList<String> comicsToAdd = new ArrayList<>();
 
         for (int i=0;i<subFilesAndFolders.size();i++)
         {
-            Comic comic;
+            //Comic comic;
             File file = new File(subFilesAndFolders.get(i));
             if (Utilities.checkImageFolder(file))
             {
@@ -169,9 +167,7 @@ public class ComicActions {
 
     public static void markFolderUnread(Context context, String folderPath)
     {
-        ArrayList<String> rootPath = new ArrayList<>();
-        rootPath.add(folderPath);
-        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(rootPath);
+        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(folderPath);
 
         for (int i=0;i<subFilesAndFolders.size();i++)
         {
@@ -196,9 +192,7 @@ public class ComicActions {
 
     public static void markFolderRead(Context context, String folderPath)
     {
-        ArrayList<String> rootPath = new ArrayList<>();
-        rootPath.add(folderPath);
-        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(rootPath);
+        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(folderPath);
 
         for (int i=0;i<subFilesAndFolders.size();i++)
         {

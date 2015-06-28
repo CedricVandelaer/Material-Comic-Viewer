@@ -59,8 +59,6 @@ import java.util.List;
  */
 public class ComicAdapter extends AbstractComicAdapter {
 
-
-
     @Override
     protected void multiAddToCollection(final ArrayList<Comic> comics) {
 
@@ -112,8 +110,6 @@ public class ComicAdapter extends AbstractComicAdapter {
                     }
                 })
                 .show();
-
-
     }
 
     public ComicAdapter(AbstractComicListFragment context, List<Object> comics, MultiSelector multiSelector) {

@@ -1,9 +1,6 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
@@ -19,8 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

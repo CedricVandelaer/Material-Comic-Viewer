@@ -1,13 +1,11 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
@@ -15,18 +13,16 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 
 import org.json.JSONException;
 
-import it.neokree.materialnavigationdrawer.elements.MaterialSection;
-
 /**
  * Created by CV on 22/06/2015.
  */
 public class CollectionsAdapter extends RecyclerView.Adapter{
 
-    private CollectionsFragment mCollectionsFragment;
+    private AbstractCollectionsFragment mCollectionsFragment;
 
     private LayoutInflater mInflater;
 
-    public CollectionsAdapter(CollectionsFragment fragment)
+    public CollectionsAdapter(AbstractCollectionsFragment fragment)
     {
         mCollectionsFragment = fragment;
 

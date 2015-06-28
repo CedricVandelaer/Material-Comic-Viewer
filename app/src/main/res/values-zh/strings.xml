@@ -170,4 +170,18 @@
     <string name="changelog">更改记录</string>
     <string name="synchronization">同步</string>
 
+    <string name="app_accent_color_setting">强调色</string>
+    <string name="app_accent_color_setting_non_pro">强调色(完整版)</string>
+    <string name="choose_accent_color">选择强调色</string>
+    <string name="go_to_page">转到页面</string>
+    <string name="collections">集合</string>
+    <string name="show_toolbar">音工具栏选项</string>
+    <string name="force_portrait_setting">强制人像模式</string>
+    <string name="add_cloud_storage_account">云存储添加到</string>
+    <string name="device">设备</string>
+    <string name="export_data">出口数据</string>
+    <string name="import_data">进口数据</string>
+    <string name="rate_app">率的应用</string>
+    <string name="find_comic_viewer_on">找到我们:</string>
+    <string name="page_flip">封面</string>
 </resources>

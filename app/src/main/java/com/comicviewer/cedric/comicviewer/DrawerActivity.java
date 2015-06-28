@@ -10,10 +10,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractCollectionsFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
