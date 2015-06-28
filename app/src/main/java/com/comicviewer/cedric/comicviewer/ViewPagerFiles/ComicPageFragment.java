@@ -96,6 +96,7 @@ public class ComicPageFragment extends Fragment {
             ImageLoader.getInstance().init(config);
         }
         mFullscreenComicView.setImageBitmap(null);
+        mFullscreenComicView.setAllowScrollOnZoom(PreferenceSetter.getScrollOnZoomSetting(getActivity()));
 
         if (filename!=null) {
             if (getActivity()!=null) {

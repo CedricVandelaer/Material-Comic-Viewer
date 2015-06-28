@@ -98,6 +98,28 @@ public class TouchImageView extends ImageView {
     private OnTouchListener userTouchListener = null;
     private OnTouchImageViewListener touchImageViewListener = null;
 
+    private boolean allowScrollOnZoom = true;
+
+
+    /////////////Disable paging while zooming/////////////////////
+    private void stopInterceptEvent()
+    {
+        getParent().requestDisallowInterceptTouchEvent(true);
+    }
+
+    private void startInterceptEvent()
+    {
+        getParent().requestDisallowInterceptTouchEvent(false);
+    }
+
+    public void setAllowScrollOnZoom(boolean enabled)
+    {
+        allowScrollOnZoom = enabled;
+    }
+
+    //////////////////////////////////////////////////////
+
+
     public TouchImageView(Context context) {
         super(context);
         sharedConstructing(context);
@@ -833,6 +855,12 @@ public class TouchImageView extends ImageView {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+
+            if (!allowScrollOnZoom && isZoomed())
+                stopInterceptEvent();
+            else
+                startInterceptEvent();
+
             mScaleDetector.onTouchEvent(event);
             mGestureDetector.onTouchEvent(event);
             PointF curr = new PointF(event.getX(), event.getY());

@@ -60,6 +60,10 @@
             android:key="forcePortrait"
             android:title="@string/force_portrait_setting"
             android:defaultValue="false"/>
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="allowScrollOnZoom"
+            android:title="Allow paging when zoomed in"
+            android:defaultValue="true"/>
         <ListPreference
             android:key="readingBackgroundColor"
             android:title="@string/reading_background_color_setting"

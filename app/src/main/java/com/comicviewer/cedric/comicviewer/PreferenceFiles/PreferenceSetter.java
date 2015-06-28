@@ -84,8 +84,15 @@ public class PreferenceSetter {
     public static final String TOOLBAR_OPTION = "toolbarOption";
     public static final String COLLECTIONS_LIST = "collectionsList";
     public static final String FORCE_PORTRAIT_SETTING = "forcePortrait";
+    public static final String SCROLL_ON_ZOOM_SETTING = "allowScrollOnZoom";
 
     public static final String COMIC_VIEWER = "ComicViewer";
+
+    public static boolean getScrollOnZoomSetting(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(SCROLL_ON_ZOOM_SETTING, true);
+    }
 
     public static boolean getForcePortraitSetting(Context context)
     {
