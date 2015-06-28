@@ -91,9 +91,29 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         @Override
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             switch (menuItem.getItemId()) {
+                case R.id.mark_read_menu_action:
+                    multiMarkRead(getSelectedComics());
+                    return true;
+                case R.id.mark_unread_menu_action:
+                    multiMarkUnread(getSelectedComics());
+                    return true;
+                case R.id.manga_menu_action:
+                    multiMakeManga(getSelectedComics());
+                    return true;
+                case R.id.normal_menu_action:
+                    multiMakeNormal(getSelectedComics());
+                    return true;
+                case R.id.add_collection_menu_action:
+                    multiAddToCollection(getSelectedComics());
+                    return true;
+                case R.id.remove_collection_menu_action:
+                    multiRemoveFromCollection(getSelectedComics());
+                    return true;
+                case R.id.hide_menu_action:
+                    multiHideComics(getSelectedComics());
+                    return true;
                 case R.id.delete_menu_action:
-                    List<Integer> selectedItems = mMultiSelector.getSelectedPositions();
-                    multiDelete(selectedItems);
+                    multiDelete(getSelectedComics());
                     return true;
                 default:
                     break;
@@ -117,11 +137,89 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
     };
 
-    public void multiDelete(final List<Integer> comicPositions)
+    protected abstract void multiHideComics(ArrayList<Comic> comics);
+
+    protected abstract void multiAddToCollection(ArrayList<Comic> comics);
+
+    protected void multiRemoveFromCollection(final ArrayList<Comic> comics)
+    {
+        ArrayList<String> collections = PreferenceSetter.getCollectionNames(mListFragment.getActivity());
+        CharSequence[] charCollectionNames = new CharSequence[collections.size()];
+        for (int i=0;i<collections.size();i++)
+        {
+            charCollectionNames[i] = collections.get(i);
+        }
+        MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
+                .title("Add to collection")
+                .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                .negativeText(mListFragment.getString(R.string.cancel))
+                .items(charCollectionNames)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        ComicActions.removeComicsFromCollection(mListFragment.getActivity(), charSequence.toString(), comics);
+                        mActionMode.finish();
+                    }
+                })
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onAny(MaterialDialog dialog) {
+                        super.onAny(dialog);
+                        mActionMode.finish();
+                    }
+                }).show();
+    }
+
+
+    protected ArrayList<Comic> getSelectedComics()
+    {
+        List<Integer> positions = mMultiSelector.getSelectedPositions();
+        ArrayList<Comic> selectedComics = new ArrayList<>();
+        for (Integer pos:positions)
+        {
+            selectedComics.add((Comic) mComicList.get(pos));
+        }
+        return selectedComics;
+    }
+
+    public void multiMakeManga(final ArrayList<Comic> comicsToMakeManga)
+    {
+        ComicActions.makeMangaComics(mListFragment.getActivity(), comicsToMakeManga);
+        notifyDataSetChanged();
+        mActionMode.finish();
+    }
+
+    public void multiMakeNormal(final ArrayList<Comic> comicsToMakeNormal)
+    {
+        ComicActions.makeNormalComics(mListFragment.getActivity(), comicsToMakeNormal);
+        notifyDataSetChanged();
+        mActionMode.finish();
+    }
+
+    public void multiMarkRead(final ArrayList<Comic> comicsToMark)
+    {
+        for (Comic comic:comicsToMark)
+        {
+            ComicActions.markComicRead(mListFragment.getActivity(), comic, false);
+        }
+        notifyDataSetChanged();
+        mActionMode.finish();
+    }
+
+    public void multiMarkUnread(final ArrayList<Comic> comicsToMark)
+    {
+        for (Comic comic:comicsToMark) {
+            ComicActions.markComicUnread(mListFragment.getActivity(),comic);
+        }
+        notifyDataSetChanged();
+        mActionMode.finish();
+    }
+
+    public void multiDelete(final ArrayList<Comic> comicsToRemove)
     {
         new MaterialDialog.Builder(mListFragment.getActivity())
                 .title(mListFragment.getString(R.string.confirm_delete))
-                .content("Are you sure you want to delete "+comicPositions.size()+" items?")
+                .content("Are you sure you want to delete "+comicsToRemove.size()+" items?")
                 .positiveText(mListFragment.getString(R.string.confirm))
                 .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
                 .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
@@ -130,18 +228,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        ArrayList<Object> comicsToRemove = new ArrayList<>();
-                        for (Integer pos:comicPositions)
-                        {
-                            comicsToRemove.add(mComicList.get(pos));
-                        }
-
-                        for (int i=0;i<comicsToRemove.size();i++)
-                        {
-                            removeItem(comicsToRemove.get(i));
-                        }
+                        removeComics(comicsToRemove);
                     }
-
                     @Override
                     public void onAny(MaterialDialog dialog)
                     {
@@ -738,58 +826,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         }
     }
 
-    protected void addAddToCollectionClickListener(final MaterialDialog dialog, View v, final Comic comic)
-    {
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (dialog!=null)
-                    dialog.dismiss();
-                JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
-                CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+    protected abstract void addAddToCollectionClickListener(final MaterialDialog dialog, View v, final Comic comic);
 
-                for (int i=0;i<collections.length();i++)
-                {
-                    try {
-                        collectionNames[i] = collections.getJSONObject(i).keys().next();
-                    }
-                    catch (JSONException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-
-                final String newCollection = "Add new collection";
-                collectionNames[collectionNames.length-1] = newCollection;
-
-                new MaterialDialog.Builder(mListFragment.getActivity())
-                        .title("Choose collection")
-                        .items(collectionNames)
-                        .itemsCallback(new MaterialDialog.ListCallback() {
-                            @Override
-                            public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                                if (charSequence.equals(newCollection))
-                                {
-                                    MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
-                                            .title("Create new collection")
-                                            .input("Collection name", "", false, new MaterialDialog.InputCallback() {
-                                                @Override
-                                                public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                                    PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
-                                                    ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
-                                                }
-                                            })
-                                            .show();
-                                }
-                                else {
-                                    ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
-                                }
-                            }
-                        })
-                        .show();
-            }
-        });
-    }
 
     abstract void addHideClickListener(final MaterialDialog dialog, View v, final Comic comic);
 
@@ -1020,7 +1058,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
     {
         final Comic comic = (Comic) mComicList.get(i);
 
-        comicItemViewHolder.mTitle.setText(comic.getTitle()+" "+comic.getIssueNumber());
+        comicItemViewHolder.mTitle.setText(comic.getTitle() + " " + comic.getIssueNumber());
 
         int color = comic.getComicColor();
         int transparentColor = Color.argb(235,
@@ -1531,6 +1569,23 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         lastPosition = position;
     }
 
+    public void removeComics(final ArrayList<Comic> comics)
+    {
+
+        for (int i=0;i<comics.size();i++)
+        {
+            mComicList.remove(comics.get(i));
+        }
+        notifyDataSetChanged();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ComicActions.removeComics(mListFragment.getActivity(), comics);
+            }
+        }).run();
+    }
+
     public void removeItem(Object obj)
     {
 
@@ -1545,25 +1600,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
                 Comic comic = (Comic) obj;
 
-                String coverImageFileName = comic.getCoverImage();
-                if (coverImageFileName != null && coverImageFileName.startsWith("file:///")) {
-                    coverImageFileName = coverImageFileName.replace("file:///", "");
-                }
-
-                try {
-                    if (coverImageFileName != null) {
-                        File coverImageFile = new File(coverImageFileName);
-                        if (coverImageFile.exists())
-                            coverImageFile.delete();
-                    }
-
-                    File archiveFile = new File(comic.getFilePath() + "/" + comic.getFileName());
-                    if (archiveFile.exists())
-                        archiveFile.delete();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                PreferenceSetter.removeSavedComic(mListFragment.getActivity(), comic);
+                ComicActions.removeComic(mListFragment.getActivity(), comic);
                 int pos = mComicList.indexOf(comic);
                 mComicList.remove(comic);
                 notifyItemRemoved(pos);

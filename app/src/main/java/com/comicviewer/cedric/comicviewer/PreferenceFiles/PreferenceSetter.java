@@ -100,6 +100,25 @@ public class PreferenceSetter {
         return prefs.getBoolean(FORCE_PORTRAIT_SETTING, false);
     }
 
+    public static ArrayList<String> getCollectionNames(Context context)
+    {
+        JSONArray collections = PreferenceSetter.getCollectionList(context);
+        ArrayList<String> collectionNames = new ArrayList<>();
+
+        for (int i=0;i<collections.length();i++)
+        {
+            try {
+                collectionNames.add(collections.getJSONObject(i).keys().next());
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        return collectionNames;
+    }
+
     public static void addToCollection(Context context, String collectionName, ArrayList<String> filenames, boolean dummy)
     {
         JSONArray collections = getCollectionList(context);
@@ -192,6 +211,56 @@ public class PreferenceSetter {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(COLLECTIONS_LIST, collections.toString());
         editor.apply();
+    }
+
+    public static void removeComicsFromCollection(Context context, String collectionName, ArrayList<Comic> comics)
+    {
+        JSONArray collections = getCollectionList(context);
+        JSONObject collection = null;
+        JSONArray collectionArray = null;
+        int pos = -1;
+        for (int i=0;i<collections.length();i++)
+        {
+            try {
+                if (collections.getJSONObject(i).keys().next().equals(collectionName))
+                {
+                    pos = i;
+                    collection = collections.getJSONObject(i);
+                    collectionArray = collection.getJSONArray(collectionName);
+                }
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        if (pos!=-1)
+        {
+            JSONArray newCollection = new JSONArray();
+            try {
+                for (int i=0;i<collectionArray.length();i++)
+                {
+                    for (Comic comic:comics) {
+                        if (!collectionArray.get(i).equals(comic.getFileName())) {
+                            newCollection.put(collectionArray.get(i));
+                        }
+                    }
+                }
+
+                collection.put(collectionName, newCollection);
+                collections.put(pos, collection);
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(COLLECTIONS_LIST, collections.toString());
+                editor.apply();
+
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void removeComicFromCollection(Context context, String collectionName, Comic comic)
@@ -564,6 +633,18 @@ public class PreferenceSetter {
         editor.apply();
     }
 
+    public static void batchAddHiddenPath(Context context, ArrayList<String> paths)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String csvList = prefs.getString(UNHIDE_LIST, "");
+
+        for (String path:paths)
+            csvList+=path+",";
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(UNHIDE_LIST, csvList);
+        editor.apply();
+    }
+
     public static void removeHiddenPath(Context context, String path)
     {
         ArrayList<String> paths = getHiddenFiles(context);
@@ -701,6 +782,32 @@ public class PreferenceSetter {
         return false;
     }
 
+    public static void batchRemoveNormalComics(Context context, ArrayList<Comic> comics)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String csvList = preferences.getString(NORMAL_LIST, "");
+        String newList = "";
+
+        String parts[] = csvList.split(",");
+
+        for (int i=0;i<parts.length;i++)
+        {
+            boolean shouldBeRemoved = false;
+            for (Comic comic:comics) {
+                if (parts[i].equals(comic.getFilePath() + "/" + comic.getFileName())) {
+                    shouldBeRemoved = true;
+                }
+            }
+            if (!shouldBeRemoved)
+                newList += parts[i] + ",";
+        }
+
+        editor.putString(NORMAL_LIST, newList);
+        editor.apply();
+    }
+
     public static void removeNormalComic(Context context, String path)
     {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -742,6 +849,19 @@ public class PreferenceSetter {
         }
 
         editor.putString(NORMAL_LIST, newList);
+        editor.apply();
+    }
+
+    public static void batchSaveNormalComics(Context context, ArrayList<Comic> comics)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String csvList = preferences.getString(NORMAL_LIST,"");
+        for (Comic comic:comics) {
+            csvList += comic.getFilePath() + "/" + comic.getFileName() + ",";
+        }
+        editor.putString(NORMAL_LIST, csvList);
         editor.apply();
     }
 
@@ -800,6 +920,32 @@ public class PreferenceSetter {
         return false;
     }
 
+    public static void batchRemoveMangaComics(Context context, ArrayList<Comic> comics)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String csvList = preferences.getString(MANGA_LIST, "");
+        String newList = "";
+
+        String parts[] = csvList.split(",");
+
+        for (int i=0;i<parts.length;i++)
+        {
+            boolean shouldBeRemoved = false;
+            for (Comic comic:comics) {
+                if (parts[i].equals(comic.getFilePath() + "/" + comic.getFileName())) {
+                    shouldBeRemoved = true;
+                }
+            }
+            if (!shouldBeRemoved)
+                newList += parts[i] + ",";
+        }
+
+        editor.putString(MANGA_LIST, newList);
+        editor.apply();
+    }
+
     public static void removeMangaComic(Context context, String path)
     {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -841,6 +987,19 @@ public class PreferenceSetter {
         }
 
         editor.putString(MANGA_LIST, newList);
+        editor.apply();
+    }
+
+    public static void batchSaveMangaComics(Context context, ArrayList<Comic> comics)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String csvList = preferences.getString(MANGA_LIST,"");
+        for (Comic comic:comics) {
+            csvList += comic.getFilePath() + "/" + comic.getFileName() + ",";
+        }
+        editor.putString(MANGA_LIST, csvList);
         editor.apply();
     }
 
@@ -1580,6 +1739,29 @@ public class PreferenceSetter {
         }
 
         return comicList;
+    }
+
+    public static void batchRemoveSavedComics(Context context, List<Comic> comicsToRemove)
+    {
+        List<Comic> currentComicList = getSavedComics(context);
+        List<Comic> comicsToKeep = new ArrayList<>();
+
+        for (Comic comic:currentComicList)
+        {
+            boolean mustBeRemoved = false;
+
+            for (int i=0;!mustBeRemoved && i<comicsToRemove.size();i++)
+            {
+                if (comic.getFileName().equals(comicsToRemove.get(i).getFileName())
+                        && comic.getFilePath().equals(comicsToRemove.get(i).getFilePath()))
+                {
+                    mustBeRemoved = true;
+                }
+            }
+            if (!mustBeRemoved)
+                comicsToKeep.add(comic);
+        }
+        saveComicList(context, comicsToKeep);
     }
 
     public static void removeSavedComic(Context context, Comic comicToRemove)

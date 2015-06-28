@@ -19,6 +19,78 @@ import java.util.ArrayList;
  */
 public class ComicActions {
 
+    public static void makeNormalComics(Context context, ArrayList<Comic> comics)
+    {
+        PreferenceSetter.batchRemoveMangaComics(context, comics);
+        PreferenceSetter.batchSaveNormalComics(context, comics);
+    }
+
+    public static void makeMangaComics(Context context, ArrayList<Comic> comics)
+    {
+        PreferenceSetter.batchRemoveNormalComics(context, comics);
+        PreferenceSetter.batchSaveMangaComics(context, comics);
+    }
+
+    public static void makeMangaComic(Context context, Comic comic)
+    {
+        PreferenceSetter.removeNormalComic(context, comic);
+        PreferenceSetter.saveMangaComic(context, comic);
+    }
+
+    public static void makeNormalComic(Context context, Comic comic)
+    {
+        PreferenceSetter.saveNormalComic(context, comic);
+        PreferenceSetter.removeMangaComic(context, comic);
+    }
+
+    public static void removeComic(Context context, Comic comic)
+    {
+        String coverImageFileName = comic.getCoverImage();
+        if (coverImageFileName != null && coverImageFileName.startsWith("file:///")) {
+            coverImageFileName = coverImageFileName.replace("file:///", "");
+        }
+
+        try {
+            if (coverImageFileName != null) {
+                File coverImageFile = new File(coverImageFileName);
+                if (coverImageFile.exists())
+                    coverImageFile.delete();
+            }
+
+            File archiveFile = new File(comic.getFilePath() + "/" + comic.getFileName());
+            if (archiveFile.exists())
+                archiveFile.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        PreferenceSetter.removeSavedComic(context, comic);
+
+    }
+
+    public static void removeComics(Context context, ArrayList<Comic> comics)
+    {
+        for (Comic comic:comics) {
+            String coverImageFileName = comic.getCoverImage();
+            if (coverImageFileName != null && coverImageFileName.startsWith("file:///")) {
+                coverImageFileName = coverImageFileName.replace("file:///", "");
+            }
+
+            try {
+                if (coverImageFileName != null) {
+                    File coverImageFile = new File(coverImageFileName);
+                    if (coverImageFile.exists())
+                        coverImageFile.delete();
+                }
+
+                File archiveFile = new File(comic.getFilePath() + "/" + comic.getFileName());
+                if (archiveFile.exists())
+                    archiveFile.delete();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        PreferenceSetter.batchRemoveSavedComics(context, comics);
+    }
 
     public static ArrayList<String> getContainingCollections(Context context, Comic comic)
     {
@@ -46,6 +118,20 @@ public class ComicActions {
             }
         }
         return containingCollections;
+    }
+
+    public static void addComicsToCollection(Context context, String collectionName, ArrayList<Comic> comics)
+    {
+        ArrayList<String> comicsToAdd = new ArrayList<>();
+        for (Comic comic:comics) {
+            comicsToAdd.add(comic.getFileName());
+        }
+        PreferenceSetter.addToCollection(context, collectionName, comicsToAdd, false);
+    }
+
+    public static void removeComicsFromCollection(Context context, String collectionName, ArrayList<Comic> comics)
+    {
+        PreferenceSetter.removeComicsFromCollection(context, collectionName, comics);
     }
 
     public static void addComicToCollection(Context context, String collectionName, Comic comic)

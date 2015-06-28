@@ -2,8 +2,44 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/mark_read_menu_action"
+        android:title="@string/mark_read"
+        android:icon="@drawable/ic_check"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/mark_unread_menu_action"
+        android:title="@string/mark_unread"
+        android:icon="@drawable/ic_close"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/manga_menu_action"
+        android:title="@string/manga_comic"
+        android:icon="@drawable/ic_fish"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/normal_menu_action"
+        android:title="@string/normal_comic"
+        android:icon="@drawable/ic_fire"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/add_collection_menu_action"
+        android:title="Add to collection"
+        android:icon="@drawable/ic_playlist_plus"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/remove_collection_menu_action"
+        android:title="Remove from collection"
+        android:icon="@drawable/ic_playlist_minus"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/hide_menu_action"
+        android:title="@string/hide"
+        android:icon="@drawable/ic_eye_off"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/delete_menu_action"
         android:title="@string/delete"
         android:icon="@drawable/ic_delete"
         app:showAsAction="ifRoom"/>
+
 </menu>

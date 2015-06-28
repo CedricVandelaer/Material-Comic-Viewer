@@ -100,7 +100,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
         mSectionsArray[6] = syncSection;
         addSection(syncSection);
 
-        MaterialSection settingsSection = newSection(getString(R.string.settings), R.drawable.settings, SettingsFragment.newInstance());
+        MaterialSection settingsSection = newSection(getString(R.string.settings), R.drawable.settings, new SettingsFragment());
         mSectionsArray[7] = settingsSection;
         addBottomSection(settingsSection);
         
@@ -141,7 +141,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
         else if (materialSection.getTitle().equals(getString(R.string.statistics)))
             return StatisticsFragment.newInstance();
         else if (materialSection.getTitle().equals(getString(R.string.settings)))
-            return SettingsFragment.newInstance();
+            return new SettingsFragment();
         else if (materialSection.getTitle().equals(getString(R.string.about)))
             return AboutFragment.newInstance();
         else if (materialSection.getTitle().equals(getString(R.string.synchronization)))
