@@ -9,7 +9,7 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.melnykov.fab.FloatingActionButton;
 
 /**
- * Created by Cédric on 28/06/2015.
+ * Created by CV on 28/06/2015.
  */
 public class CollectionsFragment extends AbstractCollectionsFragment{
 

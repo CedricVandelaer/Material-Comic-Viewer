@@ -95,6 +95,7 @@ public class BoxActivity extends Activity implements SwipeRefreshLayout.OnRefres
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new BoxAdapter(this, mCloudService);
         mRecyclerView.setAdapter(mAdapter);
+        mNavigationManager = new NavigationManager();
 
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();

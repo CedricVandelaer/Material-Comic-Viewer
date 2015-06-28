@@ -60,6 +60,11 @@ import java.util.ArrayList;
  */
 public class DisplayComicActivity extends AbstractDisplayComicActivity {
 
+    @Override
+    protected void initializeAd() {
+
+    }
+
     protected void showAd()
     {
 
