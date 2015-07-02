@@ -96,7 +96,8 @@ public class ComicPageFragment extends Fragment {
             ImageLoader.getInstance().init(config);
         }
         mFullscreenComicView.setImageBitmap(null);
-        mFullscreenComicView.setAllowScrollOnZoom(PreferenceSetter.getScrollOnZoomSetting(getActivity()));
+        if (getActivity()!=null)
+            mFullscreenComicView.setAllowScrollOnZoom(PreferenceSetter.getScrollOnZoomSetting(getActivity()));
 
         if (filename!=null) {
             if (getActivity()!=null) {
@@ -147,7 +148,6 @@ public class ComicPageFragment extends Fragment {
         }
 
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -205,6 +205,8 @@ public class ComicPageFragment extends Fragment {
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        if (getActivity()==null)
+                            return;
                         if (PreferenceSetter.getRotatePageSetting(getActivity()) && mIsRotated)
                         {
                             mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
@@ -227,6 +229,8 @@ public class ComicPageFragment extends Fragment {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            if (getActivity()==null)
+                                return;
                             mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap,90));
                             mIsRotated = true;
 
@@ -257,6 +261,8 @@ public class ComicPageFragment extends Fragment {
                         mHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
+                                if (getActivity()==null)
+                                    return;
                                 mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap,0));
                                 mIsRotated = false;
                             }
@@ -279,6 +285,8 @@ public class ComicPageFragment extends Fragment {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            if (getActivity()==null)
+                                return;
                             if (PreferenceSetter.getRotatePageSetting(getActivity()) && mIsRotated) {
                                 mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
                                 mIsRotated = false;

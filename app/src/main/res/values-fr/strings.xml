@@ -184,5 +184,6 @@
     <string name="rate_app">Évaluez app</string>
     <string name="find_comic_viewer_on">Trouvez Comic Viewer sur:</string>
     <string name="page_flip">Feuilletage</string>
+    <string name="dynamic">Dynamique</string>
 
 </resources>

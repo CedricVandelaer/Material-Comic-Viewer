@@ -26,8 +26,8 @@ import java.util.List;
 public class FileDialog {
     private static final String PARENT_DIR = "..";
     private final String TAG = getClass().getName();
-    private String[] fileList;
-    private File currentPath;
+    private String[] mFileList;
+    private File mCurrentPath;
 
     public interface FileSelectedListener {
         void fileSelected(File file);
@@ -58,14 +58,14 @@ public class FileDialog {
         MaterialDialog dialog = null;
         MaterialDialog.Builder builder = new MaterialDialog.Builder(activity);
 
-        builder.title(currentPath.getPath());
+        builder.title(mCurrentPath.getPath());
         if (selectDirectoryOption) {
             builder.positiveText(activity.getString(R.string.select_directory))
             .callback(new MaterialDialog.ButtonCallback() {
                 @Override
                 public void onPositive(MaterialDialog dialog) {
-                    Log.d(TAG, currentPath.getPath());
-                    fireDirectorySelectedEvent(currentPath);
+                    Log.d(TAG, mCurrentPath.getPath());
+                    fireDirectorySelectedEvent(mCurrentPath);
                 }
             });
             builder.positiveColor(PreferenceSetter.getAppThemeColor(activity));
@@ -74,12 +74,12 @@ public class FileDialog {
             builder.negativeColor(PreferenceSetter.getAppThemeColor(activity));
         }
 
-        builder.items(fileList);
+        builder.items(mFileList);
 
         builder.itemsCallback(new MaterialDialog.ListCallback() {
             @Override
             public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                String fileChosen = fileList[i];
+                String fileChosen = mFileList[i];
                 File chosenFile = getChosenFile(fileChosen);
                 if (chosenFile.isDirectory()) {
                     loadFileList(chosenFile);
@@ -139,7 +139,7 @@ public class FileDialog {
     }
 
     private void loadFileList(File path) {
-        this.currentPath = path;
+        this.mCurrentPath = path;
         List<String> r = new ArrayList<String>();
         if (path.exists()) {
             if (path.getParentFile() != null) r.add(PARENT_DIR);
@@ -165,12 +165,12 @@ public class FileDialog {
                 }
             });
         }
-        fileList = (String[]) r.toArray(new String[]{});
+        mFileList = (String[]) r.toArray(new String[]{});
     }
 
     private File getChosenFile(String fileChosen) {
-        if (fileChosen.equals(PARENT_DIR)) return currentPath.getParentFile();
-        else return new File(currentPath, fileChosen);
+        if (fileChosen.equals(PARENT_DIR)) return mCurrentPath.getParentFile();
+        else return new File(mCurrentPath, fileChosen);
     }
 
     public void setFileEndsWith(String fileEndsWith) {

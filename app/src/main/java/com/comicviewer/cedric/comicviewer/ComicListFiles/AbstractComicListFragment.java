@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SearchView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -74,7 +75,8 @@ abstract public class AbstractComicListFragment extends Fragment {
     protected Context mApplicationContext;
     protected Handler mHandler;
     protected SearchComicsTask mSearchComicsTask=null;
-    protected ImageButton mFolderViewToggleButton;
+    protected ImageView mFolderViewToggleButton;
+    protected ImageView mSortButton;
     protected ArrayList<SearchFilter> mFilters;
 
     protected MultiSelector mMultiSelector;
@@ -132,8 +134,7 @@ abstract public class AbstractComicListFragment extends Fragment {
         @Override
         protected void onPreExecute()
         {
-            enableSearchBar(false);
-            addShowFolderViewButton(false);
+            showActionBarButtons(false);
         }
 
         @Override
@@ -149,8 +150,7 @@ abstract public class AbstractComicListFragment extends Fragment {
         @Override
         protected void onPostExecute(Object object)
         {
-            addShowFolderViewButton(true);
-            enableSearchBar(true);
+            showActionBarButtons(true);
         }
 
     }
@@ -161,6 +161,14 @@ abstract public class AbstractComicListFragment extends Fragment {
         mApplicationContext = activity;
     }
 
+
+    protected void showActionBarButtons(boolean enabled)
+    {
+        enableSearchBar(enabled);
+        enableSortingOptions(enabled);
+        addShowFolderViewButton(enabled);
+
+    }
 
     protected void initialiseRefresh(View v)
     {
@@ -232,10 +240,8 @@ abstract public class AbstractComicListFragment extends Fragment {
                                         ArrayList<String> paths = FileLoader.getDirectSubFolders(directory.toString());
                                         ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
 
-                                        for (int i = 0; i <paths.size();i++)
-                                        {
-                                            if (!filePaths.contains(paths.get(i)))
-                                            {
+                                        for (int i = 0; i < paths.size(); i++) {
+                                            if (!filePaths.contains(paths.get(i))) {
                                                 filePaths.add(paths.get(i));
                                             }
                                         }
@@ -333,8 +339,7 @@ abstract public class AbstractComicListFragment extends Fragment {
             mSearchComicsTask.cancel(false);
         }
 
-        enableSearchBar(false);
-        addShowFolderViewButton(false);
+        showActionBarButtons(false);
     }
 
     @Override
@@ -351,8 +356,7 @@ abstract public class AbstractComicListFragment extends Fragment {
         setPreferences();
 
 
-        addShowFolderViewButton(true);
-        enableSearchBar(true);
+        showActionBarButtons(true);
 
         if (isFiltered)
             filterList("");
@@ -373,8 +377,12 @@ abstract public class AbstractComicListFragment extends Fragment {
 
     protected void enableSearchBar(boolean enabled)
     {
-        if (enabled && getActivity()!=null) {
-            final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+        if (getActivity() == null)
+            return;
+
+        Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+
+        if (enabled) {
             toolbar.removeView(mSearchView);
             mSearchView = new SearchView(getActivity());
 
@@ -397,7 +405,6 @@ abstract public class AbstractComicListFragment extends Fragment {
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-
                     filterList(newText);
                     return false;
                 }
@@ -406,14 +413,57 @@ abstract public class AbstractComicListFragment extends Fragment {
         }
         else
         {
-            if (getActivity()!=null) {
-                Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
-                toolbar.removeView(mSearchView);
-            }
+            toolbar.removeView(mSearchView);
         }
     }
 
+    protected void enableSortingOptions(boolean enabled)
+    {
+        if (getActivity()==null)
+            return;
 
+        final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+
+        if (enabled) {
+
+            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(150,100,Gravity.RIGHT);
+
+            mSortButton = new ImageView(getActivity());
+            mSortButton.setAlpha(0.75f);
+            mSortButton.setImageResource(R.drawable.ic_sort);
+            mSortButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showSortPopup();
+                }
+            });
+            toolbar.addView(mSortButton, layoutParamsCollapsed);
+        }
+        else
+        {
+            toolbar.removeView(mSortButton);
+        }
+    }
+
+    public void showSortPopup(){
+
+        CharSequence[] sortingOptions = {"Series", "Filename", "Year"};
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("Sort by")
+                .items(sortingOptions)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        materialDialog.dismiss();
+                        String[] sortOptions = {PreferenceSetter.SORT_BY_SERIES, PreferenceSetter.SORT_BY_FILENAME, PreferenceSetter.SORT_BY_YEAR};
+                        PreferenceSetter.saveSortSetting(getActivity(), sortOptions[i]);
+                        refresh();
+                    }
+                })
+                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                .negativeText(getString(R.string.cancel))
+                .show();
+    }
 
     protected void createRecyclerView(View v)
     {

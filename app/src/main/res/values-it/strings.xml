@@ -185,5 +185,6 @@
     <string name="rate_app">Tasso app</string>
     <string name="find_comic_viewer_on">Trova Comic Viewer su:</string>
     <string name="page_flip">Page flip</string>
+    <string name="dynamic">Dinamico</string>
 
 </resources>

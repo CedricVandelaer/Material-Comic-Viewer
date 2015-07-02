@@ -354,6 +354,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         @Override
         public void onPageSelected(int position) {
 
+
             if ((PreferenceSetter.getMangaSetting(AbstractDisplayComicActivity.this) && !PreferenceSetter.isNormalComic(AbstractDisplayComicActivity.this,mCurrentComic))
                     || (!(PreferenceSetter.getMangaSetting(AbstractDisplayComicActivity.this)) && PreferenceSetter.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
             {

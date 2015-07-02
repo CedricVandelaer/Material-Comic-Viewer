@@ -40,6 +40,7 @@ import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.Sorter;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
 import com.daimajia.androidanimations.library.Techniques;
@@ -51,9 +52,6 @@ import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1471,65 +1469,9 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
     public void addObjectSorted(Object obj)
     {
-        if (obj instanceof Comic) {
-
-            Comic comic = (Comic) obj;
-
-            if (mComicList.size() == 0) {
-                mComicList.add(0, comic);
-                notifyItemInserted(0);
-
-            } else {
-                for (int i = mComicList.size() - 1; i >= 0; i--) {
-
-                    if (mComicList.get(i) instanceof File) {
-                        mComicList.add(i+1, comic);
-                        notifyItemInserted(i+1);
-                        return;
-                    }
-
-                    Comic comicInList = (Comic) mComicList.get(i);
-
-                    if (comic.getTitle().compareToIgnoreCase(comicInList.getTitle()) > 0) {
-                        mComicList.add(i + 1, comic);
-                        notifyItemInserted(i + 1);
-                        return;
-                    } else if (comic.getTitle().compareToIgnoreCase(comicInList.getTitle()) == 0) {
-                        if (comic.getIssueNumber() > comicInList.getIssueNumber()) {
-                            mComicList.add(i + 1, comic);
-                            notifyItemInserted(i + 1);
-                            return;
-                        } else if (comic.getIssueNumber() == comicInList.getIssueNumber()) {
-                            mComicList.add(i + 1, comic);
-                            notifyItemInserted(i + 1);
-                            return;
-                        } else if (i == 0) {
-                            mComicList.add(i, comic);
-                            notifyItemInserted(i);
-                            return;
-                        }
-                    } else if (comic.getTitle().compareToIgnoreCase(comicInList.getTitle()) < 0) {
-                        if (i == 0) {
-                            mComicList.add(i, comic);
-                            notifyItemInserted(i);
-                            return;
-                        }
-                    }
-
-                }
-            }
-        }
-        else
-        {
-            int i=0;
-
-            while (i<mComicList.size() && mComicList.get(i) instanceof File)
-                i++;
-
-            mComicList.add(i,obj);
-            notifyItemInserted(i);
-        }
-
+        int pos = Sorter.sortedInsert(mListFragment.getActivity(), mComicList, obj);
+        if (pos!=-1)
+            notifyItemInserted(pos);
     }
 
     private void setAnimation(View viewToAnimate, int position)

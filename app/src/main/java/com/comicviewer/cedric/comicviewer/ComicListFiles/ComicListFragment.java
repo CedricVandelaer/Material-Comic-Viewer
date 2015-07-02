@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
@@ -67,15 +68,11 @@ public class ComicListFragment extends AbstractComicListFragment {
     @Override
     void addShowFolderViewButton(boolean enable) {
         if (enable && getActivity()!=null) {
+            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(120,100,Gravity.RIGHT);
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             toolbar.removeView(mFolderViewToggleButton);
-            mFolderViewToggleButton = new ImageButton(getActivity());
+            mFolderViewToggleButton = new ImageView(getActivity());
             mFolderViewToggleButton.setAlpha(0.75f);
-            if (Build.VERSION.SDK_INT>15)
-                mFolderViewToggleButton.setBackground(null);
-            else
-                mFolderViewToggleButton.getBackground().setAlpha(0);
-
             if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
             {
                 mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
@@ -97,11 +94,9 @@ public class ComicListFragment extends AbstractComicListFragment {
                     }
                     NavigationManager.getInstance().resetFileStack();
                     refresh();
-
                 }
             });
 
-            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
             toolbar.addView(mFolderViewToggleButton, layoutParamsCollapsed);
         }
         else
@@ -122,171 +117,5 @@ public class ComicListFragment extends AbstractComicListFragment {
             return FileLoader.searchComics(mApplicationContext);
     }
 
-
-    /*
-    @Override
-    void searchComicsAndFolders() {
-        if (NavigationManager.getInstance().fileStackEmpty())
-            return;
-        //map of <filename, filepath>
-        Map<String,String> map = FileLoader.searchComicsAndFolders(mApplicationContext, NavigationManager.getInstance().getPathFromFileStack());
-
-        TreeMap<String, String> treemap = new TreeMap<>(map);
-
-        List<Object> currentObjects = mAdapter.getComicsAndFiles();
-        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(mApplicationContext);
-        List<String> savedComicsFileNames = new ArrayList<>();
-
-        for (int i=0;i<savedComics.size();i++)
-        {
-            savedComicsFileNames.add(savedComics.get(i).getFilePath()+"/"+savedComics.get(i).getFileName());
-        }
-
-        List<String> currentComicsFileNames = new ArrayList<>();
-        List<String> currentFolderNames = new ArrayList<>();
-
-        for (int i=0;i<currentObjects.size();i++)
-        {
-            if (currentObjects.get(i) instanceof Comic) {
-                Comic comic = (Comic) currentObjects.get(i);
-                currentComicsFileNames.add(comic.getFilePath() + "/" + comic.getFileName());
-            }
-            else if(currentObjects.get(i) instanceof File)
-            {
-                File folder = (File) currentObjects.get(i);
-                currentFolderNames.add(folder.getName());
-            }
-        }
-
-        final ArrayList<Comic> comicsToSave = new ArrayList<>();
-        final Set<String> comicsToAdd = new HashSet<>();
-
-        boolean hasToLoad = false;
-
-        for (String str:treemap.keySet())
-        {
-            if (mSearchComicsTask!= null && mSearchComicsTask.isCancelled())
-                break;
-
-            //open the new found file
-            final String comicPath = map.get(str)+"/"+str;
-            final File file = new File(comicPath);
-
-            //check for image folder
-            if (file.isDirectory() && Utilities.checkImageFolder(file) && !(currentComicsFileNames.contains(comicPath))) {
-                Comic comic = new Comic(file.getName(), file.getParentFile().getAbsolutePath());
-
-                ComicLoader.loadComicSync(mApplicationContext, comic);
-
-                comicsToAdd.add(comic.getFileName());
-
-                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
-                    comicsToSave.add(comic);
-                    hasToLoad = true;
-                }
-
-                if (!hasToLoad)
-                {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerView.scrollToPosition(0);
-                        }
-                    });
-                }
-
-                final Comic finalComic = comic;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.addObjectSorted(finalComic);
-                    }
-                });
-
-            }
-            else if (file.isDirectory() && !(currentFolderNames.contains(file.getName())) && !(currentComicsFileNames.contains(comicPath))) {
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.addObjectSorted(file);
-                        mRecyclerView.scrollToPosition(0);
-                    }
-                });
-
-            }//check if comic is one of the saved comic files and add
-            else if (savedComicsFileNames.contains(comicPath) && !(currentComicsFileNames.contains(comicPath)))
-            {
-
-                int pos = savedComicsFileNames.indexOf(comicPath);
-
-                Comic comic = savedComics.get(pos);
-
-                comicsToAdd.add(comic.getFileName());
-
-                ComicLoader.generateComicInfo(mApplicationContext, comic);
-
-                if (ComicLoader.setComicColor(mApplicationContext, comic)) {
-                    comicsToSave.add(comic);
-                    hasToLoad = true;
-                }
-
-                if (!hasToLoad)
-                {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerView.scrollToPosition(0);
-                        }
-                    });
-                }
-
-                final Comic finalComic = comic;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.addObjectSorted(finalComic);
-                    }
-                });
-
-            }//if it is a newly added comic
-            else if (!(currentComicsFileNames.contains(comicPath))
-                    && Utilities.checkExtension(str)
-                    && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
-
-                Comic comic = new Comic(str, map.get(str));
-
-                ComicLoader.loadComicSync(mApplicationContext, comic);
-
-                comicsToAdd.add(comic.getFileName());
-
-                final Comic finalComic = comic;
-
-                hasToLoad = true;
-
-                comicsToSave.add(comic);
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.addObjectSorted(finalComic);
-                    }
-                });
-
-            }
-        }
-
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
-                PreferenceSetter.batchAddAddedComics(mApplicationContext, comicsToAdd);
-            }
-        }).run();
-
-        updateLastReadComics();
-
-    }*/
 
 }

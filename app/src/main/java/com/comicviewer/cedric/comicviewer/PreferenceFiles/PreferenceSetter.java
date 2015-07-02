@@ -85,8 +85,26 @@ public class PreferenceSetter {
     public static final String COLLECTIONS_LIST = "collectionsList";
     public static final String FORCE_PORTRAIT_SETTING = "forcePortrait";
     public static final String SCROLL_ON_ZOOM_SETTING = "allowScrollOnZoom";
+    public static final String SORT_SETTING = "sortSetting";
+    public static final String SORT_BY_SERIES = "sortSeries";
+    public static final String SORT_BY_FILENAME = "sortFilename";
+    public static final String SORT_BY_YEAR = "sortYear";
+
 
     public static final String COMIC_VIEWER = "ComicViewer";
+
+    public static void saveSortSetting(Context context, String setting)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putString(SORT_SETTING, setting);
+        editor.apply();
+    }
+    public static String getSortSetting(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(SORT_SETTING, SORT_BY_SERIES);
+    }
 
     public static boolean getScrollOnZoomSetting(Context context)
     {
@@ -366,6 +384,12 @@ public class PreferenceSetter {
     public static String getPageFlipAnimationSetting(Context context)
     {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(VIEWPAGER_ANIMATION_SETTING, context.getString(R.string.none));
+    }
+
+    public static boolean getDynamicBackgroundSetting(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(READING_BACKGROUND_COLOR, context.getString(R.string.black)).equals(context.getString(R.string.dynamic));
     }
 
     public static int getReadingBackgroundSetting(Context context)

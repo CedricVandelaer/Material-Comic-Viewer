@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
@@ -97,12 +98,8 @@ public class FavoritesListFragment extends AbstractComicListFragment {
         if (enable && getActivity()!=null) {
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             toolbar.removeView(mFolderViewToggleButton);
-            mFolderViewToggleButton = new ImageButton(getActivity());
+            mFolderViewToggleButton = new ImageView(getActivity());
             mFolderViewToggleButton.setAlpha(0.75f);
-            if (Build.VERSION.SDK_INT>15)
-                mFolderViewToggleButton.setBackground(null);
-            else
-                mFolderViewToggleButton.getBackground().setAlpha(0);
 
             if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
             {
@@ -130,7 +127,7 @@ public class FavoritesListFragment extends AbstractComicListFragment {
                 }
             });
 
-            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
+            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(120,100, Gravity.RIGHT);
             toolbar.addView(mFolderViewToggleButton, layoutParamsCollapsed);
         }
         else
