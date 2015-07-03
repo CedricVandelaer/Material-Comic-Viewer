@@ -15,6 +15,7 @@ import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
+import com.comicviewer.cedric.comicviewer.Utilities;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -127,7 +128,10 @@ public class FavoritesListFragment extends AbstractComicListFragment {
                 }
             });
 
-            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(120,100, Gravity.RIGHT);
+            int width = Utilities.getPixelValue(getActivity(), 48);
+            int height = Utilities.getPixelValue(getActivity(), 32);
+
+            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(width,height, Gravity.RIGHT);
             toolbar.addView(mFolderViewToggleButton, layoutParamsCollapsed);
         }
         else

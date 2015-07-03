@@ -72,7 +72,7 @@
         <ListPreference
             android:key="readingBackgroundColor"
             android:title="@string/reading_background_color_setting"
-            android:defaultValue="@string/black"
+            android:defaultValue="@string/dynamic"
             android:entries="@array/Reading_background_options"
             android:entryValues="@array/Reading_background_options"/>
         <ListPreference

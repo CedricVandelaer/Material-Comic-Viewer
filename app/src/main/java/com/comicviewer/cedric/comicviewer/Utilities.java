@@ -1,15 +1,21 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PreCachingLayoutManager;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -29,6 +35,15 @@ import net.lingala.zip4j.core.ZipFile;
  * Utilities for extension checking or filetype checking
  */
 public class Utilities {
+
+    public static int getPixelValue(Activity activity, int dp)
+    {
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics);
+    }
 
     public static int darkenColor(int color)
     {

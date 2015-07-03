@@ -73,7 +73,6 @@ public class ComicPageFragment extends Fragment {
     private Bitmap mBitmap;
     private boolean mIsRotated=false;
 
-
     public static ComicPageFragment newInstance(String comicPath, String pageFileName, int page)
     {
         ComicPageFragment fragment = new ComicPageFragment();
@@ -142,6 +141,11 @@ public class ComicPageFragment extends Fragment {
                             mSpinner.setVisibility(View.INVISIBLE);
                         mBitmap = loadedImage;
 
+                        if (getActivity()!=null) {
+                            ((AbstractDisplayComicActivity) getActivity()).setPagerTopPageColor(mPageNumber, loadedImage.getPixel(0, 0));
+                            ((AbstractDisplayComicActivity) getActivity()).setPagerBottomPageColor(mPageNumber, loadedImage.getPixel(0, loadedImage.getHeight()-1));
+                        }
+
                         zoomImageView();
                     }
                 });
@@ -185,9 +189,6 @@ public class ComicPageFragment extends Fragment {
                 @Override
                 public boolean onSingleTapUp(MotionEvent e) {
                     float x = e.getX();
-                    float y = e.getY();
-                    Log.d("ComicPageFragment", "Single click X: " + x);
-                    Log.d("ComicPageFragment", "Single click Y: " + y);
                     if (getActivity() != null) {
                         float totalWidth = getActivity().getWindow().getDecorView().getWidth();
                         if (x > (totalWidth / 3 * 2))
@@ -206,9 +207,6 @@ public class ComicPageFragment extends Fragment {
                 @Override
                 public void onLongPress(MotionEvent e) {
                     float x = e.getX();
-                    float y = e.getY();
-                    Log.d("ComicPageFragment", "Long click X: " + x);
-                    Log.d("ComicPageFragment", "Long click Y: " + y);
                     if (getActivity() != null) {
                         float totalWidth = getActivity().getWindow().getDecorView().getWidth();
                         if (x > (totalWidth / 3 * 2))

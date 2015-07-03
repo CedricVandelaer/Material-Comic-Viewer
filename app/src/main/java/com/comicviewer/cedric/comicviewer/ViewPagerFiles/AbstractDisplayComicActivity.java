@@ -1,5 +1,7 @@
 package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +37,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
+import com.comicviewer.cedric.comicviewer.MultiColorDrawable;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -82,8 +85,6 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         setContentView(R.layout.activity_display_comic);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
-
         initializeAd();
 
         if (PreferenceSetter.getForcePortraitSetting(this))
@@ -111,6 +112,10 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             mCurrentComic = intent.getParcelableExtra("Comic");
         }
 
+        if (PreferenceSetter.getDynamicBackgroundSetting(this))
+            getWindow().getDecorView().setBackgroundColor(mCurrentComic.getComicColor());
+        else
+            getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
 
         if (Build.VERSION.SDK_INT>18 &&!PreferenceSetter.getToolbarOption(this)) {
 
@@ -376,6 +381,12 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
             setPageNumber();
 
+            if (PreferenceSetter.getDynamicBackgroundSetting(AbstractDisplayComicActivity.this)) {
+                int[] topBottomColors = {mPagerAdapter.getPageTopColor(position), mPagerAdapter.getPageBottomColor(position)};
+                MultiColorDrawable drawable = new MultiColorDrawable(topBottomColors, MultiColorDrawable.Orientation.VERTICAL);
+                getWindow().getDecorView().setBackground(drawable);
+            }
+
             int pagesRead = PreferenceSetter.getPagesReadForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName());
 
             if (pagesRead==0)
@@ -400,6 +411,8 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
                 }
                 PreferenceSetter.incrementPagesForSeries(AbstractDisplayComicActivity.this, mCurrentComic.getTitle(), 1);
             }
+
+
 
         }
 
@@ -489,25 +502,59 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
     private class ComicStatePagerAdapter extends FragmentStatePagerAdapter
     {
         FragmentManager mFragmentManager;
+        private int[] mPageTopColors = new int[mPageCount];
+        private int[] mPageBottomColors = new int[mPageCount];
 
         public ComicStatePagerAdapter(FragmentManager fm) {
             super(fm);
             mFragmentManager = fm;
+            mPageTopColors[0] = mCurrentComic.getComicColor();
+            mPageBottomColors[0] = mCurrentComic.getComicColor();
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public Fragment getItem(final int position) {
 
             String filename = mCurrentComic.getFileName();
             String comicPath = mCurrentComic.getFilePath()+ "/" + filename;
-            ComicPageFragment fragment = ComicPageFragment.newInstance(comicPath, mPages.get(position), position);
+            final ComicPageFragment fragment = ComicPageFragment.newInstance(comicPath, mPages.get(position), position);
             return fragment;
+        }
+
+        public void setPageTopColor(int pos, int color)
+        {
+            mPageTopColors[pos] = color;
+        }
+
+        public int getPageTopColor(int pos)
+        {
+            return mPageTopColors[pos];
+        }
+
+        public void setPageBottomColor(int pos, int color)
+        {
+            mPageBottomColors[pos] = color;
+        }
+
+        public int getPageBottomColor(int pos)
+        {
+            return mPageBottomColors[pos];
         }
 
         @Override
         public int getCount() {
             return mPageCount;
         }
+    }
+
+    public void setPagerBottomPageColor(int pos, int color)
+    {
+        mPagerAdapter.setPageBottomColor(pos, color);
+    }
+
+    public void setPagerTopPageColor(int pos, int color)
+    {
+        mPagerAdapter.setPageTopColor(pos, color);
     }
 
     @Override

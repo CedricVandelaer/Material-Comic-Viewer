@@ -68,7 +68,9 @@ public class ComicListFragment extends AbstractComicListFragment {
     @Override
     void addShowFolderViewButton(boolean enable) {
         if (enable && getActivity()!=null) {
-            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(120,100,Gravity.RIGHT);
+            int width = Utilities.getPixelValue(getActivity(), 48);
+            int height = Utilities.getPixelValue(getActivity(), 32);
+            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(width,height,Gravity.RIGHT);
             final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
             toolbar.removeView(mFolderViewToggleButton);
             mFolderViewToggleButton = new ImageView(getActivity());

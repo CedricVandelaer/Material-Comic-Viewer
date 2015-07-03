@@ -394,19 +394,19 @@ public class PreferenceSetter {
     public static boolean getDynamicBackgroundSetting(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(READING_BACKGROUND_COLOR, context.getString(R.string.black)).equals(context.getString(R.string.dynamic));
+        return prefs.getString(READING_BACKGROUND_COLOR, context.getString(R.string.dynamic)).equals(context.getString(R.string.dynamic));
     }
 
     public static int getReadingBackgroundSetting(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!prefs.getString(READING_BACKGROUND_COLOR, context.getString(R.string.black)).equals(context.getString(R.string.black)))
+        if (prefs.getString(READING_BACKGROUND_COLOR, context.getString(R.string.dynamic)).equals(context.getString(R.string.black)))
         {
-            return context.getResources().getColor(R.color.White);
+            return context.getResources().getColor(R.color.Black);
         }
         else
         {
-            return context.getResources().getColor(R.color.Black);
+            return context.getResources().getColor(R.color.White);
         }
     }
 

@@ -436,7 +436,10 @@ abstract public class AbstractComicListFragment extends Fragment {
 
         if (enabled) {
 
-            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(150,100,Gravity.RIGHT);
+            int width = Utilities.getPixelValue(getActivity(), 48);
+            int height = Utilities.getPixelValue(getActivity(), 32);
+
+            final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(width,height,Gravity.RIGHT);
 
             mSortButton = new ImageView(getActivity());
             mSortButton.setAlpha(0.75f);
@@ -505,7 +508,6 @@ abstract public class AbstractComicListFragment extends Fragment {
         float dpWidth  = outMetrics.widthPixels / density;
 
         int columnCount = 1;
-
 
         if (dpWidth>=1280)
         {
