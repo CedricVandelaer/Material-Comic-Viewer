@@ -64,6 +64,11 @@
             android:key="allowScrollOnZoom"
             android:title="Allow paging when zoomed in"
             android:defaultValue="true"/>
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="scrollByTap"
+            android:title="Scroll on tap"
+            android:summary="Note: You can go to the next or previous page by tapping left and right. You can also long press to go in the opposite direction"
+            android:defaultValue="false"/>
         <ListPreference
             android:key="readingBackgroundColor"
             android:title="@string/reading_background_color_setting"

@@ -235,22 +235,16 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         });
     }
 
-    public void goToNextPage()
+    public void goToRightPage()
     {
         int currentPos = mPager.getCurrentItem();
-        if (mMangaComic)
-            mPager.setCurrentItem(currentPos-1);
-        else
-            mPager.setCurrentItem(currentPos+1);
+        mPager.setCurrentItem(currentPos+1);
     }
 
-    public void goToPreviousPage()
+    public void goToLeftPage()
     {
         int currentPos = mPager.getCurrentItem();
-        if (mMangaComic)
-            mPager.setCurrentItem(currentPos+1);
-        else
-            mPager.setCurrentItem(currentPos-1);
+        mPager.setCurrentItem(currentPos-1);
     }
 
     public void showGoToPageDialog()

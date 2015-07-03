@@ -89,9 +89,14 @@ public class PreferenceSetter {
     public static final String SORT_BY_SERIES = "sortSeries";
     public static final String SORT_BY_FILENAME = "sortFilename";
     public static final String SORT_BY_YEAR = "sortYear";
-
+    public static final String SCROLL_BY_TAP_SETTING = "scrollByTap";
 
     public static final String COMIC_VIEWER = "ComicViewer";
+
+    public static boolean getScrollByTapSetting(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SCROLL_BY_TAP_SETTING, false);
+    }
 
     public static void saveSortSetting(Context context, String setting)
     {
