@@ -409,6 +409,16 @@ abstract public class AbstractComicListFragment extends Fragment {
                     return false;
                 }
             });
+            mSearchView.setOnSearchClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mSortButton!=null)
+                        mSortButton.setVisibility(View.INVISIBLE);
+                    if (mFolderViewToggleButton!=null)
+                        mFolderViewToggleButton.setVisibility(View.INVISIBLE);
+                }
+            });
+
             toolbar.addView(mSearchView, layoutParamsCollapsed);
         }
         else
@@ -591,6 +601,10 @@ abstract public class AbstractComicListFragment extends Fragment {
         }
         else
         {
+            if (mFolderViewToggleButton!=null)
+                mFolderViewToggleButton.setVisibility(View.VISIBLE);
+            if (mSortButton!=null)
+                mSortButton.setVisibility(View.VISIBLE);
             mRecyclerView.setAdapter(mAdapter);
             isFiltered = false;
         }

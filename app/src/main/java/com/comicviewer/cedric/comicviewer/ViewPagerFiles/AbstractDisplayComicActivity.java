@@ -21,10 +21,12 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -214,8 +216,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         {
             setFabClickListener();
         }
-
-    }
+    };
 
     protected abstract void initializeAd();
 
@@ -232,6 +233,24 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
                 showGoToPageDialog();
             }
         });
+    }
+
+    public void goToNextPage()
+    {
+        int currentPos = mPager.getCurrentItem();
+        if (mMangaComic)
+            mPager.setCurrentItem(currentPos-1);
+        else
+            mPager.setCurrentItem(currentPos+1);
+    }
+
+    public void goToPreviousPage()
+    {
+        int currentPos = mPager.getCurrentItem();
+        if (mMangaComic)
+            mPager.setCurrentItem(currentPos+1);
+        else
+            mPager.setCurrentItem(currentPos-1);
     }
 
     public void showGoToPageDialog()

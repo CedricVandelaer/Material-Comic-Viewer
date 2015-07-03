@@ -17,7 +17,9 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -70,6 +72,7 @@ public class ComicPageFragment extends Fragment {
 
     private Bitmap mBitmap;
     private boolean mIsRotated=false;
+
 
     public static ComicPageFragment newInstance(String comicPath, String pageFileName, int page)
     {
@@ -167,13 +170,63 @@ public class ComicPageFragment extends Fragment {
         mPageNumber = args.getInt("PageNumber");
         mFullscreenComicView = (TouchImageView) rootView.findViewById(R.id.fullscreen_comic);
 
+        final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                float x = e.getX();
+                float y = e.getY();
+                Log.d("ComicPageFragment", "Single click X: "+x);
+                Log.d("ComicPageFragment", "Single click Y: "+y);
+                if (getActivity()!=null)
+                {
+                    float totalWidth = getActivity().getWindow().getDecorView().getWidth();
+                    if (x>(totalWidth/3*2))
+                        ((AbstractDisplayComicActivity)getActivity()).goToNextPage();
+                    else if (x<(totalWidth/3))
+                        ((AbstractDisplayComicActivity)getActivity()).goToPreviousPage();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                Log.d("ComicPageFragment", "Long click X: "+e.getX());
+                Log.d("ComicPageFragment", "Long click Y: "+e.getY());
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                return false;
+            }
+        });
+
+        mFullscreenComicView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
 
         return rootView;
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         File file = new File(mComicArchivePath);
