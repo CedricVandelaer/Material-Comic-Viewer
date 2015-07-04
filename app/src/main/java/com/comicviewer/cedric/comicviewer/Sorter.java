@@ -6,7 +6,6 @@ import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
