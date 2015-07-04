@@ -460,7 +460,7 @@ abstract public class AbstractComicListFragment extends Fragment {
 
     public void showSortPopup(){
 
-        CharSequence[] sortingOptions = {"Series", "Filename", "Year"};
+        CharSequence[] sortingOptions = {"Series", "Filename", "Year", "Last added", "Last modified date"};
         MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                 .title("Sort by")
                 .items(sortingOptions)
@@ -468,7 +468,13 @@ abstract public class AbstractComicListFragment extends Fragment {
                     @Override
                     public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                         materialDialog.dismiss();
-                        String[] sortOptions = {PreferenceSetter.SORT_BY_SERIES, PreferenceSetter.SORT_BY_FILENAME, PreferenceSetter.SORT_BY_YEAR};
+                        String[] sortOptions = {
+                                PreferenceSetter.SORT_BY_SERIES,
+                                PreferenceSetter.SORT_BY_FILENAME,
+                                PreferenceSetter.SORT_BY_YEAR,
+                                PreferenceSetter.SORT_BY_LAST_ADDED,
+                                PreferenceSetter.SORT_BY_MODIFIED_DATE
+                        };
                         PreferenceSetter.saveSortSetting(getActivity(), sortOptions[i]);
                         refresh();
                     }

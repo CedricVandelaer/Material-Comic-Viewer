@@ -22,7 +22,46 @@ public class Sorter {
             return sortByFilenameInsert(list, obj);
         else if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_YEAR))
             return sortByYearInsert(list, obj);
-        return sortByComicSeriesInsert(list,obj);
+        else if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_MODIFIED_DATE))
+            return sortByModifiedDate(list, obj);
+        else if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_LAST_ADDED))
+            return sortByLastAdded(list, obj, context);
+        else
+            return sortByComicSeriesInsert(list,obj);
+    }
+
+    private static int sortByLastAdded(List<Object> list, Object obj, Context context) {
+        if (obj instanceof File)
+            return insertFileByFilename(list, (File) obj);
+        else if (obj instanceof Comic)
+            return insertComicByLastAdded(list, (Comic)obj, context);
+        return -1;
+    }
+
+    private static int insertComicByLastAdded(List<Object> list, Comic obj, Context context) {
+
+        List<String> addedComics = PreferenceSetter.getComicsAdded(context);
+
+        for (int i=list.size()-1;i>=0;i--)
+        {
+            if (list.get(i) instanceof File)
+            {
+                list.add(i+1, obj);
+                return i+1;
+            }
+            else if (list.get(i) instanceof Comic)
+            {
+                Comic comic = (Comic) list.get(i);
+                if (addedComics.indexOf(obj.getFileName())<addedComics.indexOf(comic.getFileName()))
+                {
+                    list.add(i+1, obj);
+                    return i+1;
+                }
+            }
+        }
+
+        list.add(0, obj);
+        return 0;
     }
 
     public static int sortByComicSeriesInsert(List<Object> list, Object obj)
@@ -155,6 +194,48 @@ public class Sorter {
             }
         }
         list.add(0, comic);
+        return 0;
+    }
+
+    public static int sortByModifiedDate(List<Object> list, Object obj)
+    {
+        long modifiedDate;
+        if (obj instanceof File)
+        {
+            modifiedDate = ((File)obj).lastModified();
+        }
+        else if (obj instanceof Comic)
+        {
+            modifiedDate = new File(((Comic)obj).getFilePath()+"/"+((Comic)obj).getFileName()).lastModified();
+        }
+        else
+        {
+            return -1;
+        }
+
+        for (int i=list.size()-1;i>=0;i--)
+        {
+            long listFileModifiedDate;
+            if (list.get(i) instanceof File)
+            {
+                listFileModifiedDate = ((File)list.get(i)).lastModified();
+            }
+            else if (list.get(i) instanceof Comic)
+            {
+                listFileModifiedDate = new File(((Comic)list.get(i)).getFilePath()+"/"+((Comic)list.get(i)).getFileName()).lastModified();
+            }
+            else
+            {
+                continue;
+            }
+            if (listFileModifiedDate>modifiedDate)
+            {
+                list.add(i,obj);
+                return i;
+            }
+        }
+
+        list.add(0, obj);
         return 0;
     }
 }

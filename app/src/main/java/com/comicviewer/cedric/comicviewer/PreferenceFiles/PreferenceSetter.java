@@ -89,6 +89,8 @@ public class PreferenceSetter {
     public static final String SORT_BY_SERIES = "sortSeries";
     public static final String SORT_BY_FILENAME = "sortFilename";
     public static final String SORT_BY_YEAR = "sortYear";
+    public static final String SORT_BY_MODIFIED_DATE = "sortModified";
+    public static final String SORT_BY_LAST_ADDED = "sortLastAdded";
     public static final String SCROLL_BY_TAP_SETTING = "scrollByTap";
 
     public static final String COMIC_VIEWER = "ComicViewer";
