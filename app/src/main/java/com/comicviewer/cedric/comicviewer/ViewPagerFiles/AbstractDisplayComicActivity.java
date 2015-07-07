@@ -166,7 +166,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
 
         mPager =  (ComicViewPager) findViewById(R.id.comicpager);
-        mPager.setOffscreenPageLimit(2);
+        mPager.setOffscreenPageLimit(4);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 

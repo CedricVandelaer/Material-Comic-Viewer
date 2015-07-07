@@ -125,6 +125,7 @@ public class ComicPageFragment extends Fragment {
                     public void onLoadingStarted(String imageUri, View view) {
                         if (mSpinner != null)
                             mSpinner.setVisibility(View.VISIBLE);
+                        //mFullscreenComicView.setVisibility(View.GONE);
                         mFullscreenComicView.setZoom(1.0f);
 
                     }
@@ -132,13 +133,16 @@ public class ComicPageFragment extends Fragment {
                     @Override
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                         if (mSpinner != null)
-                            mSpinner.setVisibility(View.INVISIBLE);
+                            mSpinner.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         if (mSpinner != null)
-                            mSpinner.setVisibility(View.INVISIBLE);
+                            mSpinner.setVisibility(View.GONE);
+                        mFullscreenComicView.setVisibility(View.VISIBLE);
+                        mFullscreenComicView.setZoom(1.0f);
+
                         mBitmap = loadedImage;
 
                         if (getActivity()!=null) {
