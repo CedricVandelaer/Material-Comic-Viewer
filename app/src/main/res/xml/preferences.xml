@@ -81,6 +81,11 @@
             android:defaultValue="@string/page_number_setting_1"
             android:entries="@array/Page_number_settings"
             android:entryValues="@array/Page_number_settings"/>
+        <com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomCheckBoxPreference
+            android:key="highResPages"
+            android:title="High quality pages"
+            android:summary="Note: Disabling this options might increase performance"
+            android:defaultValue="true"/>
 
     </com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory>
 

@@ -243,7 +243,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
     public void goToRightPage()
     {
         int currentPos = mPager.getCurrentItem();
-        mPager.setCurrentItem(currentPos+1);
+        mPager.setCurrentItem(currentPos + 1);
     }
 
     public void goToLeftPage()
@@ -353,6 +353,10 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         else if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
         {
             params.setMargins(0, 0, (int)sixteenDP, (int)fortysixDP);
+        }
+        else
+        {
+            params.setMargins(0, 0, (int)fortysixDP, (int)fortysixDP);
         }
         params.addRule(RelativeLayout.ALIGN_PARENT_END);
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -502,8 +506,8 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
     private class ComicStatePagerAdapter extends FragmentStatePagerAdapter
     {
         FragmentManager mFragmentManager;
-        private int[] mPageTopColors = new int[mPageCount];
-        private int[] mPageBottomColors = new int[mPageCount];
+        private int[] mPageTopColors = new int[Math.max(0,mPageCount)];
+        private int[] mPageBottomColors = new int[Math.max(0,mPageCount)];
 
         public ComicStatePagerAdapter(FragmentManager fm) {
             super(fm);

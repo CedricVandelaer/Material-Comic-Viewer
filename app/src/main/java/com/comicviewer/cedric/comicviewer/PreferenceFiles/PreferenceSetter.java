@@ -92,8 +92,14 @@ public class PreferenceSetter {
     public static final String SORT_BY_MODIFIED_DATE = "sortModified";
     public static final String SORT_BY_LAST_ADDED = "sortLastAdded";
     public static final String SCROLL_BY_TAP_SETTING = "scrollByTap";
+    public static final String PAGE_QUALITY_SETTING = "highResPages";
 
     public static final String COMIC_VIEWER = "ComicViewer";
+
+    public static boolean getPageQualitySetting(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PAGE_QUALITY_SETTING, true);
+    }
 
     public static boolean getScrollByTapSetting(Context context)
     {
@@ -1528,8 +1534,14 @@ public class PreferenceSetter {
         for (String pair:pagesReadPairs)
         {
             if (!pair.isEmpty()) {
-                int splitPosition = pair.lastIndexOf(":");
-                pagesReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
+                try {
+                    int splitPosition = pair.lastIndexOf(":");
+                    pagesReadMap.put(pair.substring(0, splitPosition), Integer.parseInt(pair.substring(splitPosition + 1)));
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
         return pagesReadMap;

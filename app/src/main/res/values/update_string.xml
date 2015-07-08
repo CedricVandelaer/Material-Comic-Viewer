@@ -16,6 +16,9 @@
         Matteo - Spanish translations
     </string>
     <string name="updates" translatable="false">
+        v3.4.3\n
+        - Higher quality images (can be disabled in the options for better performance)\n
+        - Bugfixes\n\n
         v3.4.2\n
         - Bugfixes\n\n
         v3.4.1\n

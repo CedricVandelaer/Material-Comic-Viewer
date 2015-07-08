@@ -15,6 +15,9 @@ public class Sorter {
 
     public static int sortedInsert(Context context, List<Object> list, Object obj)
     {
+        if (context==null)
+            return -1;
+
         if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_SERIES))
             return sortByComicSeriesInsert(list, obj);
         else if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_FILENAME))

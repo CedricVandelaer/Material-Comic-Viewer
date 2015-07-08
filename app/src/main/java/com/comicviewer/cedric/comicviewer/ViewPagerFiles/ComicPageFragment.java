@@ -31,9 +31,11 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
@@ -114,7 +116,12 @@ public class ComicPageFragment extends Fragment {
 
                 Log.d("loadImage", imagePath);
 
-                ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, new SimpleImageLoadingListener() {
+                DisplayImageOptions opts = new DisplayImageOptions.Builder()
+                        .bitmapConfig(Bitmap.Config.ARGB_8888)
+                        .imageScaleType(ImageScaleType.NONE)
+                        .build();
+
+                SimpleImageLoadingListener listener = new SimpleImageLoadingListener() {
 
                     @Override
                     public void onLoadingCancelled(String imageUri, View view) {
@@ -152,8 +159,12 @@ public class ComicPageFragment extends Fragment {
 
                         zoomImageView();
                     }
-                });
+                };
 
+                if (getActivity()!=null && PreferenceSetter.getPageQualitySetting(getActivity()))
+                    ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, opts, listener);
+                else
+                    ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, listener);
 
             }
         }
