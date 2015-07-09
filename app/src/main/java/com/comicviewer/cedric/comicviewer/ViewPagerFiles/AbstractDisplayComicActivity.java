@@ -99,6 +99,9 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         int lastReadPage;
 
+        ImageLoader.getInstance().clearMemoryCache();
+        ImageLoader.getInstance().clearDiskCache();
+
 
         if (intent.getAction()!= null && intent.getAction().equals(Intent.ACTION_VIEW))
         {
@@ -117,43 +120,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         else
             getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
 
-        if (Build.VERSION.SDK_INT>18 &&!PreferenceSetter.getToolbarOption(this)) {
-
-            hideSystemUI();
-
-            setLayoutParams(getResources().getConfiguration());
-
-            getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-                @Override
-                public void onSystemUiVisibilityChange(int visibility) {
-                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                        // The system bars are visible. Make any desired
-                        // adjustments to your UI, such as showing the action bar or
-                        // other navigational controls.
-                        mFab.setVisibility(View.VISIBLE);
-                        mFab.show(true);
-
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                hideSystemUI();
-                            }
-                        }, 5000);
-                    }
-                }
-            });
-        }
-        else if (PreferenceSetter.getToolbarOption(this))
-        {
-            //toolbar
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            toolbar.setVisibility(View.VISIBLE);
-            setSupportActionBar(toolbar);
-            toolbar.showOverflowMenu();
-            getSupportActionBar().setTitle(mCurrentComic.getTitle());
-            if (PreferenceSetter.getReadingBackgroundSetting(this)==getResources().getColor(R.color.White))
-                toolbar.setBackgroundColor(getResources().getColor(R.color.Black));
-        }
+        setSystemVisibilitySettings();
 
         mPageCount = mCurrentComic.getPageCount();
 
@@ -166,7 +133,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
 
         mPager =  (ComicViewPager) findViewById(R.id.comicpager);
-        mPager.setOffscreenPageLimit(4);
+        mPager.setOffscreenPageLimit(8);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
@@ -222,6 +189,47 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             setFabClickListener();
         }
     };
+
+    protected void setSystemVisibilitySettings()
+    {
+        if (Build.VERSION.SDK_INT>18 &&!PreferenceSetter.getToolbarOption(this)) {
+
+            hideSystemUI();
+
+            setLayoutParams(getResources().getConfiguration());
+
+            getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+                @Override
+                public void onSystemUiVisibilityChange(int visibility) {
+                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                        // The system bars are visible. Make any desired
+                        // adjustments to your UI, such as showing the action bar or
+                        // other navigational controls.
+                        mFab.setVisibility(View.VISIBLE);
+                        mFab.show(true);
+
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                hideSystemUI();
+                            }
+                        }, 5000);
+                    }
+                }
+            });
+        }
+        else if (PreferenceSetter.getToolbarOption(this))
+        {
+            //toolbar
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            toolbar.setVisibility(View.VISIBLE);
+            setSupportActionBar(toolbar);
+            toolbar.showOverflowMenu();
+            getSupportActionBar().setTitle(mCurrentComic.getTitle());
+            if (PreferenceSetter.getReadingBackgroundSetting(this)==getResources().getColor(R.color.White))
+                toolbar.setBackgroundColor(getResources().getColor(R.color.Black));
+        }
+    }
 
     protected abstract void initializeAd();
 
@@ -565,6 +573,8 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
     public void onResume()
     {
         super.onResume();
+
+        setSystemVisibilitySettings();
 
         mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
         setPageNumber();

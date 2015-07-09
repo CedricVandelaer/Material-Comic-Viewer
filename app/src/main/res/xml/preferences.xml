@@ -85,7 +85,7 @@
             android:key="highResPages"
             android:title="High quality pages"
             android:summary="Note: Disabling this options might increase performance"
-            android:defaultValue="true"/>
+            android:defaultValue="false"/>
 
     </com.comicviewer.cedric.comicviewer.PreferenceFiles.CustomPreferenceCategory>
 

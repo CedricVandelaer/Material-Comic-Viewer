@@ -68,7 +68,7 @@ public class ComicPageFragment extends Fragment {
     private int mPageNumber;
     
     // The spinner to show when an image is loading
-    ProgressBarCircularIndeterminate mSpinner;
+    //ProgressBarCircularIndeterminate mSpinner;
 
     private Handler mHandler;
 
@@ -116,11 +116,6 @@ public class ComicPageFragment extends Fragment {
 
                 Log.d("loadImage", imagePath);
 
-                DisplayImageOptions opts = new DisplayImageOptions.Builder()
-                        .bitmapConfig(Bitmap.Config.ARGB_8888)
-                        .imageScaleType(ImageScaleType.NONE)
-                        .build();
-
                 SimpleImageLoadingListener listener = new SimpleImageLoadingListener() {
 
                     @Override
@@ -130,25 +125,25 @@ public class ComicPageFragment extends Fragment {
 
                     @Override
                     public void onLoadingStarted(String imageUri, View view) {
-                        if (mSpinner != null)
-                            mSpinner.setVisibility(View.VISIBLE);
-                        //mFullscreenComicView.setVisibility(View.GONE);
+                        //if (mSpinner != null)
+                            //mSpinner.setVisibility(View.VISIBLE);
+                        mFullscreenComicView.setVisibility(View.GONE);
                         mFullscreenComicView.setZoom(1.0f);
 
                     }
 
                     @Override
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                        if (mSpinner != null)
-                            mSpinner.setVisibility(View.GONE);
+                        //if (mSpinner != null)
+                            //mSpinner.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                        if (mSpinner != null)
-                            mSpinner.setVisibility(View.GONE);
                         mFullscreenComicView.setVisibility(View.VISIBLE);
                         mFullscreenComicView.setZoom(1.0f);
+                        //if (mSpinner != null)
+                            //mSpinner.setVisibility(View.GONE);
 
                         mBitmap = loadedImage;
 
@@ -161,10 +156,24 @@ public class ComicPageFragment extends Fragment {
                     }
                 };
 
-                if (getActivity()!=null && PreferenceSetter.getPageQualitySetting(getActivity()))
-                    ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, opts, listener);
-                else
-                    ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, listener);
+                if (getActivity()!=null && PreferenceSetter.getPageQualitySetting(getActivity())) {
+                    DisplayImageOptions highResOpts = new DisplayImageOptions.Builder()
+                            .bitmapConfig(Bitmap.Config.ARGB_8888)
+                            .imageScaleType(ImageScaleType.NONE)
+                            .cacheInMemory(true)
+                            .cacheOnDisk(true)
+                            .build();
+                    ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, highResOpts, listener);
+                }
+                else {
+                    DisplayImageOptions lowResOpts = new DisplayImageOptions.Builder()
+                            .bitmapConfig(Bitmap.Config.RGB_565)
+                            .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                            .cacheInMemory(true)
+                            .cacheOnDisk(true)
+                            .build();
+                    ImageLoader.getInstance().displayImage(imagePath, mFullscreenComicView, lowResOpts, listener);
+                }
 
             }
         }
@@ -179,7 +188,7 @@ public class ComicPageFragment extends Fragment {
         Bundle args = getArguments();
 
         mHandler = new Handler();
-        mSpinner = (ProgressBarCircularIndeterminate) rootView.findViewById(R.id.spinner);
+        //mSpinner = (ProgressBarCircularIndeterminate) rootView.findViewById(R.id.spinner);
         mComicArchivePath = args.getString("ComicArchive");
         if (mComicArchivePath.contains("/"))
             mFolderName = Utilities.removeExtension(mComicArchivePath.substring(mComicArchivePath.lastIndexOf("/")+1));
@@ -503,6 +512,12 @@ public class ComicPageFragment extends Fragment {
 
     }
 
-
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+        if (mBitmap!=null)
+            mBitmap.recycle();
+    }
 
 }

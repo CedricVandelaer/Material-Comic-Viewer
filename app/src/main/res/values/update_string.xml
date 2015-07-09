@@ -16,6 +16,9 @@
         Matteo - Spanish translations
     </string>
     <string name="updates" translatable="false">
+        v3.4.4\n
+        - Rename collections\n
+        - Fixed black screen issues for some people\n\n
         v3.4.3\n
         - Higher quality images (can be disabled in the options for better performance)\n
         - Bugfixes\n\n

@@ -10,6 +10,7 @@ import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
+import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONException;
 
@@ -36,8 +37,33 @@ public class CollectionsAdapter extends RecyclerView.Adapter{
         CollectionViewHolder vh = new CollectionViewHolder(v);
 
         addDeleteClickListener(vh.mDeleteButton, vh);
+        addRenameClickListener(vh.mRenameButton, vh);
 
         return vh;
+    }
+
+    private void addRenameClickListener(View v, final CollectionViewHolder vh) {
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                vh.mSwipeLayout.close();
+                MaterialDialog dialog = new MaterialDialog.Builder(mCollectionsFragment.getActivity())
+                        .title(mCollectionsFragment.getString(R.string.rename))
+                        .input("Name", "", false, new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                                PreferenceSetter.renameCollection(mCollectionsFragment.getActivity(), vh.getCollectionName(), charSequence.toString());
+                                mCollectionsFragment.refresh();
+                            }
+                        })
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mCollectionsFragment.getActivity()))
+                        .positiveText(mCollectionsFragment.getString(R.string.confirm))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mCollectionsFragment.getActivity()))
+                        .negativeText(mCollectionsFragment.getString(R.string.cancel))
+                        .show();
+            }
+        });
     }
 
     public void addDeleteClickListener(View v, final CollectionViewHolder vh)
@@ -93,8 +119,10 @@ public class CollectionsAdapter extends RecyclerView.Adapter{
             }
         });
 
-        if (PreferenceSetter.getBackgroundColorPreference(mCollectionsFragment.getActivity())== mCollectionsFragment.getResources().getColor(R.color.WhiteBG))
+        if (PreferenceSetter.getBackgroundColorPreference(mCollectionsFragment.getActivity())== mCollectionsFragment.getResources().getColor(R.color.WhiteBG)) {
             vh.mDeleteTextView.setTextColor(mCollectionsFragment.getResources().getColor(R.color.Black));
+            vh.mRenameTextView.setTextColor(mCollectionsFragment.getResources().getColor(R.color.Black));
+        }
 
     }
 

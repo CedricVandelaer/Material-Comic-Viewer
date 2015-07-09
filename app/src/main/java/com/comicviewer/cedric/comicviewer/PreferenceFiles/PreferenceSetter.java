@@ -98,7 +98,7 @@ public class PreferenceSetter {
 
     public static boolean getPageQualitySetting(Context context)
     {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PAGE_QUALITY_SETTING, true);
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PAGE_QUALITY_SETTING, false);
     }
 
     public static boolean getScrollByTapSetting(Context context)
@@ -224,6 +224,36 @@ public class PreferenceSetter {
             e.printStackTrace();
         }
 
+    }
+
+    public static void renameCollection(Context context, String collectionName, String newName)
+    {
+
+        JSONArray collections = getCollectionList(context);
+        JSONArray newCollections = new JSONArray();
+        try {
+            for (int i=0;i<collections.length();i++)
+            {
+                if (!collections.getJSONObject(i).keys().next().equals(collectionName))
+                {
+                    newCollections.put(collections.getJSONObject(i));
+                }
+                else
+                {
+                    JSONObject renamedCollection = new JSONObject();
+                    renamedCollection.put(newName, collections.getJSONObject(i).getJSONArray(collectionName));
+                    newCollections.put(renamedCollection);
+                }
+            }
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(COLLECTIONS_LIST, newCollections.toString());
+            editor.apply();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void createCollection(Context context, String collectionName)
