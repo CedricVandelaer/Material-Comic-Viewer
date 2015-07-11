@@ -150,7 +150,6 @@ public abstract class AbstractCollectionsFragment extends Fragment implements Sw
     public void refresh()
     {
         if (NavigationManager.getInstance().getPathFromCollectionStack().equals(NavigationManager.ROOT)) {
-            setProgressSpinner(true);
             mAdapter.notifyDataSetChanged();
             setProgressSpinner(false);
         }

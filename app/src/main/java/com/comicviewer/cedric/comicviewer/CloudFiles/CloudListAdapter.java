@@ -9,7 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.box.androidsdk.content.auth.BoxAuthentication;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsListFragment;
+import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -24,24 +27,25 @@ import java.util.ArrayList;
 public class CloudListAdapter extends RecyclerView.Adapter {
 
     private ArrayList<CloudService> mCloudServiceList;
+    private CloudFragment mFragment;
     private Context mContext;
     private LayoutInflater mInflater;
     private Handler mHandler;
 
-    public CloudListAdapter(Context context)
+    public CloudListAdapter(CloudFragment fragment)
     {
         mCloudServiceList = new ArrayList<>();
-        mContext = context;
+        mFragment = fragment;
         mHandler = new Handler();
+        mContext = mFragment.getActivity();
+        mCloudServiceList = PreferenceSetter.getCloudServices(mFragment.getActivity());
 
-        mCloudServiceList = PreferenceSetter.getCloudServices(mContext);
-
-        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mInflater = (LayoutInflater) mFragment.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     public void refreshCloudServiceList()
     {
-        mCloudServiceList = PreferenceSetter.getCloudServices(mContext);
+        mCloudServiceList = PreferenceSetter.getCloudServices(mFragment.getActivity());
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -56,8 +60,8 @@ public class CloudListAdapter extends RecyclerView.Adapter {
 
         CloudServiceViewHolder cloudServiceViewHolder = new CloudServiceViewHolder(v);
 
-        if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
-            cloudServiceViewHolder.mDeleteTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+        if (PreferenceSetter.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
+            cloudServiceViewHolder.mDeleteTextView.setTextColor(mFragment.getActivity().getResources().getColor(R.color.Black));
 
         addClickListener(cloudServiceViewHolder);
         addDeleteClickListener(cloudServiceViewHolder);
@@ -72,7 +76,7 @@ public class CloudListAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 final int pos = mCloudServiceList.indexOf(cloudServiceViewHolder.getCloudService());
                 mCloudServiceList.remove(cloudServiceViewHolder.getCloudService());
-                PreferenceSetter.removeCloudService(mContext, cloudServiceViewHolder.getCloudService().getEmail(), cloudServiceViewHolder.getCloudService().getName());
+                PreferenceSetter.removeCloudService(mFragment.getActivity(), cloudServiceViewHolder.getCloudService().getEmail(), cloudServiceViewHolder.getCloudService().getName());
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -90,29 +94,34 @@ public class CloudListAdapter extends RecyclerView.Adapter {
             @Override
             public void onClick(View v) {
                 Intent intent = null;
-                if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_1))) {
-                    intent = new Intent(mContext, DropboxActivity.class);
-                    intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
 
+                AbstractCloudServiceListFragment fragment=null;
+                String title=null;
+
+                if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_1))) {
+
+                    fragment = DropboxFragment.newInstance(cloudServiceViewHolder.getCloudService());
+                    title = mContext.getString(R.string.dropbox);
                 }
                 else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_3)))
                 {
-                    intent = new Intent(mContext, OneDriveActivity.class);
-                    intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
-
+                    fragment = OneDriveFragment.newInstance(cloudServiceViewHolder.getCloudService());
+                    title = mContext.getString(R.string.onedrive);
                 }
                 else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_2)))
                 {
-                    intent = new Intent(mContext, GoogleDriveActivity.class);
-                    intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
+                    fragment = GoogleDriveFragment.newInstance(cloudServiceViewHolder.getCloudService());
+                    title = "Google Drive";
                 }
                 else if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_4)))
                 {
-                    intent = new Intent(mContext, BoxActivity.class);
-                    intent.putExtra("CloudService", cloudServiceViewHolder.getCloudService());
+                    fragment = BoxFragment.newInstance(cloudServiceViewHolder.getCloudService());
+                    title= "BOX";
                 }
 
-                mContext.startActivity(intent);
+                mFragment.setActiveCloudServiceFragment(fragment);
+                ((DrawerActivity)mFragment.getActivity()).setFragment(fragment, title);
+                //mContext.startActivity(intent);
 
             }
         });
@@ -130,7 +139,7 @@ public class CloudListAdapter extends RecyclerView.Adapter {
         else
             cloudServiceViewHolder.mTitleTextView.setText(mCloudServiceList.get(position).getName());
 
-        cloudServiceViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mContext)));
+        cloudServiceViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity())));
 
         if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_1)))
         {

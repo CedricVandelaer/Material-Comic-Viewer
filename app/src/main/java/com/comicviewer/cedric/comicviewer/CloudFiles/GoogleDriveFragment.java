@@ -1,11 +1,12 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
-import android.app.Activity;
+
 import android.app.ActivityManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.app.Fragment;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,7 +15,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.HttpUtilities;
@@ -40,10 +43,9 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * Created by CV on 7/06/2015.
- * pick a google drive comic
+ * A simple {@link Fragment} subclass.
  */
-public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener{
+public class GoogleDriveFragment extends AbstractCloudServiceListFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private CloudService mCloudService;
     private TextView mErrorTextView;
@@ -59,39 +61,54 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
     private final static String DRIVE_API_SCOPE_METADATA = "https://www.googleapis.com/auth/drive.metadata.readonly";
     private final static String SCOPE_PROFILE_INFO = "https://www.googleapis.com/auth/userinfo.profile";
 
-    @Override
-    public void onCreate(Bundle savedInstanceState)
+    public GoogleDriveFragment() {
+        // Required empty public constructor
+    }
+
+    public static GoogleDriveFragment newInstance(CloudService cloudService)
     {
-        super.onCreate(savedInstanceState);
+        GoogleDriveFragment fragment = new GoogleDriveFragment();
 
-        setContentView(R.layout.activity_google_drive);
+        Bundle args = new Bundle();
+        args.putSerializable("CloudService", cloudService);
 
-        mErrorTextView = (TextView) findViewById(R.id.error_text_view);
-        mRecyclerView = (RecyclerView) findViewById(R.id.cloud_file_list);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View v = inflater.inflate(R.layout.activity_google_drive, container, false);
+
+        mErrorTextView = (TextView) v.findViewById(R.id.error_text_view);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.cloud_file_list);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mHandler = new Handler();
         mNavigationManager = new NavigationManager();
 
-        new SetTaskDescriptionTask().execute();
+        //new SetTaskDescriptionTask().execute();
 
-        mCloudService = (CloudService) getIntent().getSerializableExtra("CloudService");
+        mCloudService = (CloudService) getArguments().getSerializable("CloudService");
 
-        getActionBar().setTitle(getString(R.string.cloud_storage_2));
-        getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
-        if (Build.VERSION.SDK_INT>20)
-            getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
-        PreferenceSetter.setBackgroundColorPreference(this);
-        if (PreferenceSetter.getBackgroundColorPreference(this)==getResources().getColor(R.color.WhiteBG))
+        //getActionBar().setTitle(getString(R.string.cloud_storage_2));
+        //getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
+        //if (Build.VERSION.SDK_INT>20)
+            //getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
+        PreferenceSetter.setBackgroundColorPreference(getActivity());
+        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
         mNavigationManager.resetCloudStackWithString("root");
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new GoogleDriveAdapter(this, mCloudService);
         mRecyclerView.setAdapter(mAdapter);
 
-        Display display = getWindowManager().getDefaultDisplay();
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
         float density  = getResources().getDisplayMetrics().density;
@@ -113,7 +130,7 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
         mErrorTextView.setVisibility(View.GONE);
 
 
-        if (HttpUtilities.isConnected(this))
+        if (HttpUtilities.isConnected(getActivity()))
         {
             try {
                 new GetDriveFilesTask().execute("root");
@@ -128,7 +145,10 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
             mErrorTextView.setVisibility(View.VISIBLE);
             mErrorTextView.setText("No internet connection...");
         }
+
+        return v;
     }
+
 
     private void showProgressSpinner(final boolean enable)
     {
@@ -150,6 +170,11 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
         new GetDriveFilesTask().execute(mNavigationManager.getPathFromCloudStack());
     }
 
+    @Override
+    public NavigationManager getNavigationManager() {
+        return mNavigationManager;
+    }
+
     private class GetDriveFilesTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -162,10 +187,10 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
         @Override
         protected String doInBackground(String... folderId) {
             try {
-                String token= GoogleAuthUtil.getToken(GoogleDriveActivity.this, mCloudService.getEmail(),
+                String token= GoogleAuthUtil.getToken(getActivity(), mCloudService.getEmail(),
                         "oauth2:" + DRIVE_API_SCOPE_FILES + " " + DRIVE_API_SCOPE_METADATA + " " + SCOPE_PROFILE_INFO);
                 mCloudService.setToken(token);
-                PreferenceSetter.saveCloudService(GoogleDriveActivity.this, mCloudService);
+                PreferenceSetter.saveCloudService(getActivity(), mCloudService);
 
                 String url = "https://www.googleapis.com/drive/v2/files"+
                         "?q=%27" + folderId[0] +
@@ -212,6 +237,10 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
                             || driveObject.getType() == ObjectType.FOLDER) {
                         driveObjects.add(driveObject);
                     }
+                    else
+                    {
+                        Log.d("GoogleDrive", "Other file found: "+file.getString("title"));
+                    }
                 }
 
                 Collections.sort(driveObjects, new Comparator<GoogleDriveObject>() {
@@ -255,22 +284,13 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
 
     }
 
-    @Override
-    public void onBackPressed()
-    {
-        mNavigationManager.popFromCloudStack();
-        if (mNavigationManager.cloudStackEmpty())
-            finish();
-        else
-            refresh();
-    }
-
     public void navigateToPath(String fileId)
     {
         mNavigationManager.pushPathToCloudStack(fileId);
         new GetDriveFilesTask().execute(mNavigationManager.getPathFromCloudStack());
     }
 
+    /*
     private class SetTaskDescriptionTask extends AsyncTask
     {
 
@@ -278,7 +298,7 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
         protected Object doInBackground(Object[] params) {
 
             if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(GoogleDriveActivity.this).build();
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
                 ImageLoader.getInstance().init(config);
             }
 
@@ -289,7 +309,7 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
                     ImageSize size = new ImageSize(64, 64);
                     tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
                             ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            PreferenceSetter.getAppThemeColor(GoogleDriveActivity.this));
+                            PreferenceSetter.getAppThemeColor(getActivity()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -302,5 +322,5 @@ public class GoogleDriveActivity extends Activity implements SwipeRefreshLayout.
             return null;
         }
     }
-
+    */
 }

@@ -1,11 +1,9 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.graphics.drawable.ColorDrawable;
+
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
+import android.app.Fragment;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,8 +12,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
@@ -27,16 +26,16 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class DropboxActivity extends Activity {
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class DropboxFragment extends AbstractCloudServiceListFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private CloudService mCloudService;
 
@@ -50,35 +49,51 @@ public class DropboxActivity extends Activity {
 
     private NavigationManager mNavigationManager;
 
+    public DropboxFragment() {
+        // Required empty public constructor
+    }
+
+    public static DropboxFragment newInstance(CloudService cloudService)
+    {
+        DropboxFragment fragment = new DropboxFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable("CloudService", cloudService);
+
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.activity_dropbox, container, false);
 
-        setContentView(R.layout.activity_dropbox);
-
-        new SetTaskDescriptionTask().execute();
+        //new SetTaskDescriptionTask().execute();
 
         mNavigationManager = new NavigationManager();
-        mCloudService = (CloudService) getIntent().getSerializableExtra("CloudService");
+        mCloudService = (CloudService) getArguments().getSerializable("CloudService");
 
         mHandler = new Handler();
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
 
-        mErrorTextView = (TextView) findViewById(R.id.error_text_view);
+        mErrorTextView = (TextView) v.findViewById(R.id.error_text_view);
 
 
-        if (PreferenceSetter.getBackgroundColorPreference(this)==getResources().getColor(R.color.WhiteBG))
+        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
         mErrorTextView.setVisibility(View.GONE);
 
-        getActionBar().setTitle(getString(R.string.cloud_storage_1));
+        //getActivity().getActionBar().setTitle(getString(R.string.cloud_storage_1));
 
-        getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
+        //getActivity().getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(getActivity())));
 
-        if (Build.VERSION.SDK_INT>20)
-            getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
+        //if (Build.VERSION.SDK_INT>20)
+            //getActivity().getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(getActivity())));
 
         mNavigationManager.resetCloudStack();
 
@@ -87,13 +102,13 @@ public class DropboxActivity extends Activity {
                 + mCloudService.getEmail() + "\n"
                 + mCloudService.getToken());
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.cloud_file_list);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.cloud_file_list);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new DropboxAdapter(this, mCloudService);
         mRecyclerView.setAdapter(mAdapter);
 
-        Display display = getWindowManager().getDefaultDisplay();
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
         float density  = getResources().getDisplayMetrics().density;
@@ -113,7 +128,7 @@ public class DropboxActivity extends Activity {
         if (mDBApi.getSession().authenticationSuccessful()) {
             String token = mDBApi.getSession().finishAuthentication();
             mCloudService.setToken(token);
-            PreferenceSetter.saveCloudService(this, mCloudService);
+            PreferenceSetter.saveCloudService(getActivity(), mCloudService);
         }
 
         if (mDBApi.getSession().isLinked()) {
@@ -121,10 +136,13 @@ public class DropboxActivity extends Activity {
         }
         else
         {
-            mDBApi.getSession().startOAuth2Authentication(this);
+            mDBApi.getSession().startOAuth2Authentication(getActivity());
         }
 
+        return v;
     }
+
+
 
     public void refresh()
     {
@@ -132,15 +150,6 @@ public class DropboxActivity extends Activity {
         new RetrieveFilesTask().execute();
     }
 
-    @Override
-    public void onBackPressed()
-    {
-        mNavigationManager.popFromCloudStack();
-        if (mNavigationManager.cloudStackEmpty())
-            finish();
-        else
-            refresh();
-    }
 
     public NavigationManager getNavigationManager()
     {
@@ -151,11 +160,16 @@ public class DropboxActivity extends Activity {
     public void onResume()
     {
         super.onResume();
-        PreferenceSetter.setBackgroundColorPreference(this);
+        PreferenceSetter.setBackgroundColorPreference(getActivity());
 
         if (!mDBApi.getSession().authenticationSuccessful()) {
             new AddDropboxUserInfoTask().execute();
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        refresh();
     }
 
     private class RetrieveFilesTask extends AsyncTask
@@ -242,11 +256,6 @@ public class DropboxActivity extends Activity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return false;
-    }
-
 
     private class AddDropboxUserInfoTask extends AsyncTask
     {
@@ -279,9 +288,9 @@ public class DropboxActivity extends Activity {
                     String accessToken = mDBApi.getSession().getOAuth2AccessToken();
                     CloudService cloudService = new CloudService(service, accessToken, userName, email);
 
-                    PreferenceSetter.removeCloudService(DropboxActivity.this, cloudService.getEmail(), cloudService.getName());
+                    PreferenceSetter.removeCloudService(getActivity(), cloudService.getEmail(), cloudService.getName());
 
-                    PreferenceSetter.saveCloudService(DropboxActivity.this, cloudService);
+                    PreferenceSetter.saveCloudService(getActivity(), cloudService);
 
 
                 } catch (IllegalStateException e) {
@@ -292,6 +301,7 @@ public class DropboxActivity extends Activity {
         }
     }
 
+    /*
     private class SetTaskDescriptionTask extends AsyncTask
     {
 
@@ -299,7 +309,7 @@ public class DropboxActivity extends Activity {
         protected Object doInBackground(Object[] params) {
 
             if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(DropboxActivity.this).build();
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
                 ImageLoader.getInstance().init(config);
             }
 
@@ -310,7 +320,7 @@ public class DropboxActivity extends Activity {
                     ImageSize size = new ImageSize(64, 64);
                     tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
                             ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            PreferenceSetter.getAppThemeColor(DropboxActivity.this));
+                            PreferenceSetter.getAppThemeColor(getActivity()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -323,4 +333,9 @@ public class DropboxActivity extends Activity {
             return null;
         }
     }
+    */
 }
+
+
+
+

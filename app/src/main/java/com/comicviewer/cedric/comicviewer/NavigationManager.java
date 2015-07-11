@@ -79,6 +79,10 @@ public class NavigationManager {
         mCloudStack.push("/");
     }
 
+    public void clearCloudStack()
+    {
+        mCloudStack.clear();
+    }
     public void resetCollectionStack()
     {
         mCollectionStack.clear();
@@ -219,27 +223,5 @@ public class NavigationManager {
 
     public boolean collectionStackEmpty() {return mCollectionStack.empty();}
 
-    public String getFileStackString()
-    {
-        String paths = "";
 
-        while (!mFileNavigationStack.isEmpty())
-            paths+=mFileNavigationStack.pop()+",";
-
-        return paths;
-    }
-
-    public void initialiseFileStackFromString(String csvPathList)
-    {
-        mFileNavigationStack.clear();
-        String[] paths = csvPathList.split(",");
-
-        for (int i=paths.length-1;i>=0;i--)
-        {
-            if (paths[i].equals(""))
-                continue;
-            else
-                mFileNavigationStack.push(paths[i]);
-        }
-    }
 }

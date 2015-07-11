@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.comicviewer.cedric.comicviewer.CloudFiles.AbstractCloudServiceListFragment;
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractCollectionsFragment;
@@ -157,9 +158,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
     public void onStop()
     {
         super.onStop();
-
         cleanFiles();
-
     }
 
     public void cleanFiles()
@@ -190,9 +189,6 @@ public class DrawerActivity extends MaterialNavigationDrawer
                 Utilities.deleteDirectory(this, folder);
             }
         }
-
-
-
     }
 
     @Override
@@ -203,23 +199,30 @@ public class DrawerActivity extends MaterialNavigationDrawer
             NavigationManager.getInstance().popFromCollectionStack();
             if (NavigationManager.getInstance().collectionStackEmpty())
             {
-                NavigationManager.getInstance().popFromSectionStack();
-                if (NavigationManager.getInstance().sectionStackEmpty())
-                {
-                    finish();
+                setPreviousSection();
+            }
+            else
+                CollectionsListFragment.getInstance().refresh();
+        }
+        else if (getCurrentSection().getTargetFragment() instanceof CloudFragment)
+        {
+            if (CloudFragment.getInstance().getActiveCloudServiceFragment()!=null)
+            {
+                AbstractCloudServiceListFragment fragment = CloudFragment.getInstance().getActiveCloudServiceFragment();
+                fragment.getNavigationManager().popFromCloudStack();
+                if (fragment.getNavigationManager().cloudStackEmpty()) {
+                    CloudFragment.getInstance().setActiveCloudServiceFragment(null);
+                    setFragment(CloudFragment.getInstance(), getString(R.string.cloud_storage));
                 }
                 else
                 {
-                    for (MaterialSection sec:mSectionsArray)
-                    {
-                        sec.unSelect();
-                    }
-                    setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
-                            NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
-                    setSection(NavigationManager.getInstance().getSectionFromSectionStack());
+                    CloudFragment.getInstance().getActiveCloudServiceFragment().refresh();
                 }
             }
-            CollectionsListFragment.getInstance().refresh();
+            else
+            {
+                setPreviousSection();
+            }
         }
         else if (getCurrentSection().getTargetFragment() instanceof AbstractComicListFragment)
         {
@@ -232,40 +235,12 @@ public class DrawerActivity extends MaterialNavigationDrawer
             }
             else
             {
-                NavigationManager.getInstance().popFromSectionStack();
-                if (NavigationManager.getInstance().sectionStackEmpty())
-                {
-                    finish();
-                }
-                else
-                {
-                    for (MaterialSection sec:mSectionsArray)
-                    {
-                        sec.unSelect();
-                    }
-                    setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
-                            NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
-                    setSection(NavigationManager.getInstance().getSectionFromSectionStack());
-                }
+                setPreviousSection();
             }
         }
         else
         {
-            NavigationManager.getInstance().popFromSectionStack();
-            if (NavigationManager.getInstance().sectionStackEmpty())
-            {
-                finish();
-            }
-            else
-            {
-                for (MaterialSection sec:mSectionsArray)
-                {
-                    sec.unSelect();
-                }
-                setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
-                        NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
-                setSection(NavigationManager.getInstance().getSectionFromSectionStack());
-            }
+            setPreviousSection();
         }
     }
 
@@ -278,6 +253,25 @@ public class DrawerActivity extends MaterialNavigationDrawer
         {
             setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
                     NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+        }
+    }
+
+    private void setPreviousSection()
+    {
+        NavigationManager.getInstance().popFromSectionStack();
+        if (NavigationManager.getInstance().sectionStackEmpty())
+        {
+            finish();
+        }
+        else
+        {
+            for (MaterialSection sec:mSectionsArray)
+            {
+                sec.unSelect();
+            }
+            setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
+                    NavigationManager.getInstance().getSectionFromSectionStack().getTitle());
+            setSection(NavigationManager.getInstance().getSectionFromSectionStack());
         }
     }
 

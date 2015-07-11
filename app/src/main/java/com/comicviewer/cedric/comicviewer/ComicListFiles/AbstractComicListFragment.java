@@ -460,6 +460,8 @@ abstract public class AbstractComicListFragment extends Fragment {
 
     public void showSortPopup(){
 
+        if (getActivity()==null)
+            return;
         CharSequence[] sortingOptions = {"Series", "Filename", "Year", "Last added", "Last modified date"};
         MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                 .title("Sort by")

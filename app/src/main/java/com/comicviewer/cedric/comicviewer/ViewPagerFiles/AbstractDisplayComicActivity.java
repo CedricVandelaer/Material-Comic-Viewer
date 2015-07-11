@@ -99,6 +99,8 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         int lastReadPage;
 
+        if (!ImageLoader.getInstance().isInited())
+            ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this));
         ImageLoader.getInstance().clearMemoryCache();
         ImageLoader.getInstance().clearDiskCache();
 
@@ -133,7 +135,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
 
         mPager =  (ComicViewPager) findViewById(R.id.comicpager);
-        mPager.setOffscreenPageLimit(8);
+        mPager.setOffscreenPageLimit(6);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
@@ -514,8 +516,8 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
     private class ComicStatePagerAdapter extends FragmentStatePagerAdapter
     {
         FragmentManager mFragmentManager;
-        private int[] mPageTopColors = new int[Math.max(0,mPageCount)];
-        private int[] mPageBottomColors = new int[Math.max(0,mPageCount)];
+        private int[] mPageTopColors = new int[Math.max(1,mPageCount)];
+        private int[] mPageBottomColors = new int[Math.max(1,mPageCount)];
 
         public ComicStatePagerAdapter(FragmentManager fm) {
             super(fm);

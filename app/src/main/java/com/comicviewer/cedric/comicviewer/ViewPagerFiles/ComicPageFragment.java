@@ -158,7 +158,7 @@ public class ComicPageFragment extends Fragment {
 
                 if (getActivity()!=null && PreferenceSetter.getPageQualitySetting(getActivity())) {
                     DisplayImageOptions highResOpts = new DisplayImageOptions.Builder()
-                            .bitmapConfig(Bitmap.Config.ARGB_8888)
+                            .bitmapConfig(Bitmap.Config.RGB_565)
                             .imageScaleType(ImageScaleType.NONE)
                             .cacheInMemory(true)
                             .cacheOnDisk(true)

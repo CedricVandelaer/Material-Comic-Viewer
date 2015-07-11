@@ -24,17 +24,19 @@ import java.util.ArrayList;
  */
 public class BoxAdapter extends RecyclerView.Adapter {
 
-    private BoxActivity mActivity;
+    private BoxFragment mFragment;
+    private Context mContext;
     private ArrayList<BoxItem> mBoxItemList;
     private LayoutInflater mInflater;
     private CloudService mCloudService;
 
-    public BoxAdapter(BoxActivity activity, CloudService cloudService)
+    public BoxAdapter(BoxFragment fragment, CloudService cloudService)
     {
-        mActivity = activity;
+        mFragment = fragment;
+        mContext = fragment.getActivity();
         mCloudService = cloudService;
         mBoxItemList = new ArrayList<>();
-        this.mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -53,9 +55,9 @@ public class BoxAdapter extends RecyclerView.Adapter {
         if (viewType==0) {
             v = mInflater.inflate(R.layout.cloud_folder_card, parent, false);
             CloudFolderViewHolder cloudFolderViewHolder = new CloudFolderViewHolder(v);
-            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mActivity)));
-            if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
-                cloudFolderViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
+            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mContext)));
+            if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+                cloudFolderViewHolder.mDownloadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
             addFolderClickListener(cloudFolderViewHolder);
             addDownloadFolderClickListener(cloudFolderViewHolder);
             return cloudFolderViewHolder;
@@ -63,9 +65,9 @@ public class BoxAdapter extends RecyclerView.Adapter {
         else {
             v = mInflater.inflate(R.layout.file_card, parent, false);
             CloudFileViewHolder cloudFileViewHolder = new CloudFileViewHolder(v);
-            if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
-                cloudFileViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
-            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mActivity));
+            if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+                cloudFileViewHolder.mDownloadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mContext));
             addFileClickListener(cloudFileViewHolder);
             return cloudFileViewHolder;
         }
@@ -84,8 +86,8 @@ public class BoxAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActivity.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getBoxEntry().getId());
-                mActivity.refresh();
+                mFragment.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getBoxEntry().getId());
+                mFragment.refresh();
             }
         });
     }
@@ -97,19 +99,19 @@ public class BoxAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 final BoxItem entry = cloudFileViewHolder.getBoxEntry();
 
-                MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title(mActivity.getString(R.string.download_file))
-                        .content(mActivity.getString(R.string.download_request)+" \""+entry.getName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .positiveText(mActivity.getString(R.string.confirm))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .negativeText(mActivity.getString(R.string.cancel))
+                MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
+                        .title(mContext.getString(R.string.download_file))
+                        .content(mContext.getString(R.string.download_request)+" \""+entry.getName()+"\"?")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
+                        .positiveText(mContext.getString(R.string.confirm))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
+                        .negativeText(mContext.getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Toast.makeText(mActivity, mActivity.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry, mCloudService);
+                                Toast.makeText(mContext, mContext.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
+                                DownloadFileService.startActionDownload(mContext, entry, mCloudService);
                             }
                         }).show();
             }

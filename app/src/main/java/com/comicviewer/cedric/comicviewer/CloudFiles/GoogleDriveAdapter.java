@@ -1,5 +1,6 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,17 +26,19 @@ import java.util.ArrayList;
  */
 public class GoogleDriveAdapter extends RecyclerView.Adapter {
 
-    private GoogleDriveActivity mActivity;
+    private GoogleDriveFragment mFragment;
+    private Context mContext;
     private ArrayList<GoogleDriveObject> mFileList;
     private LayoutInflater mInflater;
     private CloudService mCloudService;
 
-    public GoogleDriveAdapter(GoogleDriveActivity activity, CloudService cloudService)
+    public GoogleDriveAdapter(GoogleDriveFragment fragment, CloudService cloudService)
     {
         mCloudService = cloudService;
-        mActivity = activity;
+        mFragment = fragment;
+        mContext = mFragment.getActivity();
         mFileList = new ArrayList<>();
-        this.mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -56,9 +59,9 @@ public class GoogleDriveAdapter extends RecyclerView.Adapter {
         if (viewType==0) {
             v = mInflater.inflate(R.layout.cloud_folder_card, parent, false);
             CloudFolderViewHolder cloudFolderViewHolder = new CloudFolderViewHolder(v);
-            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mActivity)));
-            if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
-                cloudFolderViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
+            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mContext)));
+            if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+                cloudFolderViewHolder.mDownloadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
             addFolderClickListener(cloudFolderViewHolder);
             addDownloadFolderClickListener(cloudFolderViewHolder);
             return cloudFolderViewHolder;
@@ -66,9 +69,9 @@ public class GoogleDriveAdapter extends RecyclerView.Adapter {
         else {
             v = mInflater.inflate(R.layout.file_card, parent, false);
             CloudFileViewHolder cloudFileViewHolder = new CloudFileViewHolder(v);
-            if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
-                cloudFileViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
-            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mActivity));
+            if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+                cloudFileViewHolder.mDownloadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mContext));
             addFileClickListener(cloudFileViewHolder);
             return cloudFileViewHolder;
         }
@@ -80,7 +83,7 @@ public class GoogleDriveAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActivity.navigateToPath(cloudFolderViewHolder.getGoogleDriveEntry().getId());
+                mFragment.navigateToPath(cloudFolderViewHolder.getGoogleDriveEntry().getId());
             }
         });
     }
@@ -117,19 +120,19 @@ public class GoogleDriveAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 final GoogleDriveObject entry = cloudFileViewHolder.getGoogleDriveEntry();
 
-                MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title(mActivity.getString(R.string.download_file))
-                        .content(mActivity.getString(R.string.download_request)+" \""+entry.getName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .positiveText(mActivity.getString(R.string.confirm))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .negativeText(mActivity.getString(R.string.cancel))
+                MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
+                        .title(mContext.getString(R.string.download_file))
+                        .content(mContext.getString(R.string.download_request)+" \""+entry.getName()+"\"?")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
+                        .positiveText(mContext.getString(R.string.confirm))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
+                        .negativeText(mContext.getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Toast.makeText(mActivity, mActivity.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry, mCloudService);
+                                Toast.makeText(mContext, mContext.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
+                                DownloadFileService.startActionDownload(mContext, entry, mCloudService);
                             }
                         }).show();
             }

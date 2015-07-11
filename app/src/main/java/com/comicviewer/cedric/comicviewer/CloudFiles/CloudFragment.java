@@ -30,6 +30,7 @@ import com.box.androidsdk.content.models.BoxSession;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -79,6 +80,8 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
+    private AbstractCloudServiceListFragment mActiveFragment = null;
+
     public static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     public static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
     public static final int REQUEST_CODE_RECOVER_FROM_AUTH_ERROR  = 1002;
@@ -107,7 +110,6 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         super.onCreate(savedInstanceState);
 
         mHandler = new Handler();
-
     }
 
     @Override
@@ -195,6 +197,15 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         Toast.makeText(getActivity(), "Something went wrong signing into OneDrive", Toast.LENGTH_LONG).show();
     }
 
+    public AbstractCloudServiceListFragment getActiveCloudServiceFragment()
+    {
+        return mActiveFragment;
+    }
+
+    public void setActiveCloudServiceFragment(AbstractCloudServiceListFragment fragment)
+    {
+        mActiveFragment = fragment;
+    }
 
 
     private class AddDropboxUserInfoTask extends AsyncTask
@@ -252,7 +263,9 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         this.mOneDriveAuth = new LiveAuthClient(getActivity(), getActivity().getResources().getString(R.string.onedrive_id));
 
-        mAdapter = new CloudListAdapter(getActivity());
+        mAdapter = new CloudListAdapter(this);
+
+        NavigationManager.getInstance().clearCloudStack();
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();

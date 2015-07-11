@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -25,19 +24,19 @@ import java.util.List;
  */
 public class DropboxAdapter extends RecyclerView.Adapter {
 
-    private DropboxActivity mActivity;
+    private DropboxFragment mFragment;
     private CloudService mCloudService;
     private Handler mHandler;
     private LayoutInflater mInflater;
     private List<DropboxAPI.Entry> mFileList;
 
-    public DropboxAdapter(DropboxActivity activity, CloudService cloudService)
+    public DropboxAdapter(DropboxFragment fragment, CloudService cloudService)
     {
         mFileList = new ArrayList<>();
         mCloudService = cloudService;
         mHandler = new Handler();
-        mActivity = activity;
-        this.mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mFragment = fragment;
+        this.mInflater = (LayoutInflater) fragment.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -57,9 +56,9 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         if (viewType==0) {
             v = mInflater.inflate(R.layout.cloud_folder_card, parent, false);
             CloudFolderViewHolder cloudFolderViewHolder = new CloudFolderViewHolder(v);
-            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mActivity)));
-            if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
-                cloudFolderViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
+            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity())));
+            if (PreferenceSetter.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
+                cloudFolderViewHolder.mDownloadTextView.setTextColor(mFragment.getActivity().getResources().getColor(R.color.Black));
             addFolderClickListener(cloudFolderViewHolder);
             addDownloadFolderClickListener(cloudFolderViewHolder);
             return cloudFolderViewHolder;
@@ -67,9 +66,9 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         else {
             v = mInflater.inflate(R.layout.file_card, parent, false);
             CloudFileViewHolder cloudFileViewHolder = new CloudFileViewHolder(v);
-            if (PreferenceSetter.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
-                cloudFileViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
-            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mActivity));
+            if (PreferenceSetter.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
+                cloudFileViewHolder.mDownloadTextView.setTextColor(mFragment.getActivity().getResources().getColor(R.color.Black));
+            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()));
             addFileClickListener(cloudFileViewHolder);
             return cloudFileViewHolder;
         }
@@ -84,19 +83,19 @@ public class DropboxAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 final DropboxAPI.Entry entry = cloudFolderViewHolder.getDropboxEntry();
 
-                MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title(mActivity.getString(R.string.download_folder))
-                        .content(mActivity.getString(R.string.download_folder_request)+" \""+entry.fileName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .positiveText(mActivity.getString(R.string.confirm))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .negativeText(mActivity.getString(R.string.cancel))
+                MaterialDialog materialDialog = new MaterialDialog.Builder(mFragment.getActivity())
+                        .title(mFragment.getActivity().getString(R.string.download_folder))
+                        .content(mFragment.getActivity().getString(R.string.download_folder_request)+" \""+entry.fileName()+"\"?")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()))
+                        .positiveText(mFragment.getActivity().getString(R.string.confirm))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()))
+                        .negativeText(mFragment.getActivity().getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Toast.makeText(mActivity, mActivity.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry.path, mCloudService);
+                                Toast.makeText(mFragment.getActivity(), mFragment.getActivity().getString(R.string.download_started), Toast.LENGTH_SHORT).show();
+                                DownloadFileService.startActionDownload(mFragment.getActivity(), entry.path, mCloudService);
                             }
                         }).show();
             }
@@ -111,19 +110,19 @@ public class DropboxAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 final DropboxAPI.Entry entry = cloudFileViewHolder.getDropboxEntry();
 
-                MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title(mActivity.getString(R.string.download_file))
-                        .content(mActivity.getString(R.string.download_request)+" \""+entry.fileName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .positiveText(mActivity.getString(R.string.confirm))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
-                        .negativeText(mActivity.getString(R.string.cancel))
+                MaterialDialog materialDialog = new MaterialDialog.Builder(mFragment.getActivity())
+                        .title(mFragment.getActivity().getString(R.string.download_file))
+                        .content(mFragment.getActivity().getString(R.string.download_request)+" \""+entry.fileName()+"\"?")
+                        .positiveColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()))
+                        .positiveText(mFragment.getActivity().getString(R.string.confirm))
+                        .negativeColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()))
+                        .negativeText(mFragment.getActivity().getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Toast.makeText(mActivity,mActivity.getString(R.string.download_started),Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry.path, mCloudService);
+                                Toast.makeText(mFragment.getActivity(),mFragment.getActivity().getString(R.string.download_started),Toast.LENGTH_SHORT).show();
+                                DownloadFileService.startActionDownload(mFragment.getActivity(), entry.path, mCloudService);
                             }
                         }).show();
             }
@@ -138,8 +137,8 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActivity.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getDropboxEntry().path);
-                mActivity.refresh();
+                mFragment.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getDropboxEntry().path);
+                mFragment.refresh();
             }
         });
     }
