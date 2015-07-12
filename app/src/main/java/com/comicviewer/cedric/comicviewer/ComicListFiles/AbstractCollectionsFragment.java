@@ -19,9 +19,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.CollectionActions;
+import com.comicviewer.cedric.comicviewer.ComicActions;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
+import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PauseOnScrollListener;
@@ -29,6 +32,12 @@ import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PreCachingLayout
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,6 +53,8 @@ public abstract class AbstractCollectionsFragment extends Fragment implements Sw
 
     protected Handler mHandler;
 
+    private CharSequence[] smartCollectionType = {"Series", "Year", "Folders"};
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -54,7 +65,7 @@ public abstract class AbstractCollectionsFragment extends Fragment implements Sw
         mHandler = new Handler();
         PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
+        StorageManager.setBackgroundColorPreference(getActivity());
 
         createRecyclerView(v);
         createFab(v);
@@ -78,7 +89,7 @@ public abstract class AbstractCollectionsFragment extends Fragment implements Sw
         // use a linear layout manager
         int height;
 
-        if (PreferenceSetter.getCardAppearanceSetting(getActivity()).equals(getActivity().getString(R.string.card_size_setting_3))) {
+        if (StorageManager.getCardAppearanceSetting(getActivity()).equals(getActivity().getString(R.string.card_size_setting_3))) {
             Display display = getActivity().getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
@@ -157,5 +168,189 @@ public abstract class AbstractCollectionsFragment extends Fragment implements Sw
         {
             ((DrawerActivity)getActivity()).setFragment(CollectionsListFragment.getInstance(), NavigationManager.getInstance().getPathFromCollectionStack());
         }
+    }
+
+    protected void showCollectionNameDialog()
+    {
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("Add new collection")
+                .input("Name", "", false, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                        materialDialog.dismiss();
+                        StorageManager.createCollection(getActivity(), charSequence.toString());
+                        mAdapter.notifyDataSetChanged();
+                        showSmartCollectionDialog(charSequence.toString());
+                    }
+                })
+                .positiveText(getString(R.string.confirm))
+                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                .negativeText(getString(R.string.cancel))
+                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                .show();
+    }
+
+    protected void showSmartCollectionDialog(final String collectionName)
+    {
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("Add filters")
+                .items(smartCollectionType)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        //{"Series", "Year", "Folders"}
+                        switch (i) {
+                            case 0:
+                                showSeriesListDialog(collectionName);
+                                break;
+                            case 1:
+                                showYearListDialog(collectionName);
+                                break;
+                            case 2:
+                                showFolderListDialog(collectionName);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                })
+                .positiveText(getActivity().getResources().getString(R.string.finish))
+                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                .show();
+    }
+
+    protected void showSeriesListDialog(final String collectionName)
+    {
+        List<Comic> comics = ComicActions.getAllSimpleComics(getActivity());
+        Set<String> seriesSet = new HashSet<>();
+
+        for (Comic comic:comics) {
+            if (!comic.getTitle().trim().equals(""))
+                seriesSet.add(comic.getTitle());
+        }
+
+        ArrayList<String> series = Utilities.getStringsFromSet(seriesSet);
+        Collections.sort(series);
+        CharSequence[] seriesCharSequences = new CharSequence[series.size()];
+
+        for (int i=0;i<series.size();i++)
+            seriesCharSequences[i] = series.get(i);
+
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("Select series")
+                .items(seriesCharSequences)
+                .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        ArrayList<String> series = new ArrayList<String>();
+                        for (int i = 0; i < charSequences.length; i++)
+                            series.add(charSequences[i].toString());
+                        CollectionActions.batchAddSeriesFilterToCollection(getActivity(), collectionName, series);
+                        showSmartCollectionDialog(collectionName);
+                        return false;
+                    }
+                })
+                .negativeText(getString(R.string.cancel))
+                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        showSmartCollectionDialog(collectionName);
+                    }
+                })
+                .positiveText(getString(R.string.confirm))
+                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                .show();
+    }
+
+    protected void showYearListDialog(final String collectionName)
+    {
+        List<Comic> comics = ComicActions.getAllSimpleComics(getActivity());
+        Set<String> yearsSet = new HashSet<>();
+
+        for (Comic comic:comics) {
+            if (comic.getYear()!=-1)
+                yearsSet.add(""+comic.getYear());
+        }
+
+        ArrayList<String> years = Utilities.getStringsFromSet(yearsSet);
+        Collections.sort(years);
+        CharSequence[] seriesCharSequences = new CharSequence[years.size()];
+
+        for (int i=0;i<years.size();i++)
+            seriesCharSequences[i] = years.get(i);
+
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("Select year")
+                .items(seriesCharSequences)
+                .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        ArrayList<String> years = new ArrayList<String>();
+                        for (int i = 0; i < charSequences.length; i++)
+                            years.add(charSequences[i].toString());
+                        CollectionActions.batchAddYearsFilterToCollection(getActivity(), collectionName, years);
+                        showSmartCollectionDialog(collectionName);
+                        return false;
+                    }
+                })
+                .negativeText(getString(R.string.cancel))
+                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        showSmartCollectionDialog(collectionName);
+                    }
+                })
+                .positiveText(getString(R.string.confirm))
+                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                .show();
+    }
+
+    protected void showFolderListDialog(final String collectionName)
+    {
+        List<Comic> comics = ComicActions.getAllSimpleComics(getActivity());
+        Set<String> filepathSet = new HashSet<>();
+
+        for (Comic comic:comics) {
+            if (!comic.getFilePath().trim().equals(""))
+                filepathSet.add(""+comic.getFilePath());
+        }
+
+        ArrayList<String> folders = Utilities.getStringsFromSet(filepathSet);
+        Collections.sort(folders);
+        CharSequence[] seriesCharSequences = new CharSequence[folders.size()];
+
+        for (int i=0;i<folders.size();i++)
+            seriesCharSequences[i] = folders.get(i);
+
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("Select folder")
+                .items(seriesCharSequences)
+                .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        ArrayList<String> folders = new ArrayList<String>();
+                        for (int i = 0; i < charSequences.length; i++)
+                            folders.add(charSequences[i].toString());
+                        CollectionActions.batchAddFolderFilterToCollection(getActivity(), collectionName, folders);
+                        showSmartCollectionDialog(collectionName);
+                        return false;
+                    }
+                })
+                .negativeText(getString(R.string.cancel))
+                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        showSmartCollectionDialog(collectionName);
+                    }
+                })
+                .positiveText(getString(R.string.confirm))
+                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                .show();
     }
 }

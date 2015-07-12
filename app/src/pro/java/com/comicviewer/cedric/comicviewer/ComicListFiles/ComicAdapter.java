@@ -1,56 +1,21 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
-import android.app.ActivityOptions;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
+import com.comicviewer.cedric.comicviewer.CollectionActions;
 import com.comicviewer.cedric.comicviewer.ComicActions;
-import com.comicviewer.cedric.comicviewer.ComicLoader;
-import com.comicviewer.cedric.comicviewer.Info.InfoActivity;
+import com.comicviewer.cedric.comicviewer.Model.Collection;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
-import com.comicviewer.cedric.comicviewer.Utilities;
-import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
-import com.daimajia.swipe.SimpleSwipeListener;
-import com.daimajia.swipe.SwipeLayout;
-import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
-import com.melnykov.fab.FloatingActionButton;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -62,18 +27,12 @@ public class ComicAdapter extends AbstractComicAdapter {
     @Override
     protected void multiAddToCollection(final ArrayList<Comic> comics) {
 
-        JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
-        CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+        ArrayList<Collection> collections = StorageManager.getCollectionList(mListFragment.getActivity());
+        CharSequence[] collectionNames = new CharSequence[collections.size()+1];
 
-        for (int i=0;i<collections.length();i++)
+        for (int i=0;i<collections.size();i++)
         {
-            try {
-                collectionNames[i] = collections.getJSONObject(i).keys().next();
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
+            collectionNames[i] = collections.get(i).getName();
         }
 
         final String newCollection = "Add new collection";
@@ -91,13 +50,13 @@ public class ComicAdapter extends AbstractComicAdapter {
                                     .input("Collection name", "", false, new MaterialDialog.InputCallback() {
                                         @Override
                                         public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                            PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
-                                            ComicActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
+                                            StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
+                                            CollectionActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
                                         }
                                     })
                                     .show();
                         } else {
-                            ComicActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
+                            CollectionActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
                         }
                         mActionMode.finish();
                     }
@@ -135,18 +94,12 @@ public class ComicAdapter extends AbstractComicAdapter {
 
     public void showChooseCollectionDialog(final String folderPath)
     {
-        JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
-        CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+        ArrayList<Collection> collections = StorageManager.getCollectionList(mListFragment.getActivity());
+        CharSequence[] collectionNames = new CharSequence[collections.size()+1];
 
-        for (int i=0;i<collections.length();i++)
+        for (int i=0;i<collections.size();i++)
         {
-            try {
-                collectionNames[i] = collections.getJSONObject(i).keys().next();
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
+            collectionNames[i] = collections.get(i).getName();
         }
 
         final String newCollection = "Add new collection";
@@ -165,14 +118,14 @@ public class ComicAdapter extends AbstractComicAdapter {
                                     .input("Collection name", "", false, new MaterialDialog.InputCallback() {
                                         @Override
                                         public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                            PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
-                                            ComicActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
+                                            StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
+                                            CollectionActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
                                         }
                                     })
                                     .show();
                         }
                         else {
-                            ComicActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
+                            CollectionActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
                         }
                     }
                 })
@@ -189,7 +142,7 @@ public class ComicAdapter extends AbstractComicAdapter {
                 if (dialog != null)
                     dialog.dismiss();
                 vh.mSwipeLayout.close();
-                PreferenceSetter.addHiddenPath(mListFragment.getActivity(), vh.getFile().getAbsolutePath());
+                StorageManager.addHiddenPath(mListFragment.getActivity(), vh.getFile().getAbsolutePath());
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -299,18 +252,12 @@ public class ComicAdapter extends AbstractComicAdapter {
             public void onClick(View v) {
             if (dialog!=null)
                 dialog.dismiss();
-            JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
-            CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+            ArrayList<Collection> collections = StorageManager.getCollectionList(mListFragment.getActivity());
+            CharSequence[] collectionNames = new CharSequence[collections.size()+1];
 
-            for (int i=0;i<collections.length();i++)
+            for (int i=0;i<collections.size();i++)
             {
-                try {
-                    collectionNames[i] = collections.getJSONObject(i).keys().next();
-                }
-                catch (JSONException e)
-                {
-                    e.printStackTrace();
-                }
+                collectionNames[i] = collections.get(i).getName();
             }
 
             final String newCollection = "Add new collection";
@@ -328,13 +275,13 @@ public class ComicAdapter extends AbstractComicAdapter {
                                         .input("Collection name", "", false, new MaterialDialog.InputCallback() {
                                             @Override
                                             public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                                PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
-                                                ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                                StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
+                                                CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
                                             }
                                         })
                                         .show();
                             } else {
-                                ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
                             }
                         }
                     })
@@ -351,7 +298,7 @@ public class ComicAdapter extends AbstractComicAdapter {
             public void onClick(View v) {
 
                 dialog.dismiss();
-                PreferenceSetter.addHiddenPath(mListFragment.getActivity(), comic.getFilePath() + "/" + comic.getFileName());
+                StorageManager.addHiddenPath(mListFragment.getActivity(), comic.getFilePath() + "/" + comic.getFileName());
                 int pos = mComicList.indexOf(comic);
                 mComicList.remove(comic);
                 notifyItemRemoved(pos);
@@ -370,7 +317,7 @@ public class ComicAdapter extends AbstractComicAdapter {
             mComicList.remove(comic);
         }
 
-        PreferenceSetter.batchAddHiddenPath(mListFragment.getActivity(), hiddenPaths);
+        StorageManager.batchAddHiddenPath(mListFragment.getActivity(), hiddenPaths);
         notifyDataSetChanged();
         mActionMode.finish();
     }

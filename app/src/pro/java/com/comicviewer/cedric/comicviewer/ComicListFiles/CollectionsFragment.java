@@ -3,7 +3,7 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.melnykov.fab.FloatingActionButton;
@@ -29,29 +29,16 @@ public class CollectionsFragment extends AbstractCollectionsFragment{
 
     protected void createFab(View v) {
         mFab = (FloatingActionButton)v.findViewById(R.id.fab);
-        mFab.setColorNormal(PreferenceSetter.getAccentColor(getActivity()));
-        mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAccentColor(getActivity())));
-        mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAccentColor(getActivity())));
+        mFab.setColorNormal(StorageManager.getAccentColor(getActivity()));
+        mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(getActivity())));
+        mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(getActivity())));
         mFab.attachToRecyclerView(mRecyclerView);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                        .title("Add new collection")
-                        .input("Name", "", false, new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                materialDialog.dismiss();
-                                PreferenceSetter.createCollection(getActivity(), charSequence.toString());
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        })
-                        .positiveText(getString(R.string.confirm))
-                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .negativeText(getString(R.string.cancel))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .show();
+                showCollectionNameDialog();
             }
         });
     }
+
 }

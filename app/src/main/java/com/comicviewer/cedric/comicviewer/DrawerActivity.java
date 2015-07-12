@@ -14,13 +14,12 @@ import android.util.Log;
 import com.comicviewer.cedric.comicviewer.CloudFiles.AbstractCloudServiceListFragment;
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
-import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractCollectionsFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CurrentlyReadingFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsFragment;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -56,8 +55,8 @@ public class DrawerActivity extends MaterialNavigationDrawer
 
         this.disableLearningPattern();
         this.setBackPattern(BACKPATTERN_CUSTOM);
-        if (PreferenceSetter.getBackgroundColorPreference(this)!=getResources().getColor(R.color.WhiteBG))
-            this.setDrawerBackgroundColor(PreferenceSetter.getBackgroundColorPreference(this));
+        if (StorageManager.getBackgroundColorPreference(this)!=getResources().getColor(R.color.WhiteBG))
+            this.setDrawerBackgroundColor(StorageManager.getBackgroundColorPreference(this));
         else
             this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
 
@@ -112,7 +111,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
         mNavigationManager.pushToSectionStack(mSectionsArray[0]);
         for (final MaterialSection section:mSectionsArray)
         {
-            section.setSectionColor(PreferenceSetter.getAppThemeColor(this));
+            section.setSectionColor(StorageManager.getAppThemeColor(this));
 
             section.setOnClickListener(new MaterialSectionListener() {
                 @Override
@@ -248,7 +247,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
     public void onResume()
     {
         super.onResume();
-        changeToolbarColor(PreferenceSetter.getAppThemeColor(this),darkenColor(PreferenceSetter.getAppThemeColor(this)));
+        changeToolbarColor(StorageManager.getAppThemeColor(this),darkenColor(StorageManager.getAppThemeColor(this)));
         if (!NavigationManager.getInstance().sectionStackEmpty())
         {
             setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
@@ -278,7 +277,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
     private void setDrawerHeaderImage()
     {
         Drawable[] layers = new Drawable[2];
-        layers[0] = new ColorDrawable(PreferenceSetter.getAppThemeColor(this));
+        layers[0] = new ColorDrawable(StorageManager.getAppThemeColor(this));
         layers[1] = getResources().getDrawable(R.drawable.comic_viewer_drawer_header_text);
         LayerDrawable layerDrawable = new LayerDrawable(layers);
 
@@ -303,7 +302,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
                     ImageSize size = new ImageSize(64, 64);
                     tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
                             ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            PreferenceSetter.getAppThemeColor(DrawerActivity.this));
+                            StorageManager.getAppThemeColor(DrawerActivity.this));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

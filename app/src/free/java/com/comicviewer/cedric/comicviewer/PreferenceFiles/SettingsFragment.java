@@ -108,7 +108,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
 
         final CustomCheckBoxPreference mangaPreference = new CustomCheckBoxPreference(getActivity());
 
-        mangaPreference.setKey(PreferenceSetter.MANGA_SETTING);
+        mangaPreference.setKey(StorageManager.MANGA_SETTING);
         mangaPreference.setSummary(getString(R.string.manga_setting_note));
         mangaPreference.setTitle(getString(R.string.manga_setting_non_pro));
         mangaPreference.setDefaultValue(false);

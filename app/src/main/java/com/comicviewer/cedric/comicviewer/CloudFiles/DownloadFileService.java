@@ -4,35 +4,25 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
-import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-import android.view.View;
 
 import com.box.androidsdk.content.BoxApiFile;
-import com.box.androidsdk.content.BoxApiFolder;
 import com.box.androidsdk.content.BoxConfig;
-import com.box.androidsdk.content.BoxFutureTask;
-import com.box.androidsdk.content.auth.BoxAuthentication;
-import com.box.androidsdk.content.listeners.DownloadStartListener;
 import com.box.androidsdk.content.models.BoxDownload;
 import com.box.androidsdk.content.models.BoxItem;
 import com.box.androidsdk.content.models.BoxSession;
-import com.box.androidsdk.content.requests.BoxResponse;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.GoogleDriveObject;
 import com.comicviewer.cedric.comicviewer.Model.ObjectType;
 import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity;
@@ -236,11 +226,11 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                     e.printStackTrace();
                 }
 
-                ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+                ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
 
                 if (!filepaths.contains(boxDir.getAbsolutePath())) {
                     filepaths.add(boxDir.getAbsolutePath());
-                    PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                    StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
                 }
 
                 setEndNotification(boxItem.getName(), output.getAbsolutePath(), notificationId);
@@ -324,11 +314,11 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
             //rename file
             renamedOutput.renameTo(output);
 
-            ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+            ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
 
             if (!filepaths.contains(googleDriveDir.getAbsolutePath())) {
                 filepaths.add(googleDriveDir.getAbsolutePath());
-                PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
             }
 
             setEndNotification(fileName, output.getAbsolutePath(), notificationId);
@@ -414,12 +404,12 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
                                 renamedOutput.renameTo(output);
 
-                                ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+                                ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
 
 
                                 if (!filepaths.contains(oneDriveDir.getAbsolutePath())) {
                                     filepaths.add(oneDriveDir.getAbsolutePath());
-                                    PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                                    StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
                                 }
 
                                 setEndNotification(title, filePath, notificationId);
@@ -456,11 +446,11 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                 }
                 else {
 
-                    ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+                    ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
 
                     if (!filepaths.contains(oneDriveDir.getAbsolutePath())) {
                         filepaths.add(oneDriveDir.getAbsolutePath());
-                        PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                        StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
                     }
 
                     try
@@ -534,7 +524,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
         if (dbApi.getSession().authenticationSuccessful()) {
             String token = dbApi.getSession().finishAuthentication();
             cloudService.setToken(token);
-            PreferenceSetter.saveCloudService(DownloadFileService.this, cloudService);
+            StorageManager.saveCloudService(DownloadFileService.this, cloudService);
         }
 
         if (dbApi.getSession().isLinked()) {
@@ -569,12 +559,12 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
                         renamedOutput.renameTo(output);
 
-                        ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+                        ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
 
 
                         if (!filepaths.contains(dropboxDir.getAbsolutePath())) {
                             filepaths.add(dropboxDir.getAbsolutePath());
-                            PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                            StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
                         }
 
 
@@ -596,11 +586,11 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                 }
                 else {
 
-                    ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(DownloadFileService.this);
+                    ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
 
                     if (!filepaths.contains(dropboxDir.getAbsolutePath())) {
                         filepaths.add(dropboxDir.getAbsolutePath());
-                        PreferenceSetter.saveFilePaths(DownloadFileService.this, filepaths);
+                        StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
                     }
 
                     DropboxAPI.Entry entry;
@@ -639,7 +629,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
     private void createFileExistsNotification(String title, int id)
     {
         mNotification = new NotificationCompat.Builder(this)
-                .setColor(PreferenceSetter.getAppThemeColor(this))
+                .setColor(StorageManager.getAppThemeColor(this))
                 .setSmallIcon(R.drawable.ic_recents)
                 .setContentTitle("Material Comic Viewer")
                 .setContentText(getString(R.string.error)+": "+title + " "+getString(R.string.already_exists));
@@ -658,7 +648,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
         resultIntent.setData(uri);
         resultIntent.setAction(Intent.ACTION_VIEW);
-        if (PreferenceSetter.usesRecents(this))
+        if (StorageManager.getBooleanSetting(this, StorageManager.USES_RECENTS, true))
         {
             resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
             resultIntent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
@@ -704,7 +694,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
     {
         mNotification = new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_recents)
-                        .setColor(PreferenceSetter.getAppThemeColor(DownloadFileService.this))
+                        .setColor(StorageManager.getAppThemeColor(DownloadFileService.this))
                         .setGroup(NOTIFICATION_KEY)
                 .setContentTitle("Material Comic Viewer")
                         .setContentText(getString(R.string.downloading)+": " + title);
@@ -722,7 +712,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
         mNotification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_recents)
                 .setContentTitle("Material Comic Viewer")
-                .setColor(PreferenceSetter.getAppThemeColor(DownloadFileService.this))
+                .setColor(StorageManager.getAppThemeColor(DownloadFileService.this))
                 .setContentText(getString(R.string.error_while_downloading)+": " + title);
 
         NotificationManager mNotificationManager =

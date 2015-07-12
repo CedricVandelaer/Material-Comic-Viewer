@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
@@ -56,8 +56,8 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         if (viewType==0) {
             v = mInflater.inflate(R.layout.cloud_folder_card, parent, false);
             CloudFolderViewHolder cloudFolderViewHolder = new CloudFolderViewHolder(v);
-            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity())));
-            if (PreferenceSetter.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
+            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(StorageManager.getAppThemeColor(mFragment.getActivity())));
+            if (StorageManager.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
                 cloudFolderViewHolder.mDownloadTextView.setTextColor(mFragment.getActivity().getResources().getColor(R.color.Black));
             addFolderClickListener(cloudFolderViewHolder);
             addDownloadFolderClickListener(cloudFolderViewHolder);
@@ -66,9 +66,9 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         else {
             v = mInflater.inflate(R.layout.file_card, parent, false);
             CloudFileViewHolder cloudFileViewHolder = new CloudFileViewHolder(v);
-            if (PreferenceSetter.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
+            if (StorageManager.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
                 cloudFileViewHolder.mDownloadTextView.setTextColor(mFragment.getActivity().getResources().getColor(R.color.Black));
-            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()));
+            cloudFileViewHolder.mCardView.setCardBackgroundColor(StorageManager.getAppThemeColor(mFragment.getActivity()));
             addFileClickListener(cloudFileViewHolder);
             return cloudFileViewHolder;
         }
@@ -86,9 +86,9 @@ public class DropboxAdapter extends RecyclerView.Adapter {
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mFragment.getActivity())
                         .title(mFragment.getActivity().getString(R.string.download_folder))
                         .content(mFragment.getActivity().getString(R.string.download_folder_request)+" \""+entry.fileName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()))
+                        .positiveColor(StorageManager.getAppThemeColor(mFragment.getActivity()))
                         .positiveText(mFragment.getActivity().getString(R.string.confirm))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()))
+                        .negativeColor(StorageManager.getAppThemeColor(mFragment.getActivity()))
                         .negativeText(mFragment.getActivity().getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
@@ -113,9 +113,9 @@ public class DropboxAdapter extends RecyclerView.Adapter {
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mFragment.getActivity())
                         .title(mFragment.getActivity().getString(R.string.download_file))
                         .content(mFragment.getActivity().getString(R.string.download_request)+" \""+entry.fileName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()))
+                        .positiveColor(StorageManager.getAppThemeColor(mFragment.getActivity()))
                         .positiveText(mFragment.getActivity().getString(R.string.confirm))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity()))
+                        .negativeColor(StorageManager.getAppThemeColor(mFragment.getActivity()))
                         .negativeText(mFragment.getActivity().getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override

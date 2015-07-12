@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -19,28 +18,22 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.ActionMode;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SearchView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
 import com.bignerdranch.android.multiselector.MultiSelector;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PauseOnScrollListener;
@@ -57,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Filter;
 
 /**
  * Created by CV on 22/06/2015.
@@ -201,9 +193,9 @@ abstract public class AbstractComicListFragment extends Fragment {
 
     protected void createFab(View v) {
         mFab = (FloatingActionButton)v.findViewById(R.id.fab);
-        mFab.setColorNormal(PreferenceSetter.getAccentColor(getActivity()));
-        mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAccentColor(getActivity())));
-        mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAccentColor(getActivity())));
+        mFab.setColorNormal(StorageManager.getAccentColor(getActivity()));
+        mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(getActivity())));
+        mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(getActivity())));
         mFab.attachToRecyclerView(mRecyclerView);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,19 +210,19 @@ abstract public class AbstractComicListFragment extends Fragment {
                         MaterialDialog rootPrompt = new MaterialDialog.Builder(getActivity())
                                 .title("Add folder")
                                 .content("Do you wish to include the root folder?")
-                                .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
                                 .positiveText(getString(R.string.yes))
                                 .negativeText(getString(R.string.no))
-                                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
                                         super.onPositive(dialog);
-                                        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+                                        ArrayList<String> filePaths = StorageManager.getFilePathsFromPreferences(getActivity());
 
                                         if (!filePaths.contains(directory.toString()))
                                             filePaths.add(directory.toString());
-                                        PreferenceSetter.saveFilePaths(getActivity(), filePaths);
+                                        StorageManager.saveFilePaths(getActivity(), filePaths);
                                         refresh();
                                     }
 
@@ -238,14 +230,14 @@ abstract public class AbstractComicListFragment extends Fragment {
                                     public void onNegative(MaterialDialog dialog) {
                                         super.onNegative(dialog);
                                         ArrayList<String> paths = FileLoader.getDirectSubFolders(directory.toString());
-                                        ArrayList<String> filePaths = PreferenceSetter.getFilePathsFromPreferences(getActivity());
+                                        ArrayList<String> filePaths = StorageManager.getFilePathsFromPreferences(getActivity());
 
                                         for (int i = 0; i < paths.size(); i++) {
                                             if (!filePaths.contains(paths.get(i))) {
                                                 filePaths.add(paths.get(i));
                                             }
                                         }
-                                        PreferenceSetter.saveFilePaths(getActivity(), filePaths);
+                                        StorageManager.saveFilePaths(getActivity(), filePaths);
                                         refresh();
                                     }
                                 }).show();
@@ -263,7 +255,7 @@ abstract public class AbstractComicListFragment extends Fragment {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
+        StorageManager.setBackgroundColorPreference(getActivity());
 
         if (prefs.getString("cardSize", "Normal cards").equals(getString(R.string.card_size_setting_3)))
         {
@@ -274,7 +266,7 @@ abstract public class AbstractComicListFragment extends Fragment {
     protected void updateLastReadComics()
     {
 
-        String lastReadComic = PreferenceSetter.getLastReadComic(mApplicationContext);
+        String lastReadComic = StorageManager.getStringSetting(mApplicationContext, StorageManager.LAST_READ_COMIC, getString(R.string.none));
 
         for (int i=0;i<mAdapter.getComicsAndFiles().size();i++)
         {
@@ -471,17 +463,17 @@ abstract public class AbstractComicListFragment extends Fragment {
                     public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                         materialDialog.dismiss();
                         String[] sortOptions = {
-                                PreferenceSetter.SORT_BY_SERIES,
-                                PreferenceSetter.SORT_BY_FILENAME,
-                                PreferenceSetter.SORT_BY_YEAR,
-                                PreferenceSetter.SORT_BY_LAST_ADDED,
-                                PreferenceSetter.SORT_BY_MODIFIED_DATE
+                                StorageManager.SORT_BY_SERIES,
+                                StorageManager.SORT_BY_FILENAME,
+                                StorageManager.SORT_BY_YEAR,
+                                StorageManager.SORT_BY_LAST_ADDED,
+                                StorageManager.SORT_BY_MODIFIED_DATE
                         };
-                        PreferenceSetter.saveSortSetting(getActivity(), sortOptions[i]);
+                        StorageManager.saveSortSetting(getActivity(), sortOptions[i]);
                         refresh();
                     }
                 })
-                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
                 .negativeText(getString(R.string.cancel))
                 .show();
     }
@@ -497,7 +489,7 @@ abstract public class AbstractComicListFragment extends Fragment {
         // use a linear layout manager
         int height;
 
-        if (PreferenceSetter.getCardAppearanceSetting(getActivity()).equals(getActivity().getString(R.string.card_size_setting_3))) {
+        if (StorageManager.getCardAppearanceSetting(getActivity()).equals(getActivity().getString(R.string.card_size_setting_3))) {
             Display display = getActivity().getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
@@ -663,7 +655,7 @@ abstract public class AbstractComicListFragment extends Fragment {
         TreeMap<String, String> treemap = new TreeMap<>(map);
 
         List<Object> currentListItems = mAdapter.getComicsAndFiles();
-        ArrayList<Comic> savedComics = PreferenceSetter.getSavedComics(mApplicationContext);
+        ArrayList<Comic> savedComics = StorageManager.getSavedComics(mApplicationContext);
         List<String> savedComicsFileNames = getFileNamesFromList(savedComics, true);
         List<String> currentFileNames = getFileNamesFromList(currentListItems);
 
@@ -741,8 +733,8 @@ abstract public class AbstractComicListFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                PreferenceSetter.batchSaveComics(mApplicationContext, comicsToSave);
-                PreferenceSetter.batchAddAddedComics(mApplicationContext, comicsToAdd);
+                StorageManager.batchSaveComics(mApplicationContext, comicsToSave);
+                StorageManager.batchAddAddedComics(mApplicationContext, comicsToAdd);
             }
         }).run();
 

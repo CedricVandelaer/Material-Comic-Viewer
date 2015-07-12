@@ -1,34 +1,23 @@
 package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.graphics.Point;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
-import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -36,7 +25,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -101,7 +89,7 @@ public class ComicPageFragment extends Fragment {
         }
         mFullscreenComicView.setImageBitmap(null);
         if (getActivity()!=null)
-            mFullscreenComicView.setAllowScrollOnZoom(PreferenceSetter.getScrollOnZoomSetting(getActivity()));
+            mFullscreenComicView.setAllowScrollOnZoom(StorageManager.getBooleanSetting(getActivity(), StorageManager.SCROLL_ON_ZOOM_SETTING, true));
 
         if (filename!=null) {
             if (getActivity()!=null) {
@@ -156,7 +144,7 @@ public class ComicPageFragment extends Fragment {
                     }
                 };
 
-                if (getActivity()!=null && PreferenceSetter.getPageQualitySetting(getActivity())) {
+                if (getActivity()!=null && StorageManager.getBooleanSetting(getActivity(), StorageManager.PAGE_QUALITY_SETTING, false)) {
                     DisplayImageOptions highResOpts = new DisplayImageOptions.Builder()
                             .bitmapConfig(Bitmap.Config.RGB_565)
                             .imageScaleType(ImageScaleType.NONE)
@@ -198,7 +186,7 @@ public class ComicPageFragment extends Fragment {
         mPageNumber = args.getInt("PageNumber");
         mFullscreenComicView = (TouchImageView) rootView.findViewById(R.id.fullscreen_comic);
 
-        if (getActivity()!= null && PreferenceSetter.getScrollByTapSetting(getActivity())) {
+        if (getActivity()!= null && StorageManager.getBooleanSetting(getActivity(), StorageManager.SCROLL_BY_TAP_SETTING, false)) {
             final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.OnGestureListener() {
                 @Override
                 public boolean onDown(MotionEvent e) {
@@ -283,7 +271,7 @@ public class ComicPageFragment extends Fragment {
     {
         if (getActivity()!=null) {
 
-            if (PreferenceSetter.getAutoFitSetting(getActivity())
+            if (StorageManager.getBooleanSetting(getActivity(), StorageManager.WIDTH_AUTO_FIT_SETTING, true)
                     && getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 
                 mHandler.postDelayed(new Runnable() {
@@ -291,7 +279,7 @@ public class ComicPageFragment extends Fragment {
                     public void run() {
                         if (getActivity()==null)
                             return;
-                        if (PreferenceSetter.getRotatePageSetting(getActivity()) && mIsRotated)
+                        if (StorageManager.getBooleanSetting(getActivity(), StorageManager.ROTATE_LANDSCAPE_PAGE, false) && mIsRotated)
                         {
                             mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
                             mIsRotated = false;
@@ -305,7 +293,7 @@ public class ComicPageFragment extends Fragment {
 
 
             }
-            else if(PreferenceSetter.getRotatePageSetting(getActivity()))
+            else if(StorageManager.getBooleanSetting(getActivity(), StorageManager.ROTATE_LANDSCAPE_PAGE, false))
             {
                 if (mFullscreenComicView.getDrawable().getIntrinsicWidth()>mFullscreenComicView.getDrawable().getIntrinsicHeight()
                         && !mIsRotated)
@@ -318,7 +306,7 @@ public class ComicPageFragment extends Fragment {
                             mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap,90));
                             mIsRotated = true;
 
-                            if (PreferenceSetter.getAutoFitSetting(getActivity()))
+                            if (StorageManager.getBooleanSetting(getActivity(), StorageManager.WIDTH_AUTO_FIT_SETTING, true))
                             {
                                 if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
                                 {
@@ -371,7 +359,7 @@ public class ComicPageFragment extends Fragment {
                         public void run() {
                             if (getActivity()==null)
                                 return;
-                            if (PreferenceSetter.getRotatePageSetting(getActivity()) && mIsRotated) {
+                            if (StorageManager.getBooleanSetting(getActivity(), StorageManager.ROTATE_LANDSCAPE_PAGE, false) && mIsRotated) {
                                 mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
                                 mIsRotated = false;
                             }

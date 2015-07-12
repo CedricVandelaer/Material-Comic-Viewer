@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +18,18 @@ import java.util.regex.Pattern;
  */
 public class Comic implements Parcelable 
 {
+    private static String TITLE = "title";
+    private static String COVER_IMAGE = "coverImage";
+    private static String FILE_PATH = "filePath";
+    private static String FILE_NAME = "fileName";
+    private static String ISSUE_NUMBER = "issueNumber";
+    private static String PAGE_COUNT = "pageCount";
+    private static String COLOR_SETTING = "colorSetting";
+    private static String COVER_COLOR = "coverColor";
+    private static String TEXT_COLOR = "textColor";
+    private static String YEAR = "year";
+
+
     //The title of the comic series
     String mTitle;
 
@@ -40,10 +55,7 @@ public class Comic implements Parcelable
     int mCoverColor;
     
     //The color of the primary text
-    int mPrimaryTextColor;
-
-    //The color of the secondary text
-    int mSecondaryTextColor;
+    int mTextColor;
     
     //The year of the comic
     int mYear;
@@ -58,8 +70,7 @@ public class Comic implements Parcelable
         this.mPageCount = otherComic.getPageCount();
         this.mColorSetting = otherComic.getColorSetting();
         this.mCoverColor = otherComic.getComicColor();
-        this.mPrimaryTextColor = otherComic.getPrimaryTextColor();
-        this.mSecondaryTextColor = otherComic.getSecondaryTextColor();
+        this.mTextColor = otherComic.getTextColor();
         this.mYear = otherComic.getYear();
     }
 
@@ -71,8 +82,7 @@ public class Comic implements Parcelable
         createTitle(filename);
         
         mCoverColor = -1;
-        mPrimaryTextColor=-1;
-        mSecondaryTextColor=-1;
+        mTextColor=-1;
         mPageCount = -1;
         mColorSetting = null;
         
@@ -127,7 +137,7 @@ public class Comic implements Parcelable
     }
 
     public Comic(String title, String coverImage, String filePath, String fileName, int issueNumber,
-                 int pageCount, String colorSetting, int coverColor, int primaryTextColor, int secondaryTextColor, int year)
+                 int pageCount, String colorSetting, int coverColor, int textColor, int year)
     {
         mTitle = title;
         mCoverImage = coverImage;
@@ -137,21 +147,8 @@ public class Comic implements Parcelable
         mPageCount = pageCount;
         mColorSetting = colorSetting;
         mCoverColor = coverColor;
-        mPrimaryTextColor = primaryTextColor;
-        mSecondaryTextColor = secondaryTextColor;
+        mTextColor = textColor;
         mYear = year;
-    }
-
-    public String serialize()
-    {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
-
-    static public Comic create(String serializedData) {
-        // Use GSON to instantiate this class using the JSON representation of the state
-        Gson gson = new Gson();
-        return gson.fromJson(serializedData, Comic.class);
     }
 
     public Comic(Parcel in)
@@ -168,9 +165,9 @@ public class Comic implements Parcelable
         else
             mTitle = filename;
         
-        mTitle = mTitle.replaceAll("_"," ");
+        mTitle = mTitle.replaceAll("_", " ");
 
-        mTitle = mTitle.replaceAll("#","");
+        mTitle = mTitle.replaceAll("#", "");
         
         mTitle = mTitle.trim();
         
@@ -214,21 +211,16 @@ public class Comic implements Parcelable
         mPageCount = in.readInt();
         mColorSetting = in.readString();
         mCoverColor = in.readInt();
-        mPrimaryTextColor = in.readInt();
-        mSecondaryTextColor = in.readInt();
+        mTextColor = in.readInt();
         mYear = in.readInt();
     }
 
     public void setTitle(String title){mTitle = title;}
 
-    public void setPrimaryTextColor(int color) { mPrimaryTextColor = color;}
+    public void setTextColor(int color) { mTextColor = color;}
     
-    public int getPrimaryTextColor() { return mPrimaryTextColor;}
-    
-    public void setSecondaryTextColor(int color) { mSecondaryTextColor = color;}
-    
-    public int getSecondaryTextColor() { return mSecondaryTextColor;}
-    
+    public int getTextColor() { return mTextColor;}
+
     public void setComicColor(int color)
     {
         mCoverColor = color;
@@ -315,8 +307,7 @@ public class Comic implements Parcelable
         dest.writeInt(mPageCount);
         dest.writeString(mColorSetting);
         dest.writeInt(mCoverColor);
-        dest.writeInt(mPrimaryTextColor);
-        dest.writeInt(mSecondaryTextColor);
+        dest.writeInt(mTextColor);
         dest.writeInt(mYear);
     }
 
@@ -329,4 +320,57 @@ public class Comic implements Parcelable
             return new Comic[size];
         }
     };
+
+    public static Comic fromJSON(JSONObject comicJSON)
+    {
+        try
+        {
+            Comic comic = new Comic(comicJSON.getString(FILE_NAME), comicJSON.getString(FILE_PATH));
+            comic.setTitle(comicJSON.getString(TITLE));
+            if (comicJSON.has(COVER_IMAGE))
+                comic.setCoverImage(comicJSON.getString(COVER_IMAGE));
+            comic.setIssueNumber(comicJSON.getInt(ISSUE_NUMBER));
+            comic.setPageCount(comicJSON.getInt(PAGE_COUNT));
+            if (comicJSON.has(COLOR_SETTING))
+                comic.setColorSetting(comicJSON.getString(COLOR_SETTING));
+            comic.setComicColor(comicJSON.getInt(COVER_COLOR));
+            comic.setTextColor(comicJSON.getInt(TEXT_COLOR));
+            comic.setYear(comicJSON.getInt(YEAR));
+
+            return comic;
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public JSONObject toJSON()
+    {
+        JSONObject comicJSON = new JSONObject();
+
+        try
+        {
+            comicJSON.put(TITLE, mTitle);
+            if (mCoverImage!=null)
+                comicJSON.put(COVER_IMAGE, mCoverImage);
+            comicJSON.put(FILE_PATH, mFilePath);
+            comicJSON.put(FILE_NAME, mFileName);
+            comicJSON.put(ISSUE_NUMBER, mIssueNumber);
+            comicJSON.put(PAGE_COUNT, mPageCount);
+            if (mColorSetting!=null)
+                comicJSON.put(COLOR_SETTING, mColorSetting);
+            comicJSON.put(COVER_COLOR, mCoverColor);
+            comicJSON.put(TEXT_COLOR, mTextColor);
+            comicJSON.put(YEAR, mYear);
+
+            return comicJSON;
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

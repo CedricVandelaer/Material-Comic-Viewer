@@ -212,7 +212,6 @@
     <string name="find_comic_viewer_on">Find Comic Viewer on:</string>
     <string name="page_flip">Page flip</string>
     <string name="dynamic">Dynamic</string>
+    <string name="finish">Finish</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

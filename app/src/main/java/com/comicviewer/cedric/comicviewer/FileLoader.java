@@ -5,7 +5,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Created by CV on 11/03/2015.
@@ -37,7 +36,7 @@ public class FileLoader {
         ArrayList<String> filepaths;
         if (folder.equals("root"))
         {
-            filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
+            filepaths = StorageManager.getFilePathsFromPreferences(context);
 
         }
         else
@@ -46,7 +45,7 @@ public class FileLoader {
             filepaths.add(folder);
         }
 
-        ArrayList<String> hiddenFiles = PreferenceSetter.getHiddenFiles(context);
+        ArrayList<String> hiddenFiles = StorageManager.getHiddenFiles(context);
 
         if (folder.equals("root"))
         {
@@ -94,7 +93,7 @@ public class FileLoader {
     public static Map<String, String> searchComics(Context context) {
 
         String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ComicViewer";
-        ArrayList<String> hiddenFiles = PreferenceSetter.getHiddenFiles(context);
+        ArrayList<String> hiddenFiles = StorageManager.getHiddenFiles(context);
 
         File defaultPathFile = new File(defaultPath);
         if (!defaultPathFile.exists())
@@ -104,7 +103,7 @@ public class FileLoader {
 
         long startTime = System.currentTimeMillis();
 
-        ArrayList<String> filepaths = PreferenceSetter.getFilePathsFromPreferences(context);
+        ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(context);
 
         ArrayList<String> subFolders = searchSubFolders(filepaths);
 

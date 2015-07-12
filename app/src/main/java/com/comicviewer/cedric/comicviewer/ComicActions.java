@@ -4,7 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,26 +21,26 @@ public class ComicActions {
 
     public static void makeNormalComics(Context context, ArrayList<Comic> comics)
     {
-        PreferenceSetter.batchRemoveMangaComics(context, comics);
-        PreferenceSetter.batchSaveNormalComics(context, comics);
+        StorageManager.batchRemoveMangaComics(context, comics);
+        StorageManager.batchSaveNormalComics(context, comics);
     }
 
     public static void makeMangaComics(Context context, ArrayList<Comic> comics)
     {
-        PreferenceSetter.batchRemoveNormalComics(context, comics);
-        PreferenceSetter.batchSaveMangaComics(context, comics);
+        StorageManager.batchRemoveNormalComics(context, comics);
+        StorageManager.batchSaveMangaComics(context, comics);
     }
 
     public static void makeMangaComic(Context context, Comic comic)
     {
-        PreferenceSetter.removeNormalComic(context, comic);
-        PreferenceSetter.saveMangaComic(context, comic);
+        StorageManager.removeNormalComic(context, comic);
+        StorageManager.saveMangaComic(context, comic);
     }
 
     public static void makeNormalComic(Context context, Comic comic)
     {
-        PreferenceSetter.saveNormalComic(context, comic);
-        PreferenceSetter.removeMangaComic(context, comic);
+        StorageManager.saveNormalComic(context, comic);
+        StorageManager.removeMangaComic(context, comic);
     }
 
     public static void removeComic(Context context, Comic comic)
@@ -63,7 +63,7 @@ public class ComicActions {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        PreferenceSetter.removeSavedComic(context, comic);
+        StorageManager.removeSavedComic(context, comic);
 
     }
 
@@ -89,63 +89,26 @@ public class ComicActions {
                 e.printStackTrace();
             }
         }
-        PreferenceSetter.batchRemoveSavedComics(context, comics);
+        StorageManager.batchRemoveSavedComics(context, comics);
     }
 
-    public static ArrayList<String> getContainingCollections(Context context, Comic comic)
-    {
-        JSONArray collections = PreferenceSetter.getCollectionList(context);
-        ArrayList<String> containingCollections = new ArrayList<>();
 
-        for (int i=0;i<collections.length();i++)
+    public static ArrayList<Comic> getAllSimpleComics(Context context)
+    {
+        ArrayList<Comic> comics = new ArrayList<>();
+        ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(context);
+        for (String path:filepaths)
         {
-            try {
-                JSONObject collection = collections.getJSONObject(i);
-                String collectionName = collection.keys().next();
-                JSONArray collectionArray = collection.getJSONArray(collectionName);
-                boolean inArray = false;
-                for (int j=0;j<collectionArray.length();j++)
-                {
-                    if (collectionArray.getString(j).equals(comic.getFileName()))
-                        inArray = true;
-                }
-                if (inArray)
-                    containingCollections.add(collectionName);
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
+            comics.addAll(getAllComicsInFolderRecursive(path));
         }
-        return containingCollections;
+        return comics;
     }
 
-    public static void addComicsToCollection(Context context, String collectionName, ArrayList<Comic> comics)
+    public static ArrayList<Comic> getAllComicsInFolderRecursive(String root)
     {
-        ArrayList<String> comicsToAdd = new ArrayList<>();
-        for (Comic comic:comics) {
-            comicsToAdd.add(comic.getFileName());
-        }
-        PreferenceSetter.addToCollection(context, collectionName, comicsToAdd, false);
-    }
+        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(root);
 
-    public static void removeComicsFromCollection(Context context, String collectionName, ArrayList<Comic> comics)
-    {
-        PreferenceSetter.removeComicsFromCollection(context, collectionName, comics);
-    }
-
-    public static void addComicToCollection(Context context, String collectionName, Comic comic)
-    {
-        ArrayList<String> comicsToAdd = new ArrayList<>();
-        comicsToAdd.add(comic.getFileName());
-        PreferenceSetter.addToCollection(context, collectionName, comicsToAdd, false);
-    }
-
-    public static void addFolderToCollection(Context context, String collectionName, String folderPath)
-    {
-        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(folderPath);
-
-        ArrayList<String> comicsToAdd = new ArrayList<>();
+        ArrayList<Comic> comics = new ArrayList<>();
 
         for (int i=0;i<subFilesAndFolders.size();i++)
         {
@@ -153,16 +116,16 @@ public class ComicActions {
             File file = new File(subFilesAndFolders.get(i));
             if (Utilities.checkImageFolder(file))
             {
-                comicsToAdd.add(file.getName());
+                comics.add(new Comic(file.getName(),file.getParentFile().getAbsolutePath()));
             }
             else if (Utilities.checkExtension(subFilesAndFolders.get(i))
                     && (Utilities.isRarArchive(file) || Utilities.isZipArchive(file)))
             {
-                comicsToAdd.add(file.getName());
+                comics.add(new Comic(file.getName(),file.getParentFile().getAbsolutePath()));
             }
         }
 
-        PreferenceSetter.addToCollection(context, collectionName, comicsToAdd, false);
+        return comics;
     }
 
     public static void markFolderUnread(Context context, String folderPath)
@@ -217,28 +180,28 @@ public class ComicActions {
 
     public static void markComicUnread(Context context, Comic comic)
     {
-        PreferenceSetter.removeReadComic(context, comic.getFileName());
+        StorageManager.removeReadComic(context, comic.getFileName());
 
-        int pagesRead = PreferenceSetter.getPagesReadForComic(context, comic.getFileName());
+        int pagesRead = StorageManager.getPagesReadForComic(context, comic.getFileName());
 
-        PreferenceSetter.resetSavedPagesForComic(context, comic.getFileName());
+        StorageManager.resetSavedPagesForComic(context, comic.getFileName());
 
         if (pagesRead > 0) {
-            PreferenceSetter.decrementNumberOfComicsStarted(context, 1);
+            StorageManager.decrementNumberOfComicsStarted(context, 1);
         }
 
         if (pagesRead >= comic.getPageCount()) {
-            PreferenceSetter.decrementNumberOfComicsRead(context, 1);
+            StorageManager.decrementNumberOfComicsRead(context, 1);
         }
 
-        PreferenceSetter.decrementPagesForSeries(context, comic.getTitle(), pagesRead);
+        StorageManager.decrementPagesForSeries(context, comic.getTitle(), pagesRead);
     }
 
     public static void markComicRead(Context context, Comic comic, boolean showToast)
     {
-        if (PreferenceSetter.getReadComics(context).containsKey(comic.getFileName())) {
+        if (StorageManager.getReadComics(context).containsKey(comic.getFileName())) {
 
-            if (PreferenceSetter.getReadComics(context).get(comic.getFileName())+1>= comic.getPageCount())
+            if (StorageManager.getReadComics(context).get(comic.getFileName())+1>= comic.getPageCount())
             {
                 //Do nothing, already marked as read
                 if (showToast) {
@@ -249,24 +212,24 @@ public class ComicActions {
             else
             {
                 //Comic was opened but not yet fully read
-                PreferenceSetter.saveLastReadComic(context,comic.getFileName(),comic.getPageCount()-1);
+                StorageManager.saveLastReadComic(context, comic.getFileName(), comic.getPageCount() - 1);
 
-                int pagesRead = PreferenceSetter.getPagesReadForComic(context, comic.getFileName());
+                int pagesRead = StorageManager.getPagesReadForComic(context, comic.getFileName());
 
-                PreferenceSetter.savePagesForComic(context, comic.getFileName(), comic.getPageCount());
+                StorageManager.savePagesForComic(context, comic.getFileName(), comic.getPageCount());
 
                 if (pagesRead == 0) {
-                    PreferenceSetter.incrementNumberOfComicsStarted(context, 1);
+                    StorageManager.incrementNumberOfComicsStarted(context, 1);
                 }
 
                 if (pagesRead < comic.getPageCount()) {
-                    PreferenceSetter.incrementNumberOfComicsRead(context, 1);
+                    StorageManager.incrementNumberOfComicsRead(context, 1);
                 }
 
                 int extraPagesRead = comic.getPageCount() - pagesRead;
-                PreferenceSetter.incrementPagesForSeries(context, comic.getTitle(), extraPagesRead);
+                StorageManager.incrementPagesForSeries(context, comic.getTitle(), extraPagesRead);
 
-                PreferenceSetter.saveLongestReadComic(context,
+                StorageManager.saveLongestReadComic(context,
                         comic.getFileName(),
                         comic.getPageCount(),
                         comic.getTitle(),
@@ -274,18 +237,18 @@ public class ComicActions {
             }
         }
         else {
-            PreferenceSetter.saveLongestReadComic(context,
+            StorageManager.saveLongestReadComic(context,
                     comic.getFileName(),
                     comic.getPageCount(),
                     comic.getTitle(),
                     comic.getIssueNumber());
 
             //Comic wasn't opened yet
-            PreferenceSetter.saveLastReadComic(context,comic.getFileName(),comic.getPageCount()-1);
-            PreferenceSetter.savePagesForComic(context, comic.getFileName(), comic.getPageCount());
-            PreferenceSetter.incrementNumberOfComicsStarted(context, 1);
-            PreferenceSetter.incrementNumberOfComicsRead(context, 1);
-            PreferenceSetter.incrementPagesForSeries(context, comic.getTitle(), comic.getPageCount());
+            StorageManager.saveLastReadComic(context, comic.getFileName(), comic.getPageCount() - 1);
+            StorageManager.savePagesForComic(context, comic.getFileName(), comic.getPageCount());
+            StorageManager.incrementNumberOfComicsStarted(context, 1);
+            StorageManager.incrementNumberOfComicsRead(context, 1);
+            StorageManager.incrementPagesForSeries(context, comic.getTitle(), comic.getPageCount());
         }
     }
 }

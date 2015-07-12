@@ -1,21 +1,16 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.net.Uri;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
-import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PreCachingLayoutManager;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -25,8 +20,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import net.lingala.zip4j.core.ZipFile;
 
@@ -35,6 +32,17 @@ import net.lingala.zip4j.core.ZipFile;
  * Utilities for extension checking or filetype checking
  */
 public class Utilities {
+
+    public static ArrayList<String> getStringsFromSet(Set<String> set)
+    {
+        ArrayList<String> stringsList = new ArrayList<>();
+        for (String key:set)
+        {
+            stringsList.add(key);
+        }
+
+        return stringsList;
+    }
 
     public static int getPixelValue(Activity activity, int dp)
     {
@@ -188,7 +196,7 @@ public class Utilities {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        PreferenceSetter.removeSavedComic(context, comic);
+        StorageManager.removeSavedComic(context, comic);
     }
 
     public static boolean deleteDirectory(Context context, File directory) {
@@ -205,7 +213,7 @@ public class Utilities {
                         {
                             boolean found = false;
 
-                            List<Comic> savedComics = PreferenceSetter.getSavedComics(context);
+                            List<Comic> savedComics = StorageManager.getSavedComics(context);
 
                             for (int j=0;j<savedComics.size() && !found;j++)
                             {

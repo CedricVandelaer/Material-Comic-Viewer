@@ -4,12 +4,9 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,18 +24,16 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.box.androidsdk.content.BoxConfig;
 import com.box.androidsdk.content.auth.BoxAuthentication;
 import com.box.androidsdk.content.models.BoxSession;
-import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
-import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -57,11 +52,8 @@ import com.microsoft.live.LiveStatus;
 
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Stack;
 
 
 public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LiveAuthListener{
@@ -116,7 +108,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     public void onResume()
     {
         super.onResume();
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
+        StorageManager.setBackgroundColorPreference(getActivity());
 
         new AddDropboxUserInfoTask().execute();
 
@@ -175,7 +167,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                             name
                             , email);
 
-                    PreferenceSetter.saveCloudService(getActivity(), newOneDrive);
+                    StorageManager.saveCloudService(getActivity(), newOneDrive);
                     mAdapter.refreshCloudServiceList();
                 }
 
@@ -237,7 +229,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     String accessToken = mDBApi.getSession().getOAuth2AccessToken();
                     CloudService cloudService = new CloudService(service, accessToken, userName, email);
 
-                    PreferenceSetter.saveCloudService(getActivity(), cloudService);
+                    StorageManager.saveCloudService(getActivity(), cloudService);
 
                     mAdapter.refreshCloudServiceList();
 
@@ -290,9 +282,9 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     private void createFab(View v) {
         mFab = (FloatingActionButton)v.findViewById(R.id.fab);
-        mFab.setColorNormal(PreferenceSetter.getAccentColor(getActivity()));
-        mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAccentColor(getActivity())));
-        mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAccentColor(getActivity())));
+        mFab.setColorNormal(StorageManager.getAccentColor(getActivity()));
+        mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(getActivity())));
+        mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(getActivity())));
         mFab.attachToRecyclerView(mRecyclerView);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -318,7 +310,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                             }
                         })
                         .negativeText(getString(R.string.cancel))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .negativeColor(StorageManager.getAppThemeColor(getActivity()))
                         .show();
 
             }
@@ -345,7 +337,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 String token = boxAuthenticationInfo.toJson();
                 CloudService cloudService = new CloudService(getString(R.string.cloud_storage_4),
                         token, name, id);
-                PreferenceSetter.saveCloudService(getActivity(),cloudService);
+                StorageManager.saveCloudService(getActivity(), cloudService);
                 mAdapter.refreshCloudServiceList();
             }
 
@@ -429,7 +421,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                         name,
                         mEmail);
 
-                PreferenceSetter.saveCloudService(getActivity(),driveCloudService);
+                StorageManager.saveCloudService(getActivity(), driveCloudService);
                 mAdapter.refreshCloudServiceList();
             }
             catch (Exception e)

@@ -8,7 +8,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
 import com.comicviewer.cedric.comicviewer.ComicActions;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 
 import org.json.JSONArray;
@@ -39,7 +39,7 @@ public class ComicAdapter extends AbstractComicAdapter {
 
     @Override
     protected void multiAddToCollection(final ArrayList<Comic> comics) {
-        JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
+        JSONArray collections = StorageManager.getCollectionList(mListFragment.getActivity());
 
         CharSequence[] collectionNames = new CharSequence[collections.length()+1];
 
@@ -73,7 +73,7 @@ public class ComicAdapter extends AbstractComicAdapter {
                                     .input("Collection name", "", false, new MaterialDialog.InputCallback() {
                                         @Override
                                         public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                            PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
+                                            StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
                                             ComicActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
                                         }
                                     })
@@ -110,7 +110,7 @@ public class ComicAdapter extends AbstractComicAdapter {
 
     public void showChooseCollectionDialog(final String folderPath)
     {
-        JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
+        JSONArray collections = StorageManager.getCollectionList(mListFragment.getActivity());
         CharSequence[] collectionNames = new CharSequence[collections.length()+1];
 
         for (int i=0;i<collections.length();i++)
@@ -144,7 +144,7 @@ public class ComicAdapter extends AbstractComicAdapter {
                                     .input("Collection name", "", false, new MaterialDialog.InputCallback() {
                                         @Override
                                         public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                            PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
+                                            StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
                                             ComicActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
                                         }
                                     })
@@ -223,7 +223,7 @@ public class ComicAdapter extends AbstractComicAdapter {
             public void onClick(View v) {
                 if (dialog!=null)
                     dialog.dismiss();
-                JSONArray collections = PreferenceSetter.getCollectionList(mListFragment.getActivity());
+                JSONArray collections = StorageManager.getCollectionList(mListFragment.getActivity());
                 CharSequence[] collectionNames = new CharSequence[collections.length()+1];
 
                 for (int i=0;i<collections.length();i++)
@@ -256,7 +256,7 @@ public class ComicAdapter extends AbstractComicAdapter {
                                             .input("Collection name", "", false, new MaterialDialog.InputCallback() {
                                                 @Override
                                                 public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                                    PreferenceSetter.createCollection(mListFragment.getActivity(), charSequence.toString());
+                                                    StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
                                                     ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
                                                 }
                                             })
@@ -301,9 +301,9 @@ public class ComicAdapter extends AbstractComicAdapter {
                 .title(mListFragment.getString(R.string.notice))
                 .content(mListFragment.getString(R.string.pro_version_notice))
                 .positiveText(mListFragment.getString(R.string.buy_full_version))
-                .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                .positiveColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                 .negativeText(mListFragment.getString(R.string.cancel))
-                .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                .negativeColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {

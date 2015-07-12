@@ -8,17 +8,16 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.EdgeEffect;
 import android.widget.Toast;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.Model.Collection;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -49,29 +48,23 @@ import javax.xml.transform.stream.StreamResult;
  * Created by Cédric on 8/02/2015.
  * Helper class for some preferences*
  */
-public class PreferenceSetter {
+public class StorageManager {
 
+    private static final String SAVED_COMICS = "savedComics";
     private static final String FAVORITE_COMIC_LIST = "favoriteComicList";
     private static final String NUMBER_OF_COMICS_READ = "numberOfComicsRead";
     private static final String NUMBER_OF_COMICS_STARTED = "numberOfComicsStarted";
     private static final String PAGES_READ_LIST = "pagesReadMap";
     private static final String SERIES_PAGES_READ_LIST =  "seriesPagesReadMap";
-    private static final String USES_RECENTS = "useRecents";
     private static final String READ_COMIC_LIST = "lastReadComicList";
-    private static final String LAST_READ_COMIC = "lastReadComic";
     private static final String FILEPATHS = "Filepaths";
     private static final String CARD_SIZE = "cardSize";
     private static final String BACKGROUND_COLOR = "backgroundColor";
     private static final String COMICS_ADDED_LIST = "addedComicsList";
     private static final String LONGEST_READ_COMIC = "longestReadComic";
     private static final String PAGE_NUMBER_SETTING="pageNumberSetting";
-    private static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
-    private static final String FOLDER_VIEW_ENABLED="folderViewEnabled";
-    private static final String KEEP_SCREEN_ON= "keepScreenOn";
-    private static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
     private static final String MANGA_LIST="mangaList";
     private static final String NORMAL_LIST="normalList";
-    private static final String LAST_USED_GOOGLE_ACCOUNT = "lastUsedGoogleAccount";
 
     public static final String APP_THEME_COLOR = "appThemeColor";
     public static final String ACCENT_COLOR = "accentColor";
@@ -82,7 +75,7 @@ public class PreferenceSetter {
     public static final String READING_BACKGROUND_COLOR = "readingBackgroundColor";
     public static final String VIEWPAGER_ANIMATION_SETTING="viewPagerAnimationSetting";
     public static final String TOOLBAR_OPTION = "toolbarOption";
-    public static final String COLLECTIONS_LIST = "collectionsList";
+    public static final String COLLECTIONS_JSON_LIST = "collectionsJsonList";
     public static final String FORCE_PORTRAIT_SETTING = "forcePortrait";
     public static final String SCROLL_ON_ZOOM_SETTING = "allowScrollOnZoom";
     public static final String SORT_SETTING = "sortSetting";
@@ -93,17 +86,30 @@ public class PreferenceSetter {
     public static final String SORT_BY_LAST_ADDED = "sortLastAdded";
     public static final String SCROLL_BY_TAP_SETTING = "scrollByTap";
     public static final String PAGE_QUALITY_SETTING = "highResPages";
+    public static final String USES_RECENTS = "useRecents";
+    public static final String FOLDER_VIEW_ENABLED = "folderViewEnabled";
+    public static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
+    public static final String KEEP_SCREEN_ON= "keepScreenOn";
+    public static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
+    public static final String LAST_READ_COMIC = "lastReadComic";
+
 
     public static final String COMIC_VIEWER = "ComicViewer";
 
-    public static boolean getPageQualitySetting(Context context)
+
+    public static boolean getBooleanSetting(Context context, String setting, boolean defaultValue)
     {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PAGE_QUALITY_SETTING, false);
+        if (context== null)
+            return false;
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(setting, defaultValue);
     }
 
-    public static boolean getScrollByTapSetting(Context context)
+    public static String getStringSetting(Context context, String setting, String defaultValue)
     {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SCROLL_BY_TAP_SETTING, false);
+        if (context == null)
+            return "";
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(setting, defaultValue);
     }
 
     public static void saveSortSetting(Context context, String setting)
@@ -119,284 +125,144 @@ public class PreferenceSetter {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(SORT_SETTING, SORT_BY_SERIES);
     }
 
-    public static boolean getScrollOnZoomSetting(Context context)
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(SCROLL_ON_ZOOM_SETTING, true);
-    }
-
-    public static boolean getForcePortraitSetting(Context context)
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(FORCE_PORTRAIT_SETTING, false);
-    }
-
     public static ArrayList<String> getCollectionNames(Context context)
     {
-        JSONArray collections = PreferenceSetter.getCollectionList(context);
-        ArrayList<String> collectionNames = new ArrayList<>();
+        ArrayList<Collection> collections = getCollectionList(context);
+        ArrayList<String> names = new ArrayList<>();
 
-        for (int i=0;i<collections.length();i++)
+        for (Collection collection:collections)
+            names.add(collection.getName());
+
+        return names;
+    }
+
+    public static void addToCollection(Context context, String collectionName, ArrayList<String> filenames)
+    {
+        ArrayList<Collection> collections = getCollectionList(context);
+
+        for (int i=0;i<collections.size();i++)
         {
-            try {
-                collectionNames.add(collections.getJSONObject(i).keys().next());
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
+            if (collections.get(i).getName().equals(collectionName)) {
+
+                for (String filename:filenames)
+                    collections.get(i).addFile(filename);
             }
         }
 
-        return collectionNames;
+        saveCollections(context, collections);
     }
 
-    public static void addToCollection(Context context, String collectionName, ArrayList<String> filenames, boolean dummy)
-    {
-        JSONArray collections = getCollectionList(context);
-
-        JSONArray collection = new JSONArray();
-        int index = -1;
-        try {
-            for (int i=0;i<collections.length();i++)
-            {
-                if (collections.getJSONObject(i).keys().next().equals(collectionName))
-                {
-                    index = i;
-                    collection = collections.getJSONObject(i).getJSONArray(collectionName);
-                }
-            }
-
-            for (int i=0;i<filenames.size();i++)
-            {
-                collection.put(filenames.get(i));
-            }
-
-            if (index!=-1) {
-                JSONObject newCollection = new JSONObject();
-                newCollection.put(collectionName, collection);
-                collections.put(index, newCollection);
-            }
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(COLLECTIONS_LIST, collections.toString());
-            editor.apply();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static void addToCollection(Context context, String collectionName, ArrayList<Comic> comics)
-    {
-        JSONArray collections = getCollectionList(context);
-
-        JSONArray collection = new JSONArray();
-        int index = -1;
-        try {
-            for (int i=0;i<collections.length();i++)
-            {
-                if (collections.getJSONObject(i).keys().next().equals(collectionName))
-                {
-                    index = i;
-                    collection = collections.getJSONObject(i).getJSONArray(collectionName);
-                }
-            }
-
-            for (int i=0;i<comics.size();i++)
-            {
-                collection.put(comics.get(i).getFileName());
-            }
-
-            if (index!=-1) {
-                JSONObject newCollection = new JSONObject();
-                newCollection.put(collectionName, collection);
-                collections.put(index, newCollection);
-            }
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(COLLECTIONS_LIST, collections.toString());
-            editor.apply();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public static void renameCollection(Context context, String collectionName, String newName)
     {
+        ArrayList<Collection> collections = getCollectionList(context);
 
-        JSONArray collections = getCollectionList(context);
-        JSONArray newCollections = new JSONArray();
-        try {
-            for (int i=0;i<collections.length();i++)
-            {
-                if (!collections.getJSONObject(i).keys().next().equals(collectionName))
-                {
-                    newCollections.put(collections.getJSONObject(i));
-                }
-                else
-                {
-                    JSONObject renamedCollection = new JSONObject();
-                    renamedCollection.put(newName, collections.getJSONObject(i).getJSONArray(collectionName));
-                    newCollections.put(renamedCollection);
-                }
-            }
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(COLLECTIONS_LIST, newCollections.toString());
-            editor.apply();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.setName(newName);
         }
+        saveCollections(context, collections);
     }
 
     public static void createCollection(Context context, String collectionName)
     {
-
-        JSONArray collections = getCollectionList(context);
-        try {
-            JSONObject newCollection = new JSONObject();
-            newCollection.put(collectionName, new JSONArray());
-            collections.put(newCollection);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(COLLECTIONS_LIST, collections.toString());
-        editor.apply();
+        Collection newCollection = new Collection(collectionName);
+        ArrayList<Collection> collections = getCollectionList(context);
+        collections.add(newCollection);
+        saveCollections(context, collections);
     }
 
     public static void removeComicsFromCollection(Context context, String collectionName, ArrayList<Comic> comics)
     {
-        JSONArray collections = getCollectionList(context);
-        JSONObject collection = null;
-        JSONArray collectionArray = null;
-        int pos = -1;
-        for (int i=0;i<collections.length();i++)
+        ArrayList<Collection> collections = getCollectionList(context);
+        for (int i=0;i<collections.size();i++)
         {
-            try {
-                if (collections.getJSONObject(i).keys().next().equals(collectionName))
-                {
-                    pos = i;
-                    collection = collections.getJSONObject(i);
-                    collectionArray = collection.getJSONArray(collectionName);
-                }
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
+            if (collections.get(i).getName().equals(collectionName)) {
+
+                for (Comic comic:comics)
+                    collections.get(i).removeFile(comic.getFileName());
             }
         }
-        if (pos!=-1)
-        {
-            JSONArray newCollection = new JSONArray();
-            try {
-                for (int i=0;i<collectionArray.length();i++)
-                {
-                    for (Comic comic:comics) {
-                        if (!collectionArray.get(i).equals(comic.getFileName())) {
-                            newCollection.put(collectionArray.get(i));
-                        }
-                    }
-                }
 
-                collection.put(collectionName, newCollection);
-                collections.put(pos, collection);
-
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(COLLECTIONS_LIST, collections.toString());
-                editor.apply();
-
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-        }
+        saveCollections(context, collections);
     }
 
     public static void removeComicFromCollection(Context context, String collectionName, Comic comic)
     {
-        JSONArray collections = getCollectionList(context);
-        JSONObject collection = null;
-        JSONArray collectionArray = null;
-        int pos = -1;
-        for (int i=0;i<collections.length();i++)
+        ArrayList<Collection> collections = getCollectionList(context);
+        for (int i=0;i<collections.size();i++)
         {
-            try {
-                if (collections.getJSONObject(i).keys().next().equals(collectionName))
-                {
-                    pos = i;
-                    collection = collections.getJSONObject(i);
-                    collectionArray = collection.getJSONArray(collectionName);
-                }
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
+            if (collections.get(i).getName().equals(collectionName))
+                collections.get(i).removeFile(comic.getFileName());
         }
-        if (pos!=-1)
-        {
-            JSONArray newCollection = new JSONArray();
-            try {
-                for (int i=0;i<collectionArray.length();i++)
-                {
-                    if (!collectionArray.get(i).equals(comic.getFileName())) {
-                        newCollection.put(collectionArray.get(i));
-                    }
-                }
 
-                collection.put(collectionName, newCollection);
-                collections.put(pos, collection);
-
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(COLLECTIONS_LIST, collections.toString());
-                editor.apply();
-
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-        }
+        saveCollections(context, collections);
     }
 
     public static void removeCollection(Context context, String collectionName)
     {
-        JSONArray collections = getCollectionList(context);
-        JSONArray newCollections = new JSONArray();
-        try {
-            for (int i=0;i<collections.length();i++)
-            {
-                if (!collections.getJSONObject(i).keys().next().equals(collectionName))
-                {
-                    newCollections.put(collections.getJSONObject(i));
-                }
-            }
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(COLLECTIONS_LIST, newCollections.toString());
-            editor.apply();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+        ArrayList<Collection> collections = getCollectionList(context);
+        ArrayList<Collection> collectionsToSave = new ArrayList<>();
+        for (int i=0;i<collections.size();i++)
+        {
+            if (!collections.get(i).getName().equals(collectionName))
+                collectionsToSave.add(collections.get(i));
         }
+
+        saveCollections(context, collectionsToSave);
     }
 
-    public static JSONArray getCollectionList(Context context)
+    public static void saveCollections(Context context, ArrayList<Collection> collections)
     {
+        JSONArray collectionsJSONArray = createCollectionJSONArray(collections);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(COLLECTIONS_JSON_LIST, collectionsJSONArray.toString());
+        editor.apply();
+    }
+
+    public static ArrayList<Collection> getCollectionList(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String collectionListString = prefs.getString(COLLECTIONS_JSON_LIST, null);
+
+        JSONArray collectionsArray;
+
+        if (collectionListString == null)
+        {
+            collectionsArray = new JSONArray();
+        }
+        else
+        {
+            try
+            {
+                collectionsArray = new JSONArray(collectionListString);
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+                collectionsArray = new JSONArray();
+            }
+        }
+
+        ArrayList<Collection> collections = new ArrayList<>();
+
+        for (int i=0;i<collectionsArray.length();i++) {
+            try {
+                Collection collection = Collection.fromJSON(collectionsArray.getJSONObject(i));
+                if (collection!=null)
+                    collections.add(collection);
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        return collections;
+
+        /*
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String collectionListString = prefs.getString(COLLECTIONS_LIST, null);
 
@@ -416,12 +282,7 @@ public class PreferenceSetter {
                 return new JSONArray();
             }
         }
-    }
-
-
-    public static boolean getToolbarOption(Context context)
-    {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(TOOLBAR_OPTION, false);
+        */
     }
 
     public static String getPageFlipAnimationSetting(Context context)
@@ -670,7 +531,7 @@ public class PreferenceSetter {
 
             transformer.transform(source, result);
 
-            Log.d("PreferenceSetter", "XML File saved to "+locationPath);
+            Log.d("StorageManager", "XML File saved to "+locationPath);
             return true;
 
         } catch (ParserConfigurationException pce) {
@@ -682,12 +543,6 @@ public class PreferenceSetter {
         }
     }
 
-
-    public static boolean getVolumeKeyPreference(Context context)
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(VOLUME_KEY_OPTION, false);
-    }
 
     public static void addHiddenPath(Context context, String path)
     {
@@ -1111,24 +966,10 @@ public class PreferenceSetter {
         return mangaComicPaths;
     }
 
-    public static boolean getMangaSetting(Context context)
-    {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(MANGA_SETTING, false);
-    }
 
     public static String getFileFormatSetting(Context context)
     {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(FILE_FORMAT_SETTING, context.getResources().getString(R.string.file_format_1));
-    }
-
-    public static boolean getRotatePageSetting(Context context)
-    {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(ROTATE_LANDSCAPE_PAGE, false);
-    }
-
-    public static boolean getScreenOnSetting(Context context)
-    {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEEP_SCREEN_ON, true);
     }
 
     public static void removeCloudService(Context context, String email, String servicename)
@@ -1167,7 +1008,7 @@ public class PreferenceSetter {
         int i =0;
         while (prefs.getString("CloudService "+i, null)!=null)
         {
-            cloudServices.add(CloudService.create(prefs.getString("CloudService "+i,null)));
+            cloudServices.add(CloudService.create(prefs.getString("CloudService " + i, null)));
             i++;
         }
 
@@ -1197,20 +1038,6 @@ public class PreferenceSetter {
 
     }
 
-    public static boolean getAutoFitSetting(Context context)
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(WIDTH_AUTO_FIT_SETTING, true);
-    }
-
-    public static boolean getFolderEnabledSetting(Context context)
-    {
-        if (context!=null) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            return prefs.getBoolean(FOLDER_VIEW_ENABLED, true);
-        }
-        return false;
-    }
 
     public static void setFolderEnabledSetting(Context context, boolean enabled)
     {
@@ -1595,7 +1422,7 @@ public class PreferenceSetter {
             favoritesString += (","+comicFileName);
 
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(FAVORITE_COMIC_LIST,favoritesString);
+        editor.putString(FAVORITE_COMIC_LIST, favoritesString);
         editor.apply();
 
     }
@@ -1667,13 +1494,6 @@ public class PreferenceSetter {
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getInt(NUMBER_OF_COMICS_READ, 0);
-    }
-
-    public static boolean usesRecents(Context context)
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        return prefs.getBoolean(USES_RECENTS, true);
     }
 
     public static List<String> getFavoriteComics(Context context)
@@ -1749,26 +1569,40 @@ public class PreferenceSetter {
 
     public static void saveComicList(Context context, List<Comic> comicList)
     {
+
+        JSONArray comicsJSONArray = createComicJSONArray(comicList);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
+        SharedPreferences.Editor editor = prefs.edit();
 
-        int i=0;
+        editor.putString(SAVED_COMICS, comicsJSONArray.toString());
 
-        while (prefs.getString("Comic "+i, null)!=null)
-        {
-            sharedPreferencesEditor.remove("Comic "+i);
-            i++;
-        }
-
-        for (i=0;i<comicList.size();i++)
-        {
-            String serializedComic = comicList.get(i).serialize();
-            sharedPreferencesEditor.putString("Comic "+i, serializedComic);
-        }
-
-        sharedPreferencesEditor.apply();
+        editor.apply();
 
     }
+
+    public static JSONArray createComicJSONArray(List<Comic> comicList)
+    {
+        JSONArray array = new JSONArray();
+
+        for (Comic comic:comicList)
+        {
+            array.put(comic.toJSON());
+        }
+        return array;
+    }
+
+    public static JSONArray createCollectionJSONArray(List<Collection> collectionList)
+    {
+        JSONArray array = new JSONArray();
+
+        for (Collection collection:collectionList)
+        {
+            array.put(collection.toJSON());
+        }
+        return array;
+    }
+
 
     public static void batchRemoveSavedComics(Context context, Set<Comic> comicsToRemove)
     {
@@ -1803,12 +1637,34 @@ public class PreferenceSetter {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        int i=0;
+        String savedComicsString = prefs.getString(SAVED_COMICS, null);
 
-        while (prefs.getString("Comic "+i, null)!=null)
+        JSONArray comicsJSONArray;
+
+        if (savedComicsString!=null) {
+            try {
+                comicsJSONArray = new JSONArray(savedComicsString);
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+                comicsJSONArray = new JSONArray();
+            }
+        }
+        else
+            comicsJSONArray = new JSONArray();
+
+        for (int i=0;i<comicsJSONArray.length();i++)
         {
-            comicList.add(Comic.create(prefs.getString("Comic " + i, null)));
-            i++;
+            try {
+                Comic comic = Comic.fromJSON(comicsJSONArray.getJSONObject(i));
+                if (comic!=null)
+                    comicList.add(comic);
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         return comicList;
@@ -1875,13 +1731,6 @@ public class PreferenceSetter {
         sharedPreferencesEditor.putString(LAST_READ_COMIC, comicName);
 
         sharedPreferencesEditor.apply();
-
-    }
-
-    public static String getLastReadComic(Context context)
-    {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(LAST_READ_COMIC, "none");
 
     }
 

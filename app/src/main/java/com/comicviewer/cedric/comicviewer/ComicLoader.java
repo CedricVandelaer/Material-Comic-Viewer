@@ -8,7 +8,7 @@ import android.support.v7.graphics.Palette;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.github.junrar.Archive;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -275,7 +275,6 @@ public class ComicLoader {
             try {
                 int color;
                 int primaryTextColor;
-                int secondaryTextColor;
 
                 if (cardColorSetting.equals(context.getString(R.string.card_color_setting_1))) {
                     ImageSize imageSize = new ImageSize(850, 500);
@@ -287,7 +286,6 @@ public class ComicLoader {
                     }
                     color = mutedSwatch.getRgb();
                     primaryTextColor = mutedSwatch.getTitleTextColor();
-                    secondaryTextColor = mutedSwatch.getBodyTextColor();
                 } else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_2))) {
                     ImageSize imageSize = new ImageSize(850, 500);
                     Bitmap thumbnail = ImageLoader.getInstance().loadImageSync(comic.getCoverImage(), imageSize);
@@ -298,29 +296,22 @@ public class ComicLoader {
                     }
                     color = lightVibrantSwatch.getRgb();
                     primaryTextColor = lightVibrantSwatch.getTitleTextColor();
-                    secondaryTextColor = lightVibrantSwatch.getBodyTextColor();
                 } else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_3))) {
                     color = context.getResources().getColor(R.color.WhiteBG);
                     primaryTextColor = context.getResources().getColor(R.color.Black);
-                    secondaryTextColor = context.getResources().getColor(R.color.BlueGrey);
                 } else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_4))) {
                     color = context.getResources().getColor(R.color.BlueGrey);
                     primaryTextColor = context.getResources().getColor(R.color.White);
-                    secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
                 } else if (cardColorSetting.equals(context.getString(R.string.app_theme_setting))) {
-                    color = Utilities.darkenColor(PreferenceSetter.getAppThemeColor(context));
+                    color = Utilities.darkenColor(StorageManager.getAppThemeColor(context));
                     primaryTextColor = context.getResources().getColor(R.color.White);
-                    secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
                 }else {
                     color = context.getResources().getColor(R.color.Black);
                     primaryTextColor = context.getResources().getColor(R.color.White);
-                    secondaryTextColor = context.getResources().getColor(R.color.WhiteBG);
                 }
 
                 comic.setComicColor(color);
-                comic.setPrimaryTextColor(primaryTextColor);
-                comic.setSecondaryTextColor(secondaryTextColor);
-
+                comic.setTextColor(primaryTextColor);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -333,7 +324,7 @@ public class ComicLoader {
 
     public static void generateComicInfo(Context context, Comic comic)
     {
-        String fileFormat = PreferenceSetter.getFileFormatSetting(context);
+        String fileFormat = StorageManager.getFileFormatSetting(context);
         String[] parts = fileFormat.split(",");
 
         String filename = comic.getFileName();

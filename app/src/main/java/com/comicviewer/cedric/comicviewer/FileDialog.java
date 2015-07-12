@@ -1,16 +1,12 @@
 package com.comicviewer.cedric.comicviewer;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
-import android.widget.CheckBox;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -68,10 +64,10 @@ public class FileDialog {
                     fireDirectorySelectedEvent(mCurrentPath);
                 }
             });
-            builder.positiveColor(PreferenceSetter.getAppThemeColor(activity));
+            builder.positiveColor(StorageManager.getAppThemeColor(activity));
 
             builder.negativeText(activity.getString(R.string.cancel));
-            builder.negativeColor(PreferenceSetter.getAppThemeColor(activity));
+            builder.negativeColor(StorageManager.getAppThemeColor(activity));
         }
 
         builder.items(mFileList);

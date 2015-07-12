@@ -1,15 +1,10 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
-import android.util.Log;
-
-import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
 
-import java.io.File;
 import java.util.Map;
 
 /**
@@ -37,7 +32,7 @@ public class CurrentlyReadingFragment extends AbstractComicListFragment {
 
         mFilters.clear();
 
-        mFilters.add(new SearchFilter(PreferenceSetter.getReadComics(mApplicationContext)) {
+        mFilters.add(new SearchFilter(StorageManager.getReadComics(mApplicationContext)) {
             @Override
             public boolean compare(Object object) {
 

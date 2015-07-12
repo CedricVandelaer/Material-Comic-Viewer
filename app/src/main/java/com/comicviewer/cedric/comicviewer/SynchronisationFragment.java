@@ -1,7 +1,6 @@
 package com.comicviewer.cedric.comicviewer;
 
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -15,15 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
-import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.gc.materialdesign.views.ButtonFlat;
-import com.gc.materialdesign.views.ButtonRectangle;
-import com.gc.materialdesign.widgets.SnackBar;
 
 import java.io.File;
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,9 +48,9 @@ public class SynchronisationFragment extends Fragment {
         mImportButton = (ButtonFlat) v.findViewById(R.id.import_button);
         mDeviceExportCardView = (CardView) v.findViewById(R.id.export_device_card);
         mDeviceTitleTextView = (TextView) v.findViewById(R.id.device_title_text_view);
-        mDeviceExportCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(getActivity())));
+        mDeviceExportCardView.setCardBackgroundColor(Utilities.darkenColor(StorageManager.getAppThemeColor(getActivity())));
 
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
+        StorageManager.setBackgroundColorPreference(getActivity());
 
         final File path = new File(Environment.getExternalStorageDirectory().getPath());
 
@@ -70,9 +64,9 @@ public class SynchronisationFragment extends Fragment {
                         Log.d(getClass().getName(), "Selected directory: " + directory.toString());
                         new MaterialDialog.Builder(getActivity()).title(getString(R.string.export_data))
                                 .content("The data will be exported to the folder \n\"" + directory.toString() + "\"\nDo you want to continue?")
-                                .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
                                 .positiveText(getString(R.string.confirm))
-                                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
                                 .negativeText(getString(R.string.cancel))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
@@ -100,9 +94,9 @@ public class SynchronisationFragment extends Fragment {
                         Log.d(getClass().getName(), "Selected file: " + file.toString());
                         new MaterialDialog.Builder(getActivity()).title(getString(R.string.import_data))
                                 .content("The data of \"" + file.getName() + "\" will be imported.\nDo you want to continue?")
-                                .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
                                 .positiveText(getString(R.string.confirm))
-                                .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
                                 .negativeText(getString(R.string.cancel))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
@@ -139,7 +133,7 @@ public class SynchronisationFragment extends Fragment {
         protected Object doInBackground(Object[] params) {
 
             File xmlfile = (File) params[0];
-            Boolean succes = PreferenceSetter.importData(getActivity(), xmlfile);
+            Boolean succes = StorageManager.importData(getActivity(), xmlfile);
 
             return succes;
         }
@@ -178,7 +172,7 @@ public class SynchronisationFragment extends Fragment {
         protected Object doInBackground(Object[] params) {
 
             String path = (String) params[0];
-            PreferenceSetter.exportData(getActivity(), path);
+            StorageManager.exportData(getActivity(), path);
 
             return null;
         }

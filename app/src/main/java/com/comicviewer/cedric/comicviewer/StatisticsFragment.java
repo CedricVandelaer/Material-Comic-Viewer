@@ -1,24 +1,16 @@
 package com.comicviewer.cedric.comicviewer;
 
-import android.app.Activity;
-import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
-import com.comicviewer.cedric.comicviewer.R;
-import com.gc.materialdesign.views.Button;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.ProgressBarDeterminate;
-import com.gc.materialdesign.views.Slider;
 
 import java.util.List;
 import java.util.Map;
@@ -93,18 +85,18 @@ public class StatisticsFragment extends Fragment {
 
         mProgressBar = (ProgressBarDeterminate) v.findViewById(R.id.progress_bar);
 
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
+        StorageManager.setBackgroundColorPreference(getActivity());
 
-        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
+        if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             setTitleTextViewTextColors(getResources().getColor(R.color.Black));
 
-        setTextViewTextColors(PreferenceSetter.getAppThemeColor(getActivity()));
+        setTextViewTextColors(StorageManager.getAppThemeColor(getActivity()));
 
         updateTextViews();
 
         mResetStatsButton = (ButtonFlat) v.findViewById(R.id.reset_statistics_button);
 
-        mResetStatsButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+        mResetStatsButton.setBackgroundColor(StorageManager.getAppThemeColor(getActivity()));
 
         mResetStatsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +113,7 @@ public class StatisticsFragment extends Fragment {
 
         @Override
         protected Object doInBackground(Object[] params) {
-            PreferenceSetter.resetStats(getActivity());
+            StorageManager.resetStats(getActivity());
             return null;
         }
 
@@ -133,10 +125,10 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void updateTextViews() {
-        mProgressBar.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+        mProgressBar.setBackgroundColor(StorageManager.getAppThemeColor(getActivity()));
 
-        int comicsStarted = PreferenceSetter.getNumberOfComicsStarted(getActivity());
-        int comicsRead = PreferenceSetter.getNumberOfComicsRead(getActivity());
+        int comicsStarted = StorageManager.getNumberOfComicsStarted(getActivity());
+        int comicsRead = StorageManager.getNumberOfComicsRead(getActivity());
         mComicsStartedTextView.setText("" + comicsStarted);
         mComicsReadTextView.setText("" + comicsRead);
 
@@ -154,7 +146,7 @@ public class StatisticsFragment extends Fragment {
 
 
 
-        Map<String, Integer> map = PreferenceSetter.getPagesReadMap(getActivity());
+        Map<String, Integer> map = StorageManager.getPagesReadMap(getActivity());
 
         int pagesRead = 0;
 
@@ -165,11 +157,11 @@ public class StatisticsFragment extends Fragment {
 
         mPagesReadTextView.setText(""+pagesRead);
 
-        List<String> comicsAdded = PreferenceSetter.getComicsAdded(getActivity());
+        List<String> comicsAdded = StorageManager.getComicsAdded(getActivity());
 
         mComicsAddedTextView.setText(""+comicsAdded.size());
 
-        Map<String, Integer> seriesReadMap = PreferenceSetter.getSeriesPagesReadMap(getActivity());
+        Map<String, Integer> seriesReadMap = StorageManager.getSeriesPagesReadMap(getActivity());
 
         int seriesPages = -1;
         String seriesName = "";
@@ -194,8 +186,8 @@ public class StatisticsFragment extends Fragment {
             mFavoriteSeries.setText(getString(R.string.none_yet));
         }
 
-        mLongestReadTitleTextView.setText(PreferenceSetter.getLongestReadComicTitle(getActivity()));
-        mLongestReadPagesTextView.setText(""+PreferenceSetter.getLongestReadComicPages(getActivity()));
+        mLongestReadTitleTextView.setText(StorageManager.getLongestReadComicTitle(getActivity()));
+        mLongestReadPagesTextView.setText(""+ StorageManager.getLongestReadComicPages(getActivity()));
 
     }
 

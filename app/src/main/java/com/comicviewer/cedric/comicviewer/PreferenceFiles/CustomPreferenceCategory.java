@@ -27,7 +27,7 @@ public class CustomPreferenceCategory extends PreferenceCategory {
     protected View onCreateView(ViewGroup parent) {
         // It's just a TextView!
         TextView categoryTitle =  (TextView)super.onCreateView(parent);
-        categoryTitle.setTextColor(PreferenceSetter.getAppThemeColor(getContext()));
+        categoryTitle.setTextColor(StorageManager.getAppThemeColor(getContext()));
 
         return categoryTitle;
     }

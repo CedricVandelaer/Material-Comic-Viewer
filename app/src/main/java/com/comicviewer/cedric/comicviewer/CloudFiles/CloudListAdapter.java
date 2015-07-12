@@ -8,12 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.box.androidsdk.content.auth.BoxAuthentication;
-import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsListFragment;
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -38,14 +35,14 @@ public class CloudListAdapter extends RecyclerView.Adapter {
         mFragment = fragment;
         mHandler = new Handler();
         mContext = mFragment.getActivity();
-        mCloudServiceList = PreferenceSetter.getCloudServices(mFragment.getActivity());
+        mCloudServiceList = StorageManager.getCloudServices(mFragment.getActivity());
 
         this.mInflater = (LayoutInflater) mFragment.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     public void refreshCloudServiceList()
     {
-        mCloudServiceList = PreferenceSetter.getCloudServices(mFragment.getActivity());
+        mCloudServiceList = StorageManager.getCloudServices(mFragment.getActivity());
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -60,7 +57,7 @@ public class CloudListAdapter extends RecyclerView.Adapter {
 
         CloudServiceViewHolder cloudServiceViewHolder = new CloudServiceViewHolder(v);
 
-        if (PreferenceSetter.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
+        if (StorageManager.getBackgroundColorPreference(mFragment.getActivity()) == mFragment.getActivity().getResources().getColor(R.color.WhiteBG))
             cloudServiceViewHolder.mDeleteTextView.setTextColor(mFragment.getActivity().getResources().getColor(R.color.Black));
 
         addClickListener(cloudServiceViewHolder);
@@ -76,7 +73,7 @@ public class CloudListAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 final int pos = mCloudServiceList.indexOf(cloudServiceViewHolder.getCloudService());
                 mCloudServiceList.remove(cloudServiceViewHolder.getCloudService());
-                PreferenceSetter.removeCloudService(mFragment.getActivity(), cloudServiceViewHolder.getCloudService().getEmail(), cloudServiceViewHolder.getCloudService().getName());
+                StorageManager.removeCloudService(mFragment.getActivity(), cloudServiceViewHolder.getCloudService().getEmail(), cloudServiceViewHolder.getCloudService().getName());
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -139,7 +136,7 @@ public class CloudListAdapter extends RecyclerView.Adapter {
         else
             cloudServiceViewHolder.mTitleTextView.setText(mCloudServiceList.get(position).getName());
 
-        cloudServiceViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mFragment.getActivity())));
+        cloudServiceViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(StorageManager.getAppThemeColor(mFragment.getActivity())));
 
         if (cloudServiceViewHolder.getCloudService().getName().equals(mContext.getString(R.string.cloud_storage_1)))
         {

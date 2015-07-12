@@ -32,7 +32,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                ArrayList<String> hiddenPaths = PreferenceSetter.getHiddenFiles(getActivity());
+                ArrayList<String> hiddenPaths = StorageManager.getHiddenFiles(getActivity());
 
                 CharSequence[] charSequences = new CharSequence[hiddenPaths.size()];
 
@@ -42,9 +42,9 @@ public class SettingsFragment extends AbstractSettingsFragment{
 
                 new MaterialDialog.Builder(getActivity())
                         .title(getString(R.string.unhide_files))
-                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveColor(StorageManager.getAppThemeColor(getActivity()))
                         .positiveText(getString(R.string.unhide))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .negativeColor(StorageManager.getAppThemeColor(getActivity()))
                         .negativeText(getString(R.string.cancel))
                         .items(charSequences)
                         .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
@@ -52,7 +52,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
                             public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
                                 materialDialog.dismiss();
                                 for (int i = 0; i < charSequences.length; i++) {
-                                    PreferenceSetter.removeHiddenPath(getActivity(), charSequences[i].toString());
+                                    StorageManager.removeHiddenPath(getActivity(), charSequences[i].toString());
                                 }
 
                                 return false;
@@ -70,7 +70,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
         PreferenceCategory targetCategory = (PreferenceCategory) findPreference("LayoutCategory");
 
         final ListPreference appThemeListPreference = new ListPreference(getActivity());
-        appThemeListPreference.setKey(PreferenceSetter.APP_THEME_COLOR);
+        appThemeListPreference.setKey(StorageManager.APP_THEME_COLOR);
 
         CharSequence[] entries = {
                 getString(R.string.teal),
@@ -98,7 +98,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
 
         appThemeListPreference.setEntries(entries);
         appThemeListPreference.setEntryValues(entryValues);
-        appThemeListPreference.setDefaultValue("" + PreferenceSetter.getAppThemeColor(getActivity()));
+        appThemeListPreference.setDefaultValue("" + StorageManager.getAppThemeColor(getActivity()));
 
         appThemeListPreference.setTitle(getString(R.string.app_theme_setting));
         appThemeListPreference.setSummary(getString(R.string.restart_note));
@@ -111,15 +111,15 @@ public class SettingsFragment extends AbstractSettingsFragment{
                 MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                         .title(getString(R.string.warning))
                         .content(getString(R.string.restart_dialog))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(getActivity()))
-                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                        .positiveColor(StorageManager.getAppThemeColor(getActivity()))
                         .positiveText(getString(R.string.accept))
                         .negativeText(getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                PreferenceSetter.saveAppThemeColor(getActivity(), (CharSequence) newValue);
+                                StorageManager.saveAppThemeColor(getActivity(), (CharSequence) newValue);
                                 appThemeListPreference.setOnPreferenceChangeListener(null);
                                 getActivity().finish();
                             }
@@ -139,7 +139,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
         PreferenceCategory targetCategory = (PreferenceCategory) findPreference("LayoutCategory");
 
         final ListPreference accentColorListPreference = new ListPreference(getActivity());
-        accentColorListPreference.setKey(PreferenceSetter.ACCENT_COLOR);
+        accentColorListPreference.setKey(StorageManager.ACCENT_COLOR);
 
         CharSequence[] entries = {
                 getString(R.string.app_theme_setting),
@@ -155,7 +155,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
                 getString(R.string.gold),
                 getString(R.string.indigo)};
         CharSequence[] entryValues = {
-                ""+PreferenceSetter.getAppThemeColor(getActivity()),
+                ""+ StorageManager.getAppThemeColor(getActivity()),
                 ""+getResources().getColor(R.color.Teal),
                 ""+getResources().getColor(R.color.Red),
                 ""+getResources().getColor(R.color.Orange),
@@ -170,7 +170,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
 
         accentColorListPreference.setEntries(entries);
         accentColorListPreference.setEntryValues(entryValues);
-        accentColorListPreference.setDefaultValue("" + PreferenceSetter.getAppThemeColor(getActivity()));
+        accentColorListPreference.setDefaultValue("" + StorageManager.getAppThemeColor(getActivity()));
 
         accentColorListPreference.setTitle(getString(R.string.app_accent_color_setting));
         accentColorListPreference.setDialogTitle(getString(R.string.choose_accent_color));
@@ -179,7 +179,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
             @Override
             public boolean onPreferenceChange(Preference preference, final Object newValue) {
 
-                PreferenceSetter.saveAppAccentColor(getActivity(), (CharSequence) newValue);
+                StorageManager.saveAppAccentColor(getActivity(), (CharSequence) newValue);
                 return false;
             }
         });
@@ -203,7 +203,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
             charSequences[i] = entries[i];
         }
 
-        fileFormatList.setKey(PreferenceSetter.FILE_FORMAT_SETTING);
+        fileFormatList.setKey(StorageManager.FILE_FORMAT_SETTING);
         fileFormatList.setSummary(getString(R.string.extra_chars_removed_note));
         fileFormatList.setEntries(charSequences);
         fileFormatList.setEntryValues(charSequences);
@@ -221,7 +221,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
         CustomCheckBoxPreference mangaPreference = new CustomCheckBoxPreference(getActivity());
 
 
-        mangaPreference.setKey(PreferenceSetter.MANGA_SETTING);
+        mangaPreference.setKey(StorageManager.MANGA_SETTING);
         mangaPreference.setSummary(getString(R.string.manga_setting_note));
         mangaPreference.setTitle(getString(R.string.manga_setting));
         mangaPreference.setDefaultValue(false);
@@ -241,7 +241,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
         ListPreference viewPagerAnimationPreference = new ListPreference(getActivity());
 
 
-        viewPagerAnimationPreference.setKey(PreferenceSetter.VIEWPAGER_ANIMATION_SETTING);
+        viewPagerAnimationPreference.setKey(StorageManager.VIEWPAGER_ANIMATION_SETTING);
         viewPagerAnimationPreference.setTitle(getString(R.string.page_flip_animation_setting));
         viewPagerAnimationPreference.setEntries(getResources().getTextArray(R.array.Viewpager_animations));
         viewPagerAnimationPreference.setEntryValues(getResources().getTextArray(R.array.Viewpager_animations));

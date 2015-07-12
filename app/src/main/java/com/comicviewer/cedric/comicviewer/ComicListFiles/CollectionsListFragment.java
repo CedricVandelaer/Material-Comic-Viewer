@@ -4,9 +4,10 @@ import android.view.View;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
+import com.comicviewer.cedric.comicviewer.Model.Collection;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
 import com.melnykov.fab.FloatingActionButton;
@@ -45,48 +46,18 @@ public class CollectionsListFragment extends AbstractComicListFragment{
 
         mCollectionName = NavigationManager.getInstance().getPathFromCollectionStack();
 
-        JSONArray collections = PreferenceSetter.getCollectionList(mApplicationContext);
-        JSONObject collection = null;
-        for (int i=0;i<collections.length();i++)
+        ArrayList<Collection> collections = StorageManager.getCollectionList(getActivity());
+
+        Collection collection = null;
+
+        for (int i=0;i<collections.size();i++)
         {
-            try {
-                if (collections.getJSONObject(i).keys().next().equals(mCollectionName))
-                {
-                    collection = collections.getJSONObject(i);
-                    break;
-                }
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-
+            if (collections.get(i).getName().equals(mCollectionName))
+                collection = collections.get(i);
         }
-
-        ArrayList<String> fileNames = new ArrayList<>();
-
-        try {
-            JSONArray jsonFileNames = collection.getJSONArray(mCollectionName);
-            for (int i=0;i<jsonFileNames.length();i++)
-            {
-                fileNames.add(jsonFileNames.get(i).toString());
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
 
         if (collection!=null) {
-            mFilters.add(new SearchFilter(fileNames) {
-                @Override
-                public boolean compare(Object object) {
-                    if (object instanceof Comic) {
-                        Comic comic = (Comic) object;
-                        return mCompareList.contains(comic.getFileName());
-                    }
-                    return false;
-                }
-            });
+            mFilters.add(collection.getCollectionFilter());
         }
     }
 

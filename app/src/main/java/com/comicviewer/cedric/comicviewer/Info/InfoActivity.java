@@ -58,7 +58,7 @@ public class InfoActivity extends Activity {
 
         mTitleTextView.setText(mComic.getTitle());
         mTitleTextView.setBackgroundColor(mComic.getComicColor());
-        mTitleTextView.setTextColor(mComic.getPrimaryTextColor());
+        mTitleTextView.setTextColor(mComic.getTextColor());
 
         if (mComic.getCoverImage()!=null)
             ImageLoader.getInstance().displayImage(mComic.getCoverImage(),mCoverImageView);

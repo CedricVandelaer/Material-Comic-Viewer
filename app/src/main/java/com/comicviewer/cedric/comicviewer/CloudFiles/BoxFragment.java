@@ -1,9 +1,6 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
-import android.app.ActivityManager;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,13 +24,10 @@ import com.box.androidsdk.content.models.BoxSession;
 import com.box.androidsdk.content.requests.BoxResponse;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.Utilities;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,17 +81,17 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
         mErrorTextView = (TextView) v.findViewById(R.id.error_text_view);
 
 
-        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
+        if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
         mErrorTextView.setVisibility(View.GONE);
 
         //getActionBar().setTitle(getString(R.string.cloud_storage_4));
 
-        //getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
+        //getActionBar().setBackgroundDrawable(new ColorDrawable(StorageManager.getAppThemeColor(this)));
 
         //if (Build.VERSION.SDK_INT>20)
-            //getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
+            //getWindow().setStatusBarColor(Utilities.darkenColor(StorageManager.getAppThemeColor(this)));
 
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
@@ -161,7 +155,7 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
     public void onResume()
     {
         super.onResume();
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
+        StorageManager.setBackgroundColorPreference(getActivity());
     }
 
     @Override
@@ -282,7 +276,7 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
                     ImageSize size = new ImageSize(64, 64);
                     tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
                             ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            PreferenceSetter.getAppThemeColor(getActivity()));
+                            StorageManager.getAppThemeColor(getActivity()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

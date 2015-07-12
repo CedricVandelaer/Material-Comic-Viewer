@@ -1,8 +1,6 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,11 +12,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.ObjectType;
 import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
-import com.dropbox.client2.DropboxAPI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,8 +59,8 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         if (viewType==0) {
             v = mInflater.inflate(R.layout.cloud_folder_card, parent, false);
             CloudFolderViewHolder cloudFolderViewHolder = new CloudFolderViewHolder(v);
-            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mContext)));
-            if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(StorageManager.getAppThemeColor(mContext)));
+            if (StorageManager.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
                 cloudFolderViewHolder.mDownloadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
             addFolderClickListener(cloudFolderViewHolder);
             addDownloadFolderClickListener(cloudFolderViewHolder);
@@ -73,9 +69,9 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         else {
             v = mInflater.inflate(R.layout.file_card, parent, false);
             CloudFileViewHolder cloudFileViewHolder = new CloudFileViewHolder(v);
-            if (PreferenceSetter.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+            if (StorageManager.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
                 cloudFileViewHolder.mDownloadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
-            cloudFileViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mContext));
+            cloudFileViewHolder.mCardView.setCardBackgroundColor(StorageManager.getAppThemeColor(mContext));
             addFileClickListener(cloudFileViewHolder);
             return cloudFileViewHolder;
         }
@@ -98,9 +94,9 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
                         .title("Download file")
                         .content("Do you wish to download the folder \""+entry.getName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mActivity))
+                        .positiveColor(StorageManager.getAppThemeColor(mActivity))
                         .positiveText("Confirm")
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mActivity))
+                        .negativeColor(StorageManager.getAppThemeColor(mActivity))
                         .negativeText("Cancel")
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
@@ -125,9 +121,9 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
                 MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
                         .title(mContext.getString(R.string.download_file))
                         .content(mContext.getString(R.string.download_request)+" \""+entry.getName()+"\"?")
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mContext))
+                        .positiveColor(StorageManager.getAppThemeColor(mContext))
                         .positiveText(mContext.getString(R.string.confirm))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mContext))
+                        .negativeColor(StorageManager.getAppThemeColor(mContext))
                         .negativeText(mContext.getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override

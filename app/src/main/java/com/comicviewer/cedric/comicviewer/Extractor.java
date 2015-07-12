@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 
@@ -44,8 +44,8 @@ public class Extractor {
             pages =  loadImageNamesFromComicRar(comicToExtract);
         }
 
-        if ((PreferenceSetter.getMangaSetting(context) && !PreferenceSetter.isNormalComic(context,comicToExtract))
-            || (!(PreferenceSetter.getMangaSetting(context)) && PreferenceSetter.isMangaComic(context, comicToExtract)))
+        if ((StorageManager.getBooleanSetting(context, StorageManager.MANGA_SETTING, false) && !StorageManager.isNormalComic(context, comicToExtract))
+            || (!(StorageManager.getBooleanSetting(context, StorageManager.MANGA_SETTING, false)) && StorageManager.isMangaComic(context, comicToExtract)))
         {
             if (pages.size()>0) {
                 ArrayList<String> mangaPages = new ArrayList<>();

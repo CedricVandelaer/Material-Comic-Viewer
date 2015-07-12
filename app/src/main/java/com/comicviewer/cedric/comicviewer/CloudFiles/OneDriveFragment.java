@@ -1,10 +1,6 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 
-import android.app.ActivityManager;
-import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
@@ -16,7 +12,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -25,7 +20,7 @@ import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.ObjectType;
 import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -38,9 +33,6 @@ import com.microsoft.live.LiveOperation;
 import com.microsoft.live.LiveOperationException;
 import com.microsoft.live.LiveOperationListener;
 import com.microsoft.live.LiveStatus;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -97,7 +89,7 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
 
         mNavigationManager = new NavigationManager();
 
-        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
+        if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
         mErrorTextView.setVisibility(View.GONE);
@@ -166,7 +158,7 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
     public void onResume()
     {
         super.onResume();
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
+        StorageManager.setBackgroundColorPreference(getActivity());
 
         if (mOneDriveClient!=null)
         {
@@ -246,7 +238,7 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
             mOneDriveClient = new LiveConnectClient(session);
             final String token = session.getRefreshToken();
             CloudService cloudService = new CloudService(mCloudService.getName(), token, mCloudService.getUsername(), mCloudService.getEmail());
-            PreferenceSetter.saveCloudService(getActivity(), cloudService);
+            StorageManager.saveCloudService(getActivity(), cloudService);
             readFolder();
         }
         else

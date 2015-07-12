@@ -3,7 +3,7 @@ package com.comicviewer.cedric.comicviewer;
 import android.content.Context;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 
 import java.io.File;
 import java.util.List;
@@ -18,15 +18,15 @@ public class Sorter {
         if (context==null)
             return -1;
 
-        if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_SERIES))
+        if (StorageManager.getSortSetting(context).equals(StorageManager.SORT_BY_SERIES))
             return sortByComicSeriesInsert(list, obj);
-        else if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_FILENAME))
+        else if (StorageManager.getSortSetting(context).equals(StorageManager.SORT_BY_FILENAME))
             return sortByFilenameInsert(list, obj);
-        else if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_YEAR))
+        else if (StorageManager.getSortSetting(context).equals(StorageManager.SORT_BY_YEAR))
             return sortByYearInsert(list, obj);
-        else if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_MODIFIED_DATE))
+        else if (StorageManager.getSortSetting(context).equals(StorageManager.SORT_BY_MODIFIED_DATE))
             return sortByModifiedDate(list, obj);
-        else if (PreferenceSetter.getSortSetting(context).equals(PreferenceSetter.SORT_BY_LAST_ADDED))
+        else if (StorageManager.getSortSetting(context).equals(StorageManager.SORT_BY_LAST_ADDED))
             return sortByLastAdded(list, obj, context);
         else
             return sortByComicSeriesInsert(list,obj);
@@ -42,7 +42,7 @@ public class Sorter {
 
     private static int insertComicByLastAdded(List<Object> list, Comic obj, Context context) {
 
-        List<String> addedComics = PreferenceSetter.getComicsAdded(context);
+        List<String> addedComics = StorageManager.getComicsAdded(context);
 
         for (int i=list.size()-1;i>=0;i--)
         {

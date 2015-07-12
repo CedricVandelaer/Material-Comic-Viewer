@@ -1,7 +1,5 @@
 package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -23,12 +21,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -38,7 +34,7 @@ import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Extractor;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.MultiColorDrawable;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.devspark.robototextview.widget.RobotoTextView;
@@ -49,7 +45,6 @@ import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by CV on 28/06/2015.
@@ -87,7 +82,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         initializeAd();
 
-        if (PreferenceSetter.getForcePortraitSetting(this))
+        if (StorageManager.getBooleanSetting(this, StorageManager.FORCE_PORTRAIT_SETTING, false))
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
@@ -117,10 +112,10 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             mCurrentComic = intent.getParcelableExtra("Comic");
         }
 
-        if (PreferenceSetter.getDynamicBackgroundSetting(this))
+        if (StorageManager.getDynamicBackgroundSetting(this))
             getWindow().getDecorView().setBackgroundColor(mCurrentComic.getComicColor());
         else
-            getWindow().getDecorView().setBackgroundColor(PreferenceSetter.getReadingBackgroundSetting(this));
+            getWindow().getDecorView().setBackgroundColor(StorageManager.getReadingBackgroundSetting(this));
 
         setSystemVisibilitySettings();
 
@@ -132,7 +127,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         loadImageNames();
 
-        mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
+        mPageNumberSetting = StorageManager.getPageNumberSetting(this);
 
         mPager =  (ComicViewPager) findViewById(R.id.comicpager);
         mPager.setOffscreenPageLimit(6);
@@ -140,16 +135,16 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         mPager.setAdapter(mPagerAdapter);
 
         mMangaComic = false;
-        if ((PreferenceSetter.getMangaSetting(this) && !PreferenceSetter.isNormalComic(this,mCurrentComic))
-                || (!(PreferenceSetter.getMangaSetting(this)) && PreferenceSetter.isMangaComic(this, mCurrentComic)))
+        if ((StorageManager.getBooleanSetting(this, StorageManager.MANGA_SETTING, false) && !StorageManager.isNormalComic(this, mCurrentComic))
+                || (!(StorageManager.getBooleanSetting(this, StorageManager.MANGA_SETTING, false)) && StorageManager.isMangaComic(this, mCurrentComic)))
         {
             mPager.setCurrentItem(mCurrentComic.getPageCount()-1);
             mMangaComic = true;
         }
 
-        if (PreferenceSetter.getReadComics(this).containsKey(mCurrentComic.getFileName()))
+        if (StorageManager.getReadComics(this).containsKey(mCurrentComic.getFileName()))
         {
-            lastReadPage = PreferenceSetter.getReadComics(this).get(mCurrentComic.getFileName());
+            lastReadPage = StorageManager.getReadComics(this).get(mCurrentComic.getFileName());
             if (mMangaComic)
             {
                 mPager.setCurrentItem(mPageCount-1-lastReadPage);
@@ -169,7 +164,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         }
 
 
-        if (PreferenceSetter.getScreenOnSetting(this))
+        if (StorageManager.getBooleanSetting(this, StorageManager.KEEP_SCREEN_ON, true))
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if ((mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_1))
@@ -181,9 +176,9 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         }
         else
         {
-            mFab.setColorNormal(PreferenceSetter.getAccentColor(this));
-            mFab.setColorPressed(Utilities.darkenColor(PreferenceSetter.getAccentColor(this)));
-            mFab.setColorRipple(Utilities.lightenColor(PreferenceSetter.getAccentColor(this)));
+            mFab.setColorNormal(StorageManager.getAccentColor(this));
+            mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(this)));
+            mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(this)));
         }
 
         if (Build.VERSION.SDK_INT>18)
@@ -194,7 +189,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
     protected void setSystemVisibilitySettings()
     {
-        if (Build.VERSION.SDK_INT>18 &&!PreferenceSetter.getToolbarOption(this)) {
+        if (Build.VERSION.SDK_INT>18 &&!StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false)) {
 
             hideSystemUI();
 
@@ -220,7 +215,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
                 }
             });
         }
-        else if (PreferenceSetter.getToolbarOption(this))
+        else if (StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false))
         {
             //toolbar
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -228,7 +223,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             setSupportActionBar(toolbar);
             toolbar.showOverflowMenu();
             getSupportActionBar().setTitle(mCurrentComic.getTitle());
-            if (PreferenceSetter.getReadingBackgroundSetting(this)==getResources().getColor(R.color.White))
+            if (StorageManager.getReadingBackgroundSetting(this)==getResources().getColor(R.color.White))
                 toolbar.setBackgroundColor(getResources().getColor(R.color.Black));
         }
     }
@@ -272,7 +267,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         }
         MaterialDialog dialog = new MaterialDialog.Builder(AbstractDisplayComicActivity.this)
                 .title(getString(R.string.go_to_page))
-                .negativeColor(PreferenceSetter.getAppThemeColor(AbstractDisplayComicActivity.this))
+                .negativeColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
                 .negativeText(getString(R.string.cancel))
                 .items(pages)
                 .itemsCallback(new MaterialDialog.ListCallback() {
@@ -328,7 +323,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         mFab.setVisibility(View.INVISIBLE);
 
 
-        if (Build.VERSION.SDK_INT>18 && !PreferenceSetter.getToolbarOption(this))
+        if (Build.VERSION.SDK_INT>18 && !StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false))
         {
             hideSystemUI();
             setLayoutParams(configuration);
@@ -387,43 +382,45 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         public void onPageSelected(int position) {
 
 
-            if ((PreferenceSetter.getMangaSetting(AbstractDisplayComicActivity.this) && !PreferenceSetter.isNormalComic(AbstractDisplayComicActivity.this,mCurrentComic))
-                    || (!(PreferenceSetter.getMangaSetting(AbstractDisplayComicActivity.this)) && PreferenceSetter.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
+            if ((StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false)
+                    && !StorageManager.isNormalComic(AbstractDisplayComicActivity.this, mCurrentComic))
+                    || (!(StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false))
+                    && StorageManager.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
             {
                 position = mPageCount-1-position;
             }
 
             setPageNumber();
 
-            if (PreferenceSetter.getDynamicBackgroundSetting(AbstractDisplayComicActivity.this)) {
+            if (StorageManager.getDynamicBackgroundSetting(AbstractDisplayComicActivity.this)) {
                 int[] topBottomColors = {mPagerAdapter.getPageTopColor(position), mPagerAdapter.getPageBottomColor(position)};
                 MultiColorDrawable drawable = new MultiColorDrawable(topBottomColors, MultiColorDrawable.Orientation.VERTICAL);
                 getWindow().getDecorView().setBackground(drawable);
             }
 
-            int pagesRead = PreferenceSetter.getPagesReadForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName());
+            int pagesRead = StorageManager.getPagesReadForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName());
 
             if (pagesRead==0)
             {
-                PreferenceSetter.incrementNumberOfComicsStarted(AbstractDisplayComicActivity.this, 1);
+                StorageManager.incrementNumberOfComicsStarted(AbstractDisplayComicActivity.this, 1);
             }
 
 
-            PreferenceSetter.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position);
+            StorageManager.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position);
 
             if (position+1> pagesRead)
             {
-                PreferenceSetter.savePagesForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position+1);
+                StorageManager.savePagesForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position + 1);
                 if (position+1 >= mCurrentComic.getPageCount())
                 {
-                    PreferenceSetter.incrementNumberOfComicsRead(AbstractDisplayComicActivity.this, 1);
-                    PreferenceSetter.saveLongestReadComic(AbstractDisplayComicActivity.this,
+                    StorageManager.incrementNumberOfComicsRead(AbstractDisplayComicActivity.this, 1);
+                    StorageManager.saveLongestReadComic(AbstractDisplayComicActivity.this,
                             mCurrentComic.getFileName(),
                             mCurrentComic.getPageCount(),
                             mCurrentComic.getTitle(),
                             mCurrentComic.getIssueNumber());
                 }
-                PreferenceSetter.incrementPagesForSeries(AbstractDisplayComicActivity.this, mCurrentComic.getTitle(), 1);
+                StorageManager.incrementPagesForSeries(AbstractDisplayComicActivity.this, mCurrentComic.getTitle(), 1);
             }
 
 
@@ -440,8 +437,10 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
     {
         int pageNumber = mPager.getCurrentItem()+1;
 
-        if ((PreferenceSetter.getMangaSetting(AbstractDisplayComicActivity.this) && !PreferenceSetter.isNormalComic(AbstractDisplayComicActivity.this,mCurrentComic))
-                || (!(PreferenceSetter.getMangaSetting(AbstractDisplayComicActivity.this)) && PreferenceSetter.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
+        if ((StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false)
+                && !StorageManager.isNormalComic(AbstractDisplayComicActivity.this, mCurrentComic))
+                || (!(StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false))
+                && StorageManager.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
         {
             pageNumber = mCurrentComic.getPageCount()-mPager.getCurrentItem();
         }
@@ -578,7 +577,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         setSystemVisibilitySettings();
 
-        mPageNumberSetting = PreferenceSetter.getPageNumberSetting(this);
+        mPageNumberSetting = StorageManager.getPageNumberSetting(this);
         setPageNumber();
 
         setPagerAnimation();
@@ -591,7 +590,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
                     .title("Error")
                     .content("This file can not be opened by comic viewer")
                     .positiveText("Accept")
-                    .positiveColor(PreferenceSetter.getAppThemeColor(AbstractDisplayComicActivity.this))
+                    .positiveColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
                     .callback(new MaterialDialog.ButtonCallback() {
                         @Override
                         public void onPositive(MaterialDialog dialog) {
@@ -632,12 +631,14 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         int pageNumber = mPager.getCurrentItem();
 
-        if ((PreferenceSetter.getMangaSetting(AbstractDisplayComicActivity.this) && !PreferenceSetter.isNormalComic(AbstractDisplayComicActivity.this,mCurrentComic))
-                || (!(PreferenceSetter.getMangaSetting(AbstractDisplayComicActivity.this)) && PreferenceSetter.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
+        if ((StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false)
+                && !StorageManager.isNormalComic(AbstractDisplayComicActivity.this, mCurrentComic))
+                || (!(StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false))
+                && StorageManager.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
         {
             pageNumber = mCurrentComic.getPageCount()-1-mPager.getCurrentItem();
         }
-        PreferenceSetter.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), pageNumber);
+        StorageManager.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), pageNumber);
 
     }
 
@@ -663,7 +664,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         int keyCode = event.getKeyCode();
         int action = event.getAction();
 
-        if (PreferenceSetter.getVolumeKeyPreference(this) && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+        if (StorageManager.getBooleanSetting(this, StorageManager.VOLUME_KEY_OPTION, false) && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
         {
             if (action == KeyEvent.ACTION_DOWN) {
                 int page = mPager.getCurrentItem();
@@ -683,7 +684,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             return true;
 
         }
-        else if (PreferenceSetter.getVolumeKeyPreference(this) && keyCode == KeyEvent.KEYCODE_VOLUME_UP)
+        else if (StorageManager.getBooleanSetting(this, StorageManager.VOLUME_KEY_OPTION, false) && keyCode == KeyEvent.KEYCODE_VOLUME_UP)
         {
             if (action == KeyEvent.ACTION_DOWN) {
                 int page = mPager.getCurrentItem();

@@ -33,12 +33,13 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
+import com.comicviewer.cedric.comicviewer.CollectionActions;
 import com.comicviewer.cedric.comicviewer.ComicActions;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Info.InfoActivity;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Sorter;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -141,7 +142,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
     protected void multiRemoveFromCollection(final ArrayList<Comic> comics)
     {
-        ArrayList<String> collections = PreferenceSetter.getCollectionNames(mListFragment.getActivity());
+        ArrayList<String> collections = StorageManager.getCollectionNames(mListFragment.getActivity());
         CharSequence[] charCollectionNames = new CharSequence[collections.size()];
         for (int i=0;i<collections.size();i++)
         {
@@ -149,13 +150,13 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         }
         MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
                 .title("Add to collection")
-                .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                .negativeColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                 .negativeText(mListFragment.getString(R.string.cancel))
                 .items(charCollectionNames)
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                        ComicActions.removeComicsFromCollection(mListFragment.getActivity(), charSequence.toString(), comics);
+                        CollectionActions.removeComicsFromCollection(mListFragment.getActivity(), charSequence.toString(), comics);
                         mActionMode.finish();
                     }
                 })
@@ -219,8 +220,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 .title(mListFragment.getString(R.string.confirm_delete))
                 .content("Are you sure you want to delete "+comicsToRemove.size()+" items?")
                 .positiveText(mListFragment.getString(R.string.confirm))
-                .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
-                .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                .positiveColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
+                .negativeColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                 .negativeText(mListFragment.getString(R.string.cancel))
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override
@@ -358,9 +359,9 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                         MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
                                 .title(mListFragment.getActivity().getString(R.string.rename_folder))
                                 .negativeText(mListFragment.getActivity().getString(R.string.cancel))
-                                .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                                .negativeColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                                 .positiveText(mListFragment.getActivity().getString(R.string.confirm))
-                                .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                                .positiveColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                                 .inputType(InputType.TYPE_CLASS_TEXT)
                                 .input("Folder name",
                                         folderItemViewHolder.getFile().getName(), new MaterialDialog.InputCallback() {
@@ -415,7 +416,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             String newPath = (String) params[1];
             File folder = (File) params[2];
 
-            PreferenceSetter.renamePaths(mListFragment.getActivity(), oldPath, newPath);
+            StorageManager.renamePaths(mListFragment.getActivity(), oldPath, newPath);
             folder.renameTo(new File(newPath));
 
             return null;
@@ -437,8 +438,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             @Override
             public void onClick(View v) {
                 final Comic comic = comicItemViewHolder.getComic();
-                PreferenceSetter.removeMangaComic(mListFragment.getActivity(), comic);
-                PreferenceSetter.saveNormalComic(mListFragment.getActivity(), comic);
+                StorageManager.removeMangaComic(mListFragment.getActivity(), comic);
+                StorageManager.saveNormalComic(mListFragment.getActivity(), comic);
                 comicItemViewHolder.mSwipeLayout.close();
                 mHandler.postDelayed(new Runnable() {
                     @Override
@@ -457,8 +458,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             @Override
             public void onClick(View v) {
                 final Comic comic = comicItemViewHolder.getComic();
-                PreferenceSetter.saveMangaComic(mListFragment.getActivity(), comic);
-                PreferenceSetter.removeNormalComic(mListFragment.getActivity(), comic);
+                StorageManager.saveMangaComic(mListFragment.getActivity(), comic);
+                StorageManager.removeNormalComic(mListFragment.getActivity(), comic);
                 comicItemViewHolder.mSwipeLayout.close();
                 mHandler.postDelayed(new Runnable() {
                     @Override
@@ -502,7 +503,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                     Log.d("ItemClick", clickedComic.getTitle());
                     intent.putExtra("Comic", clickedComic);
 
-                    if (PreferenceSetter.usesRecents(mListFragment.getActivity())) {
+                    if (StorageManager.getBooleanSetting(mListFragment.getActivity(), StorageManager.USES_RECENTS, true)) {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                         intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                     }
@@ -559,7 +560,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
 
 
-            if (PreferenceSetter.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
+            if (StorageManager.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
                 comicItemViewHolder.mMarkReadTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
                 comicItemViewHolder.mOptionsTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
                 comicItemViewHolder.mMangaTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
@@ -572,7 +573,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 comicItemViewHolder.mMangaPicture.setBackground(null);
             comicItemViewHolder.mMangaPicture.setImageDrawable(null);
 
-            if (PreferenceSetter.isMangaComic(mListFragment.getActivity(), comicItemViewHolder.getComic())) {
+            if (StorageManager.isMangaComic(mListFragment.getActivity(), comicItemViewHolder.getComic())) {
                 // Change button
                 comicItemViewHolder.mMangaButton.setImageResource(R.drawable.ic_fire);
                 comicItemViewHolder.mMangaButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -593,9 +594,9 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 comicItemViewHolder.mMangaTextView.setText(mListFragment.getString(R.string.manga_comic));
                 addMangaClickListener(comicItemViewHolder);
             }
-            if (PreferenceSetter.getMangaSetting(mListFragment.getActivity()))
+            if (StorageManager.getBooleanSetting(mListFragment.getActivity(), StorageManager.MANGA_SETTING,false))
             {
-                if (PreferenceSetter.isNormalComic(mListFragment.getActivity(), comicItemViewHolder.getComic()))
+                if (StorageManager.isNormalComic(mListFragment.getActivity(), comicItemViewHolder.getComic()))
                 {
                     comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
                     if (((Comic) mComicList.get(position)).getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))
@@ -614,7 +615,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             }
             else
             {
-                if (PreferenceSetter.isMangaComic(mListFragment.getActivity(), comicItemViewHolder.getComic()))
+                if (StorageManager.isMangaComic(mListFragment.getActivity(), comicItemViewHolder.getComic()))
                 {
                     comicItemViewHolder.mMangaPicture.setVisibility(View.VISIBLE);
                     if (((Comic) mComicList.get(position)).getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))
@@ -648,9 +649,9 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
         File folder = (File) mComicList.get(i);
         folderItemViewHolder.mFolderTitleTextView.setText(folder.getName());
-        folderItemViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity())));
+        folderItemViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(StorageManager.getAppThemeColor(mListFragment.getActivity())));
 
-        if (PreferenceSetter.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
+        if (StorageManager.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
 
             folderItemViewHolder.mAddToCollectionTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
             folderItemViewHolder.mRenameTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
@@ -698,9 +699,9 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                         .content(mListFragment.getActivity().getString(R.string.delete_folder_notice_1)+"\n\""+folderItemViewHolder.getFile().getName()
                                 +"\"\n"+ mListFragment.getActivity().getString(R.string.delete_folder_notice_2) +" "+
                                 mListFragment.getActivity().getString(R.string.sure_prompt))
-                        .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                        .positiveColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                         .positiveText(mListFragment.getActivity().getString(R.string.accept))
-                        .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                        .negativeColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                         .negativeText(mListFragment.getActivity().getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
@@ -727,7 +728,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                         MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
                                 .title(mListFragment.getActivity().getString(R.string.options))
                                 .positiveText(mListFragment.getActivity().getString(R.string.cancel))
-                                .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                                .positiveColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                                 .customView(R.layout.folders_options_menu, true)
                                 .show();
 
@@ -760,7 +761,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                         MaterialDialog dialog = new MaterialDialog.Builder(mListFragment.getActivity())
                                 .title(mListFragment.getActivity().getString(R.string.options))
                                 .positiveText(mListFragment.getActivity().getString(R.string.cancel))
-                                .positiveColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                                .positiveColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                                 .customView(R.layout.options_menu_layout, true)
                                 .show();
 
@@ -788,7 +789,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
     protected void addRemoveFromCollectionClickListener(final MaterialDialog dialog, View button, View layout, final Comic comic)
     {
-        final ArrayList<String> containingCollections = ComicActions.getContainingCollections(mListFragment.getActivity(), comic);
+        final ArrayList<String> containingCollections = CollectionActions.getContainingCollections(mListFragment.getActivity(), comic);
         if (containingCollections.size()>0) {
             button.setVisibility(View.VISIBLE);
             layout.setVisibility(View.VISIBLE);
@@ -806,12 +807,12 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                     new MaterialDialog.Builder(mListFragment.getActivity())
                             .title("Choose collection")
                             .items(collections)
-                            .negativeColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()))
+                            .negativeColor(StorageManager.getAppThemeColor(mListFragment.getActivity()))
                             .negativeText(mListFragment.getString(R.string.cancel))
                             .itemsCallback(new MaterialDialog.ListCallback() {
                                 @Override
                                 public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                                    PreferenceSetter.removeComicFromCollection(mListFragment.getActivity(),charSequence.toString(),comic);
+                                    StorageManager.removeComicFromCollection(mListFragment.getActivity(), charSequence.toString(), comic);
                                 }
                             }).show();
 
@@ -883,8 +884,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             public void onClick(View v) {
 
                 dialog.dismiss();
-                PreferenceSetter.removeMangaComic(mListFragment.getActivity(), comic);
-                PreferenceSetter.saveNormalComic(mListFragment.getActivity(), comic);
+                StorageManager.removeMangaComic(mListFragment.getActivity(), comic);
+                StorageManager.saveNormalComic(mListFragment.getActivity(), comic);
                 int pos = mComicList.indexOf(comic);
                 notifyItemChanged(pos);
             }
@@ -927,7 +928,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 if (dialog!=null)
                     dialog.dismiss();
 
-                if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey((comic.getFileName()))) {
+                if (StorageManager.getReadComics(mListFragment.getActivity()).containsKey((comic.getFileName()))) {
 
 
                     ComicActions.markComicUnread(mListFragment.getActivity(), comic);
@@ -954,7 +955,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
                 vh.mSwipeLayout.close(true);
 
-                if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey((vh.getComic().getFileName()))) {
+                if (StorageManager.getReadComics(mListFragment.getActivity()).containsKey((vh.getComic().getFileName()))) {
                     ComicActions.markComicUnread(mListFragment.getActivity(), vh.getComic());
                     mHandler.postDelayed(new Runnable() {
                         @Override
@@ -1042,10 +1043,10 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PreferenceSetter.getFavoriteComics(mListFragment.getActivity()).contains(vh.getComic().getFileName())) {
-                    PreferenceSetter.removeFavoriteComic(mListFragment.getActivity(), vh.getComic().getFileName());
+                if (StorageManager.getFavoriteComics(mListFragment.getActivity()).contains(vh.getComic().getFileName())) {
+                    StorageManager.removeFavoriteComic(mListFragment.getActivity(), vh.getComic().getFileName());
                 } else {
-                    PreferenceSetter.saveFavoriteComic(mListFragment.getActivity(), vh.getComic().getFileName());
+                    StorageManager.saveFavoriteComic(mListFragment.getActivity(), vh.getComic().getFileName());
                 }
                 notifyItemChanged(vh.getPosition());
             }
@@ -1064,7 +1065,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 Color.green(color),
                 Color.blue(color));
         comicItemViewHolder.mTitle.setBackgroundColor(transparentColor);
-        comicItemViewHolder.mTitle.setTextColor(comic.getPrimaryTextColor());
+        comicItemViewHolder.mTitle.setTextColor(comic.getTextColor());
 
         comicItemViewHolder.mCoverPicture.setImageBitmap(null);
 
@@ -1086,13 +1087,13 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         if (Build.VERSION.SDK_INT>15)
             comicItemViewHolder.mFavoriteButton.setBackground(circle);
 
-        if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey(comic.getFileName()))
+        if (StorageManager.getReadComics(mListFragment.getActivity()).containsKey(comic.getFileName()))
         {
 
             if (Build.VERSION.SDK_INT>15)
                 comicItemViewHolder.mLastReadIcon.setBackground(circle);
 
-            if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get(comic.getFileName())+1==comic.getPageCount())
+            if (StorageManager.getReadComics(mListFragment.getActivity()).get(comic.getFileName())+1==comic.getPageCount())
             {
                 // Change button
                 comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);
@@ -1139,7 +1140,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 comicItemViewHolder.mLastReadIcon.getBackground().setAlpha(0);
         }
 
-        if (PreferenceSetter.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
+        if (StorageManager.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
         {
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star, comicItemViewHolder.mFavoriteButton);
         }
@@ -1189,11 +1190,11 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         if (comic.getComicColor()!=-1)
         {
 
-            comicItemViewHolder.mTitle.setTextColor(Utilities.lightenColor(comic.getPrimaryTextColor()));
+            comicItemViewHolder.mTitle.setTextColor(Utilities.lightenColor(comic.getTextColor()));
 
-            comicItemViewHolder.mIssueNumber.setTextColor(comic.getPrimaryTextColor());
-            comicItemViewHolder.mPageCount.setTextColor(comic.getPrimaryTextColor());
-            comicItemViewHolder.mYear.setTextColor(comic.getPrimaryTextColor());
+            comicItemViewHolder.mIssueNumber.setTextColor(comic.getTextColor());
+            comicItemViewHolder.mPageCount.setTextColor(comic.getTextColor());
+            comicItemViewHolder.mYear.setTextColor(comic.getTextColor());
 
             comicItemViewHolder.mCardView.setCardBackgroundColor(comic.getComicColor());
         }
@@ -1205,7 +1206,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             comicItemViewHolder.mPageCount.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
             comicItemViewHolder.mYear.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
 
-            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()));
+            comicItemViewHolder.mCardView.setCardBackgroundColor(StorageManager.getAppThemeColor(mListFragment.getActivity()));
         }
 
         Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
@@ -1219,7 +1220,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 comicItemViewHolder.mFavoriteButton.setBackground(null);
         }
 
-        if (PreferenceSetter.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
+        if (StorageManager.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
         {
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star, comicItemViewHolder.mFavoriteButton);
         }
@@ -1228,7 +1229,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star_outline, comicItemViewHolder.mFavoriteButton);
         }
 
-        if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey(comic.getFileName()))
+        if (StorageManager.getReadComics(mListFragment.getActivity()).containsKey(comic.getFileName()))
         {
             //comicItemViewHolder.mLastReadIcon.setColorFilter(mComicList.get(i).getPrimaryTextColor());
             if (comic.getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
@@ -1240,7 +1241,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 if (Build.VERSION.SDK_INT > 15)
                     comicItemViewHolder.mLastReadIcon.setBackground(null);
             }
-            if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
+            if (StorageManager.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
             {
                 // Change button
                 comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);
@@ -1326,7 +1327,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
         Drawable circle = mListFragment.getActivity().getResources().getDrawable(R.drawable.dark_circle);
 
-        if (PreferenceSetter.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
+        if (StorageManager.getFavoriteComics(mListFragment.getActivity()).contains(comic.getFileName()))
         {
             ImageLoader.getInstance().displayImage("drawable://" + R.drawable.star, comicItemViewHolder.mFavoriteButton);
         }
@@ -1345,7 +1346,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 comicItemViewHolder.mFavoriteButton.setBackground(null);
         }
 
-        if (PreferenceSetter.getReadComics(mListFragment.getActivity()).containsKey((comic.getFileName())))
+        if (StorageManager.getReadComics(mListFragment.getActivity()).containsKey((comic.getFileName())))
         {
             comicItemViewHolder.mLastReadIcon.setVisibility(View.VISIBLE);
             if (comic.getColorSetting().equals(mListFragment.getActivity().getString(R.string.card_color_setting_3))) {
@@ -1358,7 +1359,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                     comicItemViewHolder.mLastReadIcon.setBackground(null);
             }
 
-            if (PreferenceSetter.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
+            if (StorageManager.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
             {
                 // Change button
                 comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);
@@ -1407,11 +1408,11 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         if (comic.getComicColor()!=-1)
         {
 
-            comicItemViewHolder.mTitle.setTextColor(Utilities.lightenColor(comic.getPrimaryTextColor()));
+            comicItemViewHolder.mTitle.setTextColor(Utilities.lightenColor(comic.getTextColor()));
 
-            comicItemViewHolder.mIssueNumber.setTextColor(comic.getPrimaryTextColor());
-            comicItemViewHolder.mPageCount.setTextColor(comic.getPrimaryTextColor());
-            comicItemViewHolder.mYear.setTextColor(comic.getPrimaryTextColor());
+            comicItemViewHolder.mIssueNumber.setTextColor(comic.getTextColor());
+            comicItemViewHolder.mPageCount.setTextColor(comic.getTextColor());
+            comicItemViewHolder.mYear.setTextColor(comic.getTextColor());
 
             comicItemViewHolder.mCardView.setCardBackgroundColor(comic.getComicColor());
         }
@@ -1423,7 +1424,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             comicItemViewHolder.mPageCount.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
             comicItemViewHolder.mYear.setTextColor(Utilities.darkenColor(mListFragment.getActivity().getResources().getColor(R.color.White)));
 
-            comicItemViewHolder.mCardView.setCardBackgroundColor(PreferenceSetter.getAppThemeColor(mListFragment.getActivity()));
+            comicItemViewHolder.mCardView.setCardBackgroundColor(StorageManager.getAppThemeColor(mListFragment.getActivity()));
         }
 
     }

@@ -16,8 +16,10 @@
         Matteo - Spanish translations
     </string>
     <string name="updates" translatable="false">
-        v3.4.6\n
-        - Better Cloud Storage navigation\n
+        v3.5\n
+        - Smart collections\n
+        - Significant performance increase\n
+        - Better cloud storage navigation\n
         - More bugfixes\n\n
         v3.4.5\n
         - Fixed a bug in the free version with cloud storage navigation\n\n

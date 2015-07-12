@@ -1,10 +1,7 @@
 package com.comicviewer.cedric.comicviewer.CloudFiles;
 
 
-import android.app.ActivityManager;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
@@ -25,14 +22,11 @@ import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.GoogleDriveObject;
 import com.comicviewer.cedric.comicviewer.Model.ObjectType;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.google.android.gms.auth.GoogleAuthUtil;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -98,8 +92,8 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
         //getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
         //if (Build.VERSION.SDK_INT>20)
             //getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
-        PreferenceSetter.setBackgroundColorPreference(getActivity());
-        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
+        StorageManager.setBackgroundColorPreference(getActivity());
+        if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
         mNavigationManager.resetCloudStackWithString("root");
@@ -190,7 +184,7 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
                 String token= GoogleAuthUtil.getToken(getActivity(), mCloudService.getEmail(),
                         "oauth2:" + DRIVE_API_SCOPE_FILES + " " + DRIVE_API_SCOPE_METADATA + " " + SCOPE_PROFILE_INFO);
                 mCloudService.setToken(token);
-                PreferenceSetter.saveCloudService(getActivity(), mCloudService);
+                StorageManager.saveCloudService(getActivity(), mCloudService);
 
                 String url = "https://www.googleapis.com/drive/v2/files"+
                         "?q=%27" + folderId[0] +

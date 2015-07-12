@@ -1,6 +1,5 @@
 package com.comicviewer.cedric.comicviewer;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -12,13 +11,11 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -100,8 +97,8 @@ public class AboutFragment extends Fragment {
 
         mTitleTextView.setText(getActivity().getResources().getString(R.string.app_name) + " v" + getPackageInfo().versionName);
 
-        mRateButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
-        mChangelogButton.setBackgroundColor(PreferenceSetter.getAppThemeColor(getActivity()));
+        mRateButton.setBackgroundColor(StorageManager.getAppThemeColor(getActivity()));
+        mChangelogButton.setBackgroundColor(StorageManager.getAppThemeColor(getActivity()));
 
         mRateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +118,7 @@ public class AboutFragment extends Fragment {
             public void onClick(View v) {
                 MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                         .content(getString(R.string.updates))
-                        .positiveColor(PreferenceSetter.getAppThemeColor(getActivity()))
+                        .positiveColor(StorageManager.getAppThemeColor(getActivity()))
                         .positiveText(getString(R.string.accept))
                         .title(getString(R.string.changelog))
                         .show();
@@ -135,14 +132,14 @@ public class AboutFragment extends Fragment {
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logohighres,logoview);
         ImageLoader.getInstance().displayImage("drawable://" + R.drawable.me, meview);
 
-        if (PreferenceSetter.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG)) {
+        if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG)) {
             getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
             if (Build.VERSION.SDK_INT > 20)
                 getActivity().getWindow().setNavigationBarColor(getActivity().getResources().getColor(R.color.BlueGrey));
         }
         else
         {
-            PreferenceSetter.setBackgroundColorPreference(getActivity());
+            StorageManager.setBackgroundColorPreference(getActivity());
         }
 
         return v;

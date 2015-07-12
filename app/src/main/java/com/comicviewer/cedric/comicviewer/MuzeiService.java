@@ -1,14 +1,12 @@
 package com.comicviewer.cedric.comicviewer;
 
-import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.content.FileProvider;
-import android.util.Log;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.google.android.apps.muzei.api.Artwork;
 import com.google.android.apps.muzei.api.MuzeiArtSource;
 
@@ -19,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public class MuzeiService extends MuzeiArtSource {
@@ -40,7 +37,7 @@ public class MuzeiService extends MuzeiArtSource {
     @Override
     protected void onUpdate(int reason) {
 
-        List<Comic> comicList = PreferenceSetter.getSavedComics(this);
+        List<Comic> comicList = StorageManager.getSavedComics(this);
 
 
         File[] savedFolders = getFilesDir().listFiles();

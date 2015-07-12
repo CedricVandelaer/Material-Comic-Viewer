@@ -1,17 +1,14 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
-import android.os.Build;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.PreferenceSetter;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -42,7 +39,7 @@ public class ComicListFragment extends AbstractComicListFragment {
     public void onResume()
     {
         super.onResume();
-        if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext))
+        if (StorageManager.getBooleanSetting(mApplicationContext, StorageManager.FOLDER_VIEW_ENABLED, true))
         {
             if (NavigationManager.getInstance().fileStackEmpty())
             {
@@ -57,7 +54,7 @@ public class ComicListFragment extends AbstractComicListFragment {
 
         mFilters.clear();
 
-        mFilters.add(new SearchFilter(PreferenceSetter.getFolderEnabledSetting(getActivity())) {
+        mFilters.add(new SearchFilter(StorageManager.getBooleanSetting(getActivity(), StorageManager.FOLDER_VIEW_ENABLED, true)) {
             @Override
             public boolean compare(Object object) {
                 return !(object instanceof File) || mCompareSetting;
@@ -75,7 +72,7 @@ public class ComicListFragment extends AbstractComicListFragment {
             toolbar.removeView(mFolderViewToggleButton);
             mFolderViewToggleButton = new ImageView(getActivity());
             mFolderViewToggleButton.setAlpha(0.75f);
-            if (PreferenceSetter.getFolderEnabledSetting(getActivity()))
+            if (StorageManager.getBooleanSetting(getActivity(), StorageManager.FOLDER_VIEW_ENABLED, true))
             {
                 mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
             }
@@ -87,11 +84,11 @@ public class ComicListFragment extends AbstractComicListFragment {
             mFolderViewToggleButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (PreferenceSetter.getFolderEnabledSetting(getActivity())) {
-                        PreferenceSetter.setFolderEnabledSetting(getActivity(), false);
+                    if (StorageManager.getBooleanSetting(getActivity(), StorageManager.FOLDER_VIEW_ENABLED, true)) {
+                        StorageManager.setFolderEnabledSetting(getActivity(), false);
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_folder));
                     } else {
-                        PreferenceSetter.setFolderEnabledSetting(getActivity(), true);
+                        StorageManager.setFolderEnabledSetting(getActivity(), true);
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
                     }
                     NavigationManager.getInstance().resetFileStack();
@@ -113,7 +110,7 @@ public class ComicListFragment extends AbstractComicListFragment {
 
     @Override
     public Map<String, String> getFiles() {
-        if (PreferenceSetter.getFolderEnabledSetting(mApplicationContext))
+        if (StorageManager.getBooleanSetting(mApplicationContext, StorageManager.FOLDER_VIEW_ENABLED, true))
             return FileLoader.searchComicsAndFolders(mApplicationContext, NavigationManager.getInstance().getPathFromFileStack());
         else
             return FileLoader.searchComics(mApplicationContext);
