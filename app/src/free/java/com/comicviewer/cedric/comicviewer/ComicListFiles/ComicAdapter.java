@@ -6,7 +6,9 @@ import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
+import com.comicviewer.cedric.comicviewer.CollectionActions;
 import com.comicviewer.cedric.comicviewer.ComicActions;
+import com.comicviewer.cedric.comicviewer.Model.Collection;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
@@ -39,24 +41,18 @@ public class ComicAdapter extends AbstractComicAdapter {
 
     @Override
     protected void multiAddToCollection(final ArrayList<Comic> comics) {
-        JSONArray collections = StorageManager.getCollectionList(mListFragment.getActivity());
+        ArrayList<Collection> collections = StorageManager.getCollectionList(mListFragment.getActivity());
 
-        CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+        CharSequence[] collectionNames = new CharSequence[collections.size()+1];
 
-        for (int i=0;i<collections.length();i++)
+        for (int i=0;i<collections.size();i++)
         {
-            try {
-                collectionNames[i] = collections.getJSONObject(i).keys().next();
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
+            collectionNames[i] = collections.get(i).getName();
         }
 
         final String noNewCollection = "Only 2 collections allowed in free version";
         final String newCollection = "Add new collection";
-        if (collections.length()<2)
+        if (collections.size()<2)
             collectionNames[collectionNames.length-1] = newCollection;
         else
             collectionNames[collectionNames.length-1] = noNewCollection;
@@ -74,13 +70,13 @@ public class ComicAdapter extends AbstractComicAdapter {
                                         @Override
                                         public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
                                             StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
-                                            ComicActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
+                                            CollectionActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
                                         }
                                     })
                                     .show();
                         } else {
                             if (!charSequence.toString().equals(noNewCollection))
-                                ComicActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
+                                CollectionActions.addComicsToCollection(mListFragment.getActivity(), charSequence.toString(), comics);
                         }
                         mActionMode.finish();
                     }
@@ -110,23 +106,17 @@ public class ComicAdapter extends AbstractComicAdapter {
 
     public void showChooseCollectionDialog(final String folderPath)
     {
-        JSONArray collections = StorageManager.getCollectionList(mListFragment.getActivity());
-        CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+        ArrayList<Collection> collections = StorageManager.getCollectionList(mListFragment.getActivity());
+        CharSequence[] collectionNames = new CharSequence[collections.size()+1];
 
-        for (int i=0;i<collections.length();i++)
+        for (int i=0;i<collections.size();i++)
         {
-            try {
-                collectionNames[i] = collections.getJSONObject(i).keys().next();
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
+            collectionNames[i] = collections.get(i).getName();
         }
 
         final String noNewCollection = "Only 2 collections allowed in free version";
         final String newCollection = "Add new collection";
-        if (collections.length()<2)
+        if (collections.size()<2)
             collectionNames[collectionNames.length-1] = newCollection;
         else
             collectionNames[collectionNames.length-1] = noNewCollection;
@@ -145,14 +135,14 @@ public class ComicAdapter extends AbstractComicAdapter {
                                         @Override
                                         public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
                                             StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
-                                            ComicActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
+                                            CollectionActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
                                         }
                                     })
                                     .show();
                         }
                         else {
                             if (!charSequence.toString().equals(noNewCollection))
-                                ComicActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
+                                CollectionActions.addFolderToCollection(mListFragment.getActivity(), charSequence.toString(), folderPath);
                         }
                     }
                 })
@@ -223,23 +213,17 @@ public class ComicAdapter extends AbstractComicAdapter {
             public void onClick(View v) {
                 if (dialog!=null)
                     dialog.dismiss();
-                JSONArray collections = StorageManager.getCollectionList(mListFragment.getActivity());
-                CharSequence[] collectionNames = new CharSequence[collections.length()+1];
+                ArrayList<Collection> collections = StorageManager.getCollectionList(mListFragment.getActivity());
+                CharSequence[] collectionNames = new CharSequence[collections.size()+1];
 
-                for (int i=0;i<collections.length();i++)
+                for (int i=0;i<collections.size();i++)
                 {
-                    try {
-                        collectionNames[i] = collections.getJSONObject(i).keys().next();
-                    }
-                    catch (JSONException e)
-                    {
-                        e.printStackTrace();
-                    }
+                    collectionNames[i] = collections.get(i).getName();
                 }
 
                 final String noNewCollection = "Only 2 collections allowed in free version";
                 final String newCollection = "Add new collection";
-                if (collections.length()<2)
+                if (collections.size()<2)
                     collectionNames[collectionNames.length-1] = newCollection;
                 else
                     collectionNames[collectionNames.length-1] = noNewCollection;
@@ -257,13 +241,13 @@ public class ComicAdapter extends AbstractComicAdapter {
                                                 @Override
                                                 public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
                                                     StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
-                                                    ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                                    CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
                                                 }
                                             })
                                             .show();
                                 } else {
                                     if (!charSequence.toString().equals(noNewCollection))
-                                    ComicActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                        CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
                                 }
                             }
                         })

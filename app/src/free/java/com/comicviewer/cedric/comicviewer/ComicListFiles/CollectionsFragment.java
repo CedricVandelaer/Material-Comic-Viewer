@@ -39,7 +39,7 @@ public class CollectionsFragment extends AbstractCollectionsFragment{
             @Override
             public void onClick(View v) {
 
-                if (StorageManager.getCollectionList(getActivity()).length()<2) {
+                if (StorageManager.getCollectionList(getActivity()).size()<2) {
                     MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                             .title("Add new collection")
                             .input("Name", "", false, new MaterialDialog.InputCallback() {

@@ -20,7 +20,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:maxRecents="4"
+        android:maxRecents="6"
         android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.google.android.gms.version"
@@ -33,13 +33,39 @@
             android:theme="@style/FullscreenTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="file" />
                 <data android:host="*" />
                 <data android:pathPattern=".*\\.cbr" />
                 <data android:pathPattern=".*\\.cbz" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\.rar" />
+                <data android:pathPattern=".*\\.CBR" />
+                <data android:pathPattern=".*\\.CBZ" />
+                <data android:pathPattern=".*\\.ZIP" />
+                <data android:pathPattern=".*\\.RAR" />
+            </intent-filter>
+            <intent-filter>
+                <data android:mimeType="application/x-cbr" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <data android:mimeType="application/x-cbz" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <data android:mimeType="application/x-rar-compressed" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <data android:mimeType="application/zip" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
@@ -51,22 +77,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- AdBuddiz -->
-        <activity
-            android:name="com.purplebrain.adbuddiz.sdk.AdBuddizActivity"
-            android:theme="@android:style/Theme.Translucent" />
-        <!-- end AdBuddiz -->
-
-
-        <!--
-        AdMob
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent" />
-        end AdMob
-        -->
 
         <activity android:name="com.box.androidsdk.content.auth.OAuthActivity" />
         <activity
@@ -83,14 +93,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".CloudFiles.DropboxActivity"
-            android:label="@string/title_activity_cloud_browser" >
-        </activity>
-        <activity
-            android:name=".CloudFiles.OneDriveActivity"
-            android:label="@string/title_activity_cloud_browser" >
         </activity>
 
         <service
@@ -127,14 +129,6 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
-        <activity
-            android:name=".CloudFiles.GoogleDriveActivity"
-            android:label="@string/title_activity_google_drive" >
-        </activity>
-        <activity
-            android:name=".CloudFiles.BoxActivity"
-            android:label="@string/cloud_storage_4" >
-        </activity>
     </application>
 
 </manifest>

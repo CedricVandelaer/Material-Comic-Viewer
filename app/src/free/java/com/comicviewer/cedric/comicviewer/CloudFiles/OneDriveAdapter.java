@@ -25,19 +25,21 @@ import java.util.List;
  */
 public class OneDriveAdapter extends RecyclerView.Adapter {
 
-    private OneDriveActivity mActivity;
+    private AbstractCloudServiceListFragment mFragment;
+    private Context mContext;
     private CloudService mCloudService;
     private Handler mHandler;
     private LayoutInflater mInflater;
     private List<OneDriveObject> mFileList;
 
-    public OneDriveAdapter(OneDriveActivity activity, CloudService cloudService)
+    public OneDriveAdapter(AbstractCloudServiceListFragment fragment, CloudService cloudService)
     {
         mFileList = new ArrayList<>();
         mCloudService = cloudService;
         mHandler = new Handler();
-        mActivity = activity;
-        this.mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mFragment = fragment;
+        mContext = fragment.getActivity();
+        this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -57,9 +59,9 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         if (viewType==0) {
             v = mInflater.inflate(R.layout.cloud_folder_card, parent, false);
             CloudFolderViewHolder cloudFolderViewHolder = new CloudFolderViewHolder(v);
-            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(StorageManager.getAppThemeColor(mActivity)));
-            if (StorageManager.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
-                cloudFolderViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
+            cloudFolderViewHolder.mCardView.setCardBackgroundColor(Utilities.darkenColor(StorageManager.getAppThemeColor(mContext)));
+            if (StorageManager.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+                cloudFolderViewHolder.mDownloadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
             addFolderClickListener(cloudFolderViewHolder);
             addDownloadFolderClickListener(cloudFolderViewHolder);
             return cloudFolderViewHolder;
@@ -67,9 +69,9 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         else {
             v = mInflater.inflate(R.layout.file_card, parent, false);
             CloudFileViewHolder cloudFileViewHolder = new CloudFileViewHolder(v);
-            if (StorageManager.getBackgroundColorPreference(mActivity) == mActivity.getResources().getColor(R.color.WhiteBG))
-                cloudFileViewHolder.mDownloadTextView.setTextColor(mActivity.getResources().getColor(R.color.Black));
-            cloudFileViewHolder.mCardView.setCardBackgroundColor(StorageManager.getAppThemeColor(mActivity));
+            if (StorageManager.getBackgroundColorPreference(mContext) == mContext.getResources().getColor(R.color.WhiteBG))
+                cloudFileViewHolder.mDownloadTextView.setTextColor(mContext.getResources().getColor(R.color.Black));
+            cloudFileViewHolder.mCardView.setCardBackgroundColor(StorageManager.getAppThemeColor(mContext));
             addFileClickListener(cloudFileViewHolder);
             return cloudFileViewHolder;
         }
@@ -116,19 +118,19 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
             public void onClick(View v) {
                 final OneDriveObject entry = cloudFileViewHolder.getOneDriveEnty();
 
-                MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title(mActivity.getString(R.string.download_file))
-                        .content(mActivity.getString(R.string.download_request)+" \""+entry.getName()+"\"?")
-                        .positiveColor(StorageManager.getAppThemeColor(mActivity))
-                        .positiveText(mActivity.getString(R.string.confirm))
-                        .negativeColor(StorageManager.getAppThemeColor(mActivity))
-                        .negativeText(mActivity.getString(R.string.cancel))
+                MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
+                        .title(mContext.getString(R.string.download_file))
+                        .content(mContext.getString(R.string.download_request)+" \""+entry.getName()+"\"?")
+                        .positiveColor(StorageManager.getAppThemeColor(mContext))
+                        .positiveText(mContext.getString(R.string.confirm))
+                        .negativeColor(StorageManager.getAppThemeColor(mContext))
+                        .negativeText(mContext.getString(R.string.cancel))
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                Toast.makeText(mActivity, mActivity.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry, mCloudService);
+                                Toast.makeText(mContext, mContext.getString(R.string.download_started), Toast.LENGTH_SHORT).show();
+                                DownloadFileService.startActionDownload(mContext, entry, mCloudService);
                             }
                         }).show();
             }
@@ -143,8 +145,8 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActivity.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getOneDriveEnty().getId()+"/files");
-                mActivity.refresh();
+                mFragment.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getOneDriveEnty().getId()+"/files");
+                mFragment.refresh();
             }
         });
     }
