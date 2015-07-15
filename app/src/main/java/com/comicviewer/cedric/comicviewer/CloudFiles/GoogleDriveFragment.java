@@ -188,7 +188,7 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
 
                 String url = "https://www.googleapis.com/drive/v2/files"+
                         "?q=%27" + folderId[0] +
-                        "%27%20in%20parents%20and%20trashed=false"+"&access_token="+token;
+                        "%27%20in%20parents%20and%20trashed=false"+"&fields=items(title,downloadUrl,id,mimeType)"+"&access_token="+token;
 
                 return HttpUtilities.GET(url);
             }
