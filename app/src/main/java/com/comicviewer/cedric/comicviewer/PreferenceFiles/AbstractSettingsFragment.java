@@ -45,6 +45,7 @@ public abstract class AbstractSettingsFragment extends PreferenceFragment {
         addClearSavedComicDataPreference();
         disableVolumeKeyPreference();
         addGoProPreference();
+        addArrowAnimationPreference();
 
         if (StorageManager.getBackgroundColorPreference(getActivity())!= getResources().getColor(R.color.WhiteBG))
         {
@@ -56,6 +57,46 @@ public abstract class AbstractSettingsFragment extends PreferenceFragment {
             if (Build.VERSION.SDK_INT>20)
                 getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
         }
+    }
+
+    private void addArrowAnimationPreference() {
+
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("LayoutCategory");
+
+        final CustomCheckBoxPreference arrowPreference = new CustomCheckBoxPreference(getActivity());
+
+
+        arrowPreference.setKey(StorageManager.DRAWER_ARROW_ANIMATION);
+        arrowPreference.setTitle("Enable drawer arrow animation");
+        arrowPreference.setDefaultValue(false);
+
+        arrowPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, final Object newValue) {
+
+                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                        .title(getString(R.string.warning))
+                        .content(getString(R.string.restart_dialog))
+                        .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                        .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                        .positiveText(getString(R.string.accept))
+                        .negativeText(getString(R.string.cancel))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                StorageManager.saveBooleanSetting(getActivity(), StorageManager.DRAWER_ARROW_ANIMATION, (Boolean) newValue);
+                                arrowPreference.setOnPreferenceChangeListener(null);
+                                getActivity().finish();
+                            }
+                        })
+                        .show();
+
+                return false;
+            }
+        });
+
+        targetCategory.addPreference(arrowPreference);
     }
 
     protected abstract void disableVolumeKeyPreference();

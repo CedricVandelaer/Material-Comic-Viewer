@@ -17,7 +17,6 @@ import com.comicviewer.cedric.comicviewer.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -92,7 +91,7 @@ public class StorageManager {
     public static final String KEEP_SCREEN_ON= "keepScreenOn";
     public static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
     public static final String LAST_READ_COMIC = "lastReadComic";
-
+    public static final String DRAWER_ARROW_ANIMATION = "drawerArrowAnimation";
 
     public static final String COMIC_VIEWER = "ComicViewer";
 
@@ -102,6 +101,16 @@ public class StorageManager {
         if (context== null)
             return false;
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(setting, defaultValue);
+    }
+
+    public static void saveBooleanSetting(Context context, String setting, boolean value)
+    {
+        if (context== null)
+            return;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(setting, value);
+        editor.apply();
     }
 
     public static String getStringSetting(Context context, String setting, String defaultValue)

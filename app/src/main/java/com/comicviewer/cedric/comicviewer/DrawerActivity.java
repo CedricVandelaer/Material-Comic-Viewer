@@ -61,7 +61,8 @@ public class DrawerActivity extends MaterialNavigationDrawer
             this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
 
         enableToolbarElevation();
-        allowArrowAnimation();
+        if (StorageManager.getBooleanSetting(this, StorageManager.DRAWER_ARROW_ANIMATION, false))
+            allowArrowAnimation();
 
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
