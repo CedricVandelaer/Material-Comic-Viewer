@@ -537,7 +537,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
 

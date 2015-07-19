@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
@@ -117,7 +118,7 @@ public class CloudListAdapter extends RecyclerView.Adapter {
                 }
 
                 mFragment.setActiveCloudServiceFragment(fragment);
-                ((DrawerActivity)mFragment.getActivity()).setFragment(fragment, title);
+                ((NewDrawerActivity)mFragment.getActivity()).setFragmentInSection(fragment, title);
                 //mContext.startActivity(intent);
 
             }

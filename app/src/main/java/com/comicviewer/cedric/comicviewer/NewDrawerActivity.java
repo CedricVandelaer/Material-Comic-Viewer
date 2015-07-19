@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -207,13 +208,17 @@ public class NewDrawerActivity extends AppCompatActivity {
         }
     }
 
-    public void setFragment(Fragment fragment, String title)
+    public void setFragmentInSection(Fragment fragment, String title)
     {
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(title);
         mDrawerTitleNavigation.pushToStack(title);
         mDrawerSectionNavigation.pushToStack(mDrawer.getCurrentSelection());
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     public void setFragment(Fragment fragment, String title, int section)
@@ -222,7 +227,16 @@ public class NewDrawerActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(title);
         mDrawerTitleNavigation.pushToStack(title);
         mDrawerSectionNavigation.pushToStack(section);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (true) {
+            transaction = transaction.setCustomAnimations(R.anim.enter_from_bottom_delayed, R.anim.exit_to_bottom, R.anim.enter_from_bottom_delayed, R.anim.exit_to_bottom);
+        }
+        else {
+            transaction = transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out);
+        }
+        transaction.replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit();
     }
 
     @Override

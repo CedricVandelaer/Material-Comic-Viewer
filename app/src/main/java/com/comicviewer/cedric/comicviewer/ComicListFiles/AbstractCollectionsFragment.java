@@ -169,7 +169,7 @@ public abstract class AbstractCollectionsFragment extends BaseFragment implement
         {
             String path = (String)getNavigationManager().getValueFromStack();
             getNavigationManager().popFromStack();
-            ((NewDrawerActivity)getActivity()).setFragment(CollectionsListFragment.newInstance(path), path);
+            ((NewDrawerActivity)getActivity()).setFragmentInSection(CollectionsListFragment.newInstance(path), path);
         }
     }
 
