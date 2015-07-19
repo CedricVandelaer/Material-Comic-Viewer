@@ -1,39 +1,56 @@
 package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 
 
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseNavigationInterface;
+import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
 import com.comicviewer.cedric.comicviewer.R;
 import com.github.machinarius.preferencefragment.PreferenceFragment;
 
 /**
  * Created by Cédric on 18/07/2015.
  */
-public class AbstractSettingsOverviewFragment extends PreferenceFragment implements BaseNavigationInterface{
+public abstract class AbstractSettingsOverviewFragment extends PreferenceFragment implements BaseNavigationInterface{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setBackground();
 
         addPreferencesFromResource(R.xml.basic_preferences);
 
         addLayoutSettings();
         addReadingSettings();
         addOtherSettings();
-        addThanksNote();
+        addProNote();
+
+
     }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        setBackground();
+    }
+
+    abstract void addProNote();
 
     private void addLayoutSettings()
     {
         Preference layoutCategory = new Preference(getActivity());
 
         layoutCategory.setTitle(getString(R.string.layout_settings_category_title));
+        layoutCategory.setIcon(R.drawable.ic_palette);
         layoutCategory.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                return false;
+                ((NewDrawerActivity) getActivity()).setFragmentInSection(new LayoutSettingsFragment(), getString(R.string.layout_settings_category_title));
+                return true;
             }
         });
         getPreferenceScreen().addPreference(layoutCategory);
@@ -43,11 +60,14 @@ public class AbstractSettingsOverviewFragment extends PreferenceFragment impleme
     {
         Preference readingCat = new Preference(getActivity());
 
+        readingCat.setIcon(R.drawable.ic_read);
+
         readingCat.setTitle(getString(R.string.reading_settings_category_setting));
         readingCat.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                return false;
+                ((NewDrawerActivity) getActivity()).setFragmentInSection(new ReadingSettingsFragment(), getString(R.string.reading_settings_category_setting));
+                return true;
             }
         });
         getPreferenceScreen().addPreference(readingCat);
@@ -58,27 +78,22 @@ public class AbstractSettingsOverviewFragment extends PreferenceFragment impleme
         Preference otherCat = new Preference(getActivity());
 
         otherCat.setTitle(getString(R.string.other_settings));
+        otherCat.setIcon(R.drawable.ic_settings_grey);
         otherCat.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                return false;
+                ((NewDrawerActivity) getActivity()).setFragmentInSection(new OtherSettingsFragment(), getString(R.string.other_settings));
+                return true;
             }
         });
         getPreferenceScreen().addPreference(otherCat);
     }
 
-    private void addThanksNote()
+    protected void setBackground()
     {
-        Preference addThanksCat = new Preference(getActivity());
-
-        addThanksCat.setTitle("Thanks for buying the pro version!");
-        addThanksCat.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                return false;
-            }
-        });
-        getPreferenceScreen().addPreference(addThanksCat);
+        getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.WhiteBG));
+        if (Build.VERSION.SDK_INT>20)
+            getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.Black));
     }
 
     @Override

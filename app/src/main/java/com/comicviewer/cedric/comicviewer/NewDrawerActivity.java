@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -24,6 +25,7 @@ import com.comicviewer.cedric.comicviewer.ComicListFiles.CurrentlyReadingFragmen
 import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.AbstractSettingsOverviewFragment;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsOverviewFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -35,6 +37,10 @@ import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Cédric on 15/07/2015.
@@ -59,7 +65,7 @@ public class NewDrawerActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
 
         new SimpleEula(this).show();
-        new SetTaskDescriptionTask().execute();
+        startSetTaskDescription();
 
         mDrawerTitleNavigation = new NavigationManager();
         mDrawerSectionNavigation = new NavigationManager();
@@ -71,6 +77,7 @@ public class NewDrawerActivity extends AppCompatActivity {
             ImageLoader.getInstance().init(config);
         }
 
+        int appThemeColor = StorageManager.getAppThemeColor(this);
         int bgColor = StorageManager.getBackgroundColorPreference(this);
         int iconColor;
         if (bgColor == getResources().getColor(R.color.WhiteBG))
@@ -88,52 +95,43 @@ public class NewDrawerActivity extends AppCompatActivity {
                 .withActionBarDrawerToggle(true)
                 .withHeader(createDrawerHeaderImage())
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.all_comics)
+                        new ColoredPrimaryDrawerItem()
+                                .withName(R.string.all_comics)
                                 .withIcon(R.drawable.book)
-                                .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor),
-                        new PrimaryDrawerItem().withName(R.string.currently_reading)
+                                .withIconTintingEnabled(true),
+                        new ColoredPrimaryDrawerItem()
+                                .withName(R.string.currently_reading)
                                 .withIcon(R.drawable.last_read)
-                                .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor),
-                        new PrimaryDrawerItem().withName(R.string.favorites)
+                                .withIconTintingEnabled(true),
+                        new ColoredPrimaryDrawerItem()
+                                .withName(R.string.favorites)
                                 .withIcon(R.drawable.star)
-                                .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor),
-                        new PrimaryDrawerItem().withName(R.string.collections)
+                                .withIconTintingEnabled(true),
+                        new ColoredPrimaryDrawerItem()
+                                .withName(R.string.collections)
                                 .withIcon(R.drawable.castle)
-                                .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor),
-                        new PrimaryDrawerItem().withName(R.string.cloud_storage)
+                                .withIconTintingEnabled(true),
+                        new ColoredPrimaryDrawerItem()
+                                .withName(R.string.cloud_storage)
                                 .withIcon(R.drawable.cloud)
-                                .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor),
-                        new PrimaryDrawerItem().withName(R.string.statistics)
+                                .withIconTintingEnabled(true),
+                        new ColoredPrimaryDrawerItem()
+                                .withName(R.string.statistics)
                                 .withIcon(R.drawable.stats)
-                                .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor),
-                        new PrimaryDrawerItem().withName(R.string.synchronization)
+                                .withIconTintingEnabled(true),
+                        new ColoredPrimaryDrawerItem()
+                                .withName(R.string.synchronization)
                                 .withIcon(R.drawable.sync)
-                                .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor),
+                                .withIconTintingEnabled(true),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName(R.string.settings)
+                        new ColoredSecondaryDrawerItem()
+                                .withName(R.string.settings)
                                 .withIcon(R.drawable.settings)
-                                .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor),
-                        new SecondaryDrawerItem().withName(R.string.about)
+                                .withIconTintingEnabled(true),
+                        new ColoredSecondaryDrawerItem()
+                                .withName(R.string.about)
                                 .withIcon(R.drawable.about)
                                 .withIconTintingEnabled(true)
-                                .withIconColor(iconColor)
-                                .withTextColor(iconColor)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -163,7 +161,7 @@ public class NewDrawerActivity extends AppCompatActivity {
                                     f = SynchronisationFragment.newInstance();
                                     break;
                                 case 8:
-                                    f = new AbstractSettingsOverviewFragment();
+                                    f = new SettingsOverviewFragment();
                                     break;
                                 case 9:
                                     f = AboutFragment.newInstance();
@@ -226,10 +224,16 @@ public class NewDrawerActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(title);
         mDrawerTitleNavigation.pushToStack(title);
+        int previousSection = 0;
+        if (!mDrawerSectionNavigation.emptyStack())
+            previousSection = (int) mDrawerSectionNavigation.getValueFromStack();
         mDrawerSectionNavigation.pushToStack(section);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (true) {
-            transaction = transaction.setCustomAnimations(R.anim.enter_from_bottom_delayed, R.anim.exit_to_bottom, R.anim.enter_from_bottom_delayed, R.anim.exit_to_bottom);
+        if (StorageManager.getBooleanSetting(this, StorageManager.SECTION_ANIMATION, true)) {
+            if (section>=previousSection)
+                transaction = transaction.setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top, R.anim.enter_from_top, R.anim.exit_to_bottom);
+            else
+                transaction = transaction.setCustomAnimations(R.anim.enter_from_top, R.anim.exit_to_bottom, R.anim.enter_from_bottom, R.anim.exit_to_top);
         }
         else {
             transaction = transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out);
@@ -252,8 +256,87 @@ public class NewDrawerActivity extends AppCompatActivity {
     public void setDrawerColor()
     {
         int color = StorageManager.getBackgroundColorPreference(this);
+        int appthemecolor = StorageManager.getAppThemeColor(this);
+        int iconColor;
+        if (color == getResources().getColor(R.color.WhiteBG))
+            iconColor = getResources().getColor(R.color.BlueGrey);
+        else
+            iconColor = getResources().getColor(R.color.White);
+
         mDrawer.getSlider().setBackgroundColor(color);
 
+        List<IDrawerItem> drawerItems = mDrawer.getDrawerItems();
+
+        for (int i=0;i<drawerItems.size();i++)
+        {
+            IDrawerItem drawerItem = drawerItems.get(i);
+            if (drawerItem instanceof ColoredPrimaryDrawerItem)
+            {
+                ((ColoredPrimaryDrawerItem)drawerItem).setBackgroundColor(color);
+                ((ColoredPrimaryDrawerItem)drawerItem).withIconColor(iconColor);
+                ((ColoredPrimaryDrawerItem)drawerItem).withTextColor(iconColor);
+                ((ColoredPrimaryDrawerItem)drawerItem).withSelectedColor(appthemecolor);
+                ((ColoredPrimaryDrawerItem)drawerItem).withSelectedTextColor(appthemecolor);
+                ((ColoredPrimaryDrawerItem)drawerItem).withSelectedIconColor(appthemecolor);
+            }
+            else if (drawerItem instanceof ColoredSecondaryDrawerItem)
+            {
+                ((ColoredSecondaryDrawerItem)drawerItem).setBackgroundColor(color);
+                ((ColoredSecondaryDrawerItem)drawerItem).withIconColor(iconColor);
+                ((ColoredSecondaryDrawerItem)drawerItem).withTextColor(iconColor);
+                ((ColoredSecondaryDrawerItem)drawerItem).withSelectedColor(appthemecolor);
+                ((ColoredSecondaryDrawerItem)drawerItem).withSelectedTextColor(appthemecolor);
+                ((ColoredSecondaryDrawerItem)drawerItem).withSelectedIconColor(appthemecolor);
+            }
+            mDrawer.setItem(drawerItem, i);
+        }
+        if (!mDrawerSectionNavigation.emptyStack())
+            mDrawer.setSelection((int)mDrawerSectionNavigation.getValueFromStack(), false);
+        else
+            mDrawer.setSelection(0, false);
+    }
+
+    public void updateDrawerHeader()
+    {
+        mDrawer.removeHeader();
+        mDrawer.setHeader(createDrawerHeaderImage());
+    }
+
+    public void cleanFiles()
+    {
+        File[] savedFolders = getFilesDir().listFiles();
+        Map<String, String> allFiles = FileLoader.searchComics(this);
+        String defaultPath = getFilesDir().getAbsolutePath();
+
+        for (File folder:savedFolders)
+        {
+            boolean found = false;
+
+            for (String filename:allFiles.keySet())
+            {
+                String comicFolder = defaultPath+"/"+filename;
+
+                comicFolder = Utilities.removeExtension(comicFolder);
+
+                File foundFolder = new File(comicFolder);
+
+                if (foundFolder.getAbsolutePath().equals(folder.getAbsolutePath()))
+                    found = true;
+            }
+
+            if (!found && !(folder.getName().equals("muzei")))
+            {
+                Log.d("OnStop", "Folder to delete: " + folder.getAbsolutePath());
+                Utilities.deleteDirectory(this, folder);
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        cleanFiles();
+        super.onDestroy();
     }
 
     public Toolbar getToolbar()
@@ -273,6 +356,11 @@ public class NewDrawerActivity extends AppCompatActivity {
         imageView.setImageDrawable(layerDrawable);
 
         return imageView;
+    }
+
+    public void startSetTaskDescription()
+    {
+        new SetTaskDescriptionTask().execute();
     }
 
     private class SetTaskDescriptionTask extends AsyncTask

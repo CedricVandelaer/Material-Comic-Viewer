@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -20,10 +21,10 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SearchView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
@@ -100,8 +101,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
 
         isFiltered = false;
         mHandler = new Handler();
-
-        PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
         createRecyclerView(v);
         createFab(v);
@@ -381,8 +380,20 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
 
         if (enabled) {
+
+            int width = Utilities.getPixelValue(getActivity(), 48);
+            int height = Utilities.getPixelValue(getActivity(), 32);
+
+            //final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(width,height,Gravity.RIGHT);
+
             toolbar.removeView(mSearchView);
             mSearchView = new SearchView(getActivity());
+            int searchImgId = android.support.v7.appcompat.R.id.search_button;
+            ImageView v = (ImageView) mSearchView.findViewById(searchImgId);
+            v.getLayoutParams().height = height;
+            v.getLayoutParams().width = width;
+            v.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            v.setImageResource(R.drawable.ic_magnify);
             mSearchView.setAlpha(0.75f);
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
 
@@ -390,6 +401,10 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                 @Override
                 public boolean onClose() {
                     filterList("");
+                    if (mFolderViewToggleButton!=null)
+                        mFolderViewToggleButton.setVisibility(View.VISIBLE);
+                    if (mSortButton!=null)
+                        mSortButton.setVisibility(View.VISIBLE);
                     return false;
                 }
             });
@@ -609,10 +624,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         }
         else
         {
-            if (mFolderViewToggleButton!=null)
-                mFolderViewToggleButton.setVisibility(View.VISIBLE);
-            if (mSortButton!=null)
-                mSortButton.setVisibility(View.VISIBLE);
             mRecyclerView.setAdapter(mAdapter);
             isFiltered = false;
         }

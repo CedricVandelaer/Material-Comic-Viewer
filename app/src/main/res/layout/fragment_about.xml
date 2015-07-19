@@ -102,6 +102,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:id="@+id/find_us_text_view"
                         android:text="@string/find_comic_viewer_on"
                         android:layout_marginBottom="8dp"/>
                     <RelativeLayout
@@ -150,17 +151,14 @@
                             android:text="Facebook"/>
                     </RelativeLayout>
                 </LinearLayout>
-
             </LinearLayout>
-
-
-
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:gravity="center"
+                android:id="@+id/thanks_text_view"
                 android:layout_gravity="center"
                 android:text="@string/thanks_to_text"/>
 

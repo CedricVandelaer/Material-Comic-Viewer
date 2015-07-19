@@ -89,6 +89,8 @@ public class StatisticsFragment extends BaseFragment {
 
         if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             setTitleTextViewTextColors(getResources().getColor(R.color.Black));
+        else
+            setTitleTextViewTextColors(getResources().getColor(R.color.White));
 
         setTextViewTextColors(StorageManager.getAppThemeColor(getActivity()));
 
@@ -206,8 +208,6 @@ public class StatisticsFragment extends BaseFragment {
         mFavoriteSeries.setTextColor(color);
         mLongestReadTitleTextView.setTextColor(color);
         mLongestReadPagesTextView.setTextColor(color);
-
-
     }
 
     public void setTitleTextViewTextColors(int color)

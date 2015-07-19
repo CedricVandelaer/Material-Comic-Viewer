@@ -56,15 +56,14 @@ public class StorageManager {
     private static final String PAGES_READ_LIST = "pagesReadMap";
     private static final String SERIES_PAGES_READ_LIST =  "seriesPagesReadMap";
     private static final String READ_COMIC_LIST = "lastReadComicList";
-    private static final String FILEPATHS = "Filepaths";
-    private static final String CARD_SIZE = "cardSize";
-    private static final String BACKGROUND_COLOR = "backgroundColor";
     private static final String COMICS_ADDED_LIST = "addedComicsList";
     private static final String LONGEST_READ_COMIC = "longestReadComic";
-    private static final String PAGE_NUMBER_SETTING="pageNumberSetting";
-    private static final String MANGA_LIST="mangaList";
-    private static final String NORMAL_LIST="normalList";
+    private static final String MANGA_LIST = "mangaList";
+    private static final String NORMAL_LIST = "normalList";
 
+    public static final String PAGE_NUMBER_SETTING = "pageNumberSetting";
+    public static final String CARD_SIZE = "cardSize";
+    public static final String FILEPATHS = "Filepaths";
     public static final String APP_THEME_COLOR = "appThemeColor";
     public static final String ACCENT_COLOR = "accentColor";
     public static final String FILE_FORMAT_SETTING = "fileFormatSetting";
@@ -93,6 +92,11 @@ public class StorageManager {
     public static final String LAST_READ_COMIC = "lastReadComic";
     public static final String DRAWER_ARROW_ANIMATION = "drawerArrowAnimation";
     public static final String MULTI_PANE = "multiPane";
+    public static final String BACKGROUND_COLOR = "backgroundColor";
+    public static final String CARD_COLOR = "cardColor";
+    public static final String SCROLL_ANIMATION = "scrollAnimation";
+    public static final String SECTION_ANIMATION = "sectionAnimation";
+
 
     public static final String COMIC_VIEWER = "ComicViewer";
 
@@ -1816,7 +1820,7 @@ public class StorageManager {
     public static int getBackgroundColorPreference(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String bgcolor = prefs.getString(BACKGROUND_COLOR, context.getString(R.string.backgroundcolor_setting2));
+        String bgcolor = prefs.getString(BACKGROUND_COLOR, context.getString(R.string.backgroundcolor_setting3));
         int color;
         
         if (bgcolor.equals(context.getString(R.string.backgroundcolor_setting1)))

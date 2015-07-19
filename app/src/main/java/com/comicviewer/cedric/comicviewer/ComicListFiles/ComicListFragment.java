@@ -117,8 +117,11 @@ public class ComicListFragment extends AbstractComicListFragment {
 
     @Override
     public Map<String, String> getFiles() {
-        if (StorageManager.getBooleanSetting(mApplicationContext, StorageManager.FOLDER_VIEW_ENABLED, true))
-            return FileLoader.searchComicsAndFolders(mApplicationContext, (String)getNavigationManager().getValueFromStack());
+        if (StorageManager.getBooleanSetting(mApplicationContext, StorageManager.FOLDER_VIEW_ENABLED, true)) {
+            if (getNavigationManager().emptyStack())
+                getNavigationManager().reset(NavigationManager.ROOT);
+            return FileLoader.searchComicsAndFolders(mApplicationContext, (String) getNavigationManager().getValueFromStack());
+        }
         else
             return FileLoader.searchComics(mApplicationContext);
     }

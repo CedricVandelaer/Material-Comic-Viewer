@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bluejamesbond.text.DocumentView;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.gc.materialdesign.views.ButtonFlat;
@@ -25,6 +26,9 @@ public class AboutFragment extends BaseFragment {
     private ButtonFlat mChangelogButton;
     private ButtonFlat mRateButton;
     private TextView mTitleTextView;
+    private DocumentView mAboutText;
+    private TextView mFindUsTextView;
+    private TextView mThanksTextView;
 
     private ImageView mGooglePlusLogo;
     private TextView mGooglePlusTextView;
@@ -58,11 +62,16 @@ public class AboutFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.activity_about,container, false);
-        
+        View v = inflater.inflate(R.layout.fragment_about,container, false);
+
+        StorageManager.setBackgroundColorPreference(getActivity());
+
         ImageView logoview = (ImageView)v.findViewById(R.id.logo);
         ImageView meview = (ImageView)v.findViewById(R.id.me_drawable);
         mTitleTextView = (TextView) v.findViewById(R.id.logo_text);
+        mAboutText = (DocumentView) v.findViewById(R.id.about_text);
+        mFindUsTextView = (TextView) v.findViewById(R.id.find_us_text_view);
+        mThanksTextView = (TextView) v.findViewById(R.id.thanks_text_view);
         mGooglePlusLogo = (ImageView) v.findViewById(R.id.google_plus_logo);
         mGooglePlusTextView = (TextView) v.findViewById(R.id.google_plus_textview);
         mFacebookLogo = (ImageView) v.findViewById(R.id.facebook_logo);
@@ -70,7 +79,10 @@ public class AboutFragment extends BaseFragment {
         mRateButton = (ButtonFlat) v.findViewById(R.id.rate_button);
         mChangelogButton = (ButtonFlat) v.findViewById(R.id.updates_button);
 
-
+        if (StorageManager.getBackgroundColorPreference(getActivity()) == getResources().getColor(R.color.WhiteBG))
+            setTextColor(getResources().getColor(R.color.BlueGrey));
+        else
+            setTextColor(getResources().getColor(R.color.White));
 
         View.OnClickListener googlePlusClickListener = new View.OnClickListener() {
             @Override
@@ -132,17 +144,17 @@ public class AboutFragment extends BaseFragment {
         ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logo,logoview);
         ImageLoader.getInstance().displayImage("drawable://" + R.drawable.me, meview);
 
-        if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG)) {
-            getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.BlueGrey));
-            if (Build.VERSION.SDK_INT > 20)
-                getActivity().getWindow().setNavigationBarColor(getActivity().getResources().getColor(R.color.BlueGrey));
-        }
-        else
-        {
-            StorageManager.setBackgroundColorPreference(getActivity());
-        }
-
         return v;
+    }
+
+    private void setTextColor(int color)
+    {
+        mTitleTextView.setTextColor(color);
+        mAboutText.getDocumentLayoutParams().setTextColor(color);
+        mFindUsTextView.setTextColor(color);
+        mThanksTextView.setTextColor(color);
+        mGooglePlusTextView.setTextColor(color);
+        mFacebookTextView.setTextColor(color);
     }
 
     @Override

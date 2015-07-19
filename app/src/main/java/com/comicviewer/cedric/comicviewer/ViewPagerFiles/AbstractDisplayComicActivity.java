@@ -78,7 +78,6 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_display_comic);
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         initializeAd();
 
@@ -167,19 +166,11 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         if (StorageManager.getBooleanSetting(this, StorageManager.KEEP_SCREEN_ON, true))
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        if ((mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_1))
-                || mCurrentComic.getColorSetting().equals(getString(R.string.card_color_setting_2))) && mCurrentComic.getComicColor()!=-1)
-        {
-            mFab.setColorNormal(mCurrentComic.getComicColor());
-            mFab.setColorPressed(Utilities.darkenColor(mCurrentComic.getComicColor()));
-            mFab.setColorRipple(Utilities.lightenColor(mCurrentComic.getComicColor()));
-        }
-        else
-        {
-            mFab.setColorNormal(StorageManager.getAccentColor(this));
-            mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(this)));
-            mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(this)));
-        }
+
+        mFab.setColorNormal(StorageManager.getAccentColor(this));
+        mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(this)));
+        mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(this)));
+
 
         if (Build.VERSION.SDK_INT>18)
         {

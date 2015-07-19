@@ -45,10 +45,6 @@
                 <data android:pathPattern=".*\\.cbz" />
             </intent-filter>
         </activity>
-        <activity android:name=".DrawerActivity" 
-            android:theme="@style/NavigationDrawerTheme">
-
-        </activity>
 
         <activity
             android:name=".NewDrawerActivity"

@@ -64,7 +64,6 @@ public abstract class AbstractCollectionsFragment extends BaseFragment implement
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mHandler = new Handler();
-        PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
         StorageManager.setBackgroundColorPreference(getActivity());
 
