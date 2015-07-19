@@ -16,13 +16,16 @@
         Matteo - Spanish translations
     </string>
     <string name="updates" translatable="false">
-        v3.5\n
+        v4.0\n
         - Smart collections\n
+        - UI polish\n
         - Significant performance increase\n
         - Better cloud storage navigation\n
+        - Added splash screen\n
         - Corrected the launcher icon size and removed the banner\n
         - Open comics directly from Dropbox app (and other supported apps)\n
         - Significant performance increase in Google Drive file browsing\n
+        - Option to enable/disable landscape multipane support on tablets\n
         - Option to enable/disable drawer menu animation\n
         - More bugfixes\n\n
         v3.4.5\n

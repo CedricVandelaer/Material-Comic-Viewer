@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class GoogleDriveAdapter extends RecyclerView.Adapter {
 
-    private GoogleDriveFragment mFragment;
+    private AbstractCloudServiceListFragment mFragment;
     private Context mContext;
     private ArrayList<GoogleDriveObject> mFileList;
     private LayoutInflater mInflater;
@@ -79,7 +79,8 @@ public class GoogleDriveAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragment.navigateToPath(cloudFolderViewHolder.getGoogleDriveEntry().getId());
+                mFragment.getNavigationManager().pushToStack(cloudFolderViewHolder.getGoogleDriveEntry().getId());
+                mFragment.refresh();
             }
         });
     }

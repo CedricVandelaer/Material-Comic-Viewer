@@ -1,7 +1,6 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -29,10 +28,12 @@ import android.widget.SearchView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
-import com.comicviewer.cedric.comicviewer.DrawerActivity;
+//import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.FileLoader;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
+import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -54,7 +55,7 @@ import java.util.TreeMap;
 /**
  * Created by CV on 22/06/2015.
  */
-abstract public class AbstractComicListFragment extends Fragment {
+abstract public class AbstractComicListFragment extends BaseFragment {
 
     protected RecyclerView mRecyclerView;
     protected ComicAdapter mAdapter;
@@ -90,6 +91,8 @@ abstract public class AbstractComicListFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_comic_list, container, false);
 
+        handleArguments(getArguments());
+
         mMultiSelector = new MultiSelector();
 
         mFilters = new ArrayList<>();
@@ -106,11 +109,14 @@ abstract public class AbstractComicListFragment extends Fragment {
         initialiseRefresh(v);
 
         initialiseVariables(savedInstanceState);
+        //((DrawerActivity)getActivity()).changeToolbarColor(StorageManager.getAppThemeColor(getActivity()), StorageManager.getAppThemeColor(getActivity()));
 
         // Inflate the layout for this fragment
         return v;
 
     }
+
+    protected abstract void handleArguments(Bundle args);
 
     abstract void setSearchFilters();
 
@@ -126,7 +132,7 @@ abstract public class AbstractComicListFragment extends Fragment {
         @Override
         protected void onPreExecute()
         {
-            showActionBarButtons(false);
+
         }
 
         @Override
@@ -142,7 +148,7 @@ abstract public class AbstractComicListFragment extends Fragment {
         @Override
         protected void onPostExecute(Object object)
         {
-            showActionBarButtons(true);
+
         }
 
     }
@@ -372,12 +378,12 @@ abstract public class AbstractComicListFragment extends Fragment {
         if (getActivity() == null)
             return;
 
-        Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+        Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
 
         if (enabled) {
             toolbar.removeView(mSearchView);
             mSearchView = new SearchView(getActivity());
-
+            mSearchView.setAlpha(0.75f);
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(Gravity.RIGHT);
 
             mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
@@ -424,7 +430,7 @@ abstract public class AbstractComicListFragment extends Fragment {
         if (getActivity()==null)
             return;
 
-        final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+        final Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
 
         if (enabled) {
 
@@ -713,6 +719,7 @@ abstract public class AbstractComicListFragment extends Fragment {
                     comicsToSave.add(comic);
                     hasToLoad = true;
                     showProgressSpinner(true);
+                    showActionBarButtons(false);
                 }
 
                 if (!hasToLoad) {
@@ -727,6 +734,9 @@ abstract public class AbstractComicListFragment extends Fragment {
                 addToAdapter(comic);
             }
         }
+
+        if (hasToLoad)
+            showActionBarButtons(true);
 
         showProgressSpinner(false);
 

@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +14,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-public class AboutFragment extends Fragment {
+public class AboutFragment extends BaseFragment {
 
     private ButtonFlat mChangelogButton;
     private ButtonFlat mRateButton;
@@ -129,7 +129,7 @@ public class AboutFragment extends Fragment {
             ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(getActivity());
             ImageLoader.getInstance().init(config);
         }
-        ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logohighres,logoview);
+        ImageLoader.getInstance().displayImage("drawable://"+R.drawable.logo,logoview);
         ImageLoader.getInstance().displayImage("drawable://" + R.drawable.me, meview);
 
         if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG)) {
@@ -145,4 +145,8 @@ public class AboutFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public boolean onBackPressed() {
+        return false;
+    }
 }

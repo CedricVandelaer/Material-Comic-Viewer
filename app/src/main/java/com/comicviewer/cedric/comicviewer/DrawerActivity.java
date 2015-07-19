@@ -36,9 +36,14 @@ import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionLis
  * Created by Cédric on 5/03/2015.
  * The drawer activity*
  */
+
 public class DrawerActivity extends MaterialNavigationDrawer
 {
+    @Override
+    public void init(Bundle savedInstanceState) {
 
+    }
+/*
     MaterialSection[] mSectionsArray;
     private NavigationManager mNavigationManager;
 
@@ -60,6 +65,9 @@ public class DrawerActivity extends MaterialNavigationDrawer
         else
             this.setDrawerBackgroundColor(getResources().getColor(R.color.BlueGrey));
 
+        if (StorageManager.getBooleanSetting(this,StorageManager.MULTI_PANE, true))
+            this.addMultiPaneSupport();
+
         enableToolbarElevation();
         if (StorageManager.getBooleanSetting(this, StorageManager.DRAWER_ARROW_ANIMATION, false))
             allowArrowAnimation();
@@ -74,45 +82,36 @@ public class DrawerActivity extends MaterialNavigationDrawer
         ComicListFragment.getInstance().setRetainInstance(true);
         MaterialSection allComicsSection = newSection(getString(R.string.all_comics), R.drawable.book, ComicListFragment.getInstance());
         mSectionsArray[0] = allComicsSection;
-        addSection(allComicsSection);
 
         MaterialSection currentlyReadingSection = newSection(getString(R.string.currently_reading), R.drawable.last_read, CurrentlyReadingFragment.getInstance());
         mSectionsArray[1] = currentlyReadingSection;
-        addSection(currentlyReadingSection);
 
         MaterialSection favoritesSection = newSection(getString(R.string.favorites), R.drawable.star, FavoritesListFragment.getInstance());
         mSectionsArray[2] = favoritesSection;
-        addSection(favoritesSection);
 
         MaterialSection collectionsSection = newSection(getString(R.string.collections), R.drawable.castle, CollectionsFragment.getInstance());
         mSectionsArray[3] = collectionsSection;
-        addSection(collectionsSection);
 
         CloudFragment.getInstance().setRetainInstance(true);
         MaterialSection cloudSection = newSection(getString(R.string.cloud_storage), R.drawable.cloud, CloudFragment.getInstance());
         mSectionsArray[4] = cloudSection;
-        addSection(cloudSection);
 
         MaterialSection statsSection = newSection(getString(R.string.statistics), R.drawable.stats, StatisticsFragment.newInstance());
         mSectionsArray[5] = statsSection;
-        addSection(statsSection);
 
         MaterialSection syncSection = newSection(getString(R.string.synchronization), R.drawable.sync, SynchronisationFragment.newInstance());
         mSectionsArray[6] = syncSection;
-        addSection(syncSection);
 
         MaterialSection settingsSection = newSection(getString(R.string.settings), R.drawable.settings, new SettingsFragment());
         mSectionsArray[7] = settingsSection;
-        addBottomSection(settingsSection);
-        
+
         MaterialSection aboutSection = newSection(getString(R.string.about), R.drawable.about, AboutFragment.newInstance());
         mSectionsArray[8] = aboutSection;
-        addBottomSection(aboutSection);
 
         mNavigationManager.pushToSectionStack(mSectionsArray[0]);
         for (final MaterialSection section:mSectionsArray)
         {
-            section.setSectionColor(StorageManager.getAppThemeColor(this));
+            section.setSectionColor(StorageManager.getAppThemeColor(this), StorageManager.getAppThemeColor(this));
 
             section.setOnClickListener(new MaterialSectionListener() {
                 @Override
@@ -122,10 +121,21 @@ public class DrawerActivity extends MaterialNavigationDrawer
                     }
                     mNavigationManager.pushToSectionStack(materialSection);
                     setSection(materialSection);
+                    changeToolbarColor(materialSection);
                     setFragment(getFragment(materialSection), materialSection.getTitle());
                 }
             });
         }
+
+        addSection(allComicsSection);
+        addSection(currentlyReadingSection);
+        addSection(favoritesSection);
+        addSection(collectionsSection);
+        addSection(cloudSection);
+        addSection(statsSection);
+        addSection(syncSection);
+        addBottomSection(settingsSection);
+        addBottomSection(aboutSection);
 
     }
 
@@ -248,7 +258,7 @@ public class DrawerActivity extends MaterialNavigationDrawer
     public void onResume()
     {
         super.onResume();
-        changeToolbarColor(StorageManager.getAppThemeColor(this),darkenColor(StorageManager.getAppThemeColor(this)));
+        changeToolbarColor(StorageManager.getAppThemeColor(this),StorageManager.getAppThemeColor(this));
         if (!NavigationManager.getInstance().sectionStackEmpty())
         {
             setFragment(getFragment(NavigationManager.getInstance().getSectionFromSectionStack()),
@@ -328,5 +338,5 @@ public class DrawerActivity extends MaterialNavigationDrawer
         }
     }
 
-
+*/
 }

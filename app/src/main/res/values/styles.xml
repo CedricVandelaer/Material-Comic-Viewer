@@ -7,6 +7,10 @@
 
     </style>
 
+    <style name="NewDrawerTheme" parent="MaterialDrawerTheme.Light.DarkToolbar">
+
+    </style>
+
     <style name="FullscreenTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowActionBar">false</item>
@@ -25,6 +29,10 @@
 
     <style name="ButtonBarButton" />
 
+    <style name="SplashTheme" parent="android:Theme.Holo.Light.NoActionBar">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:background">@color/White</item>
+    </style>
 
     <style name="NavigationDrawerTheme" parent="MaterialNavigationDrawerTheme">
         <item name="colorPrimary">@color/Teal</item>

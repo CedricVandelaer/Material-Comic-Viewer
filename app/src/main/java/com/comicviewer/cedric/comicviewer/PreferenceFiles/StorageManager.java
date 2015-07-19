@@ -92,6 +92,7 @@ public class StorageManager {
     public static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
     public static final String LAST_READ_COMIC = "lastReadComic";
     public static final String DRAWER_ARROW_ANIMATION = "drawerArrowAnimation";
+    public static final String MULTI_PANE = "multiPane";
 
     public static final String COMIC_VIEWER = "ComicViewer";
 

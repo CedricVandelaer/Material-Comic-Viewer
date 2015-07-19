@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,9 +23,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.box.androidsdk.content.BoxConfig;
 import com.box.androidsdk.content.auth.BoxAuthentication;
 import com.box.androidsdk.content.models.BoxSession;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -56,7 +55,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 
-public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LiveAuthListener{
+public class CloudFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, LiveAuthListener{
 
     private static CloudFragment mSingleton;
 
@@ -199,6 +198,11 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mActiveFragment = fragment;
     }
 
+    @Override
+    public boolean onBackPressed() {
+        return false;
+    }
+
 
     private class AddDropboxUserInfoTask extends AsyncTask
     {
@@ -257,7 +261,7 @@ public class CloudFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         mAdapter = new CloudListAdapter(this);
 
-        NavigationManager.getInstance().clearCloudStack();
+        getNavigationManager().reset();
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();

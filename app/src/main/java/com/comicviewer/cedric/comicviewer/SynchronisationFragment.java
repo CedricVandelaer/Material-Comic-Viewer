@@ -3,8 +3,8 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.gc.materialdesign.views.ButtonFlat;
 
@@ -22,7 +23,7 @@ import java.io.File;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SynchronisationFragment extends Fragment {
+public class SynchronisationFragment extends BaseFragment {
 
     private ButtonFlat mExportButton;
     private ButtonFlat mImportButton;
@@ -113,6 +114,11 @@ public class SynchronisationFragment extends Fragment {
         });
 
         return v;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
     private class ImportDataTask extends AsyncTask

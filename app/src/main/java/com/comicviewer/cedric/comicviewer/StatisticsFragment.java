@@ -2,12 +2,12 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.ProgressBarDeterminate;
@@ -15,7 +15,7 @@ import com.gc.materialdesign.views.ProgressBarDeterminate;
 import java.util.List;
 import java.util.Map;
 
-public class StatisticsFragment extends Fragment {
+public class StatisticsFragment extends BaseFragment {
 
     private TextView mComicsStartedTextView;
     private TextView mComicsReadTextView;
@@ -106,6 +106,11 @@ public class StatisticsFragment extends Fragment {
         });
 
         return v;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
     private class ResetStatsTask extends AsyncTask

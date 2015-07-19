@@ -23,7 +23,7 @@ import com.box.androidsdk.content.models.BoxListItems;
 import com.box.androidsdk.content.models.BoxSession;
 import com.box.androidsdk.content.requests.BoxResponse;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -46,7 +46,6 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
     private BoxAdapter mAdapter;
     private BoxSession mSession;
     private BoxApiFolder mBoxApiFolder;
-    private NavigationManager mNavigationManager;
 
     public BoxFragment() {
         // Required empty public constructor
@@ -70,8 +69,6 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
     {
         View v = inflater.inflate(R.layout.activity_box, container, false);
 
-        //new SetTaskDescriptionTask().execute();
-
         mCloudService = (CloudService) getArguments().getSerializable("CloudService");
 
         mHandler = new Handler();
@@ -86,14 +83,6 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
 
         mErrorTextView.setVisibility(View.GONE);
 
-        //getActionBar().setTitle(getString(R.string.cloud_storage_4));
-
-        //getActionBar().setBackgroundDrawable(new ColorDrawable(StorageManager.getAppThemeColor(this)));
-
-        //if (Build.VERSION.SDK_INT>20)
-            //getWindow().setStatusBarColor(Utilities.darkenColor(StorageManager.getAppThemeColor(this)));
-
-
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
                 + mCloudService.getEmail() + "\n"
@@ -104,7 +93,6 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new BoxAdapter(this, mCloudService);
         mRecyclerView.setAdapter(mAdapter);
-        mNavigationManager = new NavigationManager();
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -131,7 +119,7 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
             @Override
             public void onCompleted(BoxResponse<BoxSession> boxResponse) {
                 if (boxResponse.isSuccess()) {
-                    mNavigationManager.resetCloudStackWithString("0");
+                    getNavigationManager().reset("0");
                     mBoxApiFolder = new BoxApiFolder(mSession);
                     new GetBoxFilesTask().execute();
                 }
@@ -142,13 +130,6 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
         });
 
         return v;
-    }
-
-
-
-    public NavigationManager getNavigationManager()
-    {
-        return mNavigationManager;
     }
 
     @Override
@@ -169,6 +150,19 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
         new GetBoxFilesTask().execute();
     }
 
+    @Override
+    public boolean onBackPressed() {
+
+        getNavigationManager().popFromStack();
+        if (getNavigationManager().emptyStack())
+            return false;
+        else
+        {
+            refresh();
+            return true;
+        }
+    }
+
     private class GetBoxFilesTask extends AsyncTask
     {
 
@@ -181,7 +175,7 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
                     mSwipeRefreshLayout.setRefreshing(true);
                 }
             });
-            String id = mNavigationManager.getPathFromCloudStack();
+            String id = (String)getNavigationManager().getValueFromStack();
 
             try {
                 final BoxListItems boxListItems = mBoxApiFolder.getItemsRequest(id).send();
@@ -257,37 +251,4 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
         }
     }
 
-    /*
-    private class SetTaskDescriptionTask extends AsyncTask
-    {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
-                ImageLoader.getInstance().init(config);
-            }
-
-            ActivityManager.TaskDescription tdscr = null;
-
-            if (Build.VERSION.SDK_INT>20) {
-                try {
-                    ImageSize size = new ImageSize(64, 64);
-                    tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
-                            ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            StorageManager.getAppThemeColor(getActivity()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (tdscr != null)
-                setTaskDescription(tdscr);
-
-
-            return null;
-        }
-    }
-    */
 }

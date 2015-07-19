@@ -1,5 +1,7 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
+import android.os.Bundle;
+
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
@@ -24,6 +26,11 @@ public class CurrentlyReadingFragment extends AbstractComicListFragment {
 
     public CurrentlyReadingFragment()
     {
+
+    }
+
+    @Override
+    protected void handleArguments(Bundle args) {
 
     }
 
@@ -61,4 +68,8 @@ public class CurrentlyReadingFragment extends AbstractComicListFragment {
         return FileLoader.searchComics(mApplicationContext);
     }
 
+    @Override
+    public boolean onBackPressed() {
+        return false;
+    }
 }

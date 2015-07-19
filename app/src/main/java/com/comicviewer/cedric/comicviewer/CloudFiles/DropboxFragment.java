@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -47,8 +47,6 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
 
-    private NavigationManager mNavigationManager;
-
     public DropboxFragment() {
         // Required empty public constructor
     }
@@ -71,9 +69,6 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_dropbox, container, false);
 
-        //new SetTaskDescriptionTask().execute();
-
-        mNavigationManager = new NavigationManager();
         mCloudService = (CloudService) getArguments().getSerializable("CloudService");
 
         mHandler = new Handler();
@@ -88,14 +83,7 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
 
         mErrorTextView.setVisibility(View.GONE);
 
-        //getActivity().getActionBar().setTitle(getString(R.string.cloud_storage_1));
-
-        //getActivity().getActionBar().setBackgroundDrawable(new ColorDrawable(StorageManager.getAppThemeColor(getActivity())));
-
-        //if (Build.VERSION.SDK_INT>20)
-            //getActivity().getWindow().setStatusBarColor(Utilities.darkenColor(StorageManager.getAppThemeColor(getActivity())));
-
-        mNavigationManager.resetCloudStack();
+        getNavigationManager().reset("/");
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"
@@ -150,12 +138,6 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
         new RetrieveFilesTask().execute();
     }
 
-
-    public NavigationManager getNavigationManager()
-    {
-        return mNavigationManager;
-    }
-
     @Override
     public void onResume()
     {
@@ -170,6 +152,18 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
     @Override
     public void onRefresh() {
         refresh();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        getNavigationManager().popFromStack();
+        if (getNavigationManager().emptyStack())
+            return false;
+        else
+        {
+            refresh();
+            return true;
+        }
     }
 
     private class RetrieveFilesTask extends AsyncTask
@@ -188,7 +182,7 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
             DropboxAPI.Entry existingEntry = null;
 
             try {
-                existingEntry = mDBApi.metadata(mNavigationManager.getPathFromCloudStack(), 1000, null, true, null);
+                existingEntry = mDBApi.metadata((String)getNavigationManager().getValueFromStack(), 1000, null, true, null);
             }
             catch (Exception e)
             {

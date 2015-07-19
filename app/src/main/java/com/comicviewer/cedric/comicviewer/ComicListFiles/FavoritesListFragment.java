@@ -1,14 +1,15 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
+import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
@@ -39,15 +40,20 @@ public class FavoritesListFragment extends AbstractComicListFragment {
     }
 
     @Override
+    protected void handleArguments(Bundle args) {
+
+    }
+
+    @Override
     public void onResume()
     {
         super.onResume();
         if (StorageManager.getBooleanSetting(mApplicationContext, StorageManager.FOLDER_VIEW_ENABLED, true))
         {
-            if (NavigationManager.getInstance().favoriteStackEmpty())
+            if (getNavigationManager().emptyStack())
             {
                 mAdapter.clearList();
-                NavigationManager.getInstance().resetFavoriteStack();
+                getNavigationManager().reset(NavigationManager.ROOT);
             }
         }
     }
@@ -93,7 +99,7 @@ public class FavoritesListFragment extends AbstractComicListFragment {
     @Override
     void addShowFolderViewButton(boolean enable) {
         if (enable && getActivity()!=null) {
-            final Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+            final Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
             toolbar.removeView(mFolderViewToggleButton);
             mFolderViewToggleButton = new ImageView(getActivity());
             mFolderViewToggleButton.setAlpha(0.75f);
@@ -112,15 +118,13 @@ public class FavoritesListFragment extends AbstractComicListFragment {
                 public void onClick(View v) {
                     if (StorageManager.getBooleanSetting(getActivity(), StorageManager.FOLDER_VIEW_ENABLED, true)) {
                         StorageManager.setFolderEnabledSetting(getActivity(), false);
-                        NavigationManager.getInstance().resetFavoriteStack();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_folder));
-                        refresh();
                     } else {
                         StorageManager.setFolderEnabledSetting(getActivity(), true);
-                        NavigationManager.getInstance().resetFavoriteStack();
                         mFolderViewToggleButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_list));
-                        refresh();
                     }
+                    getNavigationManager().reset(NavigationManager.ROOT);
+                    refresh();
                 }
             });
 
@@ -133,7 +137,7 @@ public class FavoritesListFragment extends AbstractComicListFragment {
         else
         {
             if (getActivity()!=null) {
-                Toolbar toolbar = ((DrawerActivity) getActivity()).getToolbar();
+                Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
                 toolbar.removeView(mFolderViewToggleButton);
             }
         }
@@ -143,8 +147,20 @@ public class FavoritesListFragment extends AbstractComicListFragment {
     @Override
     public Map<String, String> getFiles() {
         if (StorageManager.getBooleanSetting(getActivity(), StorageManager.FOLDER_VIEW_ENABLED, true))
-            return FileLoader.searchComicsAndFolders(getActivity(), NavigationManager.getInstance().getPathFromFavoriteStack());
+            return FileLoader.searchComicsAndFolders(getActivity(), (String)getNavigationManager().getValueFromStack());
         else
             return FileLoader.searchComics(mApplicationContext);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        getNavigationManager().popFromStack();
+
+        if (!getNavigationManager().emptyStack()) {
+            refresh();
+            return true;
+        }
+
+        return false;
     }
 }

@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.ObjectType;
 import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -51,8 +51,6 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private OneDriveAdapter mAdapter;
     private Handler mHandler;
-
-    private NavigationManager mNavigationManager;
 
     private LiveAuthClient mOneDriveAuth;
     private LiveConnectClient mOneDriveClient;
@@ -87,26 +85,12 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
 
         mErrorTextView = (TextView) v.findViewById(R.id.error_text_view);
 
-        mNavigationManager = new NavigationManager();
-
         if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
         mErrorTextView.setVisibility(View.GONE);
 
-        //getActionBar().setTitle(getString(R.string.onedrive));
-
-        //getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
-
-        //if (Build.VERSION.SDK_INT>20)
-            //getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
-
-        mNavigationManager.resetCloudStackWithString("me/skydrive/files");
-
-        Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
-                + mCloudService.getUsername() + "\n"
-                + mCloudService.getEmail() + "\n"
-                + mCloudService.getToken());
+        getNavigationManager().reset("me/skydrive/files");
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.cloud_file_list);
 
@@ -139,18 +123,10 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
         return v;
     }
 
-
-
-
     public void refresh()
     {
         mAdapter.clear();
         readFolder();
-    }
-
-    public NavigationManager getNavigationManager()
-    {
-        return mNavigationManager;
     }
 
 
@@ -180,7 +156,7 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
             }
         });
 
-        mOneDriveClient.getAsync(mNavigationManager.getPathFromCloudStack(), new LiveOperationListener() {
+        mOneDriveClient.getAsync((String)getNavigationManager().getValueFromStack(), new LiveOperationListener() {
             public void onComplete(LiveOperation operation) {
                 JSONObject result = operation.getResult();
                 Log.d("Result", result.toString());
@@ -259,38 +235,15 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
         readFolder();
     }
 
-
-    /*
-    private class SetTaskDescriptionTask extends AsyncTask
-    {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(OneDriveActivity.this).build();
-                ImageLoader.getInstance().init(config);
-            }
-
-            ActivityManager.TaskDescription tdscr = null;
-
-            if (Build.VERSION.SDK_INT>20) {
-                try {
-                    ImageSize size = new ImageSize(64, 64);
-                    tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
-                            ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            PreferenceSetter.getAppThemeColor(OneDriveActivity.this));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (tdscr != null)
-                setTaskDescription(tdscr);
-
-
-            return null;
+    @Override
+    public boolean onBackPressed() {
+        getNavigationManager().popFromStack();
+        if (getNavigationManager().emptyStack())
+            return false;
+        else
+        {
+            refresh();
+            return true;
         }
     }
-    */
 }

@@ -45,6 +45,7 @@ public abstract class AbstractSettingsFragment extends PreferenceFragment {
         addClearSavedComicDataPreference();
         disableVolumeKeyPreference();
         addGoProPreference();
+        addMultiPanePreference();
         addArrowAnimationPreference();
 
         if (StorageManager.getBackgroundColorPreference(getActivity())!= getResources().getColor(R.color.WhiteBG))
@@ -57,6 +58,46 @@ public abstract class AbstractSettingsFragment extends PreferenceFragment {
             if (Build.VERSION.SDK_INT>20)
                 getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.BlueGrey));
         }
+    }
+
+    private void addMultiPanePreference() {
+
+        PreferenceCategory targetCategory = (PreferenceCategory) findPreference("LayoutCategory");
+
+        final CustomCheckBoxPreference multiPane = new CustomCheckBoxPreference(getActivity());
+
+
+        multiPane.setKey(StorageManager.MULTI_PANE);
+        multiPane.setTitle("Enable multi-pane layout on tablets");
+        multiPane.setDefaultValue(true);
+
+        multiPane.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, final Object newValue) {
+
+                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                        .title(getString(R.string.warning))
+                        .content(getString(R.string.restart_dialog))
+                        .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                        .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                        .positiveText(getString(R.string.accept))
+                        .negativeText(getString(R.string.cancel))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                StorageManager.saveBooleanSetting(getActivity(), StorageManager.MULTI_PANE, (Boolean) newValue);
+                                multiPane.setOnPreferenceChangeListener(null);
+                                getActivity().finish();
+                            }
+                        })
+                        .show();
+
+                return false;
+            }
+        });
+
+        targetCategory.addPreference(multiPane);
     }
 
     private void addArrowAnimationPreference() {

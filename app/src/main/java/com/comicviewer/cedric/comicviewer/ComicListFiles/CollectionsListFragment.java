@@ -1,20 +1,13 @@
 package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
+import android.os.Bundle;
 import android.view.View;
 
-import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.Model.Collection;
-import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
-import com.comicviewer.cedric.comicviewer.SearchFilter;
 import com.melnykov.fab.FloatingActionButton;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -24,14 +17,29 @@ import java.util.Map;
  */
 public class CollectionsListFragment extends AbstractComicListFragment{
 
-    public static CollectionsListFragment mSingleton;
     private String mCollectionName;
 
-    public static CollectionsListFragment getInstance()
+    public static CollectionsListFragment newInstance(String collectionName)
     {
-        if (mSingleton == null)
-            mSingleton = new CollectionsListFragment();
-        return mSingleton;
+        CollectionsListFragment f = new CollectionsListFragment();
+
+        Bundle args = new Bundle();
+        args.putString("CollectionName", collectionName);
+        f.setArguments(args);
+
+        return f;
+    }
+
+    public CollectionsListFragment()
+    {
+
+    }
+
+    @Override
+    protected void handleArguments(Bundle args) {
+
+        if (args.getString("CollectionName")!=null)
+            mCollectionName = args.getString("CollectionName");
     }
 
     @Override
@@ -43,8 +51,6 @@ public class CollectionsListFragment extends AbstractComicListFragment{
 
     @Override
     void setSearchFilters() {
-
-        mCollectionName = NavigationManager.getInstance().getPathFromCollectionStack();
 
         ArrayList<Collection> collections = StorageManager.getCollectionList(getActivity());
 
@@ -64,22 +70,13 @@ public class CollectionsListFragment extends AbstractComicListFragment{
     @Override
     public void onDetach()
     {
-        NavigationManager.getInstance().resetCollectionStack();
         super.onDetach();
     }
 
     @Override
     public void refresh()
     {
-        if (NavigationManager.getInstance().getPathFromCollectionStack().equals(NavigationManager.ROOT))
-        {
-            if (isAdded())
-                ((DrawerActivity)getActivity()).setFragment(CollectionsFragment.getInstance(),getString(R.string.collections));
-        }
-        else
-        {
-            super.refresh();
-        }
+        super.refresh();
     }
 
     @Override
@@ -92,4 +89,8 @@ public class CollectionsListFragment extends AbstractComicListFragment{
         return FileLoader.searchComics(mApplicationContext);
     }
 
+    @Override
+    public boolean onBackPressed() {
+        return false;
+    }
 }

@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.box.androidsdk.content.models.BoxItem;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
@@ -21,13 +22,13 @@ import java.util.ArrayList;
  */
 public class BoxAdapter extends RecyclerView.Adapter {
 
-    private BoxFragment mFragment;
+    private AbstractCloudServiceListFragment mFragment;
     private Context mContext;
     private ArrayList<BoxItem> mBoxItemList;
     private LayoutInflater mInflater;
     private CloudService mCloudService;
 
-    public BoxAdapter(BoxFragment fragment, CloudService cloudService)
+    public BoxAdapter(AbstractCloudServiceListFragment fragment, CloudService cloudService)
     {
         mFragment = fragment;
         mContext = fragment.getActivity();
@@ -83,7 +84,7 @@ public class BoxAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragment.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getBoxEntry().getId());
+                mFragment.getNavigationManager().pushToStack(cloudFolderViewHolder.getBoxEntry().getId());
                 mFragment.refresh();
             }
         });

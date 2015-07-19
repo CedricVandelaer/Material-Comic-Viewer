@@ -41,4 +41,8 @@ public class CollectionsFragment extends AbstractCollectionsFragment{
         });
     }
 
+    @Override
+    public boolean onBackPressed() {
+        return false;
+    }
 }

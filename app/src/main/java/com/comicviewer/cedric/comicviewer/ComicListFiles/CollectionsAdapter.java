@@ -6,12 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
-
-import org.json.JSONException;
 
 /**
  * Created by CV on 22/06/2015.
@@ -105,7 +103,7 @@ public class CollectionsAdapter extends RecyclerView.Adapter{
         vh.mCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavigationManager.getInstance().pushToCollectionStack(vh.getCollectionName());
+                mCollectionsFragment.getNavigationManager().pushToStack(vh.getCollectionName());
                 mCollectionsFragment.refresh();
             }
         });

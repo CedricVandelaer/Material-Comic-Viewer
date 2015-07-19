@@ -21,7 +21,7 @@ import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.Model.GoogleDriveObject;
 import com.comicviewer.cedric.comicviewer.Model.ObjectType;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -48,8 +48,6 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
     private RecyclerView mRecyclerView;
     private GoogleDriveAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
-    protected NavigationManager mNavigationManager;
 
     private final static String DRIVE_API_SCOPE_FILES = "https://www.googleapis.com/auth/drive.readonly";
     private final static String DRIVE_API_SCOPE_METADATA = "https://www.googleapis.com/auth/drive.metadata.readonly";
@@ -82,21 +80,15 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mHandler = new Handler();
-        mNavigationManager = new NavigationManager();
 
-        //new SetTaskDescriptionTask().execute();
 
         mCloudService = (CloudService) getArguments().getSerializable("CloudService");
 
-        //getActionBar().setTitle(getString(R.string.cloud_storage_2));
-        //getActionBar().setBackgroundDrawable(new ColorDrawable(PreferenceSetter.getAppThemeColor(this)));
-        //if (Build.VERSION.SDK_INT>20)
-            //getWindow().setStatusBarColor(Utilities.darkenColor(PreferenceSetter.getAppThemeColor(this)));
         StorageManager.setBackgroundColorPreference(getActivity());
         if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
-        mNavigationManager.resetCloudStackWithString("root");
+        getNavigationManager().reset(NavigationManager.ROOT);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new GoogleDriveAdapter(this, mCloudService);
@@ -161,12 +153,19 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
 
     public void refresh()
     {
-        new GetDriveFilesTask().execute(mNavigationManager.getPathFromCloudStack());
+        new GetDriveFilesTask().execute((String)getNavigationManager().getValueFromStack());
     }
 
     @Override
-    public NavigationManager getNavigationManager() {
-        return mNavigationManager;
+    public boolean onBackPressed() {
+        getNavigationManager().popFromStack();
+        if (getNavigationManager().emptyStack())
+            return false;
+        else
+        {
+            refresh();
+            return true;
+        }
     }
 
     private class GetDriveFilesTask extends AsyncTask<String, Void, String> {
@@ -278,43 +277,5 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
 
     }
 
-    public void navigateToPath(String fileId)
-    {
-        mNavigationManager.pushPathToCloudStack(fileId);
-        new GetDriveFilesTask().execute(mNavigationManager.getPathFromCloudStack());
-    }
 
-    /*
-    private class SetTaskDescriptionTask extends AsyncTask
-    {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
-                ImageLoader.getInstance().init(config);
-            }
-
-            ActivityManager.TaskDescription tdscr = null;
-
-            if (Build.VERSION.SDK_INT>20) {
-                try {
-                    ImageSize size = new ImageSize(64, 64);
-                    tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
-                            ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            PreferenceSetter.getAppThemeColor(getActivity()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (tdscr != null)
-                setTaskDescription(tdscr);
-
-
-            return null;
-        }
-    }
-    */
 }

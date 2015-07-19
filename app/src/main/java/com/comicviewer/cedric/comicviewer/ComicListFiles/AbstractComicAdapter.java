@@ -38,7 +38,7 @@ import com.comicviewer.cedric.comicviewer.ComicActions;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Info.InfoActivity;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Sorter;
@@ -479,7 +479,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             public void onClick(View v) {
                 Log.d("ItemClick", folderItemViewHolder.getFile().getAbsolutePath());
                 String path = folderItemViewHolder.getFile().getAbsolutePath();
-                NavigationManager.getInstance().pushPathToStack(path, mListFragment);
+                mListFragment.getNavigationManager().pushToStack(path);
                 mListFragment.refresh();
             }
         });

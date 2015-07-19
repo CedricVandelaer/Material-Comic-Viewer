@@ -47,6 +47,19 @@
         </activity>
         <activity android:name=".DrawerActivity" 
             android:theme="@style/NavigationDrawerTheme">
+
+        </activity>
+
+        <activity
+            android:name=".NewDrawerActivity"
+            android:theme="@style/NewDrawerTheme" >
+
+        </activity>
+
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

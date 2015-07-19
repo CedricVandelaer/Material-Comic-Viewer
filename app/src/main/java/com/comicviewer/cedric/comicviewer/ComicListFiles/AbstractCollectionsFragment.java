@@ -3,9 +3,9 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.graphics.Point;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -21,9 +21,10 @@ import android.view.ViewGroup;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.CollectionActions;
 import com.comicviewer.cedric.comicviewer.ComicActions;
-import com.comicviewer.cedric.comicviewer.DrawerActivity;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
-import com.comicviewer.cedric.comicviewer.NavigationManager;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
+import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -42,7 +43,7 @@ import java.util.Set;
 /**
  * A simple {@link Fragment} subclass.
  */
-public abstract class AbstractCollectionsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public abstract class AbstractCollectionsFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener{
 
     protected RecyclerView mRecyclerView;
     protected RecyclerView.LayoutManager mLayoutManager;
@@ -70,7 +71,7 @@ public abstract class AbstractCollectionsFragment extends Fragment implements Sw
         createRecyclerView(v);
         createFab(v);
 
-        NavigationManager.getInstance().resetCollectionStack();
+        getNavigationManager().reset(NavigationManager.ROOT);
         mAdapter = new CollectionsAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -160,13 +161,15 @@ public abstract class AbstractCollectionsFragment extends Fragment implements Sw
 
     public void refresh()
     {
-        if (NavigationManager.getInstance().getPathFromCollectionStack().equals(NavigationManager.ROOT)) {
+        if (getNavigationManager().getValueFromStack().equals(NavigationManager.ROOT)) {
             mAdapter.notifyDataSetChanged();
             setProgressSpinner(false);
         }
         else
         {
-            ((DrawerActivity)getActivity()).setFragment(CollectionsListFragment.getInstance(), NavigationManager.getInstance().getPathFromCollectionStack());
+            String path = (String)getNavigationManager().getValueFromStack();
+            getNavigationManager().popFromStack();
+            ((NewDrawerActivity)getActivity()).setFragment(CollectionsListFragment.newInstance(path), path);
         }
     }
 
