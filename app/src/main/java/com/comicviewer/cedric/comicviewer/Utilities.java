@@ -8,6 +8,8 @@ import android.graphics.Matrix;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
@@ -32,6 +34,30 @@ import net.lingala.zip4j.core.ZipFile;
  * Utilities for extension checking or filetype checking
  */
 public class Utilities {
+
+    public static ArrayList<View> getAllChildren(View v) {
+
+        if (!(v instanceof ViewGroup)) {
+            ArrayList<View> viewArrayList = new ArrayList<View>();
+            viewArrayList.add(v);
+            return viewArrayList;
+        }
+
+        ArrayList<View> result = new ArrayList<View>();
+
+        ViewGroup viewGroup = (ViewGroup) v;
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+
+            View child = viewGroup.getChildAt(i);
+
+            ArrayList<View> viewArrayList = new ArrayList<View>();
+            viewArrayList.add(v);
+            viewArrayList.addAll(getAllChildren(child));
+
+            result.addAll(viewArrayList);
+        }
+        return result;
+    }
 
     public static ArrayList<String> getStringsFromSet(Set<String> set)
     {

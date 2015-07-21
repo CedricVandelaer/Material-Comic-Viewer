@@ -90,7 +90,8 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
 
         mErrorTextView.setVisibility(View.GONE);
 
-        getNavigationManager().reset("me/skydrive/files");
+        if (getNavigationManager().emptyStack())
+            getNavigationManager().reset("me/skydrive/files");
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.cloud_file_list);
 

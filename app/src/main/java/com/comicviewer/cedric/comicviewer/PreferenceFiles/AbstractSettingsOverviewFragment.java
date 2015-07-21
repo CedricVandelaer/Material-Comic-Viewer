@@ -10,39 +10,29 @@ import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
 import com.comicviewer.cedric.comicviewer.R;
 import com.github.machinarius.preferencefragment.PreferenceFragment;
 
+import java.util.ArrayList;
+
 /**
  * Created by Cédric on 18/07/2015.
  */
-public abstract class AbstractSettingsOverviewFragment extends PreferenceFragment implements BaseNavigationInterface{
+public abstract class AbstractSettingsOverviewFragment extends AbstractSettingsFragment{
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setBackground();
-
-        addPreferencesFromResource(R.xml.basic_preferences);
-
         addLayoutSettings();
         addReadingSettings();
         addOtherSettings();
         addProNote();
-
-
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        setBackground();
     }
 
     abstract void addProNote();
 
     private void addLayoutSettings()
     {
-        Preference layoutCategory = new Preference(getActivity());
+        ColoredPreference layoutCategory = new ColoredPreference(getActivity(), getResources().getColor(R.color.Black));
 
         layoutCategory.setTitle(getString(R.string.layout_settings_category_title));
         layoutCategory.setIcon(R.drawable.ic_palette);
@@ -53,12 +43,12 @@ public abstract class AbstractSettingsOverviewFragment extends PreferenceFragmen
                 return true;
             }
         });
-        getPreferenceScreen().addPreference(layoutCategory);
+        addPreference(layoutCategory);
     }
 
     private void addReadingSettings()
     {
-        Preference readingCat = new Preference(getActivity());
+        ColoredPreference readingCat = new ColoredPreference(getActivity());
 
         readingCat.setIcon(R.drawable.ic_read);
 
@@ -70,12 +60,12 @@ public abstract class AbstractSettingsOverviewFragment extends PreferenceFragmen
                 return true;
             }
         });
-        getPreferenceScreen().addPreference(readingCat);
+        addPreference(readingCat);
     }
 
     private void addOtherSettings()
     {
-        Preference otherCat = new Preference(getActivity());
+        ColoredPreference otherCat = new ColoredPreference(getActivity());
 
         otherCat.setTitle(getString(R.string.other_settings));
         otherCat.setIcon(R.drawable.ic_settings_grey);
@@ -86,18 +76,7 @@ public abstract class AbstractSettingsOverviewFragment extends PreferenceFragmen
                 return true;
             }
         });
-        getPreferenceScreen().addPreference(otherCat);
+        addPreference(otherCat);
     }
 
-    protected void setBackground()
-    {
-        getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.WhiteBG));
-        if (Build.VERSION.SDK_INT>20)
-            getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.Black));
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        return false;
-    }
 }

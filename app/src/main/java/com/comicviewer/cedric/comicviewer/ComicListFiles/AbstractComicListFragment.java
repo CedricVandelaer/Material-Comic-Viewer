@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -21,7 +20,6 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,7 +27,6 @@ import android.widget.ImageView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
-//import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
@@ -47,11 +44,13 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by CV on 22/06/2015.
@@ -108,9 +107,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         initialiseRefresh(v);
 
         initialiseVariables(savedInstanceState);
-        //((DrawerActivity)getActivity()).changeToolbarColor(StorageManager.getAppThemeColor(getActivity()), StorageManager.getAppThemeColor(getActivity()));
 
-        // Inflate the layout for this fragment
         return v;
 
     }
@@ -159,11 +156,16 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     }
 
 
-    protected void showActionBarButtons(boolean enabled)
+    protected void showActionBarButtons(final boolean enabled)
     {
-        enableSearchBar(enabled);
-        enableSortingOptions(enabled);
-        addShowFolderViewButton(enabled);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                enableSearchBar(enabled);
+                enableSortingOptions(enabled);
+                addShowFolderViewButton(enabled);
+            }
+        });
 
     }
 
@@ -186,6 +188,13 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         setSearchFilters();
         if (mSearchComicsTask!=null) {
             mSearchComicsTask.cancel(false);
+            try {
+                mSearchComicsTask.get(3000, TimeUnit.MILLISECONDS);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
 
         if (mAdapter != null) {
@@ -308,6 +317,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     {
         super.onSaveInstanceState(savedState);
 
+        /*
         List<Object> currentList = mAdapter.getComicsAndFiles();
 
         for (int i=0;i<currentList.size();i++)
@@ -321,9 +331,8 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                 savedState.putParcelable("Comic "+ (i+1),(Comic) currentList.get(i));
             }
         }
-
-
         savedState.putBoolean("isRefreshing", mSwipeRefreshLayout.isRefreshing());
+        */
     }
 
     @Override
@@ -377,7 +386,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         if (getActivity() == null)
             return;
 
-        Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
+        final Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
 
         if (enabled) {
 
@@ -401,9 +410,9 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                 @Override
                 public boolean onClose() {
                     filterList("");
-                    if (mFolderViewToggleButton!=null)
+                    if (mFolderViewToggleButton != null)
                         mFolderViewToggleButton.setVisibility(View.VISIBLE);
-                    if (mSortButton!=null)
+                    if (mSortButton != null)
                         mSortButton.setVisibility(View.VISIBLE);
                     return false;
                 }
@@ -425,14 +434,15 @@ abstract public class AbstractComicListFragment extends BaseFragment {
             mSearchView.setOnSearchClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mSortButton!=null)
+                    if (mSortButton != null)
                         mSortButton.setVisibility(View.INVISIBLE);
-                    if (mFolderViewToggleButton!=null)
+                    if (mFolderViewToggleButton != null)
                         mFolderViewToggleButton.setVisibility(View.INVISIBLE);
                 }
             });
 
             toolbar.addView(mSearchView, layoutParamsCollapsed);
+
         }
         else
         {
@@ -463,11 +473,21 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                     showSortPopup();
                 }
             });
-            toolbar.addView(mSortButton, layoutParamsCollapsed);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    toolbar.addView(mSortButton, layoutParamsCollapsed);
+                }
+            });
         }
         else
         {
-            toolbar.removeView(mSortButton);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    toolbar.removeView(mSortButton);
+                }
+            });
         }
     }
 
@@ -552,8 +572,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
 
         mRecyclerView.setOnScrollListener(scrollListener);
@@ -570,7 +588,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         {
             for (int i=0;i<savedInstanceState.size();i++)
             {
-
                 if (savedInstanceState.getParcelable("Comic "+ (i+1))!=null) {
                     mAdapter.addObject(savedInstanceState.getParcelable("Comic " + (i + 1)));
                 }

@@ -300,7 +300,7 @@ public class ComicLoader {
                     color = context.getResources().getColor(R.color.WhiteBG);
                     primaryTextColor = context.getResources().getColor(R.color.Black);
                 } else if (cardColorSetting.equals(context.getString(R.string.card_color_setting_4))) {
-                    color = context.getResources().getColor(R.color.BlueGrey);
+                    color = context.getResources().getColor(R.color.BlueGreyVeryDark);
                     primaryTextColor = context.getResources().getColor(R.color.White);
                 } else if (cardColorSetting.equals(context.getString(R.string.app_theme_setting))) {
                     color = Utilities.darkenColor(StorageManager.getAppThemeColor(context));

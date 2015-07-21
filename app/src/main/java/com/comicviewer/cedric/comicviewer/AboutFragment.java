@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,7 +79,7 @@ public class AboutFragment extends BaseFragment {
         mChangelogButton = (ButtonFlat) v.findViewById(R.id.updates_button);
 
         if (StorageManager.getBackgroundColorPreference(getActivity()) == getResources().getColor(R.color.WhiteBG))
-            setTextColor(getResources().getColor(R.color.BlueGrey));
+            setTextColor(getResources().getColor(R.color.BlueGreyVeryDark));
         else
             setTextColor(getResources().getColor(R.color.White));
 

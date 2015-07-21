@@ -88,7 +88,8 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
         if (StorageManager.getBackgroundColorPreference(getActivity())==getResources().getColor(R.color.WhiteBG))
             mErrorTextView.setTextColor(getResources().getColor(R.color.Black));
 
-        getNavigationManager().reset(NavigationManager.ROOT);
+        if (getNavigationManager().emptyStack())
+            getNavigationManager().reset(NavigationManager.ROOT);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new GoogleDriveAdapter(this, mCloudService);

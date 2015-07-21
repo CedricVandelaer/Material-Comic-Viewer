@@ -4,7 +4,10 @@
     <color name="Teal">#009688</color>
     <color name="TealDark">#00796B</color>
     <color name="TealLight">#80CBC4</color>
-    <color name="BlueGrey">#263238</color>
+    <color name="BlueGreyLight">#90A4AE</color>
+    <color name="BlueGrey">#607D8B</color>
+    <color name="BlueGreyDark">#455A64</color>
+    <color name="BlueGreyVeryDark">#263238</color>
     <color name="Black">#000000</color>
     <color name="WhiteBG">#fff3f3f3</color>
     <color name="Blue">#2196F3</color>

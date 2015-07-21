@@ -21,15 +21,11 @@ import java.util.ArrayList;
 /**
  * Created by Cédric on 20/07/2015.
  */
-public abstract class AbstractOtherSettingsFragment extends PreferenceFragment implements BaseNavigationInterface
+public abstract class AbstractOtherSettingsFragment extends AbstractSettingsFragment
 {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setBackground();
-
-        addPreferencesFromResource(R.xml.basic_preferences);
 
         addUseRecentsSetting();
         addFilenameFormatSettings();
@@ -40,7 +36,7 @@ public abstract class AbstractOtherSettingsFragment extends PreferenceFragment i
     }
 
     private void addClearComicDataSetting() {
-        Preference clearDataPref = new Preference(getActivity());
+        ColoredPreference clearDataPref = new ColoredPreference(getActivity());
 
         clearDataPref.setKey("clearData");
         clearDataPref.setTitle("Clear comic data");
@@ -52,13 +48,13 @@ public abstract class AbstractOtherSettingsFragment extends PreferenceFragment i
                 return true;
             }
         });
-        getPreferenceScreen().addPreference(clearDataPref);
+        addPreference(clearDataPref);
     }
 
     protected abstract void addMangaModusSetting();
 
     private void addRemoveFilePathsSetting() {
-        Preference removePathsPreference = new Preference(getActivity());
+        ColoredPreference removePathsPreference = new ColoredPreference(getActivity());
 
         removePathsPreference.setTitle(getString(R.string.remove_filepaths_setting));
         removePathsPreference.setSummary(getString(R.string.path_preference_summary));
@@ -103,7 +99,7 @@ public abstract class AbstractOtherSettingsFragment extends PreferenceFragment i
         });
 
 
-        getPreferenceScreen().addPreference(removePathsPreference);
+        addPreference(removePathsPreference);
     }
 
     protected abstract void addUnhideSetting();
@@ -111,51 +107,13 @@ public abstract class AbstractOtherSettingsFragment extends PreferenceFragment i
     protected abstract void addFilenameFormatSettings();
 
     private void addUseRecentsSetting() {
-        CheckBoxPreference useRecentsPreference = new CheckBoxPreference(getActivity());
+        ColoredSwitchPreference useRecentsPreference = new ColoredSwitchPreference(getActivity());
         useRecentsPreference.setKey(StorageManager.USES_RECENTS);
         useRecentsPreference.setTitle(getString(R.string.recents_screen_setting));
         useRecentsPreference.setSummary(getString(R.string.recents_screen_setting_note));
         useRecentsPreference.setDefaultValue(true);
-        getPreferenceScreen().addPreference(useRecentsPreference);
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        setBackground();
+        addPreference(useRecentsPreference);
     }
 
 
-    @Override
-    public boolean onBackPressed() {
-        return false;
-    }
-
-    protected void setBackground()
-    {
-        getActivity().getWindow().getDecorView().setBackgroundColor(getActivity().getResources().getColor(R.color.WhiteBG));
-        if (Build.VERSION.SDK_INT>20)
-            getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.Black));
-    }
-
-    public void showBuyProDialog()
-    {
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title(getString(R.string.notice))
-                .content(getString(R.string.pro_version_notice))
-                .negativeText(getString(R.string.cancel))
-                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                .positiveText(getString(R.string.go_to_play_store))
-                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                .callback(new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                        Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse("market://details?id=com.comicviewer.cedric.comicviewer.pro") );
-                        startActivity(browse);
-                    }
-                }).show();
-
-    }
 }

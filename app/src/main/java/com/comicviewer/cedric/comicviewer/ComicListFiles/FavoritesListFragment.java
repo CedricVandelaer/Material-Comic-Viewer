@@ -132,12 +132,14 @@ public class FavoritesListFragment extends AbstractComicListFragment {
             int height = Utilities.getPixelValue(getActivity(), 32);
 
             final Toolbar.LayoutParams layoutParamsCollapsed = new Toolbar.LayoutParams(width,height, Gravity.RIGHT);
+
             toolbar.addView(mFolderViewToggleButton, layoutParamsCollapsed);
         }
         else
         {
             if (getActivity()!=null) {
-                Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
+                final Toolbar toolbar = ((NewDrawerActivity) getActivity()).getToolbar();
+
                 toolbar.removeView(mFolderViewToggleButton);
             }
         }

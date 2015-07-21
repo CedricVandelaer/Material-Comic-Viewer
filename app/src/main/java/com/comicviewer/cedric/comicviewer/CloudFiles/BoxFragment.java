@@ -119,7 +119,8 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
             @Override
             public void onCompleted(BoxResponse<BoxSession> boxResponse) {
                 if (boxResponse.isSuccess()) {
-                    getNavigationManager().reset("0");
+                    if (getNavigationManager().emptyStack())
+                        getNavigationManager().reset("0");
                     mBoxApiFolder = new BoxApiFolder(mSession);
                     new GetBoxFilesTask().execute();
                 }

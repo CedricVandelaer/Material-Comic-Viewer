@@ -1825,7 +1825,7 @@ public class StorageManager {
         
         if (bgcolor.equals(context.getString(R.string.backgroundcolor_setting1)))
         {
-            color = context.getResources().getColor(R.color.BlueGrey);
+            color = context.getResources().getColor(R.color.BlueGreyVeryDark);
         }
         else if (bgcolor.equals(context.getString(R.string.backgroundcolor_setting2)))
         {

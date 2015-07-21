@@ -18,7 +18,7 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 public class LayoutSettingsFragment extends AbstractLayoutSettingsFragment {
     @Override
     protected void addFabColorPreference() {
-        final ListPreference accentColorListPreference = new ListPreference(getActivity());
+        final ColoredListPreference accentColorListPreference = new ColoredListPreference(getActivity());
         accentColorListPreference.setKey(StorageManager.ACCENT_COLOR);
 
         CharSequence[] entries = {
@@ -60,17 +60,18 @@ public class LayoutSettingsFragment extends AbstractLayoutSettingsFragment {
             public boolean onPreferenceChange(Preference preference, final Object newValue) {
 
                 StorageManager.saveAppAccentColor(getActivity(), (CharSequence) newValue);
+                setPreferenceColors();
                 return false;
             }
         });
 
-        getPreferenceScreen().addPreference(accentColorListPreference);
+        addPreference(accentColorListPreference);
     }
 
     @Override
     protected void addAppThemeSettings() {
 
-        final ListPreference appThemeListPreference = new ListPreference(getActivity());
+        final ColoredListPreference appThemeListPreference = new ColoredListPreference(getActivity());
         appThemeListPreference.setKey(StorageManager.APP_THEME_COLOR);
 
         CharSequence[] entries = {
@@ -122,6 +123,6 @@ public class LayoutSettingsFragment extends AbstractLayoutSettingsFragment {
             }
         });
 
-        getPreferenceScreen().addPreference(appThemeListPreference);
+        addPreference(appThemeListPreference);
     }
 }

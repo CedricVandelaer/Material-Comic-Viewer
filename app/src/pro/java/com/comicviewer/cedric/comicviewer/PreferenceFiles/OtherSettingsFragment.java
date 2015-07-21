@@ -17,20 +17,20 @@ public class OtherSettingsFragment extends AbstractOtherSettingsFragment {
     @Override
     protected void addMangaModusSetting() {
 
-        CheckBoxPreference mangaPreference = new CheckBoxPreference(getActivity());
+        ColoredSwitchPreference mangaPreference = new ColoredSwitchPreference(getActivity());
 
         mangaPreference.setKey(StorageManager.MANGA_SETTING);
         mangaPreference.setSummary(getString(R.string.manga_setting_note));
         mangaPreference.setTitle(getString(R.string.manga_setting));
         mangaPreference.setDefaultValue(false);
 
-        getPreferenceScreen().addPreference(mangaPreference);
+        addPreference(mangaPreference);
     }
 
     @Override
     protected void addUnhideSetting() {
 
-        Preference unhideListPreference = new Preference(getActivity());
+        ColoredPreference unhideListPreference = new ColoredPreference(getActivity());
         unhideListPreference.setTitle(getString(R.string.unhide_setting));
 
         unhideListPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -67,13 +67,13 @@ public class OtherSettingsFragment extends AbstractOtherSettingsFragment {
             }
         });
 
-        getPreferenceScreen().addPreference(unhideListPreference);
+        addPreference(unhideListPreference);
     }
 
     @Override
     protected void addFilenameFormatSettings() {
 
-        ListPreference fileFormatList = new ListPreference(getActivity());
+        ColoredListPreference fileFormatList = new ColoredListPreference(getActivity());
 
         String[] entries = getActivity().getResources().getStringArray(R.array.File_formats);
 
@@ -92,6 +92,6 @@ public class OtherSettingsFragment extends AbstractOtherSettingsFragment {
         fileFormatList.setDialogTitle(getString(R.string.choose_file_format));
         fileFormatList.setDefaultValue(getActivity().getResources().getString(R.string.file_format_1));
 
-        getPreferenceScreen().addPreference(fileFormatList);
+        addPreference(fileFormatList);
     }
 }

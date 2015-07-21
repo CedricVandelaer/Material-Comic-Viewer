@@ -83,7 +83,8 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
 
         mErrorTextView.setVisibility(View.GONE);
 
-        getNavigationManager().reset("/");
+        if (getNavigationManager().emptyStack())
+            getNavigationManager().reset("/");
 
         Log.d("CloudBrowserActivity", mCloudService.getName() + "\n"
                 + mCloudService.getUsername() + "\n"

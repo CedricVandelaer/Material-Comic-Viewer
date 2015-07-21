@@ -1,12 +1,17 @@
 package com.comicviewer.cedric.comicviewer.FragmentNavigation;
 
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Stack;
 
 /**
  * Created by CV on 8/05/2015.
  * Class to manage file browser navigations
  */
-public class NavigationManager<T> {
+public class NavigationManager<T>{
 
     private Stack<T> mStack;
     public final static String ROOT = "root";
@@ -54,5 +59,52 @@ public class NavigationManager<T> {
         return mStack.empty();
     }
 
+    public int getStackSize()
+    {
+        return mStack.size();
+    }
 
+    public String toJSON()
+    {
+
+        JSONObject json = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
+        while(!mStack.empty()) {
+            jsonArray.put(mStack.pop());
+        }
+
+        try {
+            json.put("StackValues", jsonArray);
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+
+        return json.toString();
+    }
+
+    public static NavigationManager fromJSON(String jsonString)
+    {
+        NavigationManager manager = new NavigationManager();
+
+        try {
+            JSONArray values = new JSONArray();
+
+            JSONObject json = new JSONObject(jsonString);
+            values = json.getJSONArray("StackValues");
+
+            for (int i=values.length()-1;i>=0;i--)
+            {
+                manager.pushToStack(values.get(i));
+            }
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+
+        return manager;
+    }
 }

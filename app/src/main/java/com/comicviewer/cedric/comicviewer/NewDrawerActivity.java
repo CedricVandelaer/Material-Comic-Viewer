@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseNavigationInterface;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsFragment;
@@ -24,14 +25,11 @@ import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CurrentlyReadingFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
-import com.comicviewer.cedric.comicviewer.PreferenceFiles.AbstractSettingsOverviewFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsOverviewFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -67,8 +65,18 @@ public class NewDrawerActivity extends AppCompatActivity {
         new SimpleEula(this).show();
         startSetTaskDescription();
 
-        mDrawerTitleNavigation = new NavigationManager();
-        mDrawerSectionNavigation = new NavigationManager();
+        int selectedItem = 0;
+
+        if (savedInstanceState!=null)
+        {
+            mDrawerSectionNavigation = NavigationManager.fromJSON(savedInstanceState.getString("sectionNavigation"));
+            mDrawerTitleNavigation = NavigationManager.fromJSON(savedInstanceState.getString("sectionTitles"));
+            selectedItem = (int) mDrawerSectionNavigation.getValueFromStack();
+        }
+        else {
+            mDrawerTitleNavigation = new NavigationManager();
+            mDrawerSectionNavigation = new NavigationManager();
+        }
 
         StorageManager.setBackgroundColorPreference(this);
 
@@ -76,14 +84,6 @@ public class NewDrawerActivity extends AppCompatActivity {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
             ImageLoader.getInstance().init(config);
         }
-
-        int appThemeColor = StorageManager.getAppThemeColor(this);
-        int bgColor = StorageManager.getBackgroundColorPreference(this);
-        int iconColor;
-        if (bgColor == getResources().getColor(R.color.WhiteBG))
-            iconColor = getResources().getColor(R.color.BlueGrey);
-        else
-            iconColor = getResources().getColor(R.color.White);
 
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(StorageManager.getAppThemeColor(this)));
@@ -137,50 +137,23 @@ public class NewDrawerActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                         if (drawerItem != null && drawerItem instanceof Nameable) {
-                            Fragment f;
-                            switch (position) {
-                                case 0:
-                                    f = ComicListFragment.getInstance();
-                                    break;
-                                case 1:
-                                    f = CurrentlyReadingFragment.getInstance();
-                                    break;
-                                case 2:
-                                    f = FavoritesListFragment.getInstance();
-                                    break;
-                                case 3:
-                                    f = CollectionsFragment.getInstance();
-                                    break;
-                                case 4:
-                                    f = CloudFragment.getInstance();
-                                    break;
-                                case 5:
-                                    f = StatisticsFragment.newInstance();
-                                    break;
-                                case 6:
-                                    f = SynchronisationFragment.newInstance();
-                                    break;
-                                case 8:
-                                    f = new SettingsOverviewFragment();
-                                    break;
-                                case 9:
-                                    f = AboutFragment.newInstance();
-                                    break;
-                                default:
-                                    f = ComicListFragment.getInstance();
-                                    break;
-                            }
-                            setFragment(f, getString(((Nameable) drawerItem).getNameRes()), position);
+                            setFragment(getFragmentForPosition(position), getString(((Nameable) drawerItem).getNameRes()), position);
                         }
 
                         return false;
                     }
                 })
-                .withSelectedItem(0)
+                .withFireOnInitialOnClick(false)
+                .withSelectedItem(selectedItem)
                 .withSavedInstance(savedInstanceState)
                 .build();
         setDrawerColor();
-        setFragment(ComicListFragment.getInstance(), getString(R.string.all_comics), 0);
+
+        if (mDrawerSectionNavigation.emptyStack())
+            setFragment(ComicListFragment.getInstance(), getString(R.string.all_comics), 0);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setTitle((String)mDrawerTitleNavigation.getValueFromStack());
+
     }
 
     @Override
@@ -194,10 +167,24 @@ public class NewDrawerActivity extends AppCompatActivity {
             if (!f.onBackPressed()) {
                 mDrawerTitleNavigation.popFromStack();
                 mDrawerSectionNavigation.popFromStack();
-                if (mDrawerTitleNavigation.emptyStack())
-                    finish();
+                if (mDrawerTitleNavigation.emptyStack()) {
+                    MaterialDialog dialog = new MaterialDialog.Builder(this)
+                            .title("Confirm exit")
+                            .content("Do you want to exit Comic Viewer?")
+                            .positiveText(getString(R.string.confirm))
+                            .positiveColor(StorageManager.getAppThemeColor(this))
+                            .negativeText(getString(R.string.cancel))
+                            .negativeColor(StorageManager.getAppThemeColor(this))
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    super.onPositive(dialog);
+                                    finish();
+                                }
+                            }).show();
+                }
                 else {
-                    mDrawer.setSelection((Integer)mDrawerSectionNavigation.getValueFromStack(), false);
+                    mDrawer.setSelection((Integer) mDrawerSectionNavigation.getValueFromStack(), false);
                     getSupportFragmentManager().popBackStack();
                     if (getSupportActionBar() != null)
                         getSupportActionBar().setTitle((String)mDrawerTitleNavigation.getValueFromStack());
@@ -217,6 +204,44 @@ public class NewDrawerActivity extends AppCompatActivity {
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private Fragment getFragmentForPosition(int position)
+    {
+        Fragment f;
+        switch (position) {
+            case 0:
+                f = ComicListFragment.getInstance();
+                break;
+            case 1:
+                f = CurrentlyReadingFragment.getInstance();
+                break;
+            case 2:
+                f = FavoritesListFragment.getInstance();
+                break;
+            case 3:
+                f = CollectionsFragment.getInstance();
+                break;
+            case 4:
+                f = CloudFragment.getInstance();
+                break;
+            case 5:
+                f = StatisticsFragment.newInstance();
+                break;
+            case 6:
+                f = SynchronisationFragment.newInstance();
+                break;
+            case 8:
+                f = new SettingsOverviewFragment();
+                break;
+            case 9:
+                f = AboutFragment.newInstance();
+                break;
+            default:
+                f = ComicListFragment.getInstance();
+                break;
+        }
+        return f;
     }
 
     public void setFragment(Fragment fragment, String title, int section)
@@ -244,6 +269,15 @@ public class NewDrawerActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        mDrawer.saveInstanceState(outState);
+        outState.putString("sectionNavigation", mDrawerSectionNavigation.toJSON());
+        outState.putString("sectionTitles", mDrawerTitleNavigation.toJSON());
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         if (requestCode == CloudFragment.REQUEST_CODE_PICK_ACCOUNT
@@ -259,7 +293,7 @@ public class NewDrawerActivity extends AppCompatActivity {
         int appthemecolor = StorageManager.getAppThemeColor(this);
         int iconColor;
         if (color == getResources().getColor(R.color.WhiteBG))
-            iconColor = getResources().getColor(R.color.BlueGrey);
+            iconColor = getResources().getColor(R.color.BlueGreyVeryDark);
         else
             iconColor = getResources().getColor(R.color.White);
 
