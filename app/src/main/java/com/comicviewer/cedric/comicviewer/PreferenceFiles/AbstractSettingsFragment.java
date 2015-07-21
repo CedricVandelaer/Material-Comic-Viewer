@@ -46,8 +46,12 @@ public class AbstractSettingsFragment extends PreferenceFragment implements Base
     {
         mBackgroundColor = StorageManager.getBackgroundColorPreference(getActivity());
         getActivity().getWindow().getDecorView().setBackgroundColor(mBackgroundColor);
-        if (Build.VERSION.SDK_INT>20)
-            getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.Black));
+        if (Build.VERSION.SDK_INT>20) {
+            if (mBackgroundColor == getResources().getColor(R.color.WhiteBG))
+                getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.Black));
+            else
+                getActivity().getWindow().setNavigationBarColor(mBackgroundColor);
+        }
         setPreferenceColors();
     }
 
