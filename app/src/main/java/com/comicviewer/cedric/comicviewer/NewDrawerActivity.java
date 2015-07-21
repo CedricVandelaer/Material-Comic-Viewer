@@ -24,6 +24,7 @@ import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CurrentlyReadingFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.FavoritesListFragment;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.DrawerNavigator;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.SettingsOverviewFragment;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
@@ -47,8 +48,7 @@ public class NewDrawerActivity extends AppCompatActivity {
 
     private Drawer mDrawer;
     private Toolbar mToolbar;
-    private NavigationManager mDrawerTitleNavigation;
-    private NavigationManager mDrawerSectionNavigation;
+    private DrawerNavigator mDrawerNavigator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,8 @@ public class NewDrawerActivity extends AppCompatActivity {
 
         int selectedItem = 0;
 
+        mDrawerNavigator = DrawerNavigator.getInstance();
+        /*
         if (savedInstanceState!=null)
         {
             mDrawerSectionNavigation = NavigationManager.fromJSON(savedInstanceState.getString("sectionNavigation"));
@@ -77,6 +79,11 @@ public class NewDrawerActivity extends AppCompatActivity {
             mDrawerTitleNavigation = new NavigationManager();
             mDrawerSectionNavigation = new NavigationManager();
         }
+        */
+        if (!DrawerNavigator.getInstance().getSectionNavigator().emptyStack())
+            selectedItem = (int) DrawerNavigator.getInstance().getSectionNavigator().getValueFromStack();
+        else
+            selectedItem = 0;
 
         StorageManager.setBackgroundColorPreference(this);
 
@@ -149,10 +156,17 @@ public class NewDrawerActivity extends AppCompatActivity {
                 .build();
         setDrawerColor();
 
+        /*
         if (mDrawerSectionNavigation.emptyStack())
             setFragment(ComicListFragment.getInstance(), getString(R.string.all_comics), 0);
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle((String)mDrawerTitleNavigation.getValueFromStack());
+            */
+
+        if (DrawerNavigator.getInstance().getSectionNavigator().emptyStack())
+            setFragment(ComicListFragment.getInstance(), getString(R.string.all_comics), 0);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setTitle((String) DrawerNavigator.getInstance().getTitleNavigator().getValueFromStack());
 
     }
 
@@ -165,9 +179,11 @@ public class NewDrawerActivity extends AppCompatActivity {
             BaseNavigationInterface f = (BaseNavigationInterface) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
             if (!f.onBackPressed()) {
-                mDrawerTitleNavigation.popFromStack();
-                mDrawerSectionNavigation.popFromStack();
-                if (mDrawerTitleNavigation.emptyStack()) {
+                //mDrawerTitleNavigation.popFromStack();
+                //mDrawerSectionNavigation.popFromStack();
+                DrawerNavigator.getInstance().getTitleNavigator().popFromStack();
+                DrawerNavigator.getInstance().getSectionNavigator().popFromStack();
+                if (DrawerNavigator.getInstance().getSectionNavigator().emptyStack()) {
                     MaterialDialog dialog = new MaterialDialog.Builder(this)
                             .title("Confirm exit")
                             .content("Do you want to exit Comic Viewer?")
@@ -184,21 +200,43 @@ public class NewDrawerActivity extends AppCompatActivity {
                             }).show();
                 }
                 else {
-                    mDrawer.setSelection((Integer) mDrawerSectionNavigation.getValueFromStack(), false);
+                    //mDrawer.setSelection((Integer) mDrawerSectionNavigation.getValueFromStack(), false);
+                    mDrawer.setSelection((Integer) DrawerNavigator.getInstance().getSectionNavigator().getValueFromStack(), false);
                     getSupportFragmentManager().popBackStack();
                     if (getSupportActionBar() != null)
-                        getSupportActionBar().setTitle((String)mDrawerTitleNavigation.getValueFromStack());
+                        getSupportActionBar().setTitle((String)DrawerNavigator.getInstance().getTitleNavigator().getValueFromStack());
+                        //getSupportActionBar().setTitle((String)mDrawerTitleNavigation.getValueFromStack());
                 }
             }
         }
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle state)
+    {
+        super.onRestoreInstanceState(state);
+
+        /*
+        if (state!=null && state.getString("sectionNavigation")!=null && state.getString("sectionTitles")!=null)
+        {
+            mDrawerSectionNavigation = NavigationManager.fromJSON(state.getString("sectionNavigation"));
+            mDrawerTitleNavigation = NavigationManager.fromJSON(state.getString("sectionTitles"));
+        }
+        else {
+            mDrawerTitleNavigation = new NavigationManager();
+            mDrawerSectionNavigation = new NavigationManager();
+        }
+        */
     }
 
     public void setFragmentInSection(Fragment fragment, String title)
     {
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(title);
-        mDrawerTitleNavigation.pushToStack(title);
-        mDrawerSectionNavigation.pushToStack(mDrawer.getCurrentSelection());
+        //mDrawerTitleNavigation.pushToStack(title);
+        //mDrawerSectionNavigation.pushToStack(mDrawer.getCurrentSelection());
+        DrawerNavigator.getInstance().getTitleNavigator().pushToStack(title);
+        DrawerNavigator.getInstance().getSectionNavigator().pushToStack(mDrawer.getCurrentSelection());
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                 .replace(R.id.fragment_container, fragment)
@@ -248,11 +286,17 @@ public class NewDrawerActivity extends AppCompatActivity {
     {
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(title);
-        mDrawerTitleNavigation.pushToStack(title);
+        //mDrawerTitleNavigation.pushToStack(title);
+        DrawerNavigator.getInstance().getTitleNavigator().pushToStack(title);
         int previousSection = 0;
+        if (!DrawerNavigator.getInstance().getSectionNavigator().emptyStack())
+            previousSection = (int) DrawerNavigator.getInstance().getSectionNavigator().getValueFromStack();
+        DrawerNavigator.getInstance().getSectionNavigator().pushToStack(section);
+        /*
         if (!mDrawerSectionNavigation.emptyStack())
             previousSection = (int) mDrawerSectionNavigation.getValueFromStack();
         mDrawerSectionNavigation.pushToStack(section);
+        */
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (StorageManager.getBooleanSetting(this, StorageManager.SECTION_ANIMATION, true)) {
             if (section>=previousSection)
@@ -273,8 +317,8 @@ public class NewDrawerActivity extends AppCompatActivity {
     {
         super.onSaveInstanceState(outState);
         mDrawer.saveInstanceState(outState);
-        outState.putString("sectionNavigation", mDrawerSectionNavigation.toJSON());
-        outState.putString("sectionTitles", mDrawerTitleNavigation.toJSON());
+        //outState.putString("sectionNavigation", mDrawerSectionNavigation.toJSON());
+        //outState.putString("sectionTitles", mDrawerTitleNavigation.toJSON());
     }
 
     @Override
@@ -324,8 +368,14 @@ public class NewDrawerActivity extends AppCompatActivity {
             }
             mDrawer.setItem(drawerItem, i);
         }
+        /*
         if (!mDrawerSectionNavigation.emptyStack())
             mDrawer.setSelection((int)mDrawerSectionNavigation.getValueFromStack(), false);
+        else
+            mDrawer.setSelection(0, false);
+            */
+        if (!DrawerNavigator.getInstance().getSectionNavigator().emptyStack())
+            mDrawer.setSelection((int)DrawerNavigator.getInstance().getSectionNavigator().getValueFromStack(), false);
         else
             mDrawer.setSelection(0, false);
     }
@@ -390,6 +440,31 @@ public class NewDrawerActivity extends AppCompatActivity {
         imageView.setImageDrawable(layerDrawable);
 
         return imageView;
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
     }
 
     public void startSetTaskDescription()

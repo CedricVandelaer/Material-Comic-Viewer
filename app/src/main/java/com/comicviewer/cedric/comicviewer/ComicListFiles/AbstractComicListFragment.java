@@ -164,6 +164,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                 enableSearchBar(enabled);
                 enableSortingOptions(enabled);
                 addShowFolderViewButton(enabled);
+
             }
         });
 
