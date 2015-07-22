@@ -366,7 +366,7 @@ public class CloudFragment extends BaseFragment implements SwipeRefreshLayout.On
         String[] accountTypes = new String[]{"com.google"};
         Intent intent = AccountPicker.newChooseAccountIntent(null, null,
                 accountTypes, false, null, null, null, null);
-        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+        getActivity().startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
     }
 
     private void addDropboxAccount() {

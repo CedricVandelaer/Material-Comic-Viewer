@@ -22,9 +22,9 @@ public abstract class BaseFragment extends Fragment implements BaseNavigationInt
     }
 
     @Override
-    public void onActivityCreated(Bundle savedState)
+    public void onCreate(Bundle savedState)
     {
-        super.onActivityCreated(savedState);
+        super.onCreate(savedState);
 
         if (savedState!=null && savedState.getString("NavigationManager")!=null)
             mNavigationManager = NavigationManager.fromJSON(savedState.getString("NavigationManager"));
