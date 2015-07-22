@@ -159,11 +159,11 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
 
     @Override
     public boolean onBackPressed() {
-        getNavigationManager().popFromStack();
-        if (getNavigationManager().emptyStack())
+        if (getNavigationManager().hasOneElementOrLess())
             return false;
         else
         {
+            getNavigationManager().popFromStack();
             refresh();
             return true;
         }

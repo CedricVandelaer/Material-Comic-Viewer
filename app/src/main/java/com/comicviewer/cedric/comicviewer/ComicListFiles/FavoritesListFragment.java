@@ -156,9 +156,8 @@ public class FavoritesListFragment extends AbstractComicListFragment {
 
     @Override
     public boolean onBackPressed() {
-        getNavigationManager().popFromStack();
-
-        if (!getNavigationManager().emptyStack()) {
+        if (!getNavigationManager().hasOneElementOrLess()) {
+            getNavigationManager().popFromStack();
             refresh();
             return true;
         }

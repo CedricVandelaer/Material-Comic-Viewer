@@ -241,6 +241,9 @@ public class ComicPageFragment extends Fragment {
                 }
             });
         }
+
+
+
         return rootView;
     }
 

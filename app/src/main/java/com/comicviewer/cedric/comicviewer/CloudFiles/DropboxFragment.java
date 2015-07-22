@@ -157,11 +157,11 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
 
     @Override
     public boolean onBackPressed() {
-        getNavigationManager().popFromStack();
-        if (getNavigationManager().emptyStack())
+        if (getNavigationManager().hasOneElementOrLess())
             return false;
         else
         {
+            getNavigationManager().popFromStack();
             refresh();
             return true;
         }

@@ -238,11 +238,11 @@ public class OneDriveFragment extends AbstractCloudServiceListFragment implement
 
     @Override
     public boolean onBackPressed() {
-        getNavigationManager().popFromStack();
-        if (getNavigationManager().emptyStack())
+        if (getNavigationManager().hasOneElementOrLess())
             return false;
         else
         {
+            getNavigationManager().popFromStack();
             refresh();
             return true;
         }

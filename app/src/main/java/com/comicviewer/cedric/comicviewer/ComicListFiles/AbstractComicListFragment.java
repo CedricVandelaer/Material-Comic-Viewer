@@ -347,7 +347,10 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     @Override
     public void onResume()
     {
+        Log.d("AbstractComicList", "stack size: "+getNavigationManager().getStackSize());
+
         super.onResume();
+
         setPreferences();
 
         showActionBarButtons(true);
@@ -461,12 +464,9 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                     showSortPopup();
                 }
             });
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    toolbar.addView(mSortButton, layoutParamsCollapsed);
-                }
-            });
+
+            toolbar.addView(mSortButton, layoutParamsCollapsed);
+
         }
         else
         {
@@ -559,6 +559,8 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(vSpace, hSpace, columnCount));
 
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+
 
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
 

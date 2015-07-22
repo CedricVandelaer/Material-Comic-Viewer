@@ -129,7 +129,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         mPageNumberSetting = StorageManager.getPageNumberSetting(this);
 
         mPager =  (ComicViewPager) findViewById(R.id.comicpager);
-        mPager.setOffscreenPageLimit(6);
+        mPager.setOffscreenPageLimit(4);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
@@ -319,7 +319,6 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             hideSystemUI();
             setLayoutParams(configuration);
         }
-
 
         if (mFab.isVisible())
             mFab.hide(true);

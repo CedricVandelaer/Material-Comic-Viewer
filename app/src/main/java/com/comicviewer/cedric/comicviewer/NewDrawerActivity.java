@@ -20,6 +20,8 @@ import android.widget.ImageView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
+import com.comicviewer.cedric.comicviewer.ComicListFiles.AbstractComicListFragment;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseNavigationInterface;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.CollectionsFragment;
 import com.comicviewer.cedric.comicviewer.ComicListFiles.ComicListFragment;
@@ -49,7 +51,7 @@ public class NewDrawerActivity extends AppCompatActivity {
 
     private Drawer mDrawer;
     private Toolbar mToolbar;
-    private DrawerNavigator mDrawerNavigator;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,15 +70,9 @@ public class NewDrawerActivity extends AppCompatActivity {
 
         int selectedItem = 0;
 
-        mDrawerNavigator = DrawerNavigator.getInstance();
-
         if (DrawerNavigator.getInstance().hasNoSection()) {
             setFragment(ComicListFragment.getInstance(), getString(R.string.all_comics), 0);
             selectedItem = DrawerNavigator.getInstance().getCurrentSectionNumber();
-        }
-        else
-        {
-            getSupportFragmentManager().getFragment(savedInstanceState, "fragment");
         }
 
 
@@ -278,7 +274,6 @@ public class NewDrawerActivity extends AppCompatActivity {
     {
         super.onSaveInstanceState(outState);
         mDrawer.saveInstanceState(outState);
-        getSupportFragmentManager().putFragment(outState, "fragment",getSupportFragmentManager().findFragmentById(R.id.fragment_container));
     }
 
     @Override
@@ -398,21 +393,24 @@ public class NewDrawerActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause()
-    {
+    protected void onPause() {
+
         super.onPause();
+
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (f instanceof BaseFragment)
+            DrawerNavigator.getInstance().setTempNavigationManager(((BaseFragment) f).getNavigationManager());
     }
 
     @Override
-    public void onStop()
-    {
-        super.onStop();
-    }
+    protected void onResume() {
 
-    @Override
-    public void onResume()
-    {
         super.onResume();
+
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (f instanceof BaseFragment && DrawerNavigator.getInstance().hasTempNavigationManager()) {
+            ((BaseFragment) f).setNavigationManager(DrawerNavigator.getInstance().getTempNavigationManager());
+        }
 
     }
 

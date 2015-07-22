@@ -64,6 +64,8 @@ public class NavigationManager<T>{
         return mStack.size();
     }
 
+    public boolean hasOneElementOrLess(){return mStack.size() <= 1;}
+
     public String toJSON()
     {
 

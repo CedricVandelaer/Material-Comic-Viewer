@@ -154,11 +154,11 @@ public class BoxFragment extends AbstractCloudServiceListFragment implements Swi
     @Override
     public boolean onBackPressed() {
 
-        getNavigationManager().popFromStack();
-        if (getNavigationManager().emptyStack())
+        if (getNavigationManager().hasOneElementOrLess())
             return false;
         else
         {
+            getNavigationManager().popFromStack();
             refresh();
             return true;
         }

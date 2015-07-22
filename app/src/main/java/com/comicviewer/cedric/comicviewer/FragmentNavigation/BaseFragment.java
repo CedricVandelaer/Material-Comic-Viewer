@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer.FragmentNavigation;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 /**
  * Created by Cédric on 19/07/2015.
@@ -12,6 +13,8 @@ public abstract class BaseFragment extends Fragment implements BaseNavigationInt
 
     public NavigationManager getNavigationManager(){return mNavigationManager;}
 
+    public void setNavigationManager(NavigationManager navigationManager){mNavigationManager = navigationManager;}
+
     abstract public boolean onBackPressed();
 
     @Override
@@ -20,6 +23,7 @@ public abstract class BaseFragment extends Fragment implements BaseNavigationInt
         super.onSaveInstanceState(outstate);
         outstate.putString("NavigationManager", mNavigationManager.toJSON());
     }
+
 
     @Override
     public void onCreate(Bundle savedState)
@@ -31,6 +35,15 @@ public abstract class BaseFragment extends Fragment implements BaseNavigationInt
         else if (mNavigationManager == null)
         {
             mNavigationManager = new NavigationManager();
+            Log.d("BaseFragment", "created new NavigationManager");
+
         }
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        Log.d("BaseFragment", "stack size: "+mNavigationManager.getStackSize());
     }
 }

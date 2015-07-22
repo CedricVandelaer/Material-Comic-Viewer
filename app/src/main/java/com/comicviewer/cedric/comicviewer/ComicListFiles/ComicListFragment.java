@@ -2,11 +2,11 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 
-//import com.comicviewer.cedric.comicviewer.DrawerActivity;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
@@ -45,15 +45,20 @@ public class ComicListFragment extends AbstractComicListFragment {
     @Override
     public void onResume()
     {
+        Log.d("ComicListFragment", "stack size: " + getNavigationManager().getStackSize());
+
         super.onResume();
         if (StorageManager.getBooleanSetting(mApplicationContext, StorageManager.FOLDER_VIEW_ENABLED, true))
         {
+
             if (getNavigationManager().emptyStack())
             {
                 mAdapter.clearList();
                 getNavigationManager().reset(NavigationManager.ROOT);
             }
+
         }
+
     }
 
     @Override
@@ -132,9 +137,9 @@ public class ComicListFragment extends AbstractComicListFragment {
     @Override
     public boolean onBackPressed() {
 
-        getNavigationManager().popFromStack();
 
-        if (!getNavigationManager().emptyStack()) {
+        if (!getNavigationManager().hasOneElementOrLess()) {
+            getNavigationManager().popFromStack();
             refresh();
             return true;
         }

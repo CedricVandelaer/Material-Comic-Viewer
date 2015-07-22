@@ -9,6 +9,8 @@ public class DrawerNavigator {
 
     private NavigationManager mDrawerTitleNavigation;
     private NavigationManager mDrawerSectionNavigation;
+    private String mTempNavigationManager = null;
+
 
     public static DrawerNavigator getInstance()
     {
@@ -74,5 +76,22 @@ public class DrawerNavigator {
     public boolean hasNoSection()
     {
         return (mDrawerSectionNavigation.getStackSize() == 0);
+    }
+
+    public NavigationManager getTempNavigationManager()
+    {
+        NavigationManager manager = NavigationManager.fromJSON(mTempNavigationManager);
+        mTempNavigationManager = null;
+        return manager;
+    }
+
+    public boolean hasTempNavigationManager()
+    {
+        return mTempNavigationManager != null;
+    }
+
+    public void setTempNavigationManager(NavigationManager navigationManager)
+    {
+        mTempNavigationManager = navigationManager.toJSON();
     }
 }
