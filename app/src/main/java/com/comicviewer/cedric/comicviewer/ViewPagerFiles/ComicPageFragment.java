@@ -281,8 +281,10 @@ public class ComicPageFragment extends Fragment {
                             return;
                         if (StorageManager.getBooleanSetting(getActivity(), StorageManager.ROTATE_LANDSCAPE_PAGE, false) && mIsRotated)
                         {
-                            mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
-                            mIsRotated = false;
+                            if (mBitmap!=null) {
+                                mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
+                                mIsRotated = false;
+                            }
                         }
 
                         mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -295,7 +297,7 @@ public class ComicPageFragment extends Fragment {
             }
             else if(StorageManager.getBooleanSetting(getActivity(), StorageManager.ROTATE_LANDSCAPE_PAGE, false))
             {
-                if (mFullscreenComicView.getDrawable().getIntrinsicWidth()>mFullscreenComicView.getDrawable().getIntrinsicHeight()
+                if (mFullscreenComicView.getDrawable()!=null && mFullscreenComicView.getDrawable().getIntrinsicWidth()>mFullscreenComicView.getDrawable().getIntrinsicHeight()
                         && !mIsRotated)
                 {
                     mHandler.postDelayed(new Runnable() {
@@ -303,8 +305,10 @@ public class ComicPageFragment extends Fragment {
                         public void run() {
                             if (getActivity()==null)
                                 return;
-                            mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap,90));
-                            mIsRotated = true;
+                            if (mBitmap!=null) {
+                                mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 90));
+                                mIsRotated = true;
+                            }
 
                             if (StorageManager.getBooleanSetting(getActivity(), StorageManager.WIDTH_AUTO_FIT_SETTING, true))
                             {
@@ -357,7 +361,7 @@ public class ComicPageFragment extends Fragment {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (getActivity()==null)
+                            if (getActivity() == null)
                                 return;
                             if (StorageManager.getBooleanSetting(getActivity(), StorageManager.ROTATE_LANDSCAPE_PAGE, false) && mIsRotated) {
                                 mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
@@ -504,8 +508,10 @@ public class ComicPageFragment extends Fragment {
     public void onDestroyView()
     {
         super.onDestroyView();
-        if (mBitmap!=null)
+        if (mBitmap != null && !mBitmap.isRecycled()) {
             mBitmap.recycle();
+            mBitmap = null;
+        }
     }
 
 }
