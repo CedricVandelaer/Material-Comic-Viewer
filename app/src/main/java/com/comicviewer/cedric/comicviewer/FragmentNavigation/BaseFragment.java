@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment;
  */
 public abstract class BaseFragment extends Fragment implements BaseNavigationInterface {
 
-    private NavigationManager mNavigationManager = new NavigationManager();
+    private NavigationManager mNavigationManager;
 
     public NavigationManager getNavigationManager(){return mNavigationManager;}
 
@@ -22,11 +22,15 @@ public abstract class BaseFragment extends Fragment implements BaseNavigationInt
     }
 
     @Override
-    public void onCreate(Bundle savedState)
+    public void onActivityCreated(Bundle savedState)
     {
-        super.onCreate(savedState);
+        super.onActivityCreated(savedState);
 
         if (savedState!=null && savedState.getString("NavigationManager")!=null)
             mNavigationManager = NavigationManager.fromJSON(savedState.getString("NavigationManager"));
+        else if (mNavigationManager == null)
+        {
+            mNavigationManager = new NavigationManager();
+        }
     }
 }

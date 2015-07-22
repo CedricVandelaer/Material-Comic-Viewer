@@ -23,13 +23,56 @@ public class DrawerNavigator {
         mDrawerTitleNavigation = new NavigationManager();
     }
 
-    public NavigationManager getSectionNavigator()
+    protected NavigationManager getSectionNavigator()
     {
         return mDrawerSectionNavigation;
     }
 
-    public NavigationManager getTitleNavigator()
+    protected NavigationManager getTitleNavigator()
     {
         return mDrawerTitleNavigation;
+    }
+
+    public void pushSection(String title, int section)
+    {
+        mDrawerTitleNavigation.pushToStack(title);
+        mDrawerSectionNavigation.pushToStack(section);
+    }
+
+    public void popSection()
+    {
+        mDrawerTitleNavigation.popFromStack();
+        mDrawerSectionNavigation.popFromStack();
+    }
+
+    public int getCurrentSectionNumber()
+    {
+        if (mDrawerSectionNavigation.emptyStack())
+            return -1;
+
+        return (int) mDrawerSectionNavigation.getValueFromStack();
+    }
+
+    public String getCurrentSectionTitle()
+    {
+        if (mDrawerSectionNavigation.emptyStack())
+            return null;
+        return (String) mDrawerTitleNavigation.getValueFromStack();
+    }
+
+    public void clearSections()
+    {
+        mDrawerSectionNavigation.reset();
+        mDrawerTitleNavigation.reset();
+    }
+
+    public boolean isLastSection()
+    {
+        return (mDrawerSectionNavigation.getStackSize() <= 1);
+    }
+
+    public boolean hasNoSection()
+    {
+        return (mDrawerSectionNavigation.getStackSize() == 0);
     }
 }

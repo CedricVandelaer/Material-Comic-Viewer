@@ -126,12 +126,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     protected class SearchComicsTask extends AsyncTask {
 
         @Override
-        protected void onPreExecute()
-        {
-
-        }
-
-        @Override
         protected Object doInBackground(Object[] params) {
 
             searchComics();
@@ -139,12 +133,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
             mSearchComicsTask = null;
 
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Object object)
-        {
-
         }
 
     }
@@ -362,7 +350,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         super.onResume();
         setPreferences();
 
-
         showActionBarButtons(true);
 
         if (isFiltered)
@@ -531,8 +518,9 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         // use a linear layout manager
         int height;
 
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+
         if (StorageManager.getCardAppearanceSetting(getActivity()).equals(getActivity().getString(R.string.card_size_setting_3))) {
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
             height = size.y;
@@ -543,7 +531,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
             height = 0;
         }
 
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
         float density  = getResources().getDisplayMetrics().density;
@@ -583,7 +570,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     {
         mAdapter = new ComicAdapter(this, mMultiSelector);
         mRecyclerView.setAdapter(mAdapter);
-
 
         if (savedInstanceState!=null)
         {
@@ -645,10 +631,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
             mRecyclerView.setAdapter(mAdapter);
             isFiltered = false;
         }
-
     }
-
-
 
     public List<String> getFileNamesFromList(List<Object> comicList)
     {
