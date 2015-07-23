@@ -30,6 +30,7 @@ import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.FileDialog;
 import com.comicviewer.cedric.comicviewer.FileLoader;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
+import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
@@ -37,6 +38,8 @@ import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PauseOnScrollListener;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PreCachingLayoutManager;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.SlideLeftAnimator;
+import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.SlideRightAnimator;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.melnykov.fab.FloatingActionButton;
@@ -44,13 +47,15 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
+import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
 
 /**
  * Created by CV on 22/06/2015.
@@ -187,6 +192,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         }
 
         if (mAdapter != null) {
+            prepareForAdapterChange();
             mAdapter.clearList();
 
             mSearchComicsTask = new SearchComicsTask();
@@ -306,22 +312,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     {
         super.onSaveInstanceState(savedState);
 
-        /*
-        List<Object> currentList = mAdapter.getComicsAndFiles();
-
-        for (int i=0;i<currentList.size();i++)
-        {
-            if (currentList.get(i) instanceof File)
-            {
-                savedState.putSerializable("Folder "+ (i+1), (File)currentList.get(i));
-            }
-            else if (currentList.get(i) instanceof Comic)
-            {
-                savedState.putParcelable("Comic "+ (i+1),(Comic) currentList.get(i));
-            }
-        }
-        savedState.putBoolean("isRefreshing", mSwipeRefreshLayout.isRefreshing());
-        */
     }
 
     @Override
@@ -347,7 +337,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     @Override
     public void onResume()
     {
-        Log.d("AbstractComicList", "stack size: "+getNavigationManager().getStackSize());
+        Log.d("AbstractComicList", "stack size: " + getNavigationManager().getStackSize());
 
         super.onResume();
 
@@ -561,7 +551,6 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
-
         PauseOnScrollListener scrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, false);
 
         mRecyclerView.setOnScrollListener(scrollListener);
@@ -572,6 +561,8 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     {
         mAdapter = new ComicAdapter(this, mMultiSelector);
         mRecyclerView.setAdapter(mAdapter);
+
+        prepareForAdapterChange();
 
         if (savedInstanceState!=null)
         {
@@ -684,6 +675,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
 
         boolean hasToLoad = false;
 
+
         for (String str:treemap.keySet()) {
             if (mSearchComicsTask != null && mSearchComicsTask.isCancelled()) {
                 mAdapter.clearList();
@@ -783,6 +775,30 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                 return false;
         }
         return true;
+    }
+
+    private void prepareForAdapterChange()
+    {
+
+            if (getNavigationManager().getState() == NavigationManager.NAVIGATION_STATE.NEUTRAL
+                    || isFiltered)
+            {
+                mRecyclerView.setItemAnimator(null);
+            }
+            else if (getNavigationManager().getState() == NavigationManager.NAVIGATION_STATE.DOWN)
+            {
+                mRecyclerView.setItemAnimator(new SlideLeftAnimator());
+            }
+            else if (getNavigationManager().getState() == NavigationManager.NAVIGATION_STATE.UP)
+            {
+                mRecyclerView.setItemAnimator(new SlideRightAnimator());
+            }
+            if (mRecyclerView.getItemAnimator()!=null) {
+                mRecyclerView.getItemAnimator().setAddDuration(150);
+                mRecyclerView.getItemAnimator().setRemoveDuration(150);
+            }
+
+
     }
 
 }

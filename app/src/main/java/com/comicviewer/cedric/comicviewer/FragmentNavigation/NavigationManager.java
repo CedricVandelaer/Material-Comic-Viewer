@@ -14,6 +14,9 @@ import java.util.Stack;
 public class NavigationManager<T>{
 
     private Stack<T> mStack;
+    private NAVIGATION_STATE mState;
+
+    public enum NAVIGATION_STATE {DOWN, UP, NEUTRAL}
     public final static String ROOT = "root";
 
     public NavigationManager()
@@ -24,26 +27,40 @@ public class NavigationManager<T>{
     public void reset()
     {
         mStack.clear();
+        mState = NAVIGATION_STATE.NEUTRAL;
     }
 
     public void reset(T initialValue)
     {
         mStack.clear();
         mStack.push(initialValue);
+        mState = NAVIGATION_STATE.NEUTRAL;
     }
 
 
     public void pushToStack(T value)
     {
+        mState = NAVIGATION_STATE.DOWN;
         mStack.push(value);
     }
 
     public T popFromStack()
     {
+        mState = NAVIGATION_STATE.UP;
         if (!mStack.empty())
             return mStack.pop();
         else
             return null;
+    }
+
+    protected void setState(NAVIGATION_STATE state)
+    {
+        mState = state;
+    }
+
+    public NAVIGATION_STATE getState()
+    {
+        return mState;
     }
 
     public T getValueFromStack()
@@ -107,6 +124,7 @@ public class NavigationManager<T>{
             e.printStackTrace();
         }
 
+        manager.setState(NAVIGATION_STATE.NEUTRAL);
         return manager;
     }
 }
