@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -533,7 +534,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         if (dpWidth>=1280)
         {
 
-            if (StorageManager.getBooleanSetting(getActivity(),StorageManager.MULTI_PANE, true))
+            if (StorageManager.getBooleanSetting(getActivity(),StorageManager.MULTI_PANE, true) && (Build.VERSION.SDK_INT>20))
                 columnCount = 2;
             else
                 columnCount = 3;
@@ -542,7 +543,8 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         else if (dpWidth>=598)
         {
             if (StorageManager.getBooleanSetting(getActivity(),StorageManager.MULTI_PANE, true)
-                    && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                    && (Build.VERSION.SDK_INT>20))
                 columnCount = 1;
             else
                 columnCount = 2;

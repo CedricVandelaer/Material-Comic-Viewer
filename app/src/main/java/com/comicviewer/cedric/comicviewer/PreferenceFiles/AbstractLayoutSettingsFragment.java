@@ -117,6 +117,7 @@ public abstract class AbstractLayoutSettingsFragment extends AbstractSettingsFra
 
         multiPane.setKey(StorageManager.MULTI_PANE);
         multiPane.setTitle("Enable multi-pane layout on tablets");
+        multiPane.setSummary("Note: only works on lollipop devices");
         multiPane.setDefaultValue(true);
 
         addPreference(multiPane);

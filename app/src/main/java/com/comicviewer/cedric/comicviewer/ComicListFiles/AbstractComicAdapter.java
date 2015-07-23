@@ -53,6 +53,7 @@ import com.melnykov.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -249,6 +250,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 .cacheOnDisc(true)
                 .considerExifParams(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
                 .build();
         mHandler = new Handler();
         this.mInflater = (LayoutInflater) context.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -538,6 +540,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder itemViewHolder, final int position) {
 
+
         if (mComicList.get(position) instanceof Comic) {
 
             ComicItemViewHolder comicItemViewHolder = (ComicItemViewHolder) itemViewHolder;
@@ -557,7 +560,6 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             } else {
                 initialiseCardBg(comicItemViewHolder, position);
             }
-
 
 
             if (StorageManager.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
@@ -1077,7 +1079,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 comicItemViewHolder.mCardView.setCardBackgroundColor(comic.getComicColor());
             }
             if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mListFragment.getActivity()).build();
+                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mListFragment.getActivity())
+                        .build();
                 ImageLoader.getInstance().init(config);
             }
 

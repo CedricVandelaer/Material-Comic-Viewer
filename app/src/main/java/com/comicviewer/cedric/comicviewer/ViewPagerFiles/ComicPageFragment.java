@@ -40,7 +40,7 @@ import java.util.List;
 public class ComicPageFragment extends Fragment {
 
     // The imageview for the comic
-    private TouchImageView mFullscreenComicView;
+    public TouchImageView mFullscreenComicView;
 
     // The path to the .cbr file (Directory + filename)
     private String mComicArchivePath;
@@ -60,7 +60,7 @@ public class ComicPageFragment extends Fragment {
 
     private Handler mHandler;
 
-    private Bitmap mBitmap;
+    public Bitmap mBitmap;
     private boolean mIsRotated=false;
 
     public static ComicPageFragment newInstance(String comicPath, String pageFileName, int page)
@@ -133,7 +133,8 @@ public class ComicPageFragment extends Fragment {
                         //if (mSpinner != null)
                             //mSpinner.setVisibility(View.GONE);
 
-                        mBitmap = loadedImage;
+                        if (StorageManager.getBooleanSetting(getActivity(), StorageManager.ROTATE_LANDSCAPE_PAGE, false))
+                            mBitmap = loadedImage;
 
                         if (getActivity()!=null) {
                             ((AbstractDisplayComicActivity) getActivity()).setPagerTopPageColor(mPageNumber, loadedImage.getPixel(0, 0));
@@ -147,7 +148,7 @@ public class ComicPageFragment extends Fragment {
                 if (getActivity()!=null && StorageManager.getBooleanSetting(getActivity(), StorageManager.PAGE_QUALITY_SETTING, false)) {
                     DisplayImageOptions highResOpts = new DisplayImageOptions.Builder()
                             .bitmapConfig(Bitmap.Config.RGB_565)
-                            .imageScaleType(ImageScaleType.NONE)
+                            .imageScaleType(ImageScaleType.NONE_SAFE)
                             .cacheInMemory(true)
                             .cacheOnDisk(true)
                             .build();
@@ -156,7 +157,7 @@ public class ComicPageFragment extends Fragment {
                 else {
                     DisplayImageOptions lowResOpts = new DisplayImageOptions.Builder()
                             .bitmapConfig(Bitmap.Config.RGB_565)
-                            .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                            .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
                             .cacheInMemory(true)
                             .cacheOnDisk(true)
                             .build();
@@ -288,6 +289,7 @@ public class ComicPageFragment extends Fragment {
                                 mFullscreenComicView.setImageBitmap(Utilities.rotateBitmap(mBitmap, 0));
                                 mIsRotated = false;
                             }
+
                         }
 
                         mFullscreenComicView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -507,6 +509,7 @@ public class ComicPageFragment extends Fragment {
 
     }
 
+    /*
     @Override
     public void onDestroyView()
     {
@@ -516,5 +519,5 @@ public class ComicPageFragment extends Fragment {
             mBitmap = null;
         }
     }
-
+    */
 }

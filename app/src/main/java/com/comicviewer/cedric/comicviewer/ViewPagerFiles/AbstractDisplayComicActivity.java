@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
@@ -547,6 +550,22 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         @Override
         public int getCount() {
             return mPageCount;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            ComicPageFragment fragment = (ComicPageFragment) object;
+            if (fragment.mBitmap!=null && !fragment.mBitmap.isRecycled())
+                fragment.mBitmap.recycle();
+
+            if (fragment.mFullscreenComicView != null) {
+                Bitmap bitmap = ((BitmapDrawable) fragment.mFullscreenComicView.getDrawable()).getBitmap();
+                if (bitmap!=null && !bitmap.isRecycled()) {
+                    bitmap.recycle();
+                    bitmap = null;
+                }
+            }
+            super.destroyItem(container,position,object);
         }
     }
 

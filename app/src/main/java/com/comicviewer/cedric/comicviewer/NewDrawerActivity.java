@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -150,7 +151,9 @@ public class NewDrawerActivity extends AppCompatActivity {
                 .withSelectedItem(selectedItem)
                 .withSavedInstance(savedInstanceState);
 
-        if (isTablet()
+
+        if (Build.VERSION.SDK_INT>20
+                && isTablet()
                 && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 && StorageManager.getBooleanSetting(this, StorageManager.MULTI_PANE, true))
         {
@@ -413,9 +416,9 @@ public class NewDrawerActivity extends AppCompatActivity {
         Drawable[] layers = new Drawable[2];
         layers[0] = new ColorDrawable(StorageManager.getAppThemeColor(this));
         if (isTablet())
-            layers[1] = getResources().getDrawable(R.drawable.comic_viewer_drawer_header_text_tablet);
+            layers[1] = ContextCompat.getDrawable(this, R.drawable.comic_viewer_drawer_header_text_tablet);
         else
-            layers[1] = getResources().getDrawable(R.drawable.comic_viewer_drawer_header_text);
+            layers[1] = ContextCompat.getDrawable(this, R.drawable.comic_viewer_drawer_header_text);
         LayerDrawable layerDrawable = new LayerDrawable(layers);
 
         ImageView imageView = new ImageView(this);
