@@ -173,6 +173,7 @@ public class NewDrawerActivity extends AppCompatActivity {
                                 @Override
                                 public void onPositive(MaterialDialog dialog) {
                                     super.onPositive(dialog);
+                                    DrawerNavigator.getInstance().popSection();
                                     finish();
                                 }
                             }).show();
