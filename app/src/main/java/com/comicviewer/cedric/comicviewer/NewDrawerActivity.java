@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer;
 
 import android.app.ActivityManager;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -13,10 +14,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.CloudFiles.CloudFragment;
@@ -287,6 +291,16 @@ public class NewDrawerActivity extends AppCompatActivity {
         }
     }
 
+    private boolean isTablet()
+    {
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        float density  = getResources().getDisplayMetrics().density;
+        float dpWidth  = outMetrics.widthPixels / density;
+        return dpWidth>=600;
+    }
+
     public void setDrawerColor()
     {
         int color = StorageManager.getBackgroundColorPreference(this);
@@ -383,7 +397,10 @@ public class NewDrawerActivity extends AppCompatActivity {
     {
         Drawable[] layers = new Drawable[2];
         layers[0] = new ColorDrawable(StorageManager.getAppThemeColor(this));
-        layers[1] = getResources().getDrawable(R.drawable.comic_viewer_drawer_header_text);
+        if (isTablet())
+            layers[1] = getResources().getDrawable(R.drawable.comic_viewer_drawer_header_text_tablet);
+        else
+            layers[1] = getResources().getDrawable(R.drawable.comic_viewer_drawer_header_text);
         LayerDrawable layerDrawable = new LayerDrawable(layers);
 
         ImageView imageView = new ImageView(this);

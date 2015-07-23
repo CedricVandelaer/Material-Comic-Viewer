@@ -41,6 +41,13 @@ public abstract class BaseFragment extends Fragment implements BaseNavigationInt
     }
 
     @Override
+    public void onPause()
+    {
+        super.onPause();
+        mNavigationManager.setState(NavigationManager.NAVIGATION_STATE.NEUTRAL);
+    }
+
+    @Override
     public void onResume()
     {
         super.onResume();

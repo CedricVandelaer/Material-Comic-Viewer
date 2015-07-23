@@ -54,6 +54,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
 
@@ -783,7 +784,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
             if (getNavigationManager().getState() == NavigationManager.NAVIGATION_STATE.NEUTRAL
                     || isFiltered)
             {
-                mRecyclerView.setItemAnimator(null);
+                mRecyclerView.setItemAnimator(new FadeInAnimator());
             }
             else if (getNavigationManager().getState() == NavigationManager.NAVIGATION_STATE.DOWN)
             {
