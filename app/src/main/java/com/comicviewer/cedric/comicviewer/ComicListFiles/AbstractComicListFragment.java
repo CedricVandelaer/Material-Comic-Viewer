@@ -3,6 +3,7 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -531,12 +532,20 @@ abstract public class AbstractComicListFragment extends BaseFragment {
 
         if (dpWidth>=1280)
         {
-            columnCount = 3;
+
+            if (StorageManager.getBooleanSetting(getActivity(),StorageManager.MULTI_PANE, true))
+                columnCount = 2;
+            else
+                columnCount = 3;
             mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
         }
         else if (dpWidth>=598)
         {
-            columnCount = 2;
+            if (StorageManager.getBooleanSetting(getActivity(),StorageManager.MULTI_PANE, true)
+                    && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                columnCount = 1;
+            else
+                columnCount = 2;
             mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
         }
         else

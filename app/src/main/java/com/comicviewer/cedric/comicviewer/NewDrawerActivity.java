@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -90,7 +91,7 @@ public class NewDrawerActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT>20)
             getWindow().setStatusBarColor(Utilities.darkenColor(StorageManager.getAppThemeColor(this)));
 
-        mDrawer = new DrawerBuilder()
+        DrawerBuilder builder = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(mToolbar)
                 .withTranslucentStatusBar(false)
@@ -147,11 +148,25 @@ public class NewDrawerActivity extends AppCompatActivity {
                 })
                 .withFireOnInitialOnClick(false)
                 .withSelectedItem(selectedItem)
-                .withSavedInstance(savedInstanceState)
-                .build();
+                .withSavedInstance(savedInstanceState);
+
+        if (isTablet()
+                && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                && StorageManager.getBooleanSetting(this, StorageManager.MULTI_PANE, true))
+        {
+            FrameLayout frameLayout = (FrameLayout) findViewById(R.id.drawer_container);
+            frameLayout.setVisibility(View.VISIBLE);
+            mDrawer = builder.buildView();
+            frameLayout.addView(mDrawer.getSlider());
+        }
+        else
+        {
+            FrameLayout frameLayout = (FrameLayout) findViewById(R.id.drawer_container);
+            frameLayout.setVisibility(View.GONE);
+            mDrawer = builder.build();
+        }
+
         setDrawerColor();
-
-
 
     }
 
