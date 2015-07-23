@@ -540,14 +540,9 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                 columnCount = 3;
             mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
         }
-        else if (dpWidth>=598)
+        else if (dpWidth>=600)
         {
-            if (StorageManager.getBooleanSetting(getActivity(),StorageManager.MULTI_PANE, true)
-                    && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-                    && (Build.VERSION.SDK_INT>20))
-                columnCount = 1;
-            else
-                columnCount = 2;
+            columnCount = 2;
             mLayoutManager = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
         }
         else

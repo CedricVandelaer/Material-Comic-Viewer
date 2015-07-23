@@ -554,15 +554,17 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            ComicPageFragment fragment = (ComicPageFragment) object;
-            if (fragment.mBitmap!=null && !fragment.mBitmap.isRecycled())
-                fragment.mBitmap.recycle();
+            if(position<mPageCount) {
+                ComicPageFragment fragment = (ComicPageFragment) object;
+                if (fragment.mBitmap != null && !fragment.mBitmap.isRecycled())
+                    fragment.mBitmap.recycle();
 
-            if (fragment.mFullscreenComicView != null) {
-                Bitmap bitmap = ((BitmapDrawable) fragment.mFullscreenComicView.getDrawable()).getBitmap();
-                if (bitmap!=null && !bitmap.isRecycled()) {
-                    bitmap.recycle();
-                    bitmap = null;
+                if (fragment.mFullscreenComicView != null) {
+                    Bitmap bitmap = ((BitmapDrawable) fragment.mFullscreenComicView.getDrawable()).getBitmap();
+                    if (bitmap != null && !bitmap.isRecycled()) {
+                        bitmap.recycle();
+                        bitmap = null;
+                    }
                 }
             }
             super.destroyItem(container,position,object);

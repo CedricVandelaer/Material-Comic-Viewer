@@ -19,8 +19,7 @@
         android:orientation="horizontal">
         <FrameLayout
             android:id="@+id/drawer_container"
-            android:layout_weight="1"
-            android:layout_width="0dp"
+            android:layout_width="320dp"
             android:layout_height="match_parent" />
 
         <FrameLayout
