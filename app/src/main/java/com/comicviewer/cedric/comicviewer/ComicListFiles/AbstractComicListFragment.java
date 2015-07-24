@@ -463,12 +463,7 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         }
         else
         {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    toolbar.removeView(mSortButton);
-                }
-            });
+            toolbar.removeView(mSortButton);
         }
     }
 

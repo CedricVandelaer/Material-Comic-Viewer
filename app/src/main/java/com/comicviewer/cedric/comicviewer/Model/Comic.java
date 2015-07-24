@@ -28,7 +28,9 @@ public class Comic implements Parcelable
     private static String COVER_COLOR = "coverColor";
     private static String TEXT_COLOR = "textColor";
     private static String YEAR = "year";
-
+    private static String EDITED_TITLE = "editedTitle";
+    private static String EDITED_YEAR = "editedYear";
+    private static String EDITED_ISSUE_NUMBER = "editedIssueNumber";
 
     //The title of the comic series
     String mTitle;
@@ -60,6 +62,10 @@ public class Comic implements Parcelable
     //The year of the comic
     int mYear;
 
+    private String mEditedTitle;
+    private int mEditedYear;
+    private int mEditedIssueNumber;
+
     public Comic(Comic otherComic)
     {
         this.mTitle = otherComic.getTitle();
@@ -72,6 +78,9 @@ public class Comic implements Parcelable
         this.mCoverColor = otherComic.getComicColor();
         this.mTextColor = otherComic.getTextColor();
         this.mYear = otherComic.getYear();
+        this.mEditedTitle = otherComic.getEditedTitle();
+        this.mEditedYear = otherComic.getEditedYear();
+        this.mEditedIssueNumber = otherComic.getEditedIssueNumber();
     }
 
     public Comic(String filename, String filePath)
@@ -134,6 +143,9 @@ public class Comic implements Parcelable
         }
 
         mCoverImage = null;
+        this.mEditedTitle = null;
+        this.mEditedYear = -1;
+        this.mEditedIssueNumber = -1;
     }
 
     public Comic(String title, String coverImage, String filePath, String fileName, int issueNumber,
@@ -149,6 +161,9 @@ public class Comic implements Parcelable
         mCoverColor = coverColor;
         mTextColor = textColor;
         mYear = year;
+        mEditedTitle = null;
+        mEditedIssueNumber = -1;
+        mEditedYear = -1;
     }
 
     public Comic(Parcel in)
@@ -213,7 +228,39 @@ public class Comic implements Parcelable
         mCoverColor = in.readInt();
         mTextColor = in.readInt();
         mYear = in.readInt();
+        mEditedTitle = in.readString();
+        mEditedIssueNumber = in.readInt();
+        mEditedYear = in.readInt();
     }
+
+    public String getEditedTitle(){
+
+        if (mEditedTitle==null)
+            return mTitle;
+        else
+            return mEditedTitle;
+    }
+
+    public int getEditedYear(){
+        if (mEditedYear==-1)
+            return mYear;
+        else
+            return mEditedYear;
+    }
+
+    public int getEditedIssueNumber(){
+
+        if (mEditedIssueNumber==-1)
+            return mIssueNumber;
+        else
+            return mEditedIssueNumber;
+    }
+
+    public void setEditedTitle(String title){mEditedTitle = title;}
+
+    public void setEditedYear(int year){mEditedYear = year;}
+
+    public void setEditedIssueNumber(int issueNumber){mEditedIssueNumber = issueNumber;}
 
     public void setTitle(String title){mTitle = title;}
 
@@ -309,6 +356,9 @@ public class Comic implements Parcelable
         dest.writeInt(mCoverColor);
         dest.writeInt(mTextColor);
         dest.writeInt(mYear);
+        dest.writeString(mEditedTitle);
+        dest.writeInt(mEditedIssueNumber);
+        dest.writeInt(mEditedYear);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
@@ -337,6 +387,12 @@ public class Comic implements Parcelable
             comic.setTextColor(comicJSON.getInt(TEXT_COLOR));
             comic.setYear(comicJSON.getInt(YEAR));
 
+            if (comicJSON.has(EDITED_TITLE))
+                comic.setEditedTitle(comicJSON.getString(EDITED_TITLE));
+            if (comicJSON.has(EDITED_ISSUE_NUMBER))
+                comic.setEditedIssueNumber(comicJSON.getInt(EDITED_ISSUE_NUMBER));
+            if (comicJSON.has(EDITED_YEAR))
+                comic.setEditedYear(comicJSON.getInt(EDITED_YEAR));
             return comic;
         }
         catch (JSONException e)
@@ -364,6 +420,13 @@ public class Comic implements Parcelable
             comicJSON.put(COVER_COLOR, mCoverColor);
             comicJSON.put(TEXT_COLOR, mTextColor);
             comicJSON.put(YEAR, mYear);
+
+            if (mEditedTitle!=null)
+                comicJSON.put(EDITED_TITLE, mEditedTitle);
+            if (mEditedIssueNumber!=-1)
+                comicJSON.put(EDITED_ISSUE_NUMBER, mEditedIssueNumber);
+            if (mEditedYear!=-1)
+                comicJSON.put(EDITED_YEAR, mEditedYear);
 
             return comicJSON;
         }

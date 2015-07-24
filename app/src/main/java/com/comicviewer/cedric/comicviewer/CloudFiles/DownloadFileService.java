@@ -174,7 +174,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
         createStartNotification(boxItem.getName(), notificationId);
 
-        File boxDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Box");
+        File boxDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/ComicViewer" + "/Box");
         if (!boxDir.exists())
             boxDir.mkdir();
         File output = new File(boxDir.getAbsolutePath() + "/" + boxItem.getName());
@@ -277,7 +277,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
             InputStream input = new BufferedInputStream(url.openStream(),
                     8192);
 
-            File googleDriveDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Google Drive");
+            File googleDriveDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/ComicViewer"+"/Google Drive");
             if (!googleDriveDir.exists())
                 googleDriveDir.mkdir();
             File output = new File(googleDriveDir.getAbsolutePath()+"/"+fileName);
@@ -378,7 +378,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
         if (mLiveConnectClient!=null) {
 
-            final File oneDriveDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/OneDrive");
+            final File oneDriveDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/ComicViewer"+"/OneDrive");
             if (!oneDriveDir.exists())
                 oneDriveDir.mkdir();
             final File output = new File(oneDriveDir.getAbsolutePath()+"/"+parentPath+oneDriveObject.getName());
@@ -530,12 +530,13 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
         if (dbApi.getSession().isLinked()) {
 
-            File dropboxDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Dropbox");
+            File dropboxDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/ComicViewer"+"/Dropbox");
             if (!dropboxDir.exists())
                 dropboxDir.mkdir();
             File output = new File(dropboxDir.getAbsolutePath()+fileUrl);
             File renamedOutput = new File(output.getAbsolutePath()+".mcvdownload");
 
+            createParentDirs(output);
             String filePath = output.getAbsolutePath();
             final String title = output.getName();
 
@@ -625,6 +626,31 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
             }
         }
 
+    }
+
+    private void createParentDirs(File file)
+    {
+
+        ArrayList<File> parentFolders = new ArrayList<>();
+        File leafFile = file.getParentFile();
+
+        while (leafFile.getParentFile()!=null) {
+            parentFolders.add(leafFile);
+            leafFile = leafFile.getParentFile();
+        }
+
+        for (int i=parentFolders.size()-1;i>=0;i--)
+        {
+            try
+            {
+                if (!parentFolders.get(i).exists())
+                    parentFolders.get(i).mkdir();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void createFileExistsNotification(String title, int id)

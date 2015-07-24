@@ -1015,6 +1015,8 @@ public class StorageManager {
 
     public static ArrayList<CloudService> getCloudServices(Context context)
     {
+        if (context == null)
+            return null;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         ArrayList<CloudService> cloudServices = new ArrayList<>();
@@ -1815,6 +1817,12 @@ public class StorageManager {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(BACKGROUND_COLOR, value);
         editor.apply();
+    }
+
+    public static boolean hasWhiteBackgroundSet(Context context)
+    {
+        int bgColor = getBackgroundColorPreference(context);
+        return (bgColor == context.getResources().getColor(R.color.WhiteBG) || bgColor == context.getResources().getColor(R.color.White));
     }
 
     public static int getBackgroundColorPreference(Context context)
