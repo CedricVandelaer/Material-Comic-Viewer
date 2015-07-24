@@ -8,8 +8,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
@@ -18,6 +21,7 @@ import com.gc.materialdesign.views.ButtonFlat;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class InfoActivity extends Activity {
 
@@ -29,7 +33,21 @@ public class InfoActivity extends Activity {
     private TextView mFilenameTextView;
     private TextView mFileSizeTextView;
     private TextView mPagesTextView;
+
+    private TextView mDescriptionTextView;
+    private TextView mWriterTextView;
+    private TextView mPencillerTextView;
+    private TextView mInkerTextView;
+    private TextView mColoristTextView;
+    private TextView mLettererTextView;
+    private TextView mEditorTextView;
+    private TextView mCoverArtistTextView;
+    private TextView mStoryArcsTextView;
+    private TextView mCharactersTextView;
+    private TextView mAdditionalInfoTextView;
+
     private ButtonFlat mEditButton;
+    private RelativeLayout mEditButtonLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +78,146 @@ public class InfoActivity extends Activity {
         setYear();
         setPageCount();
         setFileInfo();
+        setMetadata();
+        initEditButton();
 
         if (StorageManager.hasWhiteBackgroundSet(this))
             setTextViewTextColors(getResources().getColor(R.color.BlueGreyDark));
         else
             setTextViewTextColors(getResources().getColor(R.color.White));
+    }
+
+    private void setMetadata() {
+        if (mComic.getDescription()!=null) {
+            mDescriptionTextView.setVisibility(View.VISIBLE);
+            mDescriptionTextView.setText("Description: " + mComic.getDescription());
+        }
+        else
+        {
+            mDescriptionTextView.setVisibility(View.GONE);
+        }
+        if (mComic.getWriter()!=null) {
+            mWriterTextView.setVisibility(View.VISIBLE);
+            mWriterTextView.setText("Writer: " + mComic.getWriter());
+        }
+        else {
+            mWriterTextView.setVisibility(View.GONE);
+        }
+
+        if (mComic.getPenciller()!=null) {
+            mPencillerTextView.setVisibility(View.VISIBLE);
+            mPencillerTextView.setText("Penciller: " + mComic.getPenciller());
+        }
+        else
+        {
+            mPencillerTextView.setVisibility(View.GONE);
+        }
+        if (mComic.getInker()!=null) {
+            mInkerTextView.setVisibility(View.VISIBLE);
+            mInkerTextView.setText("Inker: " + mComic.getInker());
+        }
+        else
+        {
+            mInkerTextView.setVisibility(View.GONE);
+        }
+        if (mComic.getColorist()!=null) {
+            mColoristTextView.setVisibility(View.VISIBLE);
+            mColoristTextView.setText("Colorist: " + mComic.getColorist());
+        }
+        else
+        {
+            mColoristTextView.setVisibility(View.GONE);
+        }
+
+        if (mComic.getLetterer()!=null) {
+            mLettererTextView.setVisibility(View.VISIBLE);
+            mLettererTextView.setText("Letterer: " + mComic.getLetterer());
+        }
+        else
+        {
+            mLettererTextView.setVisibility(View.GONE);
+        }
+        if (mComic.getEditor()!=null) {
+            mEditorTextView.setVisibility(View.VISIBLE);
+            mEditorTextView.setText("Editor: " + mComic.getEditor());
+        }
+        else
+        {
+            mEditorTextView.setVisibility(View.GONE);
+        }
+        if (mComic.getCoverArtist()!=null) {
+            mCoverArtistTextView.setVisibility(View.VISIBLE);
+            mCoverArtistTextView.setText("Cover artist: " + mComic.getCoverArtist());
+        }
+        else
+        {
+            mCoverArtistTextView.setVisibility(View.GONE);
+        }
+        if (mComic.getStoryArcs()!=null)
+        {
+            mStoryArcsTextView.setVisibility(View.VISIBLE);
+            String text = "Story arcs: ";
+            for (String arc:mComic.getStoryArcs())
+                text+= arc;
+            mStoryArcsTextView.setText(text);
+        }
+        else
+        {
+            mStoryArcsTextView.setVisibility(View.GONE);
+        }
+        if (mComic.getCharacters()!=null)
+        {
+            mCharactersTextView.setVisibility(View.VISIBLE);
+            String text = "Characters: ";
+            for (String character:mComic.getCharacters())
+                text+= character;
+            mCharactersTextView.setText(text);
+        }
+        else
+        {
+            mCharactersTextView.setVisibility(View.GONE);
+        }
+        if (mComic.getAdditionalInfo()!=null) {
+            mAdditionalInfoTextView.setVisibility(View.VISIBLE);
+            mAdditionalInfoTextView.setText("Additional info: " + mComic.getAdditionalInfo());
+        }
+        else
+        {
+            mAdditionalInfoTextView.setVisibility(View.GONE);
+        }
+    }
+
+    private void initEditButton() {
+
+        mEditButtonLayout.setBackgroundColor(mComic.getComicColor());
+        mEditButton.setBackgroundColor(mComic.getTextColor());
+        mEditButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                CharSequence[] editOptions = {mComic.getEditedTitle(), ""+mComic.getEditedIssueNumber(), ""+mComic.getEditedYear()};
+
+                if (mComic.getEditedIssueNumber()==-1)
+                    editOptions[1] = getString(R.string.issue_number);
+                if (mComic.getEditedYear() == -1)
+                    editOptions[2] = getString(R.string.year);
+
+                new MaterialDialog.Builder(InfoActivity.this)
+                        .title("Edit")
+                        .titleGravity(GravityEnum.CENTER)
+                        .items(editOptions)
+                        .itemsGravity(GravityEnum.CENTER)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+
+                            }
+                        })
+                        .negativeColor(StorageManager.getAppThemeColor(InfoActivity.this))
+                        .negativeText(getString(R.string.cancel))
+                        .show();
+            }
+        });
     }
 
     private void setFileInfo()
@@ -134,16 +287,40 @@ public class InfoActivity extends Activity {
         mFilenameTextView = (TextView) findViewById(R.id.filename_text_view);
         mFileSizeTextView = (TextView) findViewById(R.id.filesize_text_view);
         mPagesTextView = (TextView) findViewById(R.id.pages_text_view);
+        mEditButtonLayout = (RelativeLayout) findViewById(R.id.button_background_layout);
+
+        mDescriptionTextView = (TextView) findViewById(R.id.description_text_view);
+        mWriterTextView = (TextView) findViewById(R.id.writer_text_view);
+        mPencillerTextView = (TextView) findViewById(R.id.penciller_text_view);
+        mInkerTextView = (TextView) findViewById(R.id.inker_text_view);
+        mColoristTextView = (TextView) findViewById(R.id.colorist_text_view);
+        mLettererTextView = (TextView) findViewById(R.id.letterer_text_view);
+        mEditorTextView = (TextView) findViewById(R.id.editor_text_view);
+        mCoverArtistTextView = (TextView) findViewById(R.id.cover_artist_text_view);
+        mStoryArcsTextView = (TextView) findViewById(R.id.story_arcs_text_view);
+        mCharactersTextView = (TextView) findViewById(R.id.characters_text_view);
+        mAdditionalInfoTextView = (TextView) findViewById(R.id.additional_info_text_view);
     }
 
     public void setTextViewTextColors(int color)
     {
-        mTitleTextView.setTextColor(color);
         mIssueNumberTextView.setTextColor(color);
         mYearTextView.setTextColor(color);
         mFilenameTextView.setTextColor(color);
         mFileSizeTextView.setTextColor(color);
         mPagesTextView.setTextColor(color);
+
+        mDescriptionTextView.setTextColor(color);
+        mWriterTextView.setTextColor(color);
+        mPencillerTextView.setTextColor(color);
+        mInkerTextView.setTextColor(color);
+        mColoristTextView.setTextColor(color);
+        mLettererTextView.setTextColor(color);
+        mEditorTextView.setTextColor(color);
+        mCoverArtistTextView.setTextColor(color);
+        mStoryArcsTextView.setTextColor(color);
+        mCharactersTextView.setTextColor(color);
+        mAdditionalInfoTextView.setTextColor(color);
     }
 
     @Override

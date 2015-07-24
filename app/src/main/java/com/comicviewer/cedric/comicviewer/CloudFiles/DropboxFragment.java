@@ -116,8 +116,6 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
 
         if (mDBApi.getSession().authenticationSuccessful()) {
             String token = mDBApi.getSession().finishAuthentication();
-            mCloudService.setToken(token);
-            StorageManager.saveCloudService(getActivity(), mCloudService);
         }
 
         if (mDBApi.getSession().isLinked()) {
@@ -296,39 +294,6 @@ public class DropboxFragment extends AbstractCloudServiceListFragment implements
         }
     }
 
-    /*
-    private class SetTaskDescriptionTask extends AsyncTask
-    {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-            if (!ImageLoader.getInstance().isInited()) {
-                ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity()).build();
-                ImageLoader.getInstance().init(config);
-            }
-
-            ActivityManager.TaskDescription tdscr = null;
-
-            if (Build.VERSION.SDK_INT>20) {
-                try {
-                    ImageSize size = new ImageSize(64, 64);
-                    tdscr = new ActivityManager.TaskDescription(getString(R.string.app_name),
-                            ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_recents, size),
-                            StorageManager.getAppThemeColor(getActivity()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (tdscr != null)
-                setTaskDescription(tdscr);
-
-
-            return null;
-        }
-    }
-    */
 }
 
 
