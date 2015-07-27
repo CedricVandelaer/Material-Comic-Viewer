@@ -89,7 +89,7 @@ public class StorageManager {
     public static final String WIDTH_AUTO_FIT_SETTING="widthAutoFit";
     public static final String KEEP_SCREEN_ON= "keepScreenOn";
     public static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
-    public static final String LAST_READ_COMIC = "lastReadComic";
+    public static final String COMIC_TO_UPDATE = "comicToUpdate";
     public static final String DRAWER_ARROW_ANIMATION = "drawerArrowAnimation";
     public static final String MULTI_PANE = "multiPane";
     public static final String BACKGROUND_COLOR = "backgroundColor";
@@ -1561,6 +1561,7 @@ public class StorageManager {
 
     }
 
+
     public static void batchSaveComics(Context context, ArrayList<Comic> comics)
     {
         List<Comic> savedComics = getSavedComics(context);
@@ -1744,10 +1745,18 @@ public class StorageManager {
         SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
         sharedPreferencesEditor.putString(READ_COMIC_LIST, csvList.toString());
 
-        sharedPreferencesEditor.putString(LAST_READ_COMIC, comicName);
+        sharedPreferencesEditor.putString(COMIC_TO_UPDATE, comicName);
 
         sharedPreferencesEditor.apply();
 
+    }
+
+    public static void saveComicToUpdate(Context context, String filename)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
+        sharedPreferencesEditor.putString(COMIC_TO_UPDATE, filename);
+        sharedPreferencesEditor.apply();
     }
 
     public static Map<String, Integer> getReadComics(Context context)

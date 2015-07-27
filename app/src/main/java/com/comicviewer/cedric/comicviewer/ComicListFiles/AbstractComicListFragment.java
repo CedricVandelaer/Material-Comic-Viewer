@@ -278,18 +278,30 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     protected void updateLastReadComics()
     {
 
-        String lastReadComic = StorageManager.getStringSetting(mApplicationContext, StorageManager.LAST_READ_COMIC, getString(R.string.none));
-
+        String lastReadComic = StorageManager.getStringSetting(mApplicationContext, StorageManager.COMIC_TO_UPDATE, getString(R.string.none));
         for (int i=0;i<mAdapter.getComicsAndFiles().size();i++)
         {
             if (mAdapter.getComicsAndFiles().get(i) instanceof Comic) {
 
                 Comic comic = (Comic) mAdapter.getComicsAndFiles().get(i);
+
                 if (comic.getFileName().equals(lastReadComic)) {
+
+                    ArrayList<Comic> comics = StorageManager.getSavedComics(getActivity());
+
+                    for (int j=0;j<comics.size();j++)
+                    {
+                        if (comic.getFileName().equals(comics.get(j).getFileName()))
+                        {
+                            mAdapter.setComic(i, comics.get(j));
+                        }
+                    }
+
                     final int pos = i;
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            mRecyclerView.setItemAnimator(null);
                             mAdapter.notifyItemChanged(pos);
                         }
                     });

@@ -24,11 +24,33 @@ public class Collection{
     private ArrayList<Integer> mYearsFilters;
     private ArrayList<String> mFoldersFilters;
 
+    //additional metadata filters
+    private ArrayList<String> mWriterFilters;
+    private ArrayList<String> mPencillerFilters;
+    private ArrayList<String> mInkerFilters;
+    private ArrayList<String> mColoristFilters;
+    private ArrayList<String> mLettererFilters;
+    private ArrayList<String> mEditorFilters;
+    private ArrayList<String> mCoverArtistFilters;
+    private ArrayList<String> mStoryArcsFilters;
+    private ArrayList<String> mCharactersFilters;
+
     private static String NAME = "name";
     private static String FILE_LIST = "fileList";
     private static String SERIES_LIST = "seriesList";
     private static String YEAR_LIST = "yearList";
     private static String FOLDER_LIST = "folderList";
+
+    private static String WRITERS_LIST = "writerList";
+    private static String PENCILLERS_LIST = "pencillerList";
+    private static String INKERS_LIST = "inkerList";
+    private static String COLORISTS_LIST = "coloristsList";
+    private static String LETTERERS_LIST = "lettererList";
+    private static String EDITORS_LIST = "editorList";
+    private static String COVER_ARTISTS_LIST = "coverArtistList";
+    private static String STORY_ARC_LIST = "storyArcList";
+    private static String CHARACTERS_LIST = "characterList";
+
 
     public Collection(String name)
     {
@@ -37,6 +59,16 @@ public class Collection{
         mSeriesFilters = new ArrayList<>();
         mYearsFilters = new ArrayList<>();
         mFoldersFilters = new ArrayList<>();
+
+        mWriterFilters = new ArrayList<>();
+        mPencillerFilters = new ArrayList<>();
+        mInkerFilters = new ArrayList<>();
+        mColoristFilters = new ArrayList<>();
+        mLettererFilters = new ArrayList<>();
+        mEditorFilters = new ArrayList<>();
+        mCoverArtistFilters = new ArrayList<>();
+        mStoryArcsFilters = new ArrayList<>();
+        mCharactersFilters = new ArrayList<>();
     }
 
     public String getName()
@@ -45,6 +77,24 @@ public class Collection{
     }
 
     public void setName(String name){mName = name;}
+
+    public void addWriter(String writer){mWriterFilters.add(writer);}
+
+    public void addPenciller(String penciller){mPencillerFilters.add(penciller);}
+
+    public void addInker(String inker){mInkerFilters.add(inker);}
+
+    public void addColorist(String colorist){mColoristFilters.add(colorist);}
+
+    public void addLetterer(String letterer){mLettererFilters.add(letterer);}
+
+    public void addEditor(String editor){mEditorFilters.add(editor);}
+
+    public void addCoverArtist(String coverArtist){mCoverArtistFilters.add(coverArtist);}
+
+    public void addStoryArc(String storyArc){mStoryArcsFilters.add(storyArc);}
+
+    public void addCharacter(String character){mCharactersFilters.add(character);}
 
     public void addFile(String filename){mFileList.add(filename);}
 
@@ -74,9 +124,18 @@ public class Collection{
                 {
                     Comic comic = (Comic) object;
                     return mFileList.contains(comic.getFileName())
-                            || mSeriesFilters.contains(comic.getTitle())
-                            || mYearsFilters.contains(comic.getYear())
-                            || mFoldersFilters.contains(comic.getFilePath());
+                            || mSeriesFilters.contains(comic.getEditedTitle())
+                            || mYearsFilters.contains(comic.getEditedYear())
+                            || mFoldersFilters.contains(comic.getFilePath())
+                            || mWriterFilters.contains(comic.getWriter())
+                            || mPencillerFilters.contains(comic.getPenciller())
+                            || mInkerFilters.contains(comic.getInker())
+                            || mColoristFilters.contains(comic.getColorist())
+                            || mLettererFilters.contains(comic.getLetterer())
+                            || mEditorFilters.contains(comic.getEditor())
+                            || mCoverArtistFilters.contains(comic.getCoverArtist())
+                            || containsStoryArc(comic)
+                            || containsCharacter(comic);
                 }
                 return false;
             }
@@ -85,27 +144,109 @@ public class Collection{
         return filter;
     }
 
+    private boolean containsStoryArc(Comic comic)
+    {
+        for (String storyArc:comic.getStoryArcs())
+        {
+            if (mStoryArcsFilters.contains(storyArc))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean containsCharacter(Comic comic)
+    {
+        for (String character:comic.getCharacters())
+        {
+            if (mCharactersFilters.contains(character))
+                return true;
+        }
+        return false;
+    }
+
     public static Collection fromJSON(JSONObject collectionJSON)
     {
         try
         {
             Collection collection = new Collection(collectionJSON.getString(NAME));
 
-            JSONArray fileListArray = collectionJSON.getJSONArray(FILE_LIST);
-            for (int i=0;i<fileListArray.length();i++)
-                collection.addFile(fileListArray.getString(i));
+            if (collectionJSON.has(FILE_LIST)) {
+                JSONArray fileListArray = collectionJSON.getJSONArray(FILE_LIST);
+                for (int i = 0; i < fileListArray.length(); i++)
+                    collection.addFile(fileListArray.getString(i));
+            }
 
-            JSONArray seriesArray = collectionJSON.getJSONArray(SERIES_LIST);
-            for (int i=0;i<seriesArray.length();i++)
-                collection.addSeries(seriesArray.getString(i));
+            if (collectionJSON.has(SERIES_LIST)) {
+                JSONArray seriesArray = collectionJSON.getJSONArray(SERIES_LIST);
+                for (int i = 0; i < seriesArray.length(); i++)
+                    collection.addSeries(seriesArray.getString(i));
+            }
 
-            JSONArray yearsArray = collectionJSON.getJSONArray(YEAR_LIST);
-            for (int i=0;i<yearsArray.length();i++)
-                collection.addYear(yearsArray.getInt(i));
+            if (collectionJSON.has(YEAR_LIST)) {
+                JSONArray yearsArray = collectionJSON.getJSONArray(YEAR_LIST);
+                for (int i = 0; i < yearsArray.length(); i++)
+                    collection.addYear(yearsArray.getInt(i));
+            }
 
-            JSONArray folderArray = collectionJSON.getJSONArray(FOLDER_LIST);
-            for (int i=0;i<folderArray.length();i++)
-                collection.addFolder(folderArray.getString(i));
+            if (collectionJSON.has(FOLDER_LIST)) {
+                JSONArray folderArray = collectionJSON.getJSONArray(FOLDER_LIST);
+                for (int i = 0; i < folderArray.length(); i++)
+                    collection.addFolder(folderArray.getString(i));
+            }
+
+            if (collectionJSON.has(WRITERS_LIST)) {
+                JSONArray writerArray = collectionJSON.getJSONArray(WRITERS_LIST);
+                for (int i = 0; i < writerArray.length(); i++)
+                    collection.addWriter(writerArray.getString(i));
+            }
+
+            if (collectionJSON.has(PENCILLERS_LIST)) {
+                JSONArray pencillerArray = collectionJSON.getJSONArray(PENCILLERS_LIST);
+                for (int i = 0; i < pencillerArray.length(); i++)
+                    collection.addPenciller(pencillerArray.getString(i));
+            }
+
+            if (collectionJSON.has(INKERS_LIST)) {
+                JSONArray inkerArray = collectionJSON.getJSONArray(INKERS_LIST);
+                for (int i = 0; i < inkerArray.length(); i++)
+                    collection.addInker(inkerArray.getString(i));
+            }
+
+            if (collectionJSON.has(COLORISTS_LIST)) {
+                JSONArray coloristArray = collectionJSON.getJSONArray(COLORISTS_LIST);
+                for (int i = 0; i < coloristArray.length(); i++)
+                    collection.addColorist(coloristArray.getString(i));
+            }
+
+            if (collectionJSON.has(LETTERERS_LIST)) {
+                JSONArray lettererArray = collectionJSON.getJSONArray(LETTERERS_LIST);
+                for (int i = 0; i < lettererArray.length(); i++)
+                    collection.addLetterer(lettererArray.getString(i));
+            }
+
+            if (collectionJSON.has(EDITORS_LIST)) {
+                JSONArray editorArray = collectionJSON.getJSONArray(EDITORS_LIST);
+                for (int i = 0; i < editorArray.length(); i++)
+                    collection.addEditor(editorArray.getString(i));
+            }
+
+            if (collectionJSON.has(COVER_ARTISTS_LIST)) {
+                JSONArray coverArtistArray = collectionJSON.getJSONArray(COVER_ARTISTS_LIST);
+                for (int i = 0; i < coverArtistArray.length(); i++)
+                    collection.addCoverArtist(coverArtistArray.getString(i));
+            }
+
+            if (collectionJSON.has(STORY_ARC_LIST)) {
+                JSONArray storyArcArray = collectionJSON.getJSONArray(STORY_ARC_LIST);
+                for (int i = 0; i < storyArcArray.length(); i++)
+                    collection.addStoryArc(storyArcArray.getString(i));
+            }
+
+            if (collectionJSON.has(CHARACTERS_LIST)) {
+                JSONArray characterArray = collectionJSON.getJSONArray(CHARACTERS_LIST);
+                for (int i = 0; i < characterArray.length(); i++)
+                    collection.addCharacter(characterArray.getString(i));
+            }
 
             return collection;
         }
@@ -143,6 +284,51 @@ public class Collection{
             for (String folder:mFoldersFilters)
                 foldersArray.put(folder);
             collectionJSON.put(FOLDER_LIST, foldersArray);
+
+            JSONArray writersArray = new JSONArray();
+            for (String writer:mWriterFilters)
+                foldersArray.put(writer);
+            collectionJSON.put(WRITERS_LIST, writersArray);
+
+            JSONArray pencillerArray = new JSONArray();
+            for (String penciller:mPencillerFilters)
+                foldersArray.put(penciller);
+            collectionJSON.put(PENCILLERS_LIST, pencillerArray);
+
+            JSONArray inkerArray = new JSONArray();
+            for (String inker:mInkerFilters)
+                foldersArray.put(inker);
+            collectionJSON.put(INKERS_LIST, inkerArray);
+
+            JSONArray coloristArray = new JSONArray();
+            for (String colorist:mColoristFilters)
+                foldersArray.put(colorist);
+            collectionJSON.put(COLORISTS_LIST, coloristArray);
+
+            JSONArray letterersArray = new JSONArray();
+            for (String letterer:mLettererFilters)
+                foldersArray.put(letterer);
+            collectionJSON.put(LETTERERS_LIST, letterersArray);
+
+            JSONArray editorsArray = new JSONArray();
+            for (String editor:mEditorFilters)
+                foldersArray.put(editor);
+            collectionJSON.put(EDITORS_LIST, editorsArray);
+
+            JSONArray coverArtistArray = new JSONArray();
+            for (String coverArtist:mCoverArtistFilters)
+                foldersArray.put(coverArtist);
+            collectionJSON.put(COVER_ARTISTS_LIST, coverArtistArray);
+
+            JSONArray storyArcArray = new JSONArray();
+            for (String storyArc:mStoryArcsFilters)
+                foldersArray.put(storyArc);
+            collectionJSON.put(STORY_ARC_LIST, storyArcArray);
+
+            JSONArray characterArray = new JSONArray();
+            for (String character:mCharactersFilters)
+                foldersArray.put(character);
+            collectionJSON.put(CHARACTERS_LIST, characterArray);
 
             return collectionJSON;
         }

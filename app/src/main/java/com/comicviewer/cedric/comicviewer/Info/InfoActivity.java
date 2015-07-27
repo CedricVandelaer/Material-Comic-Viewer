@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -86,7 +87,6 @@ public class InfoActivity extends Activity {
         else
             setTextViewTextColors(getResources().getColor(R.color.White));
     }
-
     private void setMetadata() {
         if (mComic.getDescription()!=null) {
             mDescriptionTextView.setVisibility(View.VISIBLE);
@@ -170,7 +170,7 @@ public class InfoActivity extends Activity {
             mCharactersTextView.setVisibility(View.VISIBLE);
             String text = "Characters: ";
             for (String character:mComic.getCharacters())
-                text+= character;
+                text+= "\n"+character;
             mCharactersTextView.setText(text);
         }
         else
@@ -191,16 +191,27 @@ public class InfoActivity extends Activity {
 
         mEditButtonLayout.setBackgroundColor(mComic.getComicColor());
         mEditButton.setBackgroundColor(mComic.getTextColor());
+
+        final CharSequence[] editOptions = {
+                "Title",
+                getString(R.string.issue_number),
+                getString(R.string.year),
+                "Description",
+                "Writer",
+                "Penciller",
+                "Inker",
+                "Colorist",
+                "Letterer",
+                "Editor",
+                "Cover artist",
+                "Story arcs",
+                "Characters",
+                "Additional info"
+        };
+
         mEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                CharSequence[] editOptions = {mComic.getEditedTitle(), ""+mComic.getEditedIssueNumber(), ""+mComic.getEditedYear()};
-
-                if (mComic.getEditedIssueNumber()==-1)
-                    editOptions[1] = getString(R.string.issue_number);
-                if (mComic.getEditedYear() == -1)
-                    editOptions[2] = getString(R.string.year);
 
                 new MaterialDialog.Builder(InfoActivity.this)
                         .title("Edit")
@@ -210,7 +221,7 @@ public class InfoActivity extends Activity {
                         .itemsCallback(new MaterialDialog.ListCallback() {
                             @Override
                             public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-
+                                handleEditChoice(i);
                             }
                         })
                         .negativeColor(StorageManager.getAppThemeColor(InfoActivity.this))
@@ -218,6 +229,451 @@ public class InfoActivity extends Activity {
                         .show();
             }
         });
+    }
+
+    private void handleEditChoice(int choice)
+    {
+
+        switch (choice)
+        {
+            case 0:
+                handleEditTitle();
+                break;
+            case 1:
+                handleEditIssueNumber();
+                break;
+            case 2:
+                handleEditYear();
+                break;
+            case 3:
+                handleEditDescription();
+                break;
+            case 4:
+                handleEditWriter();
+                break;
+            case 5:
+                handleEditPenciller();
+                break;
+            case 6:
+                handleEditInker();
+                break;
+            case 7:
+                handleEditColorist();
+                break;
+            case 8:
+                handleEditLetter();
+                break;
+            case 9:
+                handleEditEditor();
+                break;
+            case 10:
+                handleEditCoverArtist();
+                break;
+            case 11:
+                handleEditStoryArcs();
+                break;
+            case 12:
+                handleEditCharacters();
+                break;
+            case 13:
+                handleEditAdditionalInfo();
+                break;
+        }
+    }
+
+    private void handleEditStoryArcs() {
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title("Edit story arcs")
+                .titleColor(StorageManager.getAppThemeColor(this))
+                .items(new CharSequence[]{"Add story arc", "Remove story arcs"})
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        if (i==0)
+                            handleAddStoryArc();
+                        else if (i==1)
+                            handleRemoveStoryArcs();
+                    }
+                })
+                .positiveColor(StorageManager.getAppThemeColor(this))
+                .positiveText("Done")
+                .show();
+    }
+
+    private void handleEditCharacters() {
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title("Edit characters")
+                .titleColor(StorageManager.getAppThemeColor(this))
+                .items(new CharSequence[]{"Add character", "Remove characters"})
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        if (i==0)
+                            handleAddCharacter();
+                        else if (i==1)
+                            handleRemoveCharacter();
+                    }
+                })
+                .positiveColor(StorageManager.getAppThemeColor(this))
+                .positiveText("Done")
+                .show();
+    }
+
+    private void handleAddCharacter()
+    {
+        showInputDialog("Add character", "", "Character", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.addCharacter(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+                handleEditCharacters();
+            }
+        });
+    }
+
+    private void handleRemoveCharacter()
+    {
+        CharSequence[] items = null;
+        if (mComic.getCharacters().size()>0) {
+            items = new CharSequence[mComic.getCharacters().size()];
+        }
+
+        if (items!=null) {
+
+            int i = 0;
+            for (String character : mComic.getCharacters()) {
+                items[i] = character;
+                i++;
+            }
+
+            MaterialDialog dialog = new MaterialDialog.Builder(this)
+                    .title("Select characters to remove")
+                    .titleColor(StorageManager.getAppThemeColor(this))
+                    .items(items)
+                    .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                        @Override
+                        public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+
+                            for (CharSequence sequence : charSequences)
+                                mComic.removeCharacter(sequence.toString());
+                            setMetadata();
+                            StorageManager.saveComic(InfoActivity.this, mComic);
+                            StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+                            handleEditCharacters();
+                            return false;
+                        }
+                    })
+                    .negativeColor(StorageManager.getAppThemeColor(this))
+                    .negativeText(getString(R.string.cancel))
+                    .positiveColor(StorageManager.getAppThemeColor(InfoActivity.this))
+                    .positiveText(getString(R.string.remove))
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onNegative(MaterialDialog dialog) {
+                            super.onNegative(dialog);
+                            handleEditCharacters();
+                        }
+                    })
+                    .show();
+        }
+        else
+        {
+            Toast.makeText(this, "No characters added yet", Toast.LENGTH_LONG).show();
+            handleEditCharacters();
+        }
+    }
+
+    private void handleAddStoryArc()
+    {
+        showInputDialog("Add story arc", "", "Story arc", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.addStoryArc(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+                handleEditStoryArcs();
+            }
+        });
+    }
+
+    private void handleRemoveStoryArcs()
+    {
+        CharSequence[] items = null;
+
+        if (mComic.getStoryArcs().size()>0)
+            items = new CharSequence[mComic.getStoryArcs().size()];
+
+        if (items!=null) {
+            int i = 0;
+            for (String storyArc : mComic.getStoryArcs()) {
+                items[i] = storyArc;
+                i++;
+            }
+
+            MaterialDialog dialog = new MaterialDialog.Builder(this)
+                    .title("Select story arcs to remove")
+                    .titleColor(StorageManager.getAppThemeColor(this))
+                    .items(items)
+                    .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                        @Override
+                        public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+
+                            for (CharSequence sequence : charSequences)
+                                mComic.removeStoryArc(sequence.toString());
+                            setMetadata();
+                            StorageManager.saveComic(InfoActivity.this, mComic);
+                            StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+                            handleEditStoryArcs();
+                            return false;
+                        }
+                    })
+                    .negativeColor(StorageManager.getAppThemeColor(this))
+                    .negativeText(getString(R.string.cancel))
+                    .positiveColor(StorageManager.getAppThemeColor(InfoActivity.this))
+                    .positiveText(getString(R.string.remove))
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onNegative(MaterialDialog dialog) {
+                            super.onNegative(dialog);
+                            handleEditStoryArcs();
+                        }
+                    })
+                    .show();
+        }
+        else
+        {
+            Toast.makeText(this, "No story arcs added yet", Toast.LENGTH_LONG).show();
+            handleEditStoryArcs();
+        }
+    }
+
+    private void handleEditAdditionalInfo() {
+        showInputDialog("Edit additional info", "", "Cover artist", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setAdditionalInfo(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditCoverArtist() {
+        String prefill;
+        if (mComic.getCoverArtist() == null)
+            prefill = "";
+        else
+            prefill = mComic.getCoverArtist();
+        showInputDialog("Edit cover artist", prefill, "Cover artist", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setCoverArtist(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditEditor() {
+        String prefill;
+        if (mComic.getEditor() == null)
+            prefill = "";
+        else
+            prefill = mComic.getEditor();
+        showInputDialog("Edit editor", prefill, "Editor", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setEditor(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditLetter() {
+        String prefill;
+        if (mComic.getLetterer() == null)
+            prefill = "";
+        else
+            prefill = mComic.getLetterer();
+        showInputDialog("Edit letterer", prefill, "Letterer", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setLetterer(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditColorist() {
+        String prefill;
+        if (mComic.getColorist() == null)
+            prefill = "";
+        else
+            prefill = mComic.getColorist();
+        showInputDialog("Edit colorist", prefill, "Colorist", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setColorist(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditInker() {
+        String prefill;
+        if (mComic.getInker() == null)
+            prefill = "";
+        else
+            prefill = mComic.getInker();
+        showInputDialog("Edit inker", prefill, "Inker", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setInker(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditPenciller() {
+        String prefill;
+        if (mComic.getPenciller() == null)
+            prefill = "";
+        else
+            prefill = mComic.getPenciller();
+        showInputDialog("Edit penciller", prefill, "Penciller", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setPenciller(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditWriter() {
+        String prefill;
+        if (mComic.getWriter() == null)
+            prefill = "";
+        else
+            prefill = mComic.getWriter();
+        showInputDialog("Edit writer", prefill, "Writer", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setWriter(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditDescription()
+    {
+
+        showInputDialog("Edit description", "", "Description", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setDescription(charSequence.toString());
+                setMetadata();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditYear() {
+        showInputDialog("Edit year", ""+mComic.getEditedYear(), "Year", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                int year = -1;
+                try {
+                    year = Integer.parseInt(charSequence.toString());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Toast.makeText(InfoActivity.this, "Invalid year", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (year<0)
+                {
+                    Toast.makeText(InfoActivity.this, "Years can't be negative", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                mComic.setEditedYear(year);
+                setYear();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditTitle()
+    {
+        showInputDialog("Edit title", mComic.getEditedTitle(), "Title", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                mComic.setEditedTitle(charSequence.toString());
+                setTitleTextView();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void handleEditIssueNumber()
+    {
+        showInputDialog("Edit issue number", ""+mComic.getEditedIssueNumber(), "Issue number", new MaterialDialog.InputCallback() {
+            @Override
+            public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                int issueNumber = -1;
+                try {
+                    issueNumber = Integer.parseInt(charSequence.toString());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Toast.makeText(InfoActivity.this, "Invalid issue number", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (issueNumber<0)
+                {
+                    Toast.makeText(InfoActivity.this, "Issue numbers can't be negative", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                mComic.setEditedIssueNumber(issueNumber);
+                setIssueNumber();
+                StorageManager.saveComic(InfoActivity.this, mComic);
+                StorageManager.saveComicToUpdate(InfoActivity.this, mComic.getFileName());
+            }
+        });
+    }
+
+    private void showInputDialog(String title, String prefill, String hint, MaterialDialog.InputCallback callback)
+    {
+        new MaterialDialog.Builder(this)
+                .title(title)
+                .titleColor(StorageManager.getAppThemeColor(this))
+                .negativeColor(StorageManager.getAppThemeColor(this))
+                .negativeText(getString(R.string.cancel))
+                .positiveText(getString(R.string.confirm))
+                .positiveColor(StorageManager.getAppThemeColor(this))
+                .input(hint, prefill, false, callback)
+                .show();
     }
 
     private void setFileInfo()
@@ -322,6 +778,7 @@ public class InfoActivity extends Activity {
         mCharactersTextView.setTextColor(color);
         mAdditionalInfoTextView.setTextColor(color);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

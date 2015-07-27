@@ -338,14 +338,14 @@ public class Comic implements Parcelable
                 comicJSON.put(EDITOR, mEditor);
             if (mCoverArtist!=null)
                 comicJSON.put(COVER_ARTIST, mCoverArtist);
-            if (mStoryArcs!=null)
+            if (mStoryArcs!=null && mStoryArcs.size()>0)
             {
                 JSONArray array = new JSONArray();
                 for (int i=0;i<mStoryArcs.size();i++)
                     array.put(mStoryArcs.get(i));
                 comicJSON.put(STORY_ARCS, array);
             }
-            if (mCharacters!=null)
+            if (mCharacters!=null && mCharacters.size()>0)
             {
                 JSONArray array = new JSONArray();
                 for (int i=0;i<mCharacters.size();i++)
@@ -573,6 +573,25 @@ public class Comic implements Parcelable
         return mStoryArcs;
     }
 
+    public void addStoryArc(String storyArc){
+        if (mStoryArcs == null)
+            mStoryArcs = new ArrayList<>();
+        if (!mStoryArcs.contains(storyArc))
+            mStoryArcs.add(storyArc);
+    }
+
+    public void removeStoryArc(String storyArc)
+    {
+        if (mStoryArcs!=null)
+            mStoryArcs.remove(storyArc);
+    }
+
+    public void removeCharacter(String character)
+    {
+        if(mCharacters!=null)
+            mCharacters.remove(character);
+    }
+
     public void setStoryArcs(ArrayList<String> storyArcs) {
         this.mStoryArcs = storyArcs;
     }
@@ -583,6 +602,14 @@ public class Comic implements Parcelable
 
     public void setCharacters(ArrayList<String> characters) {
         this.mCharacters = characters;
+    }
+
+    public void addCharacter(String character)
+    {
+        if (mCharacters == null)
+            mCharacters = new ArrayList<>();
+        if (!mCharacters.contains(character))
+            mCharacters.add(character);
     }
 
     public String getAdditionalInfo() {

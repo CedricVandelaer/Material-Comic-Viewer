@@ -502,7 +502,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                             Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
-                    Log.d("ItemClick", clickedComic.getTitle());
+                    Log.d("ItemClick", clickedComic.getEditedTitle());
                     intent.putExtra("Comic", clickedComic);
 
                     if (StorageManager.getBooleanSetting(mListFragment.getActivity(), StorageManager.USES_RECENTS, true)) {
@@ -987,12 +987,12 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 dialog.dismiss();
                 String message = "";
 
-                if (comic.getIssueNumber()!=-1) {
-                    message = comic.getTitle() + " "+comic.getIssueNumber();
+                if (comic.getEditedIssueNumber()!=-1) {
+                    message = comic.getEditedTitle() + " "+comic.getEditedIssueNumber();
                 }
                 else
                 {
-                    message = comic.getTitle();
+                    message = comic.getEditedTitle();
                 }
 
                 final String finalMessage = message;
@@ -1059,7 +1059,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
     {
         final Comic comic = (Comic) mComicList.get(i);
 
-        comicItemViewHolder.mTitle.setText(comic.getTitle() + " " + comic.getIssueNumber());
+        comicItemViewHolder.mTitle.setText(comic.getEditedTitle() + " " + comic.getEditedIssueNumber());
 
         int color = comic.getComicColor();
         int transparentColor = Color.argb(235,
@@ -1158,21 +1158,21 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
     {
         final Comic comic = (Comic) mComicList.get(i);
 
-        comicItemViewHolder.mTitle.setText(comic.getTitle());
+        comicItemViewHolder.mTitle.setText(comic.getEditedTitle());
 
         comicItemViewHolder.mCoverPicture.setImageBitmap(null);
 
-        if (comic.getIssueNumber()!=-1) {
+        if (comic.getEditedIssueNumber()!=-1) {
             comicItemViewHolder.mIssueNumber.setVisibility(View.VISIBLE);
-            comicItemViewHolder.mIssueNumber.setText(mListFragment.getActivity().getString(R.string.issue_number) + ": " + comic.getIssueNumber());
+            comicItemViewHolder.mIssueNumber.setText(mListFragment.getActivity().getString(R.string.issue_number) + ": " + comic.getEditedIssueNumber());
         }
         else {
             comicItemViewHolder.mIssueNumber.setVisibility(View.GONE);
         }
 
-        if (comic.getYear()!=-1) {
+        if (comic.getEditedYear()!=-1) {
             comicItemViewHolder.mYear.setVisibility(View.VISIBLE);
-            comicItemViewHolder.mYear.setText(mListFragment.getActivity().getString(R.string.year) + ": " + comic.getYear());
+            comicItemViewHolder.mYear.setText(mListFragment.getActivity().getString(R.string.year) + ": " + comic.getEditedYear());
         }
         else {
             comicItemViewHolder.mYear.setVisibility(View.GONE);
@@ -1310,14 +1310,14 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
     {
         final Comic comic = (Comic) mComicList.get(i);
 
-        comicItemViewHolder.mTitle.setText(comic.getTitle());
-        if (comic.getIssueNumber()!= -1)
-            comicItemViewHolder.mIssueNumber.setText(mListFragment.getActivity().getString(R.string.issue_number)+": "+comic.getIssueNumber());
+        comicItemViewHolder.mTitle.setText(comic.getEditedTitle());
+        if (comic.getEditedIssueNumber()!= -1)
+            comicItemViewHolder.mIssueNumber.setText(mListFragment.getActivity().getString(R.string.issue_number)+": "+comic.getEditedIssueNumber());
         else
             comicItemViewHolder.mIssueNumber.setText("");
 
-        if (comic.getYear()!=-1)
-            comicItemViewHolder.mYear.setText(mListFragment.getActivity().getString(R.string.year)+": "+comic.getYear());
+        if (comic.getEditedYear()!=-1)
+            comicItemViewHolder.mYear.setText(mListFragment.getActivity().getString(R.string.year)+": "+comic.getEditedYear());
         else
             comicItemViewHolder.mYear.setText("");
 
@@ -1575,6 +1575,12 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
 
             return null;
         }
+    }
+
+    public void setComic(int pos, Comic comic)
+    {
+        if (pos<mComicList.size())
+            mComicList.set(pos, comic);
     }
 
 

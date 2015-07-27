@@ -227,13 +227,6 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                     e.printStackTrace();
                 }
 
-                ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
-
-                if (!filepaths.contains(boxDir.getAbsolutePath())) {
-                    filepaths.add(boxDir.getAbsolutePath());
-                    StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
-                }
-
                 setEndNotification(boxItem.getName(), output.getAbsolutePath(), notificationId);
             }
 
@@ -311,16 +304,8 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
             outputStream.close();
             input.close();
 
-
             //rename file
             renamedOutput.renameTo(output);
-
-            ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
-
-            if (!filepaths.contains(googleDriveDir.getAbsolutePath())) {
-                filepaths.add(googleDriveDir.getAbsolutePath());
-                StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
-            }
 
             setEndNotification(fileName, output.getAbsolutePath(), notificationId);
 
@@ -402,16 +387,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
                             @Override
                             public void onDownloadCompleted(LiveDownloadOperation operation) {
 
-
                                 renamedOutput.renameTo(output);
-
-                                ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
-
-
-                                if (!filepaths.contains(oneDriveDir.getAbsolutePath())) {
-                                    filepaths.add(oneDriveDir.getAbsolutePath());
-                                    StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
-                                }
 
                                 setEndNotification(title, filePath, notificationId);
                             }
@@ -446,13 +422,6 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
                 }
                 else {
-
-                    ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
-
-                    if (!filepaths.contains(oneDriveDir.getAbsolutePath())) {
-                        filepaths.add(oneDriveDir.getAbsolutePath());
-                        StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
-                    }
 
                     try
                     {
@@ -561,15 +530,6 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
                         renamedOutput.renameTo(output);
 
-                        ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
-
-
-                        if (!filepaths.contains(dropboxDir.getAbsolutePath())) {
-                            filepaths.add(dropboxDir.getAbsolutePath());
-                            StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
-                        }
-
-
                         setEndNotification(title, filePath, notificationId);
                     }
                     else
@@ -587,13 +547,6 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
 
                 }
                 else {
-
-                    ArrayList<String> filepaths = StorageManager.getFilePathsFromPreferences(DownloadFileService.this);
-
-                    if (!filepaths.contains(dropboxDir.getAbsolutePath())) {
-                        filepaths.add(dropboxDir.getAbsolutePath());
-                        StorageManager.saveFilePaths(DownloadFileService.this, filepaths);
-                    }
 
                     DropboxAPI.Entry entry;
 

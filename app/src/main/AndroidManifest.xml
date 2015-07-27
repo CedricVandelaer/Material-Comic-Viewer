@@ -110,6 +110,7 @@
 
         <activity
             android:name=".Info.InfoActivity"
+            android:theme="@style/NewDrawerTheme"
             android:label="@string/title_activity_info" >
         </activity>
 
