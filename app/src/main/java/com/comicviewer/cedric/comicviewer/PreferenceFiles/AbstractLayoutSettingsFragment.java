@@ -69,7 +69,7 @@ public abstract class AbstractLayoutSettingsFragment extends AbstractSettingsFra
                             @Override
                             public void onNegative(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                sectionAnimationPref.setChecked(!(boolean)newValue);
+                                sectionAnimationPref.setChecked(!(boolean) newValue);
                             }
 
                         })
@@ -125,12 +125,49 @@ public abstract class AbstractLayoutSettingsFragment extends AbstractSettingsFra
 
     protected void addBackgroundPreference()
     {
+
+        CharSequence[] entries = {
+                getString(R.string.backgroundcolor_setting1),
+                getString(R.string.backgroundcolor_setting2),
+                getString(R.string.backgroundcolor_setting3),
+                getString(R.string.backgroundcolor_setting4),
+                getString(R.string.backgroundcolor_setting5)
+        };
+
+        final CharSequence[] entryValues = {
+                ""+ getResources().getColor(R.color.BlueGreyDark),
+                ""+ getResources().getColor(R.color.Black),
+                ""+ getResources().getColor(R.color.WhiteBG),
+                ""+ getResources().getColor(R.color.Brown),
+                ""+ getResources().getColor(R.color.Grey)
+        };
+
+
         ColoredListPreference backgroundPref = new ColoredListPreference(getActivity());
-        backgroundPref.setKey(StorageManager.BACKGROUND_COLOR);
+        backgroundPref.setKey(StorageManager.BACKGROUND_COLOR_INT);
         backgroundPref.setTitle(getString(R.string.background_color_setting));
-        backgroundPref.setDefaultValue(getString(R.string.backgroundcolor_setting3));
-        backgroundPref.setEntries(getResources().getTextArray(R.array.Background_colors));
-        backgroundPref.setEntryValues(getResources().getTextArray(R.array.Background_colors_values));
+        backgroundPref.setDefaultGetter(new ColoredListPreference.DefaultValueImplementation() {
+            @Override
+            public int getDefaultValuePos() {
+                int currentBgColor = StorageManager.getBackgroundColorPreference(getActivity());
+
+                for (int i=0;i<entryValues.length;i++)
+                {
+                    try {
+                        int listValue = Integer.parseInt(entryValues[i].toString());
+                        if (listValue == currentBgColor)
+                            return i;
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                return 2;
+            }
+        });
+        backgroundPref.setEntries(entries);
+        backgroundPref.setEntryValues(entryValues);
         backgroundPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {

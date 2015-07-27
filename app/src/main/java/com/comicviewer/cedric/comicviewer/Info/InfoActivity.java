@@ -336,7 +336,7 @@ public class InfoActivity extends Activity {
     private void handleRemoveCharacter()
     {
         CharSequence[] items = null;
-        if (mComic.getCharacters().size()>0) {
+        if (mComic.getCharacters()!=null && mComic.getCharacters().size()>0) {
             items = new CharSequence[mComic.getCharacters().size()];
         }
 
@@ -403,7 +403,7 @@ public class InfoActivity extends Activity {
     {
         CharSequence[] items = null;
 
-        if (mComic.getStoryArcs().size()>0)
+        if (mComic.getStoryArcs()!=null && mComic.getStoryArcs().size()>0)
             items = new CharSequence[mComic.getStoryArcs().size()];
 
         if (items!=null) {

@@ -90,9 +90,8 @@ public class StorageManager {
     public static final String KEEP_SCREEN_ON= "keepScreenOn";
     public static final String ROTATE_LANDSCAPE_PAGE= "rotateLandscapePage";
     public static final String COMIC_TO_UPDATE = "comicToUpdate";
-    public static final String DRAWER_ARROW_ANIMATION = "drawerArrowAnimation";
     public static final String MULTI_PANE = "multiPane";
-    public static final String BACKGROUND_COLOR = "backgroundColor";
+    public static final String BACKGROUND_COLOR_INT = "backgroundColorInt";
     public static final String CARD_COLOR = "cardColor";
     public static final String SCROLL_ANIMATION = "scrollAnimation";
     public static final String SECTION_ANIMATION = "sectionAnimation";
@@ -1822,46 +1821,36 @@ public class StorageManager {
 
     public static void setBackgroundColorPreference(Context context, String value)
     {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(BACKGROUND_COLOR, value);
-        editor.apply();
+        try
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+            int bgColor = Integer.parseInt(value);
+            editor.putInt(BACKGROUND_COLOR_INT, bgColor);
+            editor.apply();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     public static boolean hasWhiteBackgroundSet(Context context)
     {
         int bgColor = getBackgroundColorPreference(context);
-        return (bgColor == context.getResources().getColor(R.color.WhiteBG) || bgColor == context.getResources().getColor(R.color.White));
+
+        if (bgColor == context.getResources().getColor(R.color.WhiteBG))
+            return true;
+        if (bgColor == context.getResources().getColor(R.color.White))
+            return true;
+        return false;
     }
 
     public static int getBackgroundColorPreference(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String bgcolor = prefs.getString(BACKGROUND_COLOR, context.getString(R.string.backgroundcolor_setting3));
-        int color;
-        
-        if (bgcolor.equals(context.getString(R.string.backgroundcolor_setting1)))
-        {
-            color = context.getResources().getColor(R.color.BlueGreyVeryDark);
-        }
-        else if (bgcolor.equals(context.getString(R.string.backgroundcolor_setting2)))
-        {
-            color = context.getResources().getColor(R.color.Black);
-        }
-        else if(bgcolor.equals(context.getString(R.string.backgroundcolor_setting4)))
-        {
-            color = context.getResources().getColor(R.color.Brown);
-        }
-        else if(bgcolor.equals(context.getString(R.string.backgroundcolor_setting5)))
-        {
-            color = context.getResources().getColor(R.color.Grey);
-        }
-        else
-        {
-            color = context.getResources().getColor(R.color.WhiteBG);
-        }
-        
-        return color;
+        return prefs.getInt(BACKGROUND_COLOR_INT, context.getResources().getColor(R.color.WhiteBG));
     }
 
     public static void removeFilePath(Context context, String path)

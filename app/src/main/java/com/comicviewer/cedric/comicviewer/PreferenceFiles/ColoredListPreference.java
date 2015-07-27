@@ -18,6 +18,7 @@ public class ColoredListPreference extends ColoredPreference {
     CharSequence[] mEntryValues;
     CharSequence mDefaultValue = null;
     String mDialogTitle = null;
+    private DefaultValueImplementation mDefaultGetter = null;
 
     public void setEntries(CharSequence[] entries)
     {
@@ -90,30 +91,28 @@ public class ColoredListPreference extends ColoredPreference {
         });
     }
 
+    public void setDefaultGetter(DefaultValueImplementation impl){mDefaultGetter = impl;}
 
     private int getCurrentOrDefaultValue()
     {
+        if (mDefaultGetter != null)
+            return mDefaultGetter.getDefaultValuePos();
+
         int selected = -1;
 
         if (getKey()!=null)
         {
             CharSequence currentVal = PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getKey(), null);
 
-            if (currentVal!=null)
-            {
-                if (mEntryValues == null)
-                {
-                    for (int i =0;i<mEntries.length;i++)
-                    {
+            if (currentVal != null) {
+                if (mEntryValues == null) {
+                    for (int i = 0; i < mEntries.length; i++) {
                         CharSequence string = mEntries[i];
                         if (currentVal.equals(string))
                             selected = i;
                     }
-                }
-                else
-                {
-                    for (int i =0;i<mEntryValues.length;i++)
-                    {
+                } else {
+                    for (int i = 0; i < mEntryValues.length; i++) {
                         CharSequence string = mEntryValues[i];
                         if (currentVal.equals(string))
                             selected = i;
@@ -145,5 +144,10 @@ public class ColoredListPreference extends ColoredPreference {
         if (selected == -1)
             selected = 0;
         return selected;
+    }
+
+    public interface DefaultValueImplementation
+    {
+        abstract int getDefaultValuePos();
     }
 }

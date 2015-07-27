@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.Preference;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -19,8 +20,7 @@ import java.util.ArrayList;
 public class AbstractSettingsFragment extends PreferenceFragment implements BaseNavigationInterface {
 
     private ArrayList<Preference> mPreferences;
-    private int mBackgroundColor;
-
+    private Handler mHandler;
 
     @Override
     public void onCreate(Bundle state)
@@ -28,6 +28,7 @@ public class AbstractSettingsFragment extends PreferenceFragment implements Base
         super.onCreate(state);
         addPreferencesFromResource(R.xml.basic_preferences);
         mPreferences = new ArrayList<>();
+        mHandler = new Handler();
     }
 
     @Override
@@ -44,13 +45,12 @@ public class AbstractSettingsFragment extends PreferenceFragment implements Base
 
     protected void setBackground()
     {
-        mBackgroundColor = StorageManager.getBackgroundColorPreference(getActivity());
-        getActivity().getWindow().getDecorView().setBackgroundColor(mBackgroundColor);
+        StorageManager.setBackgroundColorPreference(getActivity());
         if (Build.VERSION.SDK_INT>20) {
-            if (mBackgroundColor == getResources().getColor(R.color.WhiteBG))
+            if (StorageManager.hasWhiteBackgroundSet(getActivity()))
                 getActivity().getWindow().setNavigationBarColor(getResources().getColor(R.color.Black));
             else
-                getActivity().getWindow().setNavigationBarColor(mBackgroundColor);
+                getActivity().getWindow().setNavigationBarColor(StorageManager.getBackgroundColorPreference(getActivity()));
         }
         setPreferenceColors();
     }
@@ -63,21 +63,30 @@ public class AbstractSettingsFragment extends PreferenceFragment implements Base
 
     protected void setPreferenceColors()
     {
-        int titleColor = getResources().getColor(R.color.White);
-        int summaryColor = getResources().getColor(R.color.GreyLight);
-        if (mBackgroundColor == getResources().getColor(R.color.WhiteBG)) {
-            titleColor = getResources().getColor(R.color.BlueGreyVeryDark);
-            summaryColor = getResources().getColor(R.color.BlueGreyDark);
-        }
-        for (Preference preference:mPreferences) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (Preference preference:mPreferences) {
 
-            if (preference instanceof ColoredPreference) {
-                ((ColoredPreference) preference).setTitleColor(titleColor);
-                ((ColoredPreference) preference).setSummaryColor(summaryColor);
-                ((ColoredPreference) preference).setIconColor(titleColor);
-                ((ColoredPreference) preference).updateColors();
+                    if (preference instanceof ColoredPreference) {
+
+                        int titleColor = getResources().getColor(R.color.White);
+                        int summaryColor = getResources().getColor(R.color.GreyLight);
+                        if (StorageManager.hasWhiteBackgroundSet(getActivity())) {
+                            titleColor = getResources().getColor(R.color.BlueGreyVeryDark);
+                            summaryColor = getResources().getColor(R.color.BlueGreyDark);
+                        }
+
+                        final ColoredPreference colorPref = (ColoredPreference) preference;
+                        colorPref.setTitleColor(titleColor);
+                        colorPref.setSummaryColor(summaryColor);
+                        colorPref.setIconColor(titleColor);
+
+                        colorPref.updateColors();
+                    }
+                }
             }
-        }
+        });
     }
 
     public void showBuyProDialog()

@@ -562,10 +562,16 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             }
 
 
-            if (StorageManager.getBackgroundColorPreference(mListFragment.getActivity()) == mListFragment.getActivity().getResources().getColor(R.color.WhiteBG)) {
+            if (StorageManager.hasWhiteBackgroundSet(mListFragment.getActivity())) {
                 comicItemViewHolder.mMarkReadTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
                 comicItemViewHolder.mOptionsTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
                 comicItemViewHolder.mMangaTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.Black));
+            }
+            else
+            {
+                comicItemViewHolder.mMarkReadTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.White));
+                comicItemViewHolder.mOptionsTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.White));
+                comicItemViewHolder.mMangaTextView.setTextColor(mListFragment.getActivity().getResources().getColor(R.color.White));
             }
 
             comicItemViewHolder.setComic((Comic) mComicList.get(position));
