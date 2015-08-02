@@ -4,7 +4,6 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -17,6 +16,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.CollectionActions;
@@ -54,7 +54,6 @@ public abstract class AbstractCollectionsFragment extends BaseFragment implement
 
     protected Handler mHandler;
 
-    private CharSequence[] smartCollectionType = {"Series", "Year", "Folders"};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -172,187 +171,5 @@ public abstract class AbstractCollectionsFragment extends BaseFragment implement
         }
     }
 
-    protected void showCollectionNameDialog()
-    {
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Add new collection")
-                .input("Name", "", false, new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                        materialDialog.dismiss();
-                        StorageManager.createCollection(getActivity(), charSequence.toString());
-                        mAdapter.notifyDataSetChanged();
-                        showSmartCollectionDialog(charSequence.toString());
-                    }
-                })
-                .positiveText(getString(R.string.confirm))
-                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                .negativeText(getString(R.string.cancel))
-                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                .show();
-    }
 
-    protected void showSmartCollectionDialog(final String collectionName)
-    {
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Add filters")
-                .items(smartCollectionType)
-                .itemsCallback(new MaterialDialog.ListCallback() {
-                    @Override
-                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                        //{"Series", "Year", "Folders"}
-                        switch (i) {
-                            case 0:
-                                showSeriesListDialog(collectionName);
-                                break;
-                            case 1:
-                                showYearListDialog(collectionName);
-                                break;
-                            case 2:
-                                showFolderListDialog(collectionName);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                })
-                .positiveText(getActivity().getResources().getString(R.string.finish))
-                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                .show();
-    }
-
-    protected void showSeriesListDialog(final String collectionName)
-    {
-        List<Comic> comics = ComicActions.getAllSimpleComics(getActivity());
-        Set<String> seriesSet = new HashSet<>();
-
-        for (Comic comic:comics) {
-            if (!comic.getTitle().trim().equals(""))
-                seriesSet.add(comic.getTitle());
-        }
-
-        ArrayList<String> series = Utilities.getStringsFromSet(seriesSet);
-        Collections.sort(series);
-        CharSequence[] seriesCharSequences = new CharSequence[series.size()];
-
-        for (int i=0;i<series.size();i++)
-            seriesCharSequences[i] = series.get(i);
-
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Select series")
-                .items(seriesCharSequences)
-                .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
-                    @Override
-                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
-                        ArrayList<String> series = new ArrayList<String>();
-                        for (int i = 0; i < charSequences.length; i++)
-                            series.add(charSequences[i].toString());
-                        CollectionActions.batchAddSeriesFilterToCollection(getActivity(), collectionName, series);
-                        showSmartCollectionDialog(collectionName);
-                        return false;
-                    }
-                })
-                .negativeText(getString(R.string.cancel))
-                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                .callback(new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-                        super.onNegative(dialog);
-                        showSmartCollectionDialog(collectionName);
-                    }
-                })
-                .positiveText(getString(R.string.confirm))
-                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                .show();
-    }
-
-    protected void showYearListDialog(final String collectionName)
-    {
-        List<Comic> comics = ComicActions.getAllSimpleComics(getActivity());
-        Set<String> yearsSet = new HashSet<>();
-
-        for (Comic comic:comics) {
-            if (comic.getYear()!=-1)
-                yearsSet.add(""+comic.getYear());
-        }
-
-        ArrayList<String> years = Utilities.getStringsFromSet(yearsSet);
-        Collections.sort(years);
-        CharSequence[] seriesCharSequences = new CharSequence[years.size()];
-
-        for (int i=0;i<years.size();i++)
-            seriesCharSequences[i] = years.get(i);
-
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Select year")
-                .items(seriesCharSequences)
-                .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
-                    @Override
-                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
-                        ArrayList<String> years = new ArrayList<String>();
-                        for (int i = 0; i < charSequences.length; i++)
-                            years.add(charSequences[i].toString());
-                        CollectionActions.batchAddYearsFilterToCollection(getActivity(), collectionName, years);
-                        showSmartCollectionDialog(collectionName);
-                        return false;
-                    }
-                })
-                .negativeText(getString(R.string.cancel))
-                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                .callback(new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-                        super.onNegative(dialog);
-                        showSmartCollectionDialog(collectionName);
-                    }
-                })
-                .positiveText(getString(R.string.confirm))
-                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                .show();
-    }
-
-    protected void showFolderListDialog(final String collectionName)
-    {
-        List<Comic> comics = ComicActions.getAllSimpleComics(getActivity());
-        Set<String> filepathSet = new HashSet<>();
-
-        for (Comic comic:comics) {
-            if (!comic.getFilePath().trim().equals(""))
-                filepathSet.add(""+comic.getFilePath());
-        }
-
-        ArrayList<String> folders = Utilities.getStringsFromSet(filepathSet);
-        Collections.sort(folders);
-        CharSequence[] seriesCharSequences = new CharSequence[folders.size()];
-
-        for (int i=0;i<folders.size();i++)
-            seriesCharSequences[i] = folders.get(i);
-
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Select folder")
-                .items(seriesCharSequences)
-                .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
-                    @Override
-                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
-                        ArrayList<String> folders = new ArrayList<String>();
-                        for (int i = 0; i < charSequences.length; i++)
-                            folders.add(charSequences[i].toString());
-                        CollectionActions.batchAddFolderFilterToCollection(getActivity(), collectionName, folders);
-                        showSmartCollectionDialog(collectionName);
-                        return false;
-                    }
-                })
-                .negativeText(getString(R.string.cancel))
-                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                .callback(new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-                        super.onNegative(dialog);
-                        showSmartCollectionDialog(collectionName);
-                    }
-                })
-                .positiveText(getString(R.string.confirm))
-                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                .show();
-    }
 }

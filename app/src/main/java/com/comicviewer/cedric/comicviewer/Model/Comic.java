@@ -620,6 +620,26 @@ public class Comic implements Parcelable
         this.mAdditionalInfo = additionalInfo;
     }
 
+    public boolean hasCreatorInfo()
+    {
+        return (mWriter != null
+                && mPenciller != null
+                && mInker != null
+                && mColorist != null
+                && mLetterer != null
+                && mEditor != null
+                && mCoverArtist != null
+                && mStoryArcs != null
+                && mCharacters != null);
+    }
+
+    public boolean hasMetadata()
+    {
+        return (mDescription!=null
+                || mAdditionalInfo != null
+                || hasCreatorInfo());
+    }
+
     private void setBasicInfo() {
         try {
             Pattern pattern = Pattern.compile("\\d\\d\\d\\d");

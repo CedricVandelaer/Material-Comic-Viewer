@@ -212,7 +212,7 @@ public class ComicActions {
             else
             {
                 //Comic was opened but not yet fully read
-                StorageManager.saveLastReadComic(context, comic.getFileName(), comic.getPageCount() - 1);
+                StorageManager.saveLastReadComic(context, comic.getFileName(), comic.getPageCount());
 
                 int pagesRead = StorageManager.getPagesReadForComic(context, comic.getFileName());
 

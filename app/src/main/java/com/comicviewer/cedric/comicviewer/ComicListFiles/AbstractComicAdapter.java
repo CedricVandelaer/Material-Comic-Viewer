@@ -1102,7 +1102,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             if (Build.VERSION.SDK_INT>15)
                 comicItemViewHolder.mLastReadIcon.setBackground(circle);
 
-            if (StorageManager.getReadComics(mListFragment.getActivity()).get(comic.getFileName())+1==comic.getPageCount())
+            if (StorageManager.getReadComics(mListFragment.getActivity()).get(comic.getFileName())+1>=comic.getPageCount())
             {
                 // Change button
                 comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);
@@ -1250,7 +1250,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 if (Build.VERSION.SDK_INT > 15)
                     comicItemViewHolder.mLastReadIcon.setBackground(null);
             }
-            if (StorageManager.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
+            if (StorageManager.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1>=comic.getPageCount())
             {
                 // Change button
                 comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);
@@ -1368,7 +1368,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                     comicItemViewHolder.mLastReadIcon.setBackground(null);
             }
 
-            if (StorageManager.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1==comic.getPageCount())
+            if (StorageManager.getReadComics(mListFragment.getActivity()).get((comic.getFileName()))+1>=comic.getPageCount())
             {
                 // Change button
                 comicItemViewHolder.mMarkReadButton.setImageResource(R.drawable.ic_close);

@@ -277,34 +277,37 @@ abstract public class AbstractComicListFragment extends BaseFragment {
 
     protected void updateLastReadComics()
     {
+        List<String> comicsToUpdate = StorageManager.getComicsToUpdate(getActivity(), true);
 
-        String lastReadComic = StorageManager.getStringSetting(mApplicationContext, StorageManager.COMIC_TO_UPDATE, getString(R.string.none));
-        for (int i=0;i<mAdapter.getComicsAndFiles().size();i++)
-        {
-            if (mAdapter.getComicsAndFiles().get(i) instanceof Comic) {
+        if (comicsToUpdate == null)
+            return;
 
-                Comic comic = (Comic) mAdapter.getComicsAndFiles().get(i);
+        for (String filename:comicsToUpdate) {
 
-                if (comic.getFileName().equals(lastReadComic)) {
+            for (int i=0;i<mAdapter.getComicsAndFiles().size();i++)
+            {
+                if (mAdapter.getComicsAndFiles().get(i) instanceof Comic) {
 
-                    ArrayList<Comic> comics = StorageManager.getSavedComics(getActivity());
+                    Comic comic = (Comic) mAdapter.getComicsAndFiles().get(i);
 
-                    for (int j=0;j<comics.size();j++)
-                    {
-                        if (comic.getFileName().equals(comics.get(j).getFileName()))
-                        {
-                            mAdapter.setComic(i, comics.get(j));
+                    if (comic.getFileName().equals(filename)) {
+
+                        ArrayList<Comic> comics = StorageManager.getSavedComics(getActivity());
+
+                        for (int j = 0; j < comics.size(); j++) {
+                            if (comic.getFileName().equals(comics.get(j).getFileName())) {
+                                mAdapter.setComic(i, comics.get(j));
+                            }
                         }
+                        final int pos = i;
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRecyclerView.setItemAnimator(null);
+                                mAdapter.notifyItemChanged(pos);
+                            }
+                        });
                     }
-
-                    final int pos = i;
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerView.setItemAnimator(null);
-                            mAdapter.notifyItemChanged(pos);
-                        }
-                    });
                 }
             }
         }

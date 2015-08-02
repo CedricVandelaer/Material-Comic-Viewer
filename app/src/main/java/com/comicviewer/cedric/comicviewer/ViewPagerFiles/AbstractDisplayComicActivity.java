@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -137,8 +138,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         mPager.setAdapter(mPagerAdapter);
 
         mMangaComic = false;
-        if ((StorageManager.getBooleanSetting(this, StorageManager.MANGA_SETTING, false) && !StorageManager.isNormalComic(this, mCurrentComic))
-                || (!(StorageManager.getBooleanSetting(this, StorageManager.MANGA_SETTING, false)) && StorageManager.isMangaComic(this, mCurrentComic)))
+        if (shouldUseMangaPosition())
         {
             mPager.setCurrentItem(mCurrentComic.getPageCount()-1);
             mMangaComic = true;
@@ -374,48 +374,47 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         @Override
         public void onPageSelected(int position) {
 
-
-            if ((StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false)
-                    && !StorageManager.isNormalComic(AbstractDisplayComicActivity.this, mCurrentComic))
-                    || (!(StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false))
-                    && StorageManager.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
+            if (shouldUseMangaPosition())
             {
-                position = mPageCount-1-position;
+                position = getMangaPagePosition(position);
             }
 
-            setPageNumber();
+            if (position<mPageCount) {
 
-            if (StorageManager.getDynamicBackgroundSetting(AbstractDisplayComicActivity.this)) {
-                int[] topBottomColors = {mPagerAdapter.getPageTopColor(position), mPagerAdapter.getPageBottomColor(position)};
-                MultiColorDrawable drawable = new MultiColorDrawable(topBottomColors, MultiColorDrawable.Orientation.VERTICAL);
-                getWindow().getDecorView().setBackground(drawable);
-            }
+                setPageNumberHidden(false);
+                setPageNumber();
 
-            int pagesRead = StorageManager.getPagesReadForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName());
-
-            if (pagesRead==0)
-            {
-                StorageManager.incrementNumberOfComicsStarted(AbstractDisplayComicActivity.this, 1);
-            }
-
-
-            StorageManager.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position);
-
-            if (position+1> pagesRead)
-            {
-                StorageManager.savePagesForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position + 1);
-                if (position+1 >= mCurrentComic.getPageCount())
-                {
-                    StorageManager.incrementNumberOfComicsRead(AbstractDisplayComicActivity.this, 1);
-                    StorageManager.saveLongestReadComic(AbstractDisplayComicActivity.this,
-                            mCurrentComic.getFileName(),
-                            mCurrentComic.getPageCount(),
-                            mCurrentComic.getTitle(),
-                            mCurrentComic.getIssueNumber());
+                if (StorageManager.getDynamicBackgroundSetting(AbstractDisplayComicActivity.this) && Build.VERSION.SDK_INT>15) {
+                    int[] topBottomColors = {mPagerAdapter.getPageTopColor(position), mPagerAdapter.getPageBottomColor(position)};
+                    MultiColorDrawable drawable = new MultiColorDrawable(topBottomColors, MultiColorDrawable.Orientation.VERTICAL);
+                    getWindow().getDecorView().setBackground(drawable);
                 }
-                StorageManager.incrementPagesForSeries(AbstractDisplayComicActivity.this, mCurrentComic.getTitle(), 1);
-            }
 
+                int pagesRead = StorageManager.getPagesReadForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName());
+
+                if (pagesRead == 0) {
+                    StorageManager.incrementNumberOfComicsStarted(AbstractDisplayComicActivity.this, 1);
+                }
+
+                StorageManager.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position);
+
+                if (position + 1 > pagesRead) {
+                    StorageManager.savePagesForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position + 1);
+                    if (position + 1 >= mCurrentComic.getPageCount()) {
+                        StorageManager.incrementNumberOfComicsRead(AbstractDisplayComicActivity.this, 1);
+                        StorageManager.saveLongestReadComic(AbstractDisplayComicActivity.this,
+                                mCurrentComic.getFileName(),
+                                mCurrentComic.getPageCount(),
+                                mCurrentComic.getTitle(),
+                                mCurrentComic.getIssueNumber());
+                    }
+                    StorageManager.incrementPagesForSeries(AbstractDisplayComicActivity.this, mCurrentComic.getTitle(), 1);
+                }
+            }
+            else
+            {
+                setPageNumberHidden(true);
+            }
 
 
         }
@@ -426,26 +425,29 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         }
     }
 
+    private int getMangaPagePosition(int regularPosition)
+    {
+        return mPageCount-1-regularPosition;
+    }
+
     private void setPageNumber()
     {
         int pageNumber = mPager.getCurrentItem()+1;
 
-        if ((StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false)
-                && !StorageManager.isNormalComic(AbstractDisplayComicActivity.this, mCurrentComic))
-                || (!(StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false))
-                && StorageManager.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
+        if (shouldUseMangaPosition())
         {
             pageNumber = mCurrentComic.getPageCount()-mPager.getCurrentItem();
         }
 
+        final String currentPageText = " "+pageNumber+" "+getString(R.string.of)+" "+mPageCount+" ";
+
         if (mPageNumberSetting.equals(getString(R.string.page_number_setting_1)) && mPageCount>0)
         {
             mPageIndicator.setVisibility(View.VISIBLE);
-            mPageIndicator.setText(" "+pageNumber+" "+getString(R.string.of)+" "+mPageCount+" ");
+            mPageIndicator.setText(currentPageText);
         }
         else if (mPageNumberSetting.equals(getString(R.string.page_number_setting_2)) && mPageCount>0)
         {
-            final String currentPageText = " "+pageNumber+" "+getString(R.string.of)+" "+mPageCount+" ";
             mPageIndicator.setVisibility(View.VISIBLE);
             mPageIndicator.setText(currentPageText);
             mHandler.postDelayed(new Runnable() {
@@ -464,6 +466,14 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             mPageIndicator.setVisibility(View.INVISIBLE);
             mPageIndicator.setText("");
         }
+    }
+
+    private void setPageNumberHidden(boolean enable)
+    {
+        if (enable)
+            mPageIndicator.setVisibility(View.INVISIBLE);
+        else
+            mPageIndicator.setVisibility(View.VISIBLE);
     }
 
     private class SetTaskDescriptionTask extends AsyncTask
@@ -521,10 +531,14 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         @Override
         public Fragment getItem(final int position) {
 
-            String filename = mCurrentComic.getFileName();
-            String comicPath = mCurrentComic.getFilePath()+ "/" + filename;
-            final ComicPageFragment fragment = ComicPageFragment.newInstance(comicPath, mPages.get(position), position);
-            return fragment;
+            if (position<mPageCount) {
+                String filename = mCurrentComic.getFileName();
+                String comicPath = mCurrentComic.getFilePath() + "/" + filename;
+                final ComicPageFragment fragment = ComicPageFragment.newInstance(comicPath, mPages.get(position), position);
+                return fragment;
+            }
+            else
+                return LastComicPageFragment.newInstance(mCurrentComic, null);
         }
 
         public void setPageTopColor(int pos, int color)
@@ -549,17 +563,17 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         @Override
         public int getCount() {
-            return mPageCount;
+            return mPageCount+1;
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            if(position<mPageCount) {
+            if(object instanceof ComicPageFragment) {
                 ComicPageFragment fragment = (ComicPageFragment) object;
                 if (fragment.mBitmap != null && !fragment.mBitmap.isRecycled())
                     fragment.mBitmap.recycle();
 
-                if (fragment.mFullscreenComicView != null) {
+                if (fragment.mFullscreenComicView != null && fragment.mFullscreenComicView.getDrawable()!=null) {
                     Bitmap bitmap = ((BitmapDrawable) fragment.mFullscreenComicView.getDrawable()).getBitmap();
                     if (bitmap != null && !bitmap.isRecycled()) {
                         bitmap.recycle();
@@ -589,7 +603,11 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         setSystemVisibilitySettings();
 
         mPageNumberSetting = StorageManager.getPageNumberSetting(this);
-        setPageNumber();
+
+        if (mPager.getCurrentItem()<mPageCount)
+            setPageNumber();
+        else
+            setPageNumberHidden(true);
 
         setPagerAnimation();
 
@@ -597,22 +615,25 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         if (mPageCount<1)
         {
-            MaterialDialog materialDialog = new MaterialDialog.Builder(AbstractDisplayComicActivity.this)
-                    .title("Error")
-                    .content("This file can not be opened by comic viewer")
-                    .positiveText("Accept")
-                    .positiveColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
-                    .callback(new MaterialDialog.ButtonCallback() {
-                        @Override
-                        public void onPositive(MaterialDialog dialog) {
-                            super.onPositive(dialog);
-                            AbstractDisplayComicActivity.this.finish();
-                        }
-                    }).show();
-
+            showErrorDialog();
         }
     }
 
+    private void showErrorDialog()
+    {
+        MaterialDialog materialDialog = new MaterialDialog.Builder(AbstractDisplayComicActivity.this)
+                .title("Error")
+                .content("This file can not be opened by comic viewer")
+                .positiveText("Accept")
+                .positiveColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        AbstractDisplayComicActivity.this.finish();
+                    }
+                }).show();
+    }
 
     private void removeExtractedFiles() {
 
@@ -642,15 +663,20 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         int pageNumber = mPager.getCurrentItem();
 
-        if ((StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false)
-                && !StorageManager.isNormalComic(AbstractDisplayComicActivity.this, mCurrentComic))
-                || (!(StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false))
-                && StorageManager.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic)))
+        if (shouldUseMangaPosition())
         {
             pageNumber = mCurrentComic.getPageCount()-1-mPager.getCurrentItem();
         }
         StorageManager.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), pageNumber);
 
+    }
+
+    private boolean shouldUseMangaPosition()
+    {
+        return (StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false)
+                && !StorageManager.isNormalComic(AbstractDisplayComicActivity.this, mCurrentComic))
+                || (!(StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.MANGA_SETTING, false))
+                && StorageManager.isMangaComic(AbstractDisplayComicActivity.this, mCurrentComic));
     }
 
     @Override

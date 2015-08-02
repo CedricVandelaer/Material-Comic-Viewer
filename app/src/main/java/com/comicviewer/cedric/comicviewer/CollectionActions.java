@@ -27,6 +27,105 @@ public class CollectionActions {
         StorageManager.saveCollections(context, collections);
     }
 
+    public static void addCharacterFilterToCollection(Context context, String collectionName, String character)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addStoryArc(character);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void addStoryArcFilterToCollection(Context context, String collectionName, String storyArc)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addStoryArc(storyArc);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void addCoverArtistFilterToCollection(Context context, String collectionName, String coverArtist)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addCoverArtist(coverArtist);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void addEditorFilterToCollection(Context context, String collectionName, String editor)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addEditor(editor);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void addLettererFilterToCollection(Context context, String collectionName, String letterer)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addLetterer(letterer);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void addColoristFilterToCollection(Context context, String collectionName, String colorist)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addColorist(colorist);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void addInkerFilterToCollection(Context context, String collectionName, String inker)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addInker(inker);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void addPencillerFilterToCollection(Context context, String collectionName, String penciller)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addPenciller(penciller);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void addWritersFilterToCollection(Context context, String collectionName, String writer)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName))
+                collection.addWriter(writer);
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
     public static void addSeriesFilterToCollection(Context context, String collectionName, String seriesName)
     {
         ArrayList<Collection> collections = StorageManager.getCollectionList(context);
