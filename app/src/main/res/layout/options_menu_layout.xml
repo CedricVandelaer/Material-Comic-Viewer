@@ -7,7 +7,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <include layout="@layout/info_layout"/>
+        <include layout="@layout/info_option_layout"/>
         <include layout="@layout/reload_option_layout"/>
     </LinearLayout>
     <LinearLayout

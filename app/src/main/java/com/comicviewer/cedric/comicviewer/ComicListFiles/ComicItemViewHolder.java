@@ -21,7 +21,7 @@ import com.bignerdranch.android.multiselector.SwappingHolder;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.swipe.SwipeLayout;
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 
 import org.w3c.dom.Text;
 

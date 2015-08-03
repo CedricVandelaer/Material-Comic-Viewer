@@ -2,11 +2,11 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.view.View;
 
-import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.CollectionDialogHelper;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 
 /**
  * Created by CV on 28/06/2015.
@@ -14,6 +14,7 @@ import com.melnykov.fab.FloatingActionButton;
 public class CollectionsFragment extends AbstractCollectionsFragment{
 
     private static CollectionsFragment mSingleton;
+    private CollectionDialogHelper mDialogHelper;
 
     public static CollectionsFragment getInstance()
     {
@@ -24,7 +25,6 @@ public class CollectionsFragment extends AbstractCollectionsFragment{
 
     public CollectionsFragment()
     {
-
     }
 
     protected void createFab(View v) {
@@ -32,11 +32,11 @@ public class CollectionsFragment extends AbstractCollectionsFragment{
         mFab.setColorNormal(StorageManager.getAccentColor(getActivity()));
         mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(getActivity())));
         mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(getActivity())));
-        mFab.attachToRecyclerView(mRecyclerView);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showCollectionNameDialog();
+                mDialogHelper = new CollectionDialogHelper(getActivity());
+                mDialogHelper.showCollectionNameDialog(mAdapter);
             }
         });
     }

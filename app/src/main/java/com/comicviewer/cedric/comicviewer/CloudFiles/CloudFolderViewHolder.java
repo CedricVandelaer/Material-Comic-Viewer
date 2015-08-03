@@ -11,7 +11,7 @@ import com.comicviewer.cedric.comicviewer.Model.OneDriveObject;
 import com.comicviewer.cedric.comicviewer.R;
 import com.daimajia.swipe.SwipeLayout;
 import com.dropbox.client2.DropboxAPI;
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 
 /**
  * Created by CV on 8/05/2015.

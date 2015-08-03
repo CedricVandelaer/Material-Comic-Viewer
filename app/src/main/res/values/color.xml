@@ -44,10 +44,15 @@
     <color name="LightGreen">#8BC34A</color>
     <color name="LightGreenLight">#AED581</color>
     <color name="LightGreenDark">#689F38</color>
+    <color name="GreenLight">#81C784</color>
     <color name="Green">#4CAF50</color>
+    <color name="GreenDark">#388E3C</color>
     <color name="Yellow">#FFEB3B</color>
     <color name="YellowLight">#FFF176</color>
     <color name="YellowDark">#FBC02D</color>
+    <color name="Amber">#FFC107</color>
+    <color name="AmberDark">#FFA000</color>
+    <color name="AmberLight">#FFD54F</color>
     <color name="Gold">#E5C100</color>
     <color name="GoldDark">#C5B100</color>
     <color name="Lime">#CDDC39</color>

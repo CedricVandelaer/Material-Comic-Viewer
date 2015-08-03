@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/tools"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center"
-    android:id="@+id/remove_collection_layout"
     android:layout_weight="1"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/remove_collection_button"
+        android:id="@+id/info_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/fab_playlist_minus"
+        android:src="@drawable/fab_information"
+        android:adjustViewBounds="true"
         android:layout_margin="16dp"
         android:layout_gravity="center"
         app:fab_showShadow="true"
@@ -21,14 +19,14 @@
         app:fab_shadowXOffset="1dp"
         app:fab_shadowYOffset="3dp"
         app:fab_size="normal"
-        fab:fab_colorNormal="@color/BlueGrey"
-        fab:fab_colorPressed="@color/BlueGreyDark"
-        fab:fab_colorRipple="@color/BlueGreyLight" />
+        app:fab_colorNormal="@color/Purple"
+        app:fab_colorPressed="@color/PurpleDark"
+        app:fab_colorRipple="@color/PurpleLight" />
     <TextView
         android:layout_gravity="center"
         android:gravity="center"
-        android:id="@+id/remove_collection_text"
-        android:text="Remove from collection"
+        android:id="@+id/info_text"
+        android:text="@string/info"
         android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_weight="1"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.melnykov.fab.FloatingActionButton
+    <com.github.clans.fab.FloatingActionButton
         android:id="@+id/reload_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_refresh"
+        android:src="@drawable/fab_refresh"
         android:adjustViewBounds="true"
         android:layout_margin="16dp"
         android:layout_gravity="center"
-        fab:fab_type="normal"
-        fab:fab_shadow="true"
-        fab:fab_colorNormal="@color/Cyan"
-        fab:fab_colorPressed="@color/CyanDark"
-        fab:fab_colorRipple="@color/CyanLight" />
+        app:fab_showShadow="true"
+        app:fab_shadowColor="#66000000"
+        app:fab_shadowRadius="4dp"
+        app:fab_shadowXOffset="1dp"
+        app:fab_shadowYOffset="3dp"
+        app:fab_size="normal"
+        app:fab_colorNormal="@color/Cyan"
+        app:fab_colorPressed="@color/CyanDark"
+        app:fab_colorRipple="@color/CyanLight" />
     <TextView
         android:layout_gravity="center"
         android:gravity="center"

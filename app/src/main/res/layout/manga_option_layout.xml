@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_weight="1"
     android:id="@+id/manga_layout"
     android:gravity="center"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.melnykov.fab.FloatingActionButton
+    <com.github.clans.fab.FloatingActionButton
         android:id="@+id/manga_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_fish"
+        android:src="@drawable/fab_fish"
         android:layout_gravity="center"
         android:adjustViewBounds="true"
         android:layout_margin="16dp"
-        fab:fab_type="normal"
-        fab:fab_shadow="true"
-        fab:fab_colorNormal="@color/Orange"
-        fab:fab_colorPressed="@color/OrangeDark"
-        fab:fab_colorRipple="@color/OrangeLight" />
+        app:fab_showShadow="true"
+        app:fab_shadowColor="#66000000"
+        app:fab_shadowRadius="4dp"
+        app:fab_shadowXOffset="1dp"
+        app:fab_shadowYOffset="3dp"
+        app:fab_size="normal"
+        app:fab_colorNormal="@color/Orange"
+        app:fab_colorPressed="@color/OrangeDark"
+        app:fab_colorRipple="@color/OrangeLight" />
     <TextView
         android:layout_gravity="center"
         android:gravity="center"

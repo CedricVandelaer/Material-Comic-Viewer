@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/bottom_wrapper"
     android:layout_width="match_parent"
     android:orientation="horizontal"
@@ -14,18 +15,22 @@
         android:layout_width="0dp"
         android:gravity="center"
         android:layout_height="match_parent">
-        <com.melnykov.fab.FloatingActionButton
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/delete_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete"
+            android:src="@drawable/fab_delete"
             android:adjustViewBounds="true"
             android:layout_margin="16dp"
-            fab:fab_type="normal"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Red"
-            fab:fab_colorPressed="@color/RedDark"
-            fab:fab_colorRipple="@color/RedLight" />
+            app:fab_showShadow="true"
+            app:fab_shadowColor="#66000000"
+            app:fab_shadowRadius="4dp"
+            app:fab_shadowXOffset="1dp"
+            app:fab_shadowYOffset="3dp"
+            app:fab_size="normal"
+            app:fab_colorNormal="@color/Red"
+            app:fab_colorPressed="@color/RedDark"
+            app:fab_colorRipple="@color/RedLight" />
         <TextView
             android:gravity="center"
             android:id="@+id/delete_text"

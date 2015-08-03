@@ -146,20 +146,22 @@ public class Collection{
 
     private boolean containsStoryArc(Comic comic)
     {
-        for (String storyArc:comic.getStoryArcs())
-        {
-            if (mStoryArcsFilters.contains(storyArc))
-                return true;
+        if (comic.getStoryArcs()!=null) {
+            for (String storyArc : comic.getStoryArcs()) {
+                if (mStoryArcsFilters.contains(storyArc))
+                    return true;
+            }
         }
         return false;
     }
 
     private boolean containsCharacter(Comic comic)
     {
-        for (String character:comic.getCharacters())
-        {
-            if (mCharactersFilters.contains(character))
-                return true;
+        if (comic.getCharacters()!=null) {
+            for (String character : comic.getCharacters()) {
+                if (mCharactersFilters.contains(character))
+                    return true;
+            }
         }
         return false;
     }

@@ -42,7 +42,7 @@ import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.devspark.robototextview.widget.RobotoTextView;
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
@@ -323,8 +323,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             setLayoutParams(configuration);
         }
 
-        if (mFab.isVisible())
-            mFab.hide(true);
+        mFab.hide(true);
 
         super.onConfigurationChanged(configuration);
 

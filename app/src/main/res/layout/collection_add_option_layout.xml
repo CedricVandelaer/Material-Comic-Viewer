@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:gravity="center"
     android:id="@+id/add_collection_layout"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_weight="1"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.melnykov.fab.FloatingActionButton
+    <com.github.clans.fab.FloatingActionButton
         android:id="@+id/add_collection_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_playlist_plus"
-        android:adjustViewBounds="true"
+        android:src="@drawable/fab_playlist_plus"
         android:layout_margin="16dp"
         android:layout_gravity="center"
-        fab:fab_type="normal"
-        fab:fab_shadow="true"
-        fab:fab_colorNormal="@color/Lime"
-        fab:fab_colorPressed="@color/LimeDark"
-        fab:fab_colorRipple="@color/LimeLight" />
+        app:fab_showShadow="true"
+        app:fab_shadowColor="#66000000"
+        app:fab_shadowRadius="4dp"
+        app:fab_shadowXOffset="1dp"
+        app:fab_shadowYOffset="3dp"
+        app:fab_size="normal"
+        fab:fab_colorNormal="@color/Amber"
+        fab:fab_colorPressed="@color/AmberDark"
+        fab:fab_colorRipple="@color/AmberLight" />
     <TextView
         android:layout_gravity="center"
         android:gravity="center"

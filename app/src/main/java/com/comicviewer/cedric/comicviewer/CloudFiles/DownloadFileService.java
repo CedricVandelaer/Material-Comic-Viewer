@@ -651,7 +651,7 @@ public class DownloadFileService extends IntentService implements LiveAuthListen
         mNotification.setContentIntent(resultPendingIntent);
         mNotification.setContentText(getString(R.string.finished_downloading) + ": " + title);
         mNotification.setProgress(0, 0, false);
-        mNotification.setSmallIcon(R.drawable.ic_check);
+        mNotification.setSmallIcon(R.drawable.fab_check);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

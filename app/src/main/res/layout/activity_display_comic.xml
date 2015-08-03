@@ -1,11 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     tools:context="com.comicviewer.cedric.comicviewer.ViewPagerFiles.DisplayComicActivity">
 
     <android.support.v7.widget.Toolbar
@@ -34,11 +32,11 @@
             android:textColor="@color/White"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"/>
-        <com.melnykov.fab.FloatingActionButton
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_right"
+            android:src="@drawable/fab_action_menu"
             android:adjustViewBounds="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
@@ -47,11 +45,15 @@
             android:layout_marginBottom="64dp"
             android:visibility="invisible"
             android:layout_alignParentBottom="true"
-            fab:fab_type="normal"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Teal"
-            fab:fab_colorPressed="@color/TealDark"
-            fab:fab_colorRipple="@color/TealLight" />
+            app:fab_size="normal"
+            app:fab_showShadow="true"
+            app:fab_shadowColor="#66000000"
+            app:fab_shadowRadius="4dp"
+            app:fab_shadowXOffset="1dp"
+            app:fab_shadowYOffset="3dp"
+            app:fab_colorNormal="@color/Teal"
+            app:fab_colorPressed="@color/TealDark"
+            app:fab_colorRipple="@color/TealLight" />
     </RelativeLayout>
 
 </LinearLayout>

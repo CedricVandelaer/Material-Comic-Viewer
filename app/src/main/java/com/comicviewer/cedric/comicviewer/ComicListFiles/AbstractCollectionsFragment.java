@@ -30,15 +30,8 @@ import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PauseOnScrollListener;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.PreCachingLayoutManager;
-import com.comicviewer.cedric.comicviewer.Utilities;
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.

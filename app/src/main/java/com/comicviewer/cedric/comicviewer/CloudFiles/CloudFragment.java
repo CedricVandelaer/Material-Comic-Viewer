@@ -33,12 +33,12 @@ import com.comicviewer.cedric.comicviewer.Utilities;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.melnykov.fab.FloatingActionButton;
 import com.microsoft.live.LiveAuthClient;
 import com.microsoft.live.LiveAuthException;
 import com.microsoft.live.LiveAuthListener;
@@ -289,7 +289,19 @@ public class CloudFragment extends BaseFragment implements SwipeRefreshLayout.On
         mFab.setColorNormal(StorageManager.getAccentColor(getActivity()));
         mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(getActivity())));
         mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(getActivity())));
-        mFab.attachToRecyclerView(mRecyclerView);
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (Math.abs(dy) > 4) {
+                    if (dy > 0) {
+                        mFab.hide(true);
+                    } else {
+                        mFab.show(true);
+                    }
+                }
+            }
+        });
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -450,13 +462,18 @@ public class CloudFragment extends BaseFragment implements SwipeRefreshLayout.On
         @Override
         protected Void doInBackground(Object... params) {
             try {
-                String token = fetchToken();
+                final String token = fetchToken();
                 if (token != null) {
                     // **Insert the good stuff here.**
                     // Use the token to access the user's Google data.
                     Log.d("Google Drive", "Token: " + token);
 
-                    new GetGoogleUserNameTask(token, mEmail).execute();
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            new GetGoogleUserNameTask(token, mEmail).execute();
+                        }
+                    });
 
                 }
             } catch (IOException e) {

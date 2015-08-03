@@ -44,7 +44,7 @@ import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.SlideLeftAnimato
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.SlideRightAnimator;
 import com.comicviewer.cedric.comicviewer.SearchFilter;
 import com.comicviewer.cedric.comicviewer.Utilities;
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
@@ -208,7 +208,19 @@ abstract public class AbstractComicListFragment extends BaseFragment {
         mFab.setColorNormal(StorageManager.getAccentColor(getActivity()));
         mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(getActivity())));
         mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(getActivity())));
-        mFab.attachToRecyclerView(mRecyclerView);
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (Math.abs(dy) > 4) {
+                    if (dy > 0) {
+                        mFab.hide(true);
+                    } else {
+                        mFab.show(true);
+                    }
+                }
+            }
+        });
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

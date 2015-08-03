@@ -41,7 +41,7 @@ public class CollectionDialogHelper {
         mContext = context;
     }
 
-    protected void showCollectionNameDialog(final RecyclerView.Adapter adapter)
+    public void showCollectionNameDialog(final RecyclerView.Adapter adapter)
     {
         MaterialDialog dialog = new MaterialDialog.Builder(mContext)
                 .title("Add new collection")

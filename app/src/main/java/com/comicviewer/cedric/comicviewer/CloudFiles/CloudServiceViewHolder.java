@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
 import com.comicviewer.cedric.comicviewer.R;
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 
 /**
  * Created by CV on 6/05/2015.

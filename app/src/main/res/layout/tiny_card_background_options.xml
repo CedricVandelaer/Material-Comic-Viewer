@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:fab="http://schemas.android.com/apk/res-auto"
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/bottom_wrapper"
     android:layout_width="match_parent"
     android:orientation="horizontal"
@@ -14,18 +15,22 @@
         android:layout_width="0dp"
         android:gravity="center"
         android:layout_height="match_parent">
-        <com.melnykov.fab.FloatingActionButton
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/mark_read_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_check"
+            android:src="@drawable/fab_check"
             android:adjustViewBounds="true"
             android:layout_margin="6dp"
-            fab:fab_type="mini"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Teal"
-            fab:fab_colorPressed="@color/TealDark"
-            fab:fab_colorRipple="@color/TealLight" />
+            app:fab_showShadow="true"
+            app:fab_shadowColor="#66000000"
+            app:fab_shadowRadius="4dp"
+            app:fab_shadowXOffset="1dp"
+            app:fab_shadowYOffset="3dp"
+            app:fab_size="mini"
+            app:fab_colorNormal="@color/Teal"
+            app:fab_colorPressed="@color/TealDark"
+            app:fab_colorRipple="@color/TealLight" />
         <TextView
             android:gravity="center"
             android:id="@+id/mark_read_text"
@@ -42,18 +47,22 @@
         android:layout_width="0dp"
         android:gravity="center"
         android:layout_height="match_parent">
-        <com.melnykov.fab.FloatingActionButton
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/manga_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_fish"
+            android:src="@drawable/fab_fish"
             android:adjustViewBounds="true"
             android:layout_margin="6dp"
-            fab:fab_type="mini"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Orange"
-            fab:fab_colorPressed="@color/OrangeDark"
-            fab:fab_colorRipple="@color/OrangeLight" />
+            app:fab_showShadow="true"
+            app:fab_shadowColor="#66000000"
+            app:fab_shadowRadius="4dp"
+            app:fab_shadowXOffset="1dp"
+            app:fab_shadowYOffset="3dp"
+            app:fab_size="mini"
+            app:fab_colorNormal="@color/Orange"
+            app:fab_colorPressed="@color/OrangeDark"
+            app:fab_colorRipple="@color/OrangeLight" />
         <TextView
             android:gravity="center"
             android:id="@+id/manga_text"
@@ -70,18 +79,22 @@
         android:layout_width="0dp"
         android:gravity="center"
         android:layout_height="match_parent">
-        <com.melnykov.fab.FloatingActionButton
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/more_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_dots_horizontal"
+            android:src="@drawable/fab_dots_horizontal"
             android:adjustViewBounds="true"
             android:layout_margin="6dp"
-            fab:fab_type="mini"
-            fab:fab_shadow="true"
-            fab:fab_colorNormal="@color/Purple"
-            fab:fab_colorPressed="@color/PurpleDark"
-            fab:fab_colorRipple="@color/PurpleLight" />
+            app:fab_showShadow="true"
+            app:fab_shadowColor="#66000000"
+            app:fab_shadowRadius="4dp"
+            app:fab_shadowXOffset="1dp"
+            app:fab_shadowYOffset="3dp"
+            app:fab_size="mini"
+            app:fab_colorNormal="@color/Purple"
+            app:fab_colorPressed="@color/PurpleDark"
+            app:fab_colorRipple="@color/PurpleLight" />
         <TextView
             android:gravity="center"
             android:id="@+id/more_text"

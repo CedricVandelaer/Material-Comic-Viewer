@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
@@ -277,11 +278,13 @@ public class ComicAdapter extends AbstractComicAdapter {
                                             public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
                                                 StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
                                                 CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                                Toast.makeText(mListFragment.getActivity(), "Comic added to "+charSequence.toString()+"!", Toast.LENGTH_SHORT).show();
                                             }
                                         })
                                         .show();
                             } else {
                                 CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                Toast.makeText(mListFragment.getActivity(), "Comic added to "+charSequence.toString()+"!", Toast.LENGTH_SHORT).show();
                             }
                         }
                     })
