@@ -82,7 +82,8 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
             mListFragment.getActivity().getMenuInflater().inflate(R.menu.edit_menu, menu);
-
+            if (Build.VERSION.SDK_INT>20)
+                mListFragment.getActivity().getWindow().setStatusBarColor(mListFragment.getResources().getColor(R.color.BlueGreyDark));
             return true;
         }
 
@@ -131,6 +132,9 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             {
                 notifyItemChanged(pos);
             }
+
+            if (Build.VERSION.SDK_INT>20)
+                mListFragment.getActivity().getWindow().setStatusBarColor(Utilities.darkenColor(StorageManager.getAppThemeColor(mListFragment.getActivity())));
 
         }
 
@@ -348,8 +352,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
             public void onClick(View v) {
                 folderItemViewHolder.mSwipeLayout.close();
 
-                if (folderItemViewHolder.getFile().getName().equals("ComicViewer"))
-                {
+                if (folderItemViewHolder.getFile().getName().equals("ComicViewer")) {
                     Toast.makeText(mListFragment.getActivity(), mListFragment.getActivity().getString(R.string.folder_rename_error), Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -496,6 +499,29 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                 if (!mMultiSelector.tapSelection(vh)) {
                     Intent intent = new Intent(mListFragment.getActivity(), DisplayComicActivity.class);
                     Comic clickedComic = (Comic) vh.getComic();
+
+                    ArrayList<Comic> nextComics = new ArrayList<Comic>();
+
+                    int i = 0;
+                    boolean found = false;
+                    while (i<mComicList.size() && !found)
+                    {
+                        if (mComicList.get(i) instanceof Comic)
+                        {
+                            if (((Comic)mComicList.get(i)).getFileName().equals(clickedComic.getFileName()))
+                                found = true;
+                        }
+                        i++;
+                    }
+
+                    if (found) {
+                        for (; i < mComicList.size(); i++) {
+                            if (mComicList.get(i) instanceof Comic)
+                                nextComics.add((Comic) mComicList.get(i));
+                        }
+
+                        intent.putParcelableArrayListExtra("NextComics", nextComics);
+                    }
 
                     InputMethodManager imm = (InputMethodManager) mListFragment.getActivity().getSystemService(
                             Context.INPUT_METHOD_SERVICE);

@@ -51,7 +51,7 @@ import javax.xml.transform.stream.StreamResult;
 public class StorageManager {
 
     private static final String SAVED_COMICS = "savedComics";
-    private static final String FAVORITE_COMIC_LIST = "favoriteComicList";
+    private static final String FAVORITE_COMIC_LIST_JSON = "favoriteComicListJson";
     private static final String NUMBER_OF_COMICS_READ = "numberOfComicsRead";
     private static final String NUMBER_OF_COMICS_STARTED = "numberOfComicsStarted";
     private static final String PAGES_READ_LIST = "pagesReadMap";
@@ -99,10 +99,25 @@ public class StorageManager {
     public static final String CARD_COLOR = "cardColor";
     public static final String SCROLL_ANIMATION = "scrollAnimation";
     public static final String SECTION_ANIMATION = "sectionAnimation";
+    public static final String ZOOM_FACTOR = "zoomFactor";
 
 
     public static final String COMIC_VIEWER = "ComicViewer";
 
+    public static float getZoomFactorPreference(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String value = prefs.getString(ZOOM_FACTOR, "3.0f");
+        try
+        {
+            return Float.parseFloat(value);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return 3.0f;
+        }
+    }
 
     public static boolean getBooleanSetting(Context context, String setting, boolean defaultValue)
     {
@@ -279,27 +294,6 @@ public class StorageManager {
 
         return collections;
 
-        /*
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String collectionListString = prefs.getString(COLLECTIONS_LIST, null);
-
-        if (collectionListString == null)
-        {
-            return new JSONArray();
-        }
-        else
-        {
-            try
-            {
-                return new JSONArray(collectionListString);
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-                return new JSONArray();
-            }
-        }
-        */
     }
 
     public static String getPageFlipAnimationSetting(Context context)
@@ -338,7 +332,7 @@ public class StorageManager {
             doc.getDocumentElement().normalize();
 
 
-            NodeList favoriteNodes = ((Element)doc.getElementsByTagName(FAVORITE_COMIC_LIST).item(0)).getElementsByTagName("FavoriteComic");
+            NodeList favoriteNodes = ((Element)doc.getElementsByTagName(FAVORITE_COMIC_LIST_JSON).item(0)).getElementsByTagName("FavoriteComic");
 
             for (int i=0;i<favoriteNodes.getLength();i++)
             {
@@ -443,7 +437,7 @@ public class StorageManager {
             doc.appendChild(rootElement);
 
             //children of comicInfo
-            Element favorites = doc.createElement(FAVORITE_COMIC_LIST);
+            Element favorites = doc.createElement(FAVORITE_COMIC_LIST_JSON);
             rootElement.appendChild(favorites);
 
             List<String> favoritesList = getFavoriteComics(context);
@@ -1435,30 +1429,43 @@ public class StorageManager {
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        String favoritesString = prefs.getString(FAVORITE_COMIC_LIST, "");
+        String favoritesString = prefs.getString(FAVORITE_COMIC_LIST_JSON, "");
 
-        if (!favoritesString.contains(comicFileName))
-            favoritesString += (","+comicFileName);
+        JSONArray array;
+
+        try {
+            array = new JSONArray(favoritesString);
+            for (int i=0;i<array.length();i++)
+            {
+                if (array.getString(i).equals(comicFileName))
+                    return;
+            }
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            array = new JSONArray();
+        }
+
+        array.put(comicFileName);
 
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(FAVORITE_COMIC_LIST, favoritesString);
+        editor.putString(FAVORITE_COMIC_LIST_JSON, array.toString());
         editor.apply();
 
     }
 
     public static void saveFavoriteComicList(Context context, List<String> favoritesList)
     {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        SharedPreferences.Editor editor = prefs.edit();
-
-        String favoriteString = "";
+        JSONArray array = new JSONArray();
 
         for (String favorite:favoritesList)
-        {
-            favoriteString+= (favorite+",");
-        }
-        editor.putString(FAVORITE_COMIC_LIST, favoriteString);
+            array.put(favorite);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(FAVORITE_COMIC_LIST_JSON, array.toString());
         editor.apply();
     }
 
@@ -1518,26 +1525,32 @@ public class StorageManager {
     public static List<String> getFavoriteComics(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
         ArrayList<String> favoriteArrayList = new ArrayList<>();
+        String favoritesString = prefs.getString(FAVORITE_COMIC_LIST_JSON, "");
 
-        String favoritesString = prefs.getString(FAVORITE_COMIC_LIST, "");
+        JSONArray array;
 
-        String[] favorites = favoritesString.split(",");
-
-        for (String comic:favorites)
+        try
         {
-            if (!comic.equals(""))
-                favoriteArrayList.add(comic);
+            array = new JSONArray(favoritesString);
+
+            for (int i=0;i<array.length();i++)
+            {
+                favoriteArrayList.add(array.getString(i));
+            }
+            return favoriteArrayList;
         }
-        return favoriteArrayList;
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            return favoriteArrayList;
+        }
     }
 
     public static void removeFavoriteComic(Context context, String comicFileName)
     {
         List<String> favorites = getFavoriteComics(context);
         favorites.remove(comicFileName);
-
         saveFavoriteComicList(context, favorites);
     }
 

@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,42 @@ import net.lingala.zip4j.core.ZipFile;
  * Created by Cédric on 5/03/2015.
  * Utilities for extension checking or filetype checking
  */
-public class Utilities {
+public class Utilities{
+
+    public static ArrayList<String> charSequenceArrayToStringList(CharSequence[] array)
+    {
+        ArrayList<String> list = new ArrayList<>();
+        for (int i=0;i<array.length;i++)
+            list.add(array[i].toString());
+        return list;
+    }
+
+    public static List<String> removeStringListDoubles(List<String> list)
+    {
+        Set<String> stringSet = new HashSet<>();
+
+        for (int i=0;i<list.size();i++)
+        {
+            stringSet.add(list.get(i));
+        }
+
+        return getStringsFromSet(stringSet);
+    }
+
+    public static CharSequence[] stringListToCharSequenceArray(List<String> list)
+    {
+        if (list.size()==0)
+            return new CharSequence[]{};
+
+        CharSequence[] array = new CharSequence[list.size()];
+
+        for (int i=0;i<list.size();i++)
+        {
+            array[i] = list.get(i);
+        }
+
+        return array;
+    }
 
     public static ArrayList<View> getAllChildren(View v) {
 

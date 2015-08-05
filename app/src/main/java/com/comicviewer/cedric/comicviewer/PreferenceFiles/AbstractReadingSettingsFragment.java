@@ -29,10 +29,25 @@ public abstract class AbstractReadingSettingsFragment extends AbstractSettingsFr
         addShowToolbarSetting();
         addForcePortraitSetting();
         addPagingOnZoomSetting();
+        addZoomFactorSetting();
         addScrollOnTapSetting();
         addReadingBackgroundSetting();
         addPageNumberSetting();
         addPageAnimationSetting();
+    }
+
+    private void addZoomFactorSetting() {
+
+        CharSequence[] entries = {"1.5x", "2x", "3x", "4x", "4.5x"};
+        CharSequence[] values = {"1.5f", "2.0f", "3.0f", "4.0f", "4.5f"};
+
+        ColoredListPreference zoomFactorPreference = new ColoredListPreference(getActivity());
+        zoomFactorPreference.setKey(StorageManager.ZOOM_FACTOR);
+        zoomFactorPreference.setTitle("Zoom factor");
+        zoomFactorPreference.setDefaultValue("3.0f");
+        zoomFactorPreference.setEntries(entries);
+        zoomFactorPreference.setEntryValues(values);
+        addPreference(zoomFactorPreference);
     }
 
     protected abstract void addPageAnimationSetting();

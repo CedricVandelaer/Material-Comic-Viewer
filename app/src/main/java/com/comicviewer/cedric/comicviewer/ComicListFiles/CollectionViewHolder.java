@@ -27,6 +27,9 @@ public class CollectionViewHolder extends RecyclerView.ViewHolder {
     protected FloatingActionButton mRenameButton;
     protected TextView mRenameTextView;
 
+    protected FloatingActionButton mInfoButton;
+    protected TextView mInfoTextView;
+
     private String mCollectionName;
 
     public CollectionViewHolder(View itemView) {
@@ -40,6 +43,9 @@ public class CollectionViewHolder extends RecyclerView.ViewHolder {
         mDeleteTextView = (TextView) itemView.findViewById(R.id.delete_text);
         mRenameButton = (FloatingActionButton) itemView.findViewById(R.id.rename_button);
         mRenameTextView = (TextView) itemView.findViewById(R.id.rename_text);
+        mInfoButton = (FloatingActionButton) itemView.findViewById(R.id.info_button);
+        mInfoTextView = (TextView) itemView.findViewById(R.id.info_text);
+
     }
 
     public void setCollectionName(String name)

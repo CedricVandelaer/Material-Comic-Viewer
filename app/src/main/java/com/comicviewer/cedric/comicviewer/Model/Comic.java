@@ -623,14 +623,14 @@ public class Comic implements Parcelable
     public boolean hasCreatorInfo()
     {
         return (mWriter != null
-                && mPenciller != null
-                && mInker != null
-                && mColorist != null
-                && mLetterer != null
-                && mEditor != null
-                && mCoverArtist != null
-                && mStoryArcs != null
-                && mCharacters != null);
+                || mPenciller != null
+                || mInker != null
+                || mColorist != null
+                || mLetterer != null
+                || mEditor != null
+                || mCoverArtist != null
+                || mStoryArcs != null
+                || mCharacters != null);
     }
 
     public boolean hasMetadata()

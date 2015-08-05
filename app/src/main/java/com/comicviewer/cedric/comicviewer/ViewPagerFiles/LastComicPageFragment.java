@@ -2,6 +2,8 @@ package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import com.comicviewer.cedric.comicviewer.Model.Collection;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
+import com.comicviewer.cedric.comicviewer.Utilities;
 import com.github.clans.fab.FloatingActionButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -29,8 +32,10 @@ import java.util.ArrayList;
  */
 public class LastComicPageFragment extends Fragment {
 
-    protected ArrayList<Comic> mComicList;
+    private LayoutInflater mInflater;
+
     protected Comic mCurrentComic;
+    protected ArrayList<Comic> mComicList;
 
     protected LinearLayout mInfoLayout;
     protected ImageView mParallaxImageView;
@@ -54,6 +59,16 @@ public class LastComicPageFragment extends Fragment {
     protected FloatingActionButton mAddToCollectionFab;
     protected TextView mAddToCollectionTextView;
 
+    protected FloatingActionButton mFavoriteFab;
+    protected TextView mFavoriteTextView;
+
+    protected FloatingActionButton mExitFab;
+    protected TextView mExitTextView;
+
+    protected TextView mNextComicsErrorTextView;
+    protected LinearLayout mNextComicLayout;
+
+
     public static LastComicPageFragment newInstance(Comic currentComic, ArrayList<Comic> nextComics)
     {
         LastComicPageFragment fragment = new LastComicPageFragment();
@@ -61,6 +76,7 @@ public class LastComicPageFragment extends Fragment {
         Bundle args = new Bundle();
 
         args.putParcelable("Comic", currentComic);
+        args.putParcelableArrayList("NextComics", nextComics);
 
         fragment.setArguments(args);
 
@@ -79,8 +95,13 @@ public class LastComicPageFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_last_comic_page, container, false);
 
+        mInflater = inflater;
+
         if (getArguments().getParcelable("Comic")!=null)
             mCurrentComic = getArguments().getParcelable("Comic");
+
+        if (getArguments().getParcelableArrayList("NextComics")!=null)
+            mComicList = getArguments().getParcelableArrayList("NextComics");
 
         mParallaxImageView = (ImageView)v.findViewById(R.id.parallax_image_view);
         mInfoLayout = (LinearLayout) v.findViewById(R.id.info_layout);
@@ -103,18 +124,117 @@ public class LastComicPageFragment extends Fragment {
         mAddToCollectionFab = (FloatingActionButton) v.findViewById(R.id.add_collection_button);
         mAddToCollectionTextView = (TextView) v.findViewById(R.id.add_collection_text);
 
+        mFavoriteFab = (FloatingActionButton) v.findViewById(R.id.favorite_button);
+        mFavoriteTextView = (TextView) v.findViewById(R.id.favorite_text);
+
+        mExitFab = (FloatingActionButton) v.findViewById(R.id.exit_button);
+        mExitTextView = (TextView) v.findViewById(R.id.exit_text);
+
+        mNextComicLayout = (LinearLayout) v.findViewById(R.id.next_comics_layout);
+        mNextComicsErrorTextView = (TextView) v.findViewById(R.id.no_comics_text_view);
+
         ImageLoader.getInstance().displayImage(mCurrentComic.getCoverImage(), mParallaxImageView);
 
         mInfoLayout.setBackgroundColor(mCurrentComic.getComicColor());
         setEssentialInfo();
         setMetadataInfo();
         setComicActions();
+        setNextComicViews();
 
         return v;
     }
 
+    private void setNextComicViews() {
+
+        if (mComicList == null || mComicList.size()==0) {
+            mNextComicsErrorTextView.setVisibility(View.VISIBLE);
+            return;
+        }
+        for (int i=0;i<3 && i<mComicList.size();i++)
+        {
+            LinearLayout layout = (LinearLayout) mInflater.inflate(R.layout.simple_comic_layout, mNextComicLayout, false);
+            TextView title = (TextView) layout.findViewById(R.id.simple_comic_text_view);
+            if (mComicList.get(i).getEditedIssueNumber()!=-1)
+                title.setText(mComicList.get(i).getEditedTitle()+" "+mComicList.get(i).getEditedIssueNumber());
+            else
+                title.setText(mComicList.get(i).getEditedTitle());
+            title.setTextColor(Utilities.lightenColor(mComicList.get(i).getTextColor()));
+            ImageView image = (ImageView) layout.findViewById(R.id.simple_comic_image_view);
+            ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(), image);
+            layout.setBackgroundColor(mComicList.get(i).getComicColor());
+            final int finalI = i;
+            layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), DisplayComicActivity.class);
+
+                    intent.putExtra("Comic", mComicList.get(finalI));
+                    ArrayList<Comic> newNextComics = new ArrayList<Comic>();
+                    for (int j=finalI+1;j<mComicList.size();j++)
+                    {
+                        newNextComics.add(mComicList.get(j));
+                    }
+                    intent.putExtra("NextComics", newNextComics);
+                    if (StorageManager.getBooleanSetting(getActivity(), StorageManager.USES_RECENTS, true)) {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                    }
+
+                    getActivity().startActivity(intent);
+                    getActivity().finish();
+                }
+            });
+            mNextComicLayout.addView(layout);
+        }
+    }
+
     private void setComicActions() {
         setAddCollectionAction();
+        setFavoriteAction();
+        setExitAction();
+    }
+
+    private void setExitAction() {
+        mExitTextView.setTextColor(getResources().getColor(R.color.BlueGreyDark));
+        mExitFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().finish();
+            }
+        });
+    }
+
+    private void setFavoriteAction() {
+
+        mFavoriteTextView.setTextColor(getResources().getColor(R.color.BlueGreyDark));
+
+        if (StorageManager.getFavoriteComics(getActivity()).contains(mCurrentComic.getFileName()))
+        {
+            mFavoriteTextView.setText("Unfavorite");
+            mFavoriteFab.setImageResource(R.drawable.fab_star);
+            mFavoriteFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StorageManager.removeFavoriteComic(getActivity(), mCurrentComic.getFileName());
+                    setFavoriteAction();
+                }
+            });
+        }
+        else
+        {
+            mFavoriteTextView.setText("Favorite");
+            mFavoriteFab.setImageResource(R.drawable.fab_star_outline);
+            mFavoriteFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StorageManager.saveFavoriteComic(getActivity(), mCurrentComic.getFileName());
+                    setFavoriteAction();
+                }
+            });
+        }
+
+
+
     }
 
     private void setAddCollectionAction() {
@@ -143,6 +263,9 @@ public class LastComicPageFragment extends Fragment {
 
         MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                 .title("Choose collection")
+                .titleColor(getResources().getColor(R.color.Black))
+                .itemColor(getResources().getColor(R.color.GreyDark))
+                .backgroundColor(getResources().getColor(R.color.White))
                 .items(collectionNames)
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override
@@ -150,6 +273,8 @@ public class LastComicPageFragment extends Fragment {
                         if (charSequence.equals(newCollection)) {
                             MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                                     .title("Create new collection")
+                                    .titleColor(getResources().getColor(R.color.Black))
+                                    .backgroundColor(getResources().getColor(R.color.White))
                                     .input("Collection name", "", false, new MaterialDialog.InputCallback() {
                                         @Override
                                         public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
@@ -157,10 +282,24 @@ public class LastComicPageFragment extends Fragment {
                                             CollectionActions.addComicToCollection(getActivity(), charSequence.toString(), mCurrentComic);
                                         }
                                     })
+                                    .positiveText(getString(R.string.confirm))
+                                    .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                                    .dismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            ((AbstractDisplayComicActivity)getActivity()).setSystemVisibilitySettings();
+                                        }
+                                    })
                                     .show();
                         } else {
                             CollectionActions.addComicToCollection(getActivity(), charSequence.toString(), mCurrentComic);
                         }
+                    }
+                })
+                .dismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        ((AbstractDisplayComicActivity)getActivity()).setSystemVisibilitySettings();
                     }
                 })
                 .show();

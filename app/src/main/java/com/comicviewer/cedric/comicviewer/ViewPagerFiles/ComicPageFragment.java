@@ -187,6 +187,9 @@ public class ComicPageFragment extends Fragment {
         mPageNumber = args.getInt("PageNumber");
         mFullscreenComicView = (TouchImageView) rootView.findViewById(R.id.fullscreen_comic);
 
+        if (getActivity()!=null)
+            mFullscreenComicView.setMaxZoom(StorageManager.getZoomFactorPreference(getActivity()));
+
         if (getActivity()!= null && StorageManager.getBooleanSetting(getActivity(), StorageManager.SCROLL_BY_TAP_SETTING, false)) {
             final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.OnGestureListener() {
                 @Override

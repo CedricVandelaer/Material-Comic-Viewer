@@ -49,6 +49,7 @@ import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by CV on 28/06/2015.
@@ -57,6 +58,8 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
     //The comic to be displayed
     protected Comic mCurrentComic;
+
+    protected ArrayList<Comic> mNextComics;
 
     //The number of pages of the comic
     protected int mPageCount;
@@ -114,6 +117,11 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         else {
             mCurrentComic = intent.getParcelableExtra("Comic");
         }
+
+        if (intent.getParcelableArrayListExtra("NextComics")!=null)
+            mNextComics = intent.getParcelableArrayListExtra("NextComics");
+        else
+            mNextComics = null;
 
         if (StorageManager.getDynamicBackgroundSetting(this))
             getWindow().getDecorView().setBackgroundColor(mCurrentComic.getComicColor());
@@ -181,7 +189,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         }
     };
 
-    protected void setSystemVisibilitySettings()
+    public void setSystemVisibilitySettings()
     {
         if (Build.VERSION.SDK_INT>18 &&!StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false)) {
 
@@ -537,7 +545,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
                 return fragment;
             }
             else
-                return LastComicPageFragment.newInstance(mCurrentComic, null);
+                return LastComicPageFragment.newInstance(mCurrentComic, mNextComics);
         }
 
         public void setPageTopColor(int pos, int color)

@@ -14,6 +14,123 @@ import java.util.ArrayList;
  */
 public class CollectionActions {
 
+    public static void batchAddCharacterToCollection(Context context, String collectionName, ArrayList<String> characters)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String character:characters)
+                    collection.addCharacter(character);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void batchAddStoryArcToCollection(Context context, String collectionName, ArrayList<String> storyArcs)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String storyArc:storyArcs)
+                    collection.addStoryArc(storyArc);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void batchAddCoverArtistsToCollection(Context context, String collectionName, ArrayList<String> coverArtists)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String coverArtist:coverArtists)
+                    collection.addCoverArtist(coverArtist);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void batchAddEditorToCollection(Context context, String collectionName, ArrayList<String> editors)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String editor:editors)
+                    collection.addEditor(editor);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void batchAddLetterersToCollection(Context context, String collectionName, ArrayList<String> letterers)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String letterer:letterers)
+                    collection.addLetterer(letterer);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void batchAddColoristsToCollection(Context context, String collectionName, ArrayList<String> colorists)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String colorist:colorists)
+                    collection.addColorist(colorist);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void batchAddInkersToCollection(Context context, String collectionName, ArrayList<String> inkers)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String inker:inkers)
+                    collection.addInker(inker);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void batchAddPencillersToCollection(Context context, String collectionName, ArrayList<String> pencillers)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String penciller:pencillers)
+                    collection.addPenciller(penciller);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
+    public static void batchAddWriterFilterToCollection(Context context, String collectionName, ArrayList<String> writers)
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        for (Collection collection:collections)
+        {
+            if (collection.getName().equals(collectionName)) {
+                for (String writer:writers)
+                    collection.addWriter(writer);
+            }
+        }
+        StorageManager.saveCollections(context, collections);
+    }
+
     public static void batchAddSeriesFilterToCollection(Context context, String collectionName, ArrayList<String> seriesNames)
     {
         ArrayList<Collection> collections = StorageManager.getCollectionList(context);

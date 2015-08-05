@@ -7,9 +7,12 @@ import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
+import com.comicviewer.cedric.comicviewer.Model.Collection;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
+
+import java.util.ArrayList;
 
 /**
  * Created by CV on 22/06/2015.
@@ -34,9 +37,41 @@ public class CollectionsAdapter extends RecyclerView.Adapter{
         CollectionViewHolder vh = new CollectionViewHolder(v);
 
         addDeleteClickListener(vh.mDeleteButton, vh);
+        addInfoClickListener(vh.mInfoButton, vh);
         addRenameClickListener(vh.mRenameButton, vh);
 
         return vh;
+    }
+
+    private void addInfoClickListener(View v, final CollectionViewHolder vh) {
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                vh.mSwipeLayout.close();
+                String info = "Filters:";
+                ArrayList<Collection> collections = StorageManager.getCollectionList(mCollectionsFragment.getActivity());
+                Collection currentCollection = null;
+
+                for (int i=0;i<collections.size();i++)
+                {
+                    if (collections.get(i).getName().equals(vh.getCollectionName()))
+                        currentCollection = collections.get(i);
+                }
+                if (currentCollection == null)
+                    return;
+
+                for (String filter:currentCollection.getAllFilters())
+                    info+="\n"+filter;
+
+                MaterialDialog dialog = new MaterialDialog.Builder(mCollectionsFragment.getActivity())
+                        .title(mCollectionsFragment.getString(R.string.info))
+                        .content(info)
+                        .positiveColor(StorageManager.getAppThemeColor(mCollectionsFragment.getActivity()))
+                        .positiveText(mCollectionsFragment.getString(R.string.confirm))
+                        .show();
+            }
+        });
     }
 
     private void addRenameClickListener(View v, final CollectionViewHolder vh) {

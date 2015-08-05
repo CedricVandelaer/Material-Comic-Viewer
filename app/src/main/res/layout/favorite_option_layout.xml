@@ -7,10 +7,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/info_button"
+        android:id="@+id/favorite_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/fab_information"
+        android:src="@drawable/fab_star_outline"
         android:adjustViewBounds="true"
         android:layout_margin="16dp"
         android:layout_gravity="center"
@@ -20,14 +20,14 @@
         app:fab_shadowXOffset="1dp"
         app:fab_shadowYOffset="3dp"
         app:fab_size="normal"
-        app:fab_colorNormal="@color/Purple"
-        app:fab_colorPressed="@color/PurpleDark"
-        app:fab_colorRipple="@color/PurpleLight" />
+        app:fab_colorNormal="@color/Pink"
+        app:fab_colorPressed="@color/PinkDark"
+        app:fab_colorRipple="@color/PinkLight" />
     <TextView
         android:layout_gravity="center"
         android:gravity="center"
-        android:id="@+id/info_text"
-        android:text="@string/info"
+        android:id="@+id/favorite_text"
+        android:text="Favorite"
         android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
