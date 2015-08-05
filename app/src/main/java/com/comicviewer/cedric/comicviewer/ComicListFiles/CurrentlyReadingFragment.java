@@ -39,7 +39,7 @@ public class CurrentlyReadingFragment extends AbstractComicListFragment {
 
         mFilters.clear();
 
-        mFilters.add(new SearchFilter(StorageManager.getReadComics(mApplicationContext)) {
+        mFilters.add(new SearchFilter(StorageManager.getComicPositionsMap(mApplicationContext)) {
             @Override
             public boolean compare(Object object) {
 

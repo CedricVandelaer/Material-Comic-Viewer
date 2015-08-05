@@ -56,9 +56,11 @@ public class OtherSettingsFragment extends AbstractOtherSettingsFragment {
                             @Override
                             public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
                                 materialDialog.dismiss();
+                                ArrayList<String> pathsToRemove = new ArrayList<String>();
                                 for (int i = 0; i < charSequences.length; i++) {
-                                    StorageManager.removeHiddenPath(getActivity(), charSequences[i].toString());
+                                    pathsToRemove.add(charSequences[i].toString());
                                 }
+                                StorageManager.batchRemoveHiddenPaths(getActivity(), pathsToRemove);
 
                                 return false;
                             }

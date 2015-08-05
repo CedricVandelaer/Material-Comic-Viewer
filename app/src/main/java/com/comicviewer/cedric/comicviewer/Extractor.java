@@ -174,48 +174,4 @@ public class Extractor {
         return pages;
     }
 
-    /*
-    public static String loadImageFromRar(Context context, Comic comic, int pageNumber)
-    {
-        File comicArchive = new File(comic.getFilePath()+"/"+comic.getFileName());
-        try {
-            Archive arch = new Archive(comicArchive);
-            List<FileHeader> fileheaders = arch.getFileHeaders();
-
-            for (int j = 0; j < fileheaders.size(); j++) {
-
-                String extractedImageFile = fileheaders.get(j).getFileNameString().substring(fileheaders.get(j).getFileNameString().lastIndexOf("\\")+1);
-
-                if (fileheaders.get(j).getFileNameString().equals(mImageFileName))
-                {
-                    // get rid of special chars
-                    if (extractedImageFile.contains("#"))
-                        extractedImageFile = extractedImageFile.replaceAll("#","");
-
-                    if (getActivity()==null)
-                        throw new NullPointerException("Activity is null while loading page");
-                    File directory = new File(getActivity().getFilesDir().getPath()+"/"+mFolderName);
-                    directory.mkdir();
-                    File outputPage = new File(directory.getPath(), extractedImageFile);
-
-                    if (!outputPage.exists()) {
-                        FileOutputStream osPage = new FileOutputStream(outputPage);
-                        arch.extractFile(fileheaders.get(j), osPage);
-                    }
-
-                    Log.d("Extract rar",extractedImageFile);
-                    return extractedImageFile;
-                }
-            }
-
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-    */
-
 }

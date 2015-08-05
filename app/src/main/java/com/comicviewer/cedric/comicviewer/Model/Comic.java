@@ -493,6 +493,16 @@ public class Comic implements Parcelable
         return mCoverImage;
     }
 
+    public String getCoverImageFilePath()
+    {
+        String path = mCoverImage;
+        if (path.startsWith("file:///"))
+        {
+            path = path.replace("file:///", "");
+        }
+        return path;
+    }
+
     public String getColorSetting()
     {
         return mColorSetting;

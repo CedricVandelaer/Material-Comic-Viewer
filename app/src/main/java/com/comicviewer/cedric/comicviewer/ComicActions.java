@@ -6,10 +6,6 @@ import android.widget.Toast;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.util.ArrayList;
 
@@ -199,9 +195,9 @@ public class ComicActions {
 
     public static void markComicRead(Context context, Comic comic, boolean showToast)
     {
-        if (StorageManager.getReadComics(context).containsKey(comic.getFileName())) {
+        if (StorageManager.getComicPositionsMap(context).containsKey(comic.getFileName())) {
 
-            if (StorageManager.getReadComics(context).get(comic.getFileName())+1>= comic.getPageCount())
+            if (StorageManager.getComicPositionsMap(context).get(comic.getFileName())+1>= comic.getPageCount())
             {
                 //Do nothing, already marked as read
                 if (showToast) {
@@ -212,7 +208,7 @@ public class ComicActions {
             else
             {
                 //Comic was opened but not yet fully read
-                StorageManager.saveLastReadComic(context, comic.getFileName(), comic.getPageCount());
+                StorageManager.saveComicPosition(context, comic.getFileName(), comic.getPageCount());
 
                 int pagesRead = StorageManager.getPagesReadForComic(context, comic.getFileName());
 
@@ -244,7 +240,7 @@ public class ComicActions {
                     comic.getIssueNumber());
 
             //Comic wasn't opened yet
-            StorageManager.saveLastReadComic(context, comic.getFileName(), comic.getPageCount() - 1);
+            StorageManager.saveComicPosition(context, comic.getFileName(), comic.getPageCount() - 1);
             StorageManager.savePagesForComic(context, comic.getFileName(), comic.getPageCount());
             StorageManager.incrementNumberOfComicsStarted(context, 1);
             StorageManager.incrementNumberOfComicsRead(context, 1);

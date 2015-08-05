@@ -19,6 +19,7 @@
         v4.0\n
         - Special last page with common comic actions\n
         - Smart collections\n
+        - More functions when reading\n
         - Metadata editor (found in the info section of a comic)\n
         - UI polish and new animations\n
         - Set the zoom level in settings\n
@@ -26,6 +27,7 @@
         - Revere volume keys option\n
         - Performance increase\n
         - Better cloud storage navigation\n
+        = Better exportation, exportation of collections etc.\n
         - Added splash screen\n
         - Corrected the launcher icon size and removed the banner\n
         - Open comics directly from Dropbox app (and other apps that allow it)\n

@@ -53,67 +53,103 @@ public class SynchronisationFragment extends BaseFragment {
 
         StorageManager.setBackgroundColorPreference(getActivity());
 
-        final File path = new File(Environment.getExternalStorageDirectory().getPath());
-
         mExportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                FileDialog dialog = new FileDialog(getActivity(), path);
-                dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
-                    public void directorySelected(final File directory) {
-                        Log.d(getClass().getName(), "Selected directory: " + directory.toString());
-                        new MaterialDialog.Builder(getActivity()).title(getString(R.string.export_data))
-                                .content("The data will be exported to the folder \n\"" + directory.toString() + "\"\nDo you want to continue?")
-                                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                                .positiveText(getString(R.string.confirm))
-                                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                                .negativeText(getString(R.string.cancel))
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        super.onPositive(dialog);
-                                        new ExportDataTask().execute(directory.toString());
-                                    }
-                                })
-                                .show();
-                    }
-                });
-                dialog.setSelectDirectoryOption(true);
-                dialog.showDialog();
+                showAskDirectoryExportDialog();
             }
         });
 
         mImportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FileDialog dialog = new FileDialog(getActivity(), path);
-                dialog.setSelectDirectoryOption(false);
-                dialog.addFileListener(new FileDialog.FileSelectedListener() {
-                    @Override
-                    public void fileSelected(final File file) {
-                        Log.d(getClass().getName(), "Selected file: " + file.toString());
-                        new MaterialDialog.Builder(getActivity()).title(getString(R.string.import_data))
-                                .content("The data of \"" + file.getName() + "\" will be imported.\nDo you want to continue?")
-                                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                                .positiveText(getString(R.string.confirm))
-                                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                                .negativeText(getString(R.string.cancel))
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        super.onPositive(dialog);
-                                        new ImportDataTask().execute(file);
-                                    }
-                                })
-                                .show();
-                    }
-                });
-                dialog.showDialog();
+                showAskFileImportDialog();
             }
         });
 
         return v;
+    }
+
+    private void showAskFileImportDialog()
+    {
+        final File path = new File(Environment.getExternalStorageDirectory().getPath());
+
+        FileDialog dialog = new FileDialog(getActivity(), path);
+        dialog.setSelectDirectoryOption(false);
+        dialog.addFileListener(new FileDialog.FileSelectedListener() {
+            @Override
+            public void fileSelected(final File file) {
+                Log.d(getClass().getName(), "Selected file: " + file.toString());
+                new MaterialDialog.Builder(getActivity()).title(getString(R.string.import_data))
+                        .content("The data of \"" + file.getName() + "\" will be imported.\nDo you want to continue?")
+                        .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                        .positiveText(getString(R.string.confirm))
+                        .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                        .negativeText(getString(R.string.cancel))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                new ImportDataTask().execute(file);
+                            }
+                        })
+                        .show();
+            }
+        });
+        dialog.showDialog();
+    }
+
+    private void showAskDirectoryExportDialog()
+    {
+        final File path = new File(Environment.getExternalStorageDirectory().getPath());
+        FileDialog dialog = new FileDialog(getActivity(), path);
+        dialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
+            public void directorySelected(final File directory) {
+                Log.d(getClass().getName(), "Selected directory: " + directory.toString());
+                showAskFileNameDialog(directory);
+            }
+        });
+        dialog.setSelectDirectoryOption(true);
+        dialog.showDialog();
+    }
+
+    private void showAskFileNameDialog(final File directory)
+    {
+        new MaterialDialog.Builder(getActivity()).title(getString(R.string.import_data))
+                .title("Enter filename")
+                .input("Filename", "", false, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                        showConfirmExportDialog(directory, charSequence.toString());
+                    }
+                })
+                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                .positiveText(getString(R.string.confirm))
+                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                .negativeText(getString(R.string.cancel))
+                .show();
+    }
+
+    private void showConfirmExportDialog(final File directory, final String filename)
+    {
+        String tempFileName = filename;
+        if (!tempFileName.endsWith(".cvexport"))
+            tempFileName+=".cvexport";
+
+        new MaterialDialog.Builder(getActivity()).title(getString(R.string.export_data))
+                .content("The data will be exported to the folder \n\"" + directory.toString()+"/"+tempFileName + "\"\nDo you want to continue?")
+                .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                .positiveText(getString(R.string.confirm))
+                .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                .negativeText(getString(R.string.cancel))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        new ExportDataTask().execute(directory.toString(), filename);
+                    }
+                })
+                .show();
     }
 
     @Override
@@ -138,8 +174,8 @@ public class SynchronisationFragment extends BaseFragment {
         @Override
         protected Object doInBackground(Object[] params) {
 
-            File xmlfile = (File) params[0];
-            Boolean succes = StorageManager.importData(getActivity(), xmlfile);
+            File jsonFile = (File) params[0];
+            Boolean succes = Exporter.importData(getActivity(), jsonFile);
 
             return succes;
         }
@@ -178,7 +214,8 @@ public class SynchronisationFragment extends BaseFragment {
         protected Object doInBackground(Object[] params) {
 
             String path = (String) params[0];
-            StorageManager.exportData(getActivity(), path);
+            String filename = (String) params[1];
+            Exporter.exportData(getActivity(), filename, path);
 
             return null;
         }

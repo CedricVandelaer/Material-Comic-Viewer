@@ -8,13 +8,11 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -54,7 +52,6 @@ import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by CV on 28/06/2015.
@@ -165,8 +162,8 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity {
             mMangaComic = true;
         }
 
-        if (StorageManager.getReadComics(this).containsKey(mCurrentComic.getFileName())) {
-            lastReadPage = StorageManager.getReadComics(this).get(mCurrentComic.getFileName());
+        if (StorageManager.getComicPositionsMap(this).containsKey(mCurrentComic.getFileName())) {
+            lastReadPage = StorageManager.getComicPositionsMap(this).get(mCurrentComic.getFileName());
             if (mMangaComic) {
                 mPager.setCurrentItem(mPageCount - 1 - lastReadPage);
             } else {
@@ -595,7 +592,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity {
                     StorageManager.incrementNumberOfComicsStarted(AbstractDisplayComicActivity.this, 1);
                 }
 
-                StorageManager.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position);
+                StorageManager.saveComicPosition(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position);
 
                 if (position + 1 > pagesRead) {
                     StorageManager.savePagesForComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), position + 1);
@@ -866,7 +863,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity {
         {
             pageNumber = mCurrentComic.getPageCount()-1-mPager.getCurrentItem();
         }
-        StorageManager.saveLastReadComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), pageNumber);
+        StorageManager.saveComicPosition(AbstractDisplayComicActivity.this, mCurrentComic.getFileName(), pageNumber);
 
     }
 

@@ -63,11 +63,7 @@ public abstract class AbstractOtherSettingsFragment extends AbstractSettingsFrag
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                final String defaultPath = Environment.getExternalStorageDirectory().toString() + "/ComicViewer";
                 ArrayList<String> filePaths = StorageManager.getFilePathsFromPreferences(getActivity());
-
-                if (!filePaths.contains(defaultPath))
-                    filePaths.add(defaultPath);
 
                 CharSequence[] charSequences = new CharSequence[filePaths.size()];
 
@@ -86,10 +82,11 @@ public abstract class AbstractOtherSettingsFragment extends AbstractSettingsFrag
                             @Override
                             public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
                                 materialDialog.dismiss();
+                                ArrayList<String> paths = new ArrayList<String>();
                                 for (int i = 0; i < charSequences.length; i++) {
-                                    if (!charSequences.toString().equals(defaultPath))
-                                        StorageManager.removeFilePath(getActivity(), charSequences[i].toString());
+                                    paths.add(charSequences[i].toString());
                                 }
+                                StorageManager.batchRemoveFilePaths(getActivity(), paths);
 
                                 return false;
                             }

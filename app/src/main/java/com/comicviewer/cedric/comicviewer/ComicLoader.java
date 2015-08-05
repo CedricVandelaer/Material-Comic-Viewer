@@ -35,19 +35,10 @@ public class ComicLoader {
     public static void loadComicSync(Context context, Comic comic)
     {
         try {
-            File file = new File(comic.getFilePath() + "/" + comic.getFileName());
 
             generateComicInfo(context, comic);
 
-            if (file.isDirectory())
-            {
-                initialiseImageFolderComic(comic);
-            }
-            else if (Utilities.isZipArchive(file)) {
-                extractZipComic(comic, context);
-            } else {
-                extractRarComic(context, comic);
-            }
+            extractCoverImage(context, comic);
 
             setComicColor(context, comic);
         }
@@ -55,6 +46,21 @@ public class ComicLoader {
         {
             e.printStackTrace();
             Log.e("ComicLoader", "Error loading comic: " + comic.getFileName());
+        }
+    }
+
+    public static void extractCoverImage(Context context, Comic comic)
+    {
+        File file = new File(comic.getFilePath() + "/" + comic.getFileName());
+
+        if (file.isDirectory())
+        {
+            initialiseImageFolderComic(comic);
+        }
+        else if (Utilities.isZipArchive(file)) {
+            extractZipComic(comic, context);
+        } else {
+            extractRarComic(context, comic);
         }
     }
 

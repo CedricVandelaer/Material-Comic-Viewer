@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -731,6 +732,15 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                     int pos = savedComicsFileNames.indexOf(comicPath);
 
                     comic = savedComics.get(pos);
+
+                    File coverImage = new File(comic.getCoverImageFilePath());
+
+                    if (!coverImage.exists()) {
+                        hasToLoad = true;
+                        showActionBarButtons(false);
+                        showProgressSpinner(true);
+                        ComicLoader.extractCoverImage(mApplicationContext, comic);
+                    }
 
                     ComicLoader.generateComicInfo(mApplicationContext, comic);
 
