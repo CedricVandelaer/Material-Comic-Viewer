@@ -190,53 +190,101 @@ public class ComicPageFragment extends Fragment {
         if (getActivity()!=null)
             mFullscreenComicView.setMaxZoom(StorageManager.getZoomFactorPreference(getActivity()));
 
+        setTapListener();
+
+
+
+        return rootView;
+    }
+
+    private void setTapListener() {
         if (getActivity()!= null && StorageManager.getBooleanSetting(getActivity(), StorageManager.SCROLL_BY_TAP_SETTING, false)) {
-            final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.OnGestureListener() {
-                @Override
-                public boolean onDown(MotionEvent e) {
-                    return false;
-                }
+            final GestureDetector gestureDetector;
 
-                @Override
-                public void onShowPress(MotionEvent e) {
-
-                }
-
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    float x = e.getX();
-                    if (getActivity() != null) {
-                        float totalWidth = getActivity().getWindow().getDecorView().getWidth();
-                        if (x > (totalWidth / 3 * 2))
-                            ((AbstractDisplayComicActivity) getActivity()).goToRightPage();
-                        else if (x < (totalWidth / 3))
-                            ((AbstractDisplayComicActivity) getActivity()).goToLeftPage();
+            if (!StorageManager.getBooleanSetting(getActivity(),StorageManager.SINGLE_TAP_SCROLL, false)) {
+                gestureDetector = new GestureDetector(new GestureDetector.OnGestureListener() {
+                    @Override
+                    public boolean onDown(MotionEvent e) {
+                        return false;
                     }
-                    return true;
-                }
 
-                @Override
-                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                    return false;
-                }
+                    @Override
+                    public void onShowPress(MotionEvent e) {
 
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    float x = e.getX();
-                    if (getActivity() != null) {
-                        float totalWidth = getActivity().getWindow().getDecorView().getWidth();
-                        if (x > (totalWidth / 3 * 2))
-                            ((AbstractDisplayComicActivity) getActivity()).goToLeftPage();
-                        else if (x < (totalWidth / 3))
-                            ((AbstractDisplayComicActivity) getActivity()).goToRightPage();
                     }
-                }
 
-                @Override
-                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                    return false;
-                }
-            });
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent e) {
+                        float x = e.getX();
+                        if (getActivity() != null) {
+                            float totalWidth = getActivity().getWindow().getDecorView().getWidth();
+                            if (x > (totalWidth / 3 * 2))
+                                ((AbstractDisplayComicActivity) getActivity()).goToRightPage();
+                            else if (x < (totalWidth / 3))
+                                ((AbstractDisplayComicActivity) getActivity()).goToLeftPage();
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+                        float x = e.getX();
+                        if (getActivity() != null) {
+                            float totalWidth = getActivity().getWindow().getDecorView().getWidth();
+                            if (x > (totalWidth / 3 * 2))
+                                ((AbstractDisplayComicActivity) getActivity()).goToLeftPage();
+                            else if (x < (totalWidth / 3))
+                                ((AbstractDisplayComicActivity) getActivity()).goToRightPage();
+                        }
+                    }
+
+                    @Override
+                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                        return false;
+                    }
+                });
+            }
+            else
+            {
+                gestureDetector = new GestureDetector(new GestureDetector.OnGestureListener() {
+                    @Override
+                    public boolean onDown(MotionEvent e) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onShowPress(MotionEvent e) {
+
+                    }
+
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent e) {
+                        ((AbstractDisplayComicActivity)getActivity()).goToNextPage();
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+                        ((AbstractDisplayComicActivity)getActivity()).goToPreviousPage();
+                    }
+
+                    @Override
+                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                        return false;
+                    }
+                });
+            }
+
 
             mFullscreenComicView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
@@ -245,10 +293,6 @@ public class ComicPageFragment extends Fragment {
                 }
             });
         }
-
-
-
-        return rootView;
     }
 
     @Override

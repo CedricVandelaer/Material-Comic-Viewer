@@ -247,6 +247,22 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         });
     }
 
+    public void goToNextPage()
+    {
+        if (mMangaComic)
+            goToLeftPage();
+        else
+            goToRightPage();
+    }
+
+    public void goToPreviousPage()
+    {
+        if (mMangaComic)
+            goToRightPage();
+        else
+            goToLeftPage();
+    }
+
     public void goToRightPage()
     {
         int currentPos = mPager.getCurrentItem();
@@ -711,18 +727,10 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         if (StorageManager.getBooleanSetting(this, StorageManager.VOLUME_KEY_OPTION, false) && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
         {
             if (action == KeyEvent.ACTION_DOWN) {
-                int page = mPager.getCurrentItem();
-                if (mMangaComic) {
-                    page++;
-                    if (page >= 0 && page < mPageCount) {
-                        mPager.setCurrentItem(page);
-                    }
-                } else {
-                    page--;
-                    if (page >= 0 && page < mPageCount) {
-                        mPager.setCurrentItem(page);
-                    }
-                }
+                if (!StorageManager.getBooleanSetting(this, StorageManager.REVERSE_VOLUME_KEYS, false))
+                    goToNextPage();
+                else
+                    goToPreviousPage();
             }
 
             return true;
@@ -731,18 +739,10 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         else if (StorageManager.getBooleanSetting(this, StorageManager.VOLUME_KEY_OPTION, false) && keyCode == KeyEvent.KEYCODE_VOLUME_UP)
         {
             if (action == KeyEvent.ACTION_DOWN) {
-                int page = mPager.getCurrentItem();
-                if (mMangaComic) {
-                    page--;
-                    if (page >= 0 && page < mPageCount) {
-                        mPager.setCurrentItem(page);
-                    }
-                } else {
-                    page++;
-                    if (page >= 0 && page < mPageCount) {
-                        mPager.setCurrentItem(page);
-                    }
-                }
+                if (!StorageManager.getBooleanSetting(this, StorageManager.REVERSE_VOLUME_KEYS, false))
+                    goToPreviousPage();
+                else
+                    goToNextPage();
             }
             return true;
         }

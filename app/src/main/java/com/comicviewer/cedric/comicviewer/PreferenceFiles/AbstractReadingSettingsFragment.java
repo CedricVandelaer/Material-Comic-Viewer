@@ -26,11 +26,13 @@ public abstract class AbstractReadingSettingsFragment extends AbstractSettingsFr
         addKeepScreenOnSetting();
         addHighQualitySetting();
         addUseVolumeKeysSetting();
+        addReverseVolumeKeySetting();
         addShowToolbarSetting();
         addForcePortraitSetting();
         addPagingOnZoomSetting();
         addZoomFactorSetting();
         addScrollOnTapSetting();
+        addSingleTapScrollSetting();
         addReadingBackgroundSetting();
         addPageNumberSetting();
         addPageAnimationSetting();
@@ -90,6 +92,16 @@ public abstract class AbstractReadingSettingsFragment extends AbstractSettingsFr
         addPreference(scrollOnTapPreference);
     }
 
+    private void addSingleTapScrollSetting()
+    {
+        ColoredSwitchPreference singleTapScrollPreference = new ColoredSwitchPreference(getActivity());
+        singleTapScrollPreference.setKey(StorageManager.SINGLE_TAP_SCROLL);
+        singleTapScrollPreference.setTitle("Single tap to scroll");
+        singleTapScrollPreference.setSummary("Note: You can go in the opposite direction by a long press");
+        singleTapScrollPreference.setDefaultValue(false);
+        addPreference(singleTapScrollPreference);
+    }
+
     private void addPagingOnZoomSetting() {
         ColoredSwitchPreference pagingOnZoomPreference = new ColoredSwitchPreference(getActivity());
         pagingOnZoomPreference.setKey(StorageManager.SCROLL_ON_ZOOM_SETTING);
@@ -115,6 +127,8 @@ public abstract class AbstractReadingSettingsFragment extends AbstractSettingsFr
     }
 
     protected abstract void addUseVolumeKeysSetting();
+
+    protected abstract void addReverseVolumeKeySetting();
 
     private void addKeepScreenOnSetting() {
         ColoredSwitchPreference keepScreenOnPreference = new ColoredSwitchPreference(getActivity());

@@ -87,6 +87,7 @@ public class ColoredPreference extends Preference {
     @Override
     protected View onCreateView( ViewGroup parent )
     {
+        super.onCreateView(parent);
         LayoutInflater layoutInflater = (LayoutInflater)getContext().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         View v = layoutInflater.inflate(R.layout.colored_preference, parent, false);
 

@@ -66,7 +66,9 @@ public class AbstractSettingsFragment extends PreferenceFragment implements Base
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (Preference preference:mPreferences) {
+                for (int i=0;i<mPreferences.size();i++) {
+
+                    Preference preference = mPreferences.get(i);
 
                     if (preference instanceof ColoredPreference) {
 

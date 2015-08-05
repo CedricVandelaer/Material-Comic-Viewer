@@ -33,4 +33,13 @@ public class ReadingSettingsFragment extends AbstractReadingSettingsFragment {
         volumeKeyPreference.setDefaultValue(false);
         addPreference(volumeKeyPreference);
     }
+
+    @Override
+    protected void addReverseVolumeKeySetting() {
+        ColoredSwitchPreference reverseVolumeKeysPreference = new ColoredSwitchPreference(getActivity());
+        reverseVolumeKeysPreference.setKey(StorageManager.REVERSE_VOLUME_KEYS);
+        reverseVolumeKeysPreference.setTitle("Reverse volume keys");
+        reverseVolumeKeysPreference.setDefaultValue(false);
+        addPreference(reverseVolumeKeysPreference);
+    }
 }

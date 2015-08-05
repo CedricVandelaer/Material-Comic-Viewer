@@ -40,6 +40,7 @@ public class ColoredSwitchPreference extends ColoredPreference {
     @Override
     protected View onCreateView( ViewGroup parent )
     {
+        super.onCreateView(parent);
         LayoutInflater layoutInflater = (LayoutInflater)getContext().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         View v = layoutInflater.inflate(R.layout.colored_switch_preference, parent, false);
 
@@ -52,6 +53,12 @@ public class ColoredSwitchPreference extends ColoredPreference {
         updateColors();
 
         return v;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled)
+    {
+        mSwitch.setEnabled(enabled);
     }
 
     public void updateColors()

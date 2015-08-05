@@ -100,6 +100,8 @@ public class StorageManager {
     public static final String SCROLL_ANIMATION = "scrollAnimation";
     public static final String SECTION_ANIMATION = "sectionAnimation";
     public static final String ZOOM_FACTOR = "zoomFactor";
+    public static final String SINGLE_TAP_SCROLL = "singleTapScroll";
+    public static final String REVERSE_VOLUME_KEYS = "reverseVolumeKeys";
 
 
     public static final String COMIC_VIEWER = "ComicViewer";
