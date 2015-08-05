@@ -15,6 +15,9 @@
     <color name="BlueDark">#1976D2</color>
     <color name="BlueVeryDark">#01579B</color>
     <color name="BlueLight">#64B5F6</color>
+    <color name="BlueAlternate">#00B0FF</color>
+    <color name="BlueAlternateDark">#0091EA</color>
+    <color name="BlueAlternateLight">#40C4FF</color>
     <color name="Cyan">#00BCD4</color>
     <color name="CyanDark">#0097A7</color>
     <color name="CyanVeryDark">#006064</color>
@@ -35,6 +38,9 @@
     <color name="Grey">#616161</color>
     <color name="GreyDark">#212121</color>
     <color name="GreyLight">#E0E0E0</color>
+    <color name="CyanAlternate">#00E5FF</color>
+    <color name="CyanAlternateDark">#00B8D4</color>
+    <color name="CyanAlternateLight">#18FFFF</color>
     <color name="White">#FFFFFF</color>
     <color name="Pink">#E91E63</color>
     <color name="PinkDark">#C2185B</color>

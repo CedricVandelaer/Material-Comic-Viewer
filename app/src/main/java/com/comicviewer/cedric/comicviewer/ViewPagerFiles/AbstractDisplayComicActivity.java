@@ -2,6 +2,7 @@ package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -32,10 +33,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.CollectionActions;
 import com.comicviewer.cedric.comicviewer.ComicLoader;
 import com.comicviewer.cedric.comicviewer.Extractor;
+import com.comicviewer.cedric.comicviewer.Model.Collection;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.MultiColorDrawable;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
@@ -43,6 +47,7 @@ import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
@@ -54,7 +59,7 @@ import java.util.List;
 /**
  * Created by CV on 28/06/2015.
  */
-public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
+public abstract class AbstractDisplayComicActivity extends AppCompatActivity {
 
     //The comic to be displayed
     protected Comic mCurrentComic;
@@ -78,7 +83,13 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
     protected boolean mMangaComic = false;
 
-    protected FloatingActionButton mFab;
+    protected FloatingActionMenu mMenuFab;
+
+    protected FloatingActionButton mGoToPageFab;
+    protected FloatingActionButton mExitFab;
+    protected FloatingActionButton mFavoriteFab;
+    protected FloatingActionButton mAddToCollectionFab;
+    protected FloatingActionButton mNextComicFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +103,12 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mMenuFab = (FloatingActionMenu) findViewById(R.id.menu_fab);
+        mGoToPageFab = (FloatingActionButton) findViewById(R.id.go_to_page_fab);
+        mExitFab = (FloatingActionButton) findViewById(R.id.exit_fab);
+        mFavoriteFab = (FloatingActionButton) findViewById(R.id.favorite_fab);
+        mAddToCollectionFab = (FloatingActionButton) findViewById(R.id.add_to_collection_fab);
+        mNextComicFab = (FloatingActionButton) findViewById(R.id.next_comic_fab);
 
         mHandler = new Handler();
 
@@ -106,19 +122,17 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         ImageLoader.getInstance().clearDiskCache();
 
 
-        if (intent.getAction()!= null && intent.getAction().equals(Intent.ACTION_VIEW))
-        {
+        if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
             Uri uri = intent.getData();
             File file = new File(uri.getPath());
             Comic comic = new Comic(file.getName(), new File(file.getParent()).getPath());
             ComicLoader.loadComicSync(this, comic);
             mCurrentComic = comic;
-        }
-        else {
+        } else {
             mCurrentComic = intent.getParcelableExtra("Comic");
         }
 
-        if (intent.getParcelableArrayListExtra("NextComics")!=null)
+        if (intent.getParcelableArrayListExtra("NextComics") != null)
             mNextComics = intent.getParcelableArrayListExtra("NextComics");
         else
             mNextComics = null;
@@ -140,26 +154,22 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
         mPageNumberSetting = StorageManager.getPageNumberSetting(this);
 
-        mPager =  (ComicViewPager) findViewById(R.id.comicpager);
+        mPager = (ComicViewPager) findViewById(R.id.comicpager);
         mPager.setOffscreenPageLimit(4);
         mPagerAdapter = new ComicStatePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
         mMangaComic = false;
-        if (shouldUseMangaPosition())
-        {
-            mPager.setCurrentItem(mCurrentComic.getPageCount()-1);
+        if (shouldUseMangaPosition()) {
+            mPager.setCurrentItem(mCurrentComic.getPageCount() - 1);
             mMangaComic = true;
         }
 
-        if (StorageManager.getReadComics(this).containsKey(mCurrentComic.getFileName()))
-        {
+        if (StorageManager.getReadComics(this).containsKey(mCurrentComic.getFileName())) {
             lastReadPage = StorageManager.getReadComics(this).get(mCurrentComic.getFileName());
-            if (mMangaComic)
-            {
-                mPager.setCurrentItem(mPageCount-1-lastReadPage);
-            }
-            else {
+            if (mMangaComic) {
+                mPager.setCurrentItem(mPageCount - 1 - lastReadPage);
+            } else {
                 mPager.setCurrentItem(lastReadPage);
             }
         }
@@ -167,9 +177,9 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         setPagerAnimation();
 
 
-        boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents",true);
+        boolean showInRecentsPref = getPreferences(Context.MODE_PRIVATE).getBoolean("useRecents", true);
 
-        if (showInRecentsPref && Build.VERSION.SDK_INT>20) {
+        if (showInRecentsPref && Build.VERSION.SDK_INT > 20) {
             new SetTaskDescriptionTask().execute();
         }
 
@@ -178,20 +188,20 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
-        mFab.setColorNormal(StorageManager.getAccentColor(this));
-        mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(this)));
-        mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(this)));
+        mMenuFab.setMenuButtonColorNormal(StorageManager.getAccentColor(this));
+        mMenuFab.setMenuButtonColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(this)));
+        mMenuFab.setMenuButtonColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(this)));
 
 
-        if (Build.VERSION.SDK_INT>18)
-        {
-            setFabClickListener();
+        if (Build.VERSION.SDK_INT > 18) {
+            setFabClickListeners();
         }
-    };
+    }
 
-    public void setSystemVisibilitySettings()
-    {
-        if (Build.VERSION.SDK_INT>18 &&!StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false)) {
+    ;
+
+    public void setSystemVisibilitySettings() {
+        if (Build.VERSION.SDK_INT > 18 && !StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false)) {
 
             hideSystemUI();
 
@@ -204,8 +214,8 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
                         // The system bars are visible. Make any desired
                         // adjustments to your UI, such as showing the action bar or
                         // other navigational controls.
-                        mFab.setVisibility(View.VISIBLE);
-                        mFab.show(true);
+                        mMenuFab.setVisibility(View.VISIBLE);
+                        mMenuFab.showMenuButton(true);
 
                         mHandler.postDelayed(new Runnable() {
                             @Override
@@ -216,16 +226,14 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
                     }
                 }
             });
-        }
-        else if (StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false))
-        {
+        } else if (StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false)) {
             //toolbar
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             toolbar.setVisibility(View.VISIBLE);
             setSupportActionBar(toolbar);
             toolbar.showOverflowMenu();
             getSupportActionBar().setTitle(mCurrentComic.getTitle());
-            if (StorageManager.getReadingBackgroundSetting(this)==getResources().getColor(R.color.White))
+            if (StorageManager.getReadingBackgroundSetting(this) == getResources().getColor(R.color.White))
                 toolbar.setBackgroundColor(getResources().getColor(R.color.Black));
         }
     }
@@ -236,15 +244,123 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
 
     protected abstract void setPagerAnimation();
 
-    private void setFabClickListener() {
-        mFab.setOnClickListener(new View.OnClickListener() {
+    private void setFabClickListeners() {
+
+        setGoToPageClickListener();
+        setExitFabClickListener();
+        setFavoriteClickListener();
+        setAddToCollectionClickListener();
+        setNextComicClickListener();
+    }
+
+    private void setNextComicClickListener() {
+        mNextComicFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideSystemUI();
+                mMenuFab.close(true);
+                showNextComicDialog();
+            }
+        });
+    }
 
+    private void setAddToCollectionClickListener() {
+        mAddToCollectionFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMenuFab.close(true);
+                showChooseCollectionsDialog();
+            }
+        });
+    }
+
+    protected void setFavoriteClickListener()
+    {
+        if (StorageManager.getFavoriteComics(this).contains(mCurrentComic.getFileName()))
+        {
+            mFavoriteFab.setLabelText("Unfavorite");
+            mFavoriteFab.setImageResource(R.drawable.fab_star);
+            mFavoriteFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StorageManager.removeFavoriteComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName());
+                    setFavoriteClickListener();
+                }
+            });
+        }
+        else
+        {
+            mFavoriteFab.setLabelText("Favorite");
+            mFavoriteFab.setImageResource(R.drawable.fab_star_outline);
+            mFavoriteFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StorageManager.saveFavoriteComic(AbstractDisplayComicActivity.this, mCurrentComic.getFileName());
+                    setFavoriteClickListener();
+                }
+            });
+        }
+    }
+
+    private void setExitFabClickListener() {
+        mExitFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMenuFab.close(true);
+                finish();
+            }
+        });
+    }
+
+    private void setGoToPageClickListener()
+    {
+        mGoToPageFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMenuFab.close(true);
                 showGoToPageDialog();
             }
         });
+    }
+
+    public void showNextComicDialog()
+    {
+        if (mNextComics!=null && mNextComics.size()>0) {
+            new MaterialDialog.Builder(this)
+                    .title("Next comic")
+                    .titleColor(getResources().getColor(R.color.Black))
+                    .backgroundColor(getResources().getColor(R.color.White))
+                    .content("Are you sure you want to open the next comic?")
+                    .contentColor(getResources().getColor(R.color.GreyDark))
+                    .positiveText(getString(R.string.confirm))
+                    .positiveColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
+                    .negativeText(getString(R.string.cancel))
+                    .negativeColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            Intent intent = new Intent(AbstractDisplayComicActivity.this, DisplayComicActivity.class);
+
+                            intent.putExtra("Comic", mNextComics.get(0));
+                            ArrayList<Comic> newNextComics = new ArrayList<Comic>();
+                            for (int j=1;j<mNextComics.size();j++)
+                            {
+                                newNextComics.add(mNextComics.get(j));
+                            }
+                            intent.putExtra("NextComics", newNextComics);
+                            if (StorageManager.getBooleanSetting(AbstractDisplayComicActivity.this, StorageManager.USES_RECENTS, true)) {
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                            }
+                            startActivity(intent);
+                            finish();
+                        }
+                    }).show();
+        }
+        else
+        {
+            Toast.makeText(AbstractDisplayComicActivity.this, "No next comics found!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void goToNextPage()
@@ -275,6 +391,65 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         mPager.setCurrentItem(currentPos-1);
     }
 
+    private void showChooseCollectionsDialog()
+    {
+        ArrayList<Collection> collections = StorageManager.getCollectionList(this);
+        CharSequence[] collectionNames = new CharSequence[collections.size()+1];
+
+        for (int i=0;i<collections.size();i++)
+        {
+            collectionNames[i] = collections.get(i).getName();
+        }
+
+        final String newCollection = "Add new collection";
+        collectionNames[collectionNames.length-1] = newCollection;
+
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title("Choose collection")
+                .titleColor(getResources().getColor(R.color.Black))
+                .itemColor(getResources().getColor(R.color.GreyDark))
+                .backgroundColor(getResources().getColor(R.color.White))
+                .items(collectionNames)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        if (charSequence.equals(newCollection)) {
+                            MaterialDialog dialog = new MaterialDialog.Builder(AbstractDisplayComicActivity.this)
+                                    .title("Create new collection")
+                                    .titleColor(getResources().getColor(R.color.Black))
+                                    .backgroundColor(getResources().getColor(R.color.White))
+                                    .input("Collection name", "", false, new MaterialDialog.InputCallback() {
+                                        @Override
+                                        public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
+                                            StorageManager.createCollection(AbstractDisplayComicActivity.this, charSequence.toString());
+                                            CollectionActions.addComicToCollection(AbstractDisplayComicActivity.this, charSequence.toString(), mCurrentComic);
+                                        }
+                                    })
+                                    .positiveText(getString(R.string.confirm))
+                                    .positiveColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
+                                    .negativeColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
+                                    .negativeText(getString(R.string.cancel))
+                                    .dismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            setSystemVisibilitySettings();
+                                        }
+                                    })
+                                    .show();
+                        } else {
+                            CollectionActions.addComicToCollection(AbstractDisplayComicActivity.this, charSequence.toString(), mCurrentComic);
+                        }
+                    }
+                })
+                .dismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        setSystemVisibilitySettings();
+                    }
+                })
+                .show();
+    }
+
     public void showGoToPageDialog()
     {
 
@@ -285,16 +460,19 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         }
         MaterialDialog dialog = new MaterialDialog.Builder(AbstractDisplayComicActivity.this)
                 .title(getString(R.string.go_to_page))
+                .titleColor(getResources().getColor(R.color.Black))
+                .backgroundColor(getResources().getColor(R.color.White))
                 .negativeColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
                 .negativeText(getString(R.string.cancel))
                 .items(pages)
+                .itemColor(getResources().getColor(R.color.GreyDark))
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                         materialDialog.dismiss();
                         int pos = i;
                         if (mMangaComic)
-                            pos = (mPageCount-1) - i;
+                            pos = (mPageCount - 1) - i;
                         mPager.setCurrentItem(pos);
                     }
                 }).show();
@@ -331,15 +509,13 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                         | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
                         | View.SYSTEM_UI_FLAG_IMMERSIVE);
-        mFab.hide(true);
+        mMenuFab.close(true);
+        mMenuFab.hideMenuButton(true);
     }
 
     @Override
     public void onConfigurationChanged(Configuration configuration)
     {
-
-        mFab.setVisibility(View.INVISIBLE);
-
 
         if (Build.VERSION.SDK_INT>18 && !StorageManager.getBooleanSetting(this, StorageManager.TOOLBAR_OPTION, false))
         {
@@ -347,7 +523,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
             setLayoutParams(configuration);
         }
 
-        mFab.hide(true);
+        mMenuFab.hideMenuButton(true);
 
         super.onConfigurationChanged(configuration);
 
@@ -382,7 +558,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity{
         params.addRule(RelativeLayout.ALIGN_PARENT_END);
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        mFab.setLayoutParams(params);
+        mMenuFab.setLayoutParams(params);
     }
 
 

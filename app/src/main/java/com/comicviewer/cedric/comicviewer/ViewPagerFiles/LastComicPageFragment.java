@@ -284,10 +284,12 @@ public class LastComicPageFragment extends Fragment {
                                     })
                                     .positiveText(getString(R.string.confirm))
                                     .positiveColor(StorageManager.getAppThemeColor(getActivity()))
+                                    .negativeColor(StorageManager.getAppThemeColor(getActivity()))
+                                    .negativeText(getString(R.string.cancel))
                                     .dismissListener(new DialogInterface.OnDismissListener() {
                                         @Override
                                         public void onDismiss(DialogInterface dialog) {
-                                            ((AbstractDisplayComicActivity)getActivity()).setSystemVisibilitySettings();
+                                            ((AbstractDisplayComicActivity) getActivity()).setSystemVisibilitySettings();
                                         }
                                     })
                                     .show();
@@ -303,8 +305,6 @@ public class LastComicPageFragment extends Fragment {
                     }
                 })
                 .show();
-
-
     }
 
     private void setMetadataInfo() {
