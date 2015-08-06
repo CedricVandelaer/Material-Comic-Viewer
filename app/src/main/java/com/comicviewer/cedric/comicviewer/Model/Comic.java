@@ -496,7 +496,8 @@ public class Comic implements Parcelable
     public String getCoverImageFilePath()
     {
         String path = mCoverImage;
-        if (path.startsWith("file:///"))
+
+        if (path!=null && path.startsWith("file:///"))
         {
             path = path.replace("file:///", "");
         }
@@ -582,6 +583,8 @@ public class Comic implements Parcelable
     public ArrayList<String> getStoryArcs() {
         return mStoryArcs;
     }
+
+    public boolean equals(Comic otherComic){return this.mFileName.equals(otherComic.getFileName());}
 
     public void addStoryArc(String storyArc){
         if (mStoryArcs == null)

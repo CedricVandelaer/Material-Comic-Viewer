@@ -733,9 +733,11 @@ abstract public class AbstractComicListFragment extends BaseFragment {
 
                     comic = savedComics.get(pos);
 
-                    File coverImage = new File(comic.getCoverImageFilePath());
+                    File coverImage = null;
+                    if (comic.getCoverImageFilePath()!=null)
+                        coverImage = new File(comic.getCoverImageFilePath());
 
-                    if (!coverImage.exists()) {
+                    if (coverImage==null || !coverImage.exists()) {
                         hasToLoad = true;
                         showActionBarButtons(false);
                         showProgressSpinner(true);
