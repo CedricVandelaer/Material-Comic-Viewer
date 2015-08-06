@@ -9,6 +9,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 /**
@@ -48,30 +50,31 @@ public class SimpleEula {
             //Includes the updates as well so users know what changed.
             String message = mActivity.getString(R.string.updates) + "\n\n" + mActivity.getString(R.string.eula);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity)
-                    .setTitle(title)
-                    .setMessage(message)
-                    .setPositiveButton(mActivity.getString(R.string.accept), new Dialog.OnClickListener() {
-
+            new MaterialDialog.Builder(mActivity)
+                    .title(title)
+                    .content(message)
+                    .positiveText(mActivity.getString(R.string.accept))
+                    .positiveColor(StorageManager.getAppThemeColor(mActivity))
+                    .negativeText(mActivity.getString(R.string.decline))
+                    .negativeColor(StorageManager.getAppThemeColor(mActivity))
+                    .callback(new MaterialDialog.ButtonCallback() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            // Mark this version as read.
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
                             SharedPreferences.Editor editor = prefs.edit();
                             editor.putBoolean(eulaKey, true);
-                            editor.commit();
-                            dialogInterface.dismiss();
+                            editor.apply();
                         }
-                    })
-                    .setNegativeButton(mActivity.getString(R.string.decline), new Dialog.OnClickListener() {
 
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Close the activity as they have declined the EULA
+                        public void onNegative(MaterialDialog dialog) {
+                            super.onNegative(dialog);
                             mActivity.finish();
                         }
+                    })
+                    .cancelable(false)
+                    .show();
 
-                    });
-            builder.create().show();
         }
     }
 

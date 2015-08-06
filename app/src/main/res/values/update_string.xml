@@ -3,9 +3,12 @@
     <string name="about_text" translatable="false">
         Hi! My name is Cédric Vandelaer and first of all thanks for checking out my app! I\'m a master student computer
         science at the university of Hasselt (Belgium) and I enjoy reading comics in my free time. I\'m also a big fan
-        of android so I decided to make a comic viewer app in my free time. I wasn\'t really happy with existing apps because of
-        their poor performance, overly complex interfaces or just because I didn\'t like how they looked. Well anyway, have fun reading
-        comics with Comic Viewer!
+        of android so I decided to make a comic viewer app in my free time. A lot of things have changed since the original release of the app,
+        which wasn\'t even that long ago. The reason I created the app was because I felt like the other comic apps out there didn\'t look
+        that good or were just a bit too complex for just having a nice, immersive reading experience. Comic Viewer tends to fix
+        just these things. I have gotten a lot of loyal users in the meantime whom I\'d like to thank for all their
+        support! There are still many features planned for the future, and if you have found a bug or have a request, feel free to contact me
+        on Facebook, Google+ or my email (cedric.vandelaer@gmail.com). Enjoy reading using the app!
     </string>
     <string name="thanks_to_text" translatable="false">
         Special thanks to:\n\n

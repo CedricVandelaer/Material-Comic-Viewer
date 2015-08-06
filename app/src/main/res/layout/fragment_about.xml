@@ -68,19 +68,7 @@
                     android:text="@string/rate_app" />
             </LinearLayout>
 
-            <com.bluejamesbond.text.DocumentView
-                xmlns:ext="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginBottom="12dp"
-                android:id="@+id/about_text"
-                ext:documentView_textColor="@android:color/white"
-                ext:documentView_textAlignment="justified"
-                ext:documentView_text="@string/about_text"/>
+
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -152,6 +140,14 @@
                     </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:id="@+id/about_text"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/about_text"/>
 
             <TextView
                 android:layout_width="match_parent"

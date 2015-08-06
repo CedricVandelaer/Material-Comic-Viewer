@@ -25,7 +25,7 @@ public class AboutFragment extends BaseFragment {
     private ButtonFlat mChangelogButton;
     private ButtonFlat mRateButton;
     private TextView mTitleTextView;
-    private DocumentView mAboutText;
+    private TextView mAboutText;
     private TextView mFindUsTextView;
     private TextView mThanksTextView;
 
@@ -68,7 +68,7 @@ public class AboutFragment extends BaseFragment {
         ImageView logoview = (ImageView)v.findViewById(R.id.logo);
         ImageView meview = (ImageView)v.findViewById(R.id.me_drawable);
         mTitleTextView = (TextView) v.findViewById(R.id.logo_text);
-        mAboutText = (DocumentView) v.findViewById(R.id.about_text);
+        mAboutText = (TextView) v.findViewById(R.id.about_text);
         mFindUsTextView = (TextView) v.findViewById(R.id.find_us_text_view);
         mThanksTextView = (TextView) v.findViewById(R.id.thanks_text_view);
         mGooglePlusLogo = (ImageView) v.findViewById(R.id.google_plus_logo);
@@ -149,7 +149,7 @@ public class AboutFragment extends BaseFragment {
     private void setTextColor(int color)
     {
         mTitleTextView.setTextColor(color);
-        mAboutText.getDocumentLayoutParams().setTextColor(color);
+        mAboutText.setTextColor(color);
         mFindUsTextView.setTextColor(color);
         mThanksTextView.setTextColor(color);
         mGooglePlusTextView.setTextColor(color);
