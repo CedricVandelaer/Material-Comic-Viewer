@@ -86,6 +86,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".IntroActivity"
+            android:theme="@style/IntroTheme"/>
+
         <activity android:name="com.box.androidsdk.content.auth.OAuthActivity" />
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"

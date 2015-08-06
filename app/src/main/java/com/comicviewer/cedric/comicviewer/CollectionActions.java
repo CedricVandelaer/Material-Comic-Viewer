@@ -245,13 +245,9 @@ public class CollectionActions {
 
     public static void addSeriesFilterToCollection(Context context, String collectionName, String seriesName)
     {
-        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
-        for (Collection collection:collections)
-        {
-            if (collection.getName().equals(collectionName))
-                collection.addSeries(seriesName);
-        }
-        StorageManager.saveCollections(context, collections);
+        Collection collection = StorageManager.getCollection(context, collectionName);
+        collection.addSeries(seriesName);
+        StorageManager.saveCollection(context, collection);
     }
 
     public static void batchAddYearsFilterToCollection(Context context, String collectionName, ArrayList<String> yearStrings)
@@ -259,33 +255,26 @@ public class CollectionActions {
 
         ArrayList<Integer> years = new ArrayList<>();
 
-        try
-        {
-            for (String year:yearStrings)
+        for (String year:yearStrings) {
+            try {
                 years.add(Integer.parseInt(year));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return;
-        }
-
-        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
-
-        for (Collection collection:collections)
-        {
-            if (collection.getName().equals(collectionName)) {
-                for (Integer year:years)
-                    collection.addYear(year);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        StorageManager.saveCollections(context, collections);
+
+        Collection collection = StorageManager.getCollection(context, collectionName);
+
+        for (Integer year:years)
+            collection.addYear(year);
+
+        StorageManager.saveCollection(context, collection);
     }
 
     public static void addYearsFilterToCollection(Context context, String collectionName, String yearString)
     {
         int year;
-
+        Collection collection = StorageManager.getCollection(context, collectionName);
         try
         {
             year = Integer.parseInt(yearString);
@@ -295,42 +284,19 @@ public class CollectionActions {
             e.printStackTrace();
             return;
         }
-        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
-
-        for (Collection collection:collections)
-        {
-            if (collection.getName().equals(collectionName))
-                collection.addYear(year);
-        }
-        StorageManager.saveCollections(context, collections);
+        collection.addYear(year);
+        StorageManager.saveCollection(context, collection);
     }
 
     public static void batchAddFolderFilterToCollection(Context context, String collectionName, ArrayList<String> folderNames)
     {
 
-        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
+        Collection collection = StorageManager.getCollection(context, collectionName);
 
-        for (Collection collection:collections)
-        {
-            if (collection.getName().equals(collectionName)) {
-                for (String folderName:folderNames)
-                    collection.addFolder(folderName);
-            }
-        }
-        StorageManager.saveCollections(context, collections);
-    }
+        for (String folderName:folderNames)
+            collection.addFolder(folderName);
 
-    public static void addFolderFilterToCollection(Context context, String collectionName, String folderName)
-    {
-
-        ArrayList<Collection> collections = StorageManager.getCollectionList(context);
-
-        for (Collection collection:collections)
-        {
-            if (collection.getName().equals(collectionName))
-                collection.addFolder(folderName);
-        }
-        StorageManager.saveCollections(context, collections);
+        StorageManager.saveCollection(context, collection);
     }
 
     public static ArrayList<String> getContainingCollections(Context context, Comic comic)
@@ -348,46 +314,42 @@ public class CollectionActions {
 
     public static void addComicsToCollection(Context context, String collectionName, ArrayList<Comic> comics)
     {
-        ArrayList<String> comicsToAdd = new ArrayList<>();
+        Collection collection = StorageManager.getCollection(context, collectionName);
         for (Comic comic:comics) {
-            comicsToAdd.add(comic.getFileName());
+            collection.addFile(comic.getFileName());
         }
-        StorageManager.addToCollection(context, collectionName, comicsToAdd);
+        StorageManager.saveCollection(context, collection);
     }
 
     public static void removeComicsFromCollection(Context context, String collectionName, ArrayList<Comic> comics)
     {
-        StorageManager.removeComicsFromCollection(context, collectionName, comics);
+        Collection collection = StorageManager.getCollection(context, collectionName);
+        for (Comic comic:comics) {
+            collection.removeFile(comic.getFileName());
+        }
+        StorageManager.saveCollection(context, collection);
+    }
+
+    public static void removeComicFromCollection(Context context, String collectionName, Comic comic)
+    {
+        Collection collection = StorageManager.getCollection(context, collectionName);
+        collection.removeFile(comic.getFileName());
+        StorageManager.saveCollection(context, collection);
     }
 
     public static void addComicToCollection(Context context, String collectionName, Comic comic)
     {
-        ArrayList<String> comicsToAdd = new ArrayList<>();
-        comicsToAdd.add(comic.getFileName());
-        StorageManager.addToCollection(context, collectionName, comicsToAdd);
+        Collection collection = StorageManager.getCollection(context, collectionName);
+        collection.addFile(comic.getFileName());
+        StorageManager.saveCollection(context, collection);
     }
 
     public static void addFolderToCollection(Context context, String collectionName, String folderPath)
     {
-        ArrayList<String> subFilesAndFolders = FileLoader.searchSubFoldersAndFilesRecursive(folderPath);
+        Collection collection = StorageManager.getCollection(context, collectionName);
 
-        ArrayList<String> comicsToAdd = new ArrayList<>();
+        collection.addFolder(folderPath);
 
-        for (int i=0;i<subFilesAndFolders.size();i++)
-        {
-            //Comic comic;
-            File file = new File(subFilesAndFolders.get(i));
-            if (Utilities.checkImageFolder(file))
-            {
-                comicsToAdd.add(file.getName());
-            }
-            else if (Utilities.checkExtension(subFilesAndFolders.get(i))
-                    && (Utilities.isRarArchive(file) || Utilities.isZipArchive(file)))
-            {
-                comicsToAdd.add(file.getName());
-            }
-        }
-
-        StorageManager.addToCollection(context, collectionName, comicsToAdd);
+        StorageManager.saveCollection(context, collection);
     }
 }

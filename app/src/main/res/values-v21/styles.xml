@@ -12,6 +12,10 @@
             @transition/cover_transition</item>
     </style>
 
+    <style name="IntroTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>"
+
     <style name="NewDrawerTheme" parent="MaterialDrawerTheme.Light.DarkToolbar">
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeStyle">@style/Widget.AppCompat.ActionMode</item>

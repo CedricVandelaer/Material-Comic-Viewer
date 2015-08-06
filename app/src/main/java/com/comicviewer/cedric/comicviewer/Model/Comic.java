@@ -584,7 +584,15 @@ public class Comic implements Parcelable
         return mStoryArcs;
     }
 
-    public boolean equals(Comic otherComic){return this.mFileName.equals(otherComic.getFileName());}
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object instanceof Comic)
+            return mFileName.equals(((Comic)object).getFileName());
+        else
+            return super.equals(object);
+    }
+
 
     public void addStoryArc(String storyArc){
         if (mStoryArcs == null)

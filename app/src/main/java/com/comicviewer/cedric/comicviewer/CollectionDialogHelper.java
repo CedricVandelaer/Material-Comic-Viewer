@@ -3,7 +3,6 @@ package com.comicviewer.cedric.comicviewer;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.Model.Collection;
@@ -53,9 +52,10 @@ public class CollectionDialogHelper {
                     public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
                         materialDialog.dismiss();
                         StorageManager.createCollection(mContext, charSequence.toString());
-                        if (adapter!=null)
+                        if (adapter != null)
                             adapter.notifyDataSetChanged();
-                        showSelectFilterTypeDialog(charSequence.toString());
+                        mCurrentCollection = charSequence.toString();
+                        showSelectFilterTypeAddDialog();
                     }
                 })
                 .positiveText(mContext.getString(R.string.confirm))
@@ -90,7 +90,7 @@ public class CollectionDialogHelper {
                     @Override
                     public void onNegative(MaterialDialog dialog) {
                         super.onNegative(dialog);
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                     }
                 })
                 .positiveText(mContext.getString(R.string.confirm))
@@ -115,48 +115,65 @@ public class CollectionDialogHelper {
         dialog.show();
     }
 
-    protected void showAddFilterDialogSingleOption(String title, CharSequence[] options, MaterialDialog.ListCallback callback)
+    public void showEditFilterDialog(String collectionName)
     {
+        mCurrentCollection = collectionName;
         MaterialDialog dialog = new MaterialDialog.Builder(mContext)
+                .title("Edit collection")
+                .positiveText(mContext.getString(R.string.confirm))
+                .positiveColor(StorageManager.getAppThemeColor(mContext))
+                .items(new CharSequence[]{"Add filters", "Remove filters"})
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        if (i == 0)
+                            showSelectFilterTypeAddDialog();
+                        else if (i == 1)
+                            showSelectFilterTypeRemoveDialog();
+                    }
+                }).show();
+    }
+
+    protected void showRemoveFilterDialogMultiOption(final String title, final CharSequence[] options, final MaterialDialog.ListCallbackMultiChoice callback)
+    {
+        MaterialDialog.Builder dialog = new MaterialDialog.Builder(mContext)
                 .title(title)
-                .items(options)
-                .itemsCallback(callback)
                 .negativeText(mContext.getString(R.string.cancel))
                 .negativeColor(StorageManager.getAppThemeColor(mContext))
                 .callback(new MaterialDialog.ButtonCallback() {
+
                     @Override
                     public void onNegative(MaterialDialog dialog) {
                         super.onNegative(dialog);
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                     }
                 })
-                .show();
+                .positiveText(mContext.getString(R.string.confirm))
+                .positiveColor(StorageManager.getAppThemeColor(mContext));
+
+        if (options.length>0)
+        {
+            dialog
+                    .items(options)
+                    .itemsCallbackMultiChoice(null, callback);
+        }
+        else
+        {
+            dialog.content("No filters found yet...");
+        }
+
+        dialog.show();
     }
 
-    protected void showSelectFilterTypeDialog(final String collectionName)
+
+    protected void showSelectFilterTypeAddDialog()
     {
-        mCurrentCollection = collectionName;
         MaterialDialog dialog = new MaterialDialog.Builder(mContext)
                 .title("Add filters")
                 .items(smartCollectionType)
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                        /*
-                        {"Series",
-                            "Year",
-                            "Folders",
-                            "Writer",
-                            "Penciller",
-                            "Inker",
-                            "Colorist",
-                            "Letterer",
-                            "Editor",
-                            "Cover artist",
-                            "Story arc",
-                            "Character"
-                         };
-                         */
                         switch (i) {
                             case 0:
                                 showSeriesListDialog();
@@ -204,6 +221,300 @@ public class CollectionDialogHelper {
                 .show();
     }
 
+    protected void showSelectFilterTypeRemoveDialog()
+    {
+        MaterialDialog dialog = new MaterialDialog.Builder(mContext)
+                .title("Remove filters")
+                .items(smartCollectionType)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                        switch (i) {
+                            case 0:
+                                removeSeries();
+                                break;
+                            case 1:
+                                removeYears();
+                                break;
+                            case 2:
+                                removeFolders();
+                                break;
+                            case 3:
+                                removeWriters();
+                                break;
+                            case 4:
+                                removePencillers();
+                                break;
+                            case 5:
+                                removeInkers();
+                                break;
+                            case 6:
+                                removeColorists();
+                                break;
+                            case 7:
+                                removeLetterers();
+                                break;
+                            case 8:
+                                removeEditors();
+                                break;
+                            case 9:
+                                removeCoverArtists();
+                                break;
+                            case 10:
+                                removeStoryArcs();
+                                break;
+                            case 11:
+                                removeCharacters();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                })
+                .positiveText(mContext.getResources().getString(R.string.finish))
+                .positiveColor(StorageManager.getAppThemeColor(mContext))
+                .show();
+    }
+
+    private void removeCharacters() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentCharacters = Utilities.stringListToCharSequenceArray(collection.getCharactersFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove characters",
+                currentCharacters,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeCharacter(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeStoryArcs() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentStoryArcs = Utilities.stringListToCharSequenceArray(collection.getStoryArcsFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove story arcs",
+                currentStoryArcs,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeStoryArc(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeCoverArtists() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentCoverArtists = Utilities.stringListToCharSequenceArray(collection.getCoverArtistFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove cover artists",
+                currentCoverArtists,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeCoverArtist(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeEditors() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentEditors = Utilities.stringListToCharSequenceArray(collection.getEditorFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove editors",
+                currentEditors,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeEditor(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeLetterers() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentLetterers = Utilities.stringListToCharSequenceArray(collection.getLettererFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove letterers",
+                currentLetterers,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeLetterer(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeColorists() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentColorists = Utilities.stringListToCharSequenceArray(collection.getColoristFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove colorists",
+                currentColorists,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeColorist(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeInkers() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentInkers = Utilities.stringListToCharSequenceArray(collection.getInkerFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove inkers",
+                currentInkers,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeInker(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removePencillers() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentPencillers = Utilities.stringListToCharSequenceArray(collection.getPencillerFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove pencillers",
+                currentPencillers,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removePenciller(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeWriters() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentWriters = Utilities.stringListToCharSequenceArray(collection.getWriterFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove writers",
+                currentWriters,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeWriter(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeFolders() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentFolders = Utilities.stringListToCharSequenceArray(collection.getFolderFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove folders",
+                currentFolders,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeFolder(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+        );
+    }
+
+    private void removeYears() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentYears = new CharSequence[collection.getYearsFilters().size()];
+        for (int i=0;i<collection.getYearsFilters().size();i++)
+            currentYears[i] = ""+collection.getYearsFilters().get(i);
+        showRemoveFilterDialogMultiOption(
+                "Remove years",
+                currentYears,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++) {
+                            try {
+                                int year = Integer.parseInt(charSequences[i].toString());
+                                collection.removeYear(year);
+                            }catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+
+        );
+    }
+
+    private void removeSeries() {
+        final Collection collection = StorageManager.getCollection(mContext, mCurrentCollection);
+        CharSequence[] currentSeries = Utilities.stringListToCharSequenceArray(collection.getSeriesFilters());
+        showRemoveFilterDialogMultiOption(
+                "Remove series",
+                currentSeries,
+                new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                        for (int i=0;i<charSequences.length;i++)
+                            collection.removeSeries(charSequences[i].toString());
+                        StorageManager.saveCollection(mContext, collection);
+                        showEditFilterDialog(mCurrentCollection);
+                        return false;
+                    }
+                }
+
+        );
+    }
+
     private void showCharacterListDialog() {
         showAddFilterDialogMultiOption("Add character",
                 getCurrentCharacters(),
@@ -213,7 +524,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddCharacterToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 },
@@ -230,7 +541,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddStoryArcToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 },
@@ -247,7 +558,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddCoverArtistsToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 },
@@ -264,7 +575,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddEditorToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 },
@@ -281,7 +592,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddLetterersToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 },
@@ -298,7 +609,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddColoristsToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 },
@@ -315,7 +626,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddInkersToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 },
@@ -332,7 +643,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddPencillersToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 },
@@ -351,8 +662,7 @@ public class CollectionDialogHelper {
                     public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
 
                         CollectionActions.batchAddSeriesFilterToCollection(mContext, mCurrentCollection, Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
-
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 }, true);
@@ -368,7 +678,7 @@ public class CollectionDialogHelper {
                     @Override
                     public void onNegative(MaterialDialog dialog) {
                         super.onNegative(dialog);
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                     }
                 })
                 .input("Filter name", "", false, inputCallback)
@@ -388,7 +698,7 @@ public class CollectionDialogHelper {
                     @Override
                     public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
                         CollectionActions.batchAddYearsFilterToCollection(mContext, mCurrentCollection, Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 }, true);
@@ -403,7 +713,7 @@ public class CollectionDialogHelper {
                     @Override
                     public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
                         CollectionActions.batchAddFolderFilterToCollection(mContext, mCurrentCollection, Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
                         return true;
                     }
                 }, false);
@@ -418,7 +728,7 @@ public class CollectionDialogHelper {
                         CollectionActions.batchAddWriterFilterToCollection(mContext,
                                 mCurrentCollection,
                                 Utilities.charSequenceArrayToStringList(charSequences));
-                        showSelectFilterTypeDialog(mCurrentCollection);
+                        showEditFilterDialog(mCurrentCollection);
 
                         return true;
                     }

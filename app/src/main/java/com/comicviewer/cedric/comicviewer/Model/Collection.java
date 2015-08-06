@@ -139,6 +139,24 @@ public class Collection{
 
     public void removeSeries(String seriesName){mSeriesFilters.remove(seriesName);}
 
+    public void removeWriter(String writer){mWriterFilters.remove(writer);}
+
+    public void removeCharacter(String character){mCharactersFilters.remove(character);}
+
+    public void removeLetterer(String letterer){mLettererFilters.remove(letterer);}
+
+    public void removeCoverArtist(String coverArtist){mCoverArtistFilters.remove(coverArtist);}
+
+    public void removeStoryArc(String storyArc){mStoryArcsFilters.remove(storyArc);}
+
+    public void removeEditor(String editor){mEditorFilters.remove(editor);}
+
+    public void removeInker(String inker){mInkerFilters.remove(inker);}
+
+    public void removeColorist(String colorist){mColoristFilters.remove(colorist);}
+
+    public void removePenciller(String penciller){mPencillerFilters.remove(penciller);}
+
     public void addYear(int year){
         if (!mYearsFilters.contains(year))
             mYearsFilters.add(year);
@@ -226,26 +244,9 @@ public class Collection{
         return filter;
     }
 
-    public ArrayList<String> getAllFilters()
+    public ArrayList<String> getFolderFilters()
     {
-        ArrayList<String> filters = new ArrayList<>();
-
-        filters.addAll(mFileList);
-        filters.addAll(mSeriesFilters);
-        for (int i=0;i<mYearsFilters.size();i++)
-            filters.add(""+mYearsFilters.get(i));
-        filters.addAll(mFoldersFilters);
-        filters.addAll(mWriterFilters);
-        filters.addAll(mPencillerFilters);
-        filters.addAll(mInkerFilters);
-        filters.addAll(mColoristFilters);
-        filters.addAll(mLettererFilters);
-        filters.addAll(mEditorFilters);
-        filters.addAll(mCoverArtistFilters);
-        filters.addAll(mStoryArcsFilters);
-        filters.addAll(mCharactersFilters);
-
-        return filters;
+        return mFoldersFilters;
     }
 
     private boolean containsStoryArc(Comic comic)
@@ -268,6 +269,15 @@ public class Collection{
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object instanceof Collection)
+            return mName.equals(((Collection)object).getName());
+        else
+            return super.equals(object);
     }
 
     public static Collection fromJSON(JSONObject collectionJSON)

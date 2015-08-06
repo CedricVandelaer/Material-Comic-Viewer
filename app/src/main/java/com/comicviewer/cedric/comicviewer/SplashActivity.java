@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
 
+import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
+
 /**
  * Created by CV on 15/07/2015.
  */
@@ -30,7 +32,11 @@ public class SplashActivity extends Activity {
             @Override
             public void run() {
             /* Create an Intent that will start the Menu-Activity. */
-                Intent mainIntent = new Intent(SplashActivity.this, NewDrawerActivity.class);
+                Intent mainIntent;
+                if (StorageManager.getBooleanSetting(SplashActivity.this, StorageManager.INTRO_WAS_SHOWN, false))
+                    mainIntent = new Intent(SplashActivity.this, NewDrawerActivity.class);
+                else
+                    mainIntent = new Intent(SplashActivity.this, IntroActivity.class);
                 SplashActivity.this.startActivity(mainIntent);
                 SplashActivity.this.finish();
             }

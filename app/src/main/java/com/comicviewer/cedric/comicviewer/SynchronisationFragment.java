@@ -81,7 +81,7 @@ public class SynchronisationFragment extends BaseFragment {
             public void fileSelected(final File file) {
                 Log.d(getClass().getName(), "Selected file: " + file.toString());
                 new MaterialDialog.Builder(getActivity()).title(getString(R.string.import_data))
-                        .content("The data of \"" + file.getName() + "\" will be imported.\nDo you want to continue?")
+                        .content("The data of \"" + file.getName() + "\" will be imported. This will override current app data.\nDo you want to continue?")
                         .positiveColor(StorageManager.getAppThemeColor(getActivity()))
                         .positiveText(getString(R.string.confirm))
                         .negativeColor(StorageManager.getAppThemeColor(getActivity()))

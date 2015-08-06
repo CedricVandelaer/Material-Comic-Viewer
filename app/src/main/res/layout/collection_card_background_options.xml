@@ -8,6 +8,6 @@
     android:layout_height="match_parent">
     <!--What you want to show-->
     <include layout="@layout/rename_option_layout"/>
-    <include layout="@layout/info_option_layout"/>
+    <include layout="@layout/edit_filters_option_layout"/>
     <include layout="@layout/delete_option_layout"/>
 </LinearLayout>

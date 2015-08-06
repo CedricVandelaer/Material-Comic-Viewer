@@ -116,6 +116,7 @@ public class StorageManager {
     public static final String ZOOM_FACTOR = "zoomFactor";
     public static final String SINGLE_TAP_SCROLL = "singleTapScroll";
     public static final String REVERSE_VOLUME_KEYS = "reverseVolumeKeys";
+    public static final String INTRO_WAS_SHOWN = "introWasShown";
 
 
     public static final String COMIC_VIEWER = "ComicViewer";
@@ -239,23 +240,6 @@ public class StorageManager {
         return names;
     }
 
-    public static void addToCollection(Context context, String collectionName, ArrayList<String> filenames)
-    {
-        ArrayList<Collection> collections = getCollectionList(context);
-
-        for (int i=0;i<collections.size();i++)
-        {
-            if (collections.get(i).getName().equals(collectionName)) {
-
-                for (String filename:filenames)
-                    collections.get(i).addFile(filename);
-            }
-        }
-
-        saveCollections(context, collections);
-    }
-
-
     public static void renameCollection(Context context, String collectionName, String newName)
     {
         ArrayList<Collection> collections = getCollectionList(context);
@@ -276,32 +260,6 @@ public class StorageManager {
         saveCollections(context, collections);
     }
 
-    public static void removeComicsFromCollection(Context context, String collectionName, ArrayList<Comic> comics)
-    {
-        ArrayList<Collection> collections = getCollectionList(context);
-        for (int i=0;i<collections.size();i++)
-        {
-            if (collections.get(i).getName().equals(collectionName)) {
-
-                for (Comic comic:comics)
-                    collections.get(i).removeFile(comic.getFileName());
-            }
-        }
-
-        saveCollections(context, collections);
-    }
-
-    public static void removeComicFromCollection(Context context, String collectionName, Comic comic)
-    {
-        ArrayList<Collection> collections = getCollectionList(context);
-        for (int i=0;i<collections.size();i++)
-        {
-            if (collections.get(i).getName().equals(collectionName))
-                collections.get(i).removeFile(comic.getFileName());
-        }
-
-        saveCollections(context, collections);
-    }
 
     public static void removeCollection(Context context, String collectionName)
     {
@@ -316,13 +274,37 @@ public class StorageManager {
         saveCollections(context, collectionsToSave);
     }
 
-    public static void saveCollections(Context context, ArrayList<Collection> collections)
+    public static void saveCollections(Context context, List<Collection> collections)
     {
         JSONArray collectionsJSONArray = createCollectionJSONArray(collections);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(COLLECTIONS_JSON_LIST, collectionsJSONArray.toString());
         editor.apply();
+    }
+
+    public static void saveCollection(Context context, Collection collection)
+    {
+        List<Collection> collections = getCollectionList(context);
+        for (int i=0;i<collections.size();i++)
+        {
+            if (collections.get(i).equals(collection))
+                collections.set(i, collection);
+        }
+        saveCollections(context, collections);
+    }
+
+    public static Collection getCollection(Context context, String collectionName)
+    {
+        ArrayList<Collection> collections = getCollectionList(context);
+        for (int i=0;i<collections.size();i++)
+        {
+            Collection collection = collections.get(i);
+            if (collection.getName().equals(collectionName))
+                return collection;
+        }
+
+        return new Collection("Error");
     }
 
     public static ArrayList<Collection> getCollectionList(Context context)

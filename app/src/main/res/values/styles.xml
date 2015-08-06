@@ -13,6 +13,10 @@
         <item name="android:actionModeBackground">@color/BlueGreyVeryDark</item>
     </style>
 
+    <style name="IntroTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>"
+
     <style name="FullscreenTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowActionBar">false</item>

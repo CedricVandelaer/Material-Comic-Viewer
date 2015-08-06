@@ -842,7 +842,7 @@ public abstract class AbstractComicAdapter extends RecyclerSwipeAdapter<Recycler
                             .itemsCallback(new MaterialDialog.ListCallback() {
                                 @Override
                                 public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                                    StorageManager.removeComicFromCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                    CollectionActions.removeComicFromCollection(mListFragment.getActivity(), charSequence.toString(), comic);
                                 }
                             }).show();
 
