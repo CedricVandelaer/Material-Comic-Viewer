@@ -20,19 +20,20 @@
     </string>
     <string name="updates" translatable="false">
         v4.0\n
-        - Special last page with common comic actions\n
+        - New special last page\n
         - Smart collections\n
         - More functions when reading\n
-        - Metadata editor (found in the info section of a comic)\n
+        - Metadata editor\n
         - UI polish and new animations\n
         - Set the zoom level in settings\n
         - Single tap to scroll option\n
         - Revere volume keys option\n
         - Performance increase\n
         - Better cloud storage navigation\n
-        = Better exportation, exportation of collections etc.\n
+        - Faster exportation
+        - Exportation of collections etc.\n
         - Added splash screen\n
-        - Corrected the launcher icon size and removed the banner\n
+        - Corrected icon size and removed banner\n
         - Open comics directly from Dropbox app (and other apps that allow it)\n
         - Significant performance increase in Google Drive file browsing\n
         - Option to enable/disable landscape multipane support on tablets\n

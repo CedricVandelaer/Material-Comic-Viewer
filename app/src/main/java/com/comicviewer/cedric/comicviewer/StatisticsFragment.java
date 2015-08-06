@@ -194,7 +194,11 @@ public class StatisticsFragment extends BaseFragment {
         }
 
         mLongestReadTitleTextView.setText(StorageManager.getLongestReadComicTitle(getActivity()));
-        mLongestReadPagesTextView.setText(""+ StorageManager.getLongestReadComicPages(getActivity()));
+        int longestReadPages = StorageManager.getLongestReadComicPages(getActivity());
+        if (longestReadPages!=-1)
+            mLongestReadPagesTextView.setText(""+ longestReadPages);
+        else
+            mLongestReadPagesTextView.setText("");
 
     }
 

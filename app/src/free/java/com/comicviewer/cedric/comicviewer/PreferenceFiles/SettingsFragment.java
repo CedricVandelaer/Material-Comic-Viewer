@@ -18,6 +18,7 @@ public class SettingsFragment extends AbstractSettingsFragment{
         // Required empty public constructor
     }
 
+    /*
 
     protected void addFabColorPreference()
     {
@@ -185,6 +186,6 @@ public class SettingsFragment extends AbstractSettingsFragment{
     }
 
 
-
+*/
 
 }
