@@ -47,8 +47,10 @@ public class IntroActivity extends AppIntro2 {
 
     @Override
     public void onDonePressed() {
-        Intent intent = new Intent(this, NewDrawerActivity.class);
-        startActivity(intent);
+        if (!StorageManager.getBooleanSetting(this, StorageManager.INTRO_WAS_SHOWN, false)) {
+            Intent intent = new Intent(this, NewDrawerActivity.class);
+            startActivity(intent);
+        }
         StorageManager.saveBooleanSetting(this, StorageManager.INTRO_WAS_SHOWN, true);
         this.finish();
     }

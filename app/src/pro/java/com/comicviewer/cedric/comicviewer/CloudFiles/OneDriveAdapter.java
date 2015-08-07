@@ -85,30 +85,6 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mDownloadTextView.setVisibility(View.GONE);
         cloudFolderViewHolder.mSwipeLayout.setLeftSwipeEnabled(false);
         cloudFolderViewHolder.mSwipeLayout.setRightSwipeEnabled(false);
-        /*
-        cloudFolderViewHolder.mDownloadFolderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final OneDriveObject entry = cloudFolderViewHolder.getOneDriveEnty();
-
-                MaterialDialog materialDialog = new MaterialDialog.Builder(mActivity)
-                        .title("Download file")
-                        .content("Do you wish to download the folder \""+entry.getName()+"\"?")
-                        .positiveColor(StorageManager.getAppThemeColor(mActivity))
-                        .positiveText("Confirm")
-                        .negativeColor(StorageManager.getAppThemeColor(mActivity))
-                        .negativeText("Cancel")
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                super.onPositive(dialog);
-                                Toast.makeText(mActivity,"Download started...",Toast.LENGTH_SHORT).show();
-                                DownloadFileService.startActionDownload(mActivity, entry, mCloudService);
-                            }
-                        }).show();
-            }
-        });
-        */
     }
 
     private void addFileClickListener(final CloudFileViewHolder cloudFileViewHolder) {

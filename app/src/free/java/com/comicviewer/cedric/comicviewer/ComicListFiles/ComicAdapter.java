@@ -3,6 +3,7 @@ package com.comicviewer.cedric.comicviewer.ComicListFiles;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.android.multiselector.MultiSelector;
@@ -200,7 +201,7 @@ public class ComicAdapter extends AbstractComicAdapter {
                     public void run() {
                         showGoProDialog();
                     }
-                },300);
+                }, 300);
             }
         });
     }
@@ -213,20 +214,20 @@ public class ComicAdapter extends AbstractComicAdapter {
             public void onClick(View v) {
                 if (dialog!=null)
                     dialog.dismiss();
+                final String newCollection = "Add new collection";
                 ArrayList<Collection> collections = StorageManager.getCollectionList(mListFragment.getActivity());
-                CharSequence[] collectionNames = new CharSequence[collections.size()+1];
+                CharSequence[] collectionNames;
+                if (collections.size()<2) {
+                    collectionNames = new CharSequence[collections.size() + 1];
+                    collectionNames[collections.size()] = newCollection;
+                }
+                else
+                    collectionNames = new CharSequence[collections.size()];
 
                 for (int i=0;i<collections.size();i++)
                 {
                     collectionNames[i] = collections.get(i).getName();
                 }
-
-                final String noNewCollection = "Only 2 collections allowed in free version";
-                final String newCollection = "Add new collection";
-                if (collections.size()<2)
-                    collectionNames[collectionNames.length-1] = newCollection;
-                else
-                    collectionNames[collectionNames.length-1] = noNewCollection;
 
                 new MaterialDialog.Builder(mListFragment.getActivity())
                         .title("Choose collection")
@@ -242,12 +243,13 @@ public class ComicAdapter extends AbstractComicAdapter {
                                                 public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
                                                     StorageManager.createCollection(mListFragment.getActivity(), charSequence.toString());
                                                     CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                                    Toast.makeText(mListFragment.getActivity(), "Comic added to "+charSequence.toString()+"!", Toast.LENGTH_SHORT).show();
                                                 }
                                             })
                                             .show();
                                 } else {
-                                    if (!charSequence.toString().equals(noNewCollection))
-                                        CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                    CollectionActions.addComicToCollection(mListFragment.getActivity(), charSequence.toString(), comic);
+                                    Toast.makeText(mListFragment.getActivity(), "Comic added to "+charSequence.toString()+"!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         })

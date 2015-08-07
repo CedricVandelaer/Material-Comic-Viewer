@@ -49,6 +49,12 @@ public class ComicLoader {
         }
     }
 
+    public static void extractCoverAndSetColor(Context context, Comic comic)
+    {
+        extractCoverImage(context, comic);
+        setComicColor(context, comic);
+    }
+
     public static void extractCoverImage(Context context, Comic comic)
     {
         File file = new File(comic.getFilePath() + "/" + comic.getFileName());

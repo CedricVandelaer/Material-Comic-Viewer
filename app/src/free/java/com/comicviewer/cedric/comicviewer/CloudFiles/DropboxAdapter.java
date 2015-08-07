@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class DropboxAdapter extends RecyclerView.Adapter {
 
-    private DropboxFragment mFragment;
+    private AbstractCloudServiceListFragment mFragment;
     private Context mContext;
     private CloudService mCloudService;
     private Handler mHandler;
@@ -141,7 +141,7 @@ public class DropboxAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragment.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getDropboxEntry().path);
+                mFragment.getNavigationManager().pushToStack(cloudFolderViewHolder.getDropboxEntry().path);
                 mFragment.refresh();
             }
         });

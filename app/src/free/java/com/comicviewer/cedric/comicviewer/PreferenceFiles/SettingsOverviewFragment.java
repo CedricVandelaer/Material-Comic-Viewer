@@ -3,7 +3,6 @@ package com.comicviewer.cedric.comicviewer.PreferenceFiles;
 import android.content.Intent;
 import android.net.Uri;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
 
 import com.comicviewer.cedric.comicviewer.R;
 
@@ -15,6 +14,7 @@ public class SettingsOverviewFragment extends AbstractSettingsOverviewFragment {
     void addProNote() {
         ColoredPreference goProPreference = new ColoredPreference(getActivity());
         goProPreference.setTitle(getString(R.string.buy_full_version));
+        goProPreference.setIcon(R.drawable.ic_duck);
         goProPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseNavigationInterface;
+import com.comicviewer.cedric.comicviewer.IntroActivity;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.R;
 import com.github.machinarius.preferencefragment.PreferenceFragment;
@@ -32,7 +33,24 @@ public abstract class AbstractOtherSettingsFragment extends AbstractSettingsFrag
         addUnhideSetting();
         addRemoveFilePathsSetting();
         addMangaModusSetting();
+        addShowTutorialSetting();
         addClearComicDataSetting();
+    }
+
+    private void addShowTutorialSetting() {
+        ColoredPreference showTutorial = new ColoredPreference(getActivity());
+
+        showTutorial.setKey("tutorial");
+        showTutorial.setTitle("Show the intro screen");
+        showTutorial.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent intent = new Intent(getActivity(), IntroActivity.class);
+                startActivity(intent);
+                return true;
+            }
+        });
+        addPreference(showTutorial);
     }
 
     private void addClearComicDataSetting() {

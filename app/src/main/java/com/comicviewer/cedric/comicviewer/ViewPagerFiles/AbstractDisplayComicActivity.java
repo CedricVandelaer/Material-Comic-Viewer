@@ -388,64 +388,7 @@ public abstract class AbstractDisplayComicActivity extends AppCompatActivity {
         mPager.setCurrentItem(currentPos-1);
     }
 
-    private void showChooseCollectionsDialog()
-    {
-        ArrayList<Collection> collections = StorageManager.getCollectionList(this);
-        CharSequence[] collectionNames = new CharSequence[collections.size()+1];
-
-        for (int i=0;i<collections.size();i++)
-        {
-            collectionNames[i] = collections.get(i).getName();
-        }
-
-        final String newCollection = "Add new collection";
-        collectionNames[collectionNames.length-1] = newCollection;
-
-        MaterialDialog dialog = new MaterialDialog.Builder(this)
-                .title("Choose collection")
-                .titleColor(getResources().getColor(R.color.Black))
-                .itemColor(getResources().getColor(R.color.GreyDark))
-                .backgroundColor(getResources().getColor(R.color.White))
-                .items(collectionNames)
-                .itemsCallback(new MaterialDialog.ListCallback() {
-                    @Override
-                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                        if (charSequence.equals(newCollection)) {
-                            MaterialDialog dialog = new MaterialDialog.Builder(AbstractDisplayComicActivity.this)
-                                    .title("Create new collection")
-                                    .titleColor(getResources().getColor(R.color.Black))
-                                    .backgroundColor(getResources().getColor(R.color.White))
-                                    .input("Collection name", "", false, new MaterialDialog.InputCallback() {
-                                        @Override
-                                        public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                            StorageManager.createCollection(AbstractDisplayComicActivity.this, charSequence.toString());
-                                            CollectionActions.addComicToCollection(AbstractDisplayComicActivity.this, charSequence.toString(), mCurrentComic);
-                                        }
-                                    })
-                                    .positiveText(getString(R.string.confirm))
-                                    .positiveColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
-                                    .negativeColor(StorageManager.getAppThemeColor(AbstractDisplayComicActivity.this))
-                                    .negativeText(getString(R.string.cancel))
-                                    .dismissListener(new DialogInterface.OnDismissListener() {
-                                        @Override
-                                        public void onDismiss(DialogInterface dialog) {
-                                            setSystemVisibilitySettings();
-                                        }
-                                    })
-                                    .show();
-                        } else {
-                            CollectionActions.addComicToCollection(AbstractDisplayComicActivity.this, charSequence.toString(), mCurrentComic);
-                        }
-                    }
-                })
-                .dismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        setSystemVisibilitySettings();
-                    }
-                })
-                .show();
-    }
+    abstract void showChooseCollectionsDialog();
 
     public void showGoToPageDialog()
     {

@@ -145,7 +145,7 @@ public class OneDriveAdapter extends RecyclerView.Adapter {
         cloudFolderViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragment.getNavigationManager().pushPathToCloudStack(cloudFolderViewHolder.getOneDriveEnty().getId()+"/files");
+                mFragment.getNavigationManager().pushToStack(cloudFolderViewHolder.getOneDriveEnty().getId()+"/files");
                 mFragment.refresh();
             }
         });

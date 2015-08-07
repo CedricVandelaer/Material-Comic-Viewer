@@ -18,23 +18,26 @@ import com.kyleduo.switchbutton.SwitchButton;
 public class ColoredSwitchPreference extends ColoredPreference {
 
     private SwitchButton mSwitch;
+    private boolean mSwitchOn;
     private boolean mEnabled;
 
     public ColoredSwitchPreference(Context context) {
         super(context);
 
-        mEnabled = false;
+        mSwitchOn = false;
+        mEnabled = true;
     }
 
     public ColoredSwitchPreference(Context context, int color) {
         super(context, color);
 
-        mEnabled = false;
+        mSwitchOn = false;
+        mEnabled = true;
     }
 
     public void setDefaultValue(boolean value)
     {
-        mEnabled = value;
+        mSwitchOn = value;
     }
 
     @Override
@@ -58,19 +61,28 @@ public class ColoredSwitchPreference extends ColoredPreference {
     @Override
     public void setEnabled(boolean enabled)
     {
-        mSwitch.setEnabled(enabled);
+        mEnabled = false;
+        updateColors();
     }
 
     public void updateColors()
     {
         super.updateColors();
 
-        if (mSwitch!=null) {
+        if (mSwitch!=null && mEnabled) {
             Configuration config = Configuration.getDefault(getContext().getResources().getDisplayMetrics().density);
             config.setOffColor(getContext().getResources().getColor(R.color.GreyLight));
             config.setOnColor(StorageManager.getAccentColor(getContext()));
             mSwitch.setConfiguration(config);
         }
+        else if (mSwitch!=null)
+        {
+            Configuration config = Configuration.getDefault(getContext().getResources().getDisplayMetrics().density);
+            config.setOffColor(getContext().getResources().getColor(R.color.GreyLight));
+            config.setOnColor(getContext().getResources().getColor(R.color.GreyLight));
+            mSwitch.setConfiguration(config);
+        }
+
     }
 
     public void setChecked(boolean checked)
@@ -83,12 +95,12 @@ public class ColoredSwitchPreference extends ColoredPreference {
         if (getKey()!=null)
         {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-            boolean initialValue = prefs.getBoolean(getKey(), mEnabled);
+            boolean initialValue = prefs.getBoolean(getKey(), mSwitchOn);
             mSwitch.setChecked(initialValue);
         }
         else
         {
-            mSwitch.setChecked(mEnabled, false);
+            mSwitch.setChecked(mSwitchOn, false);
         }
 
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -96,16 +108,19 @@ public class ColoredSwitchPreference extends ColoredPreference {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 OnPreferenceChangeListener onPreferenceChangeListener = getOnPreferenceChangeListener();
 
-                if (onPreferenceChangeListener!=null)
-                {
-                    onPreferenceChangeListener.onPreferenceChange(ColoredSwitchPreference.this, isChecked);
+                if (mEnabled) {
+                    if (onPreferenceChangeListener != null) {
+                        onPreferenceChangeListener.onPreferenceChange(ColoredSwitchPreference.this, isChecked);
+                    } else if (getKey() != null) {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean(getKey(), isChecked);
+                        editor.apply();
+                    }
                 }
-                else if (getKey()!=null)
+                else
                 {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean(getKey(), isChecked);
-                    editor.apply();
+                    setChecked(!isChecked);
                 }
             }
         });

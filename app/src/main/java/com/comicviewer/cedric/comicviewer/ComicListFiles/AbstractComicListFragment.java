@@ -733,23 +733,12 @@ abstract public class AbstractComicListFragment extends BaseFragment {
 
                     comic = savedComics.get(pos);
 
-                    File coverImage = null;
-                    if (comic.getCoverImageFilePath()!=null)
-                        coverImage = new File(comic.getCoverImageFilePath());
-
-                    if (coverImage==null || !coverImage.exists()) {
-                        hasToLoad = true;
-                        showActionBarButtons(false);
-                        showProgressSpinner(true);
-                        ComicLoader.extractCoverImage(mApplicationContext, comic);
-                    }
-
                     ComicLoader.generateComicInfo(mApplicationContext, comic);
 
                 } else if (Utilities.checkExtension(str)
                         && (Utilities.isZipArchive(file) || Utilities.isRarArchive(file))) {
                     comic = new Comic(str, map.get(str));
-                    ComicLoader.loadComicSync(mApplicationContext, comic);
+                    ComicLoader.generateComicInfo(mApplicationContext, comic);
                     mustSave = true;
                 } else {
                     continue;
@@ -758,6 +747,17 @@ abstract public class AbstractComicListFragment extends BaseFragment {
                 if (!checkSearchFilters(comic))
                 {
                     continue;
+                }
+
+                File coverImage = null;
+                if (comic.getCoverImageFilePath()!=null)
+                    coverImage = new File(comic.getCoverImageFilePath());
+
+                if (coverImage==null || !coverImage.exists()) {
+                    hasToLoad = true;
+                    showActionBarButtons(false);
+                    showProgressSpinner(true);
+                    ComicLoader.extractCoverAndSetColor(mApplicationContext, comic);
                 }
 
                 comicsToAdd.add(comic.getFileName());

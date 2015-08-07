@@ -1,11 +1,8 @@
 package com.comicviewer.cedric.comicviewer.ViewPagerFiles;
 
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -30,7 +27,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LastComicPageFragment extends Fragment {
+public abstract class AbstractLastComicPageFragment extends Fragment {
 
     private LayoutInflater mInflater;
 
@@ -69,21 +66,7 @@ public class LastComicPageFragment extends Fragment {
     protected LinearLayout mNextComicLayout;
 
 
-    public static LastComicPageFragment newInstance(Comic currentComic, ArrayList<Comic> nextComics)
-    {
-        LastComicPageFragment fragment = new LastComicPageFragment();
-
-        Bundle args = new Bundle();
-
-        args.putParcelable("Comic", currentComic);
-        args.putParcelableArrayList("NextComics", nextComics);
-
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
-    public LastComicPageFragment() {
+    public AbstractLastComicPageFragment() {
         // Required empty public constructor
 
     }
@@ -247,65 +230,7 @@ public class LastComicPageFragment extends Fragment {
         });
     }
 
-    private void showChooseCollectionsDialog()
-    {
-
-        ArrayList<Collection> collections = StorageManager.getCollectionList(getActivity());
-        CharSequence[] collectionNames = new CharSequence[collections.size()+1];
-
-        for (int i=0;i<collections.size();i++)
-        {
-            collectionNames[i] = collections.get(i).getName();
-        }
-
-        final String newCollection = "Add new collection";
-        collectionNames[collectionNames.length-1] = newCollection;
-
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Choose collection")
-                .titleColor(getResources().getColor(R.color.Black))
-                .itemColor(getResources().getColor(R.color.GreyDark))
-                .backgroundColor(getResources().getColor(R.color.White))
-                .items(collectionNames)
-                .itemsCallback(new MaterialDialog.ListCallback() {
-                    @Override
-                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                        if (charSequence.equals(newCollection)) {
-                            MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                                    .title("Create new collection")
-                                    .titleColor(getResources().getColor(R.color.Black))
-                                    .backgroundColor(getResources().getColor(R.color.White))
-                                    .input("Collection name", "", false, new MaterialDialog.InputCallback() {
-                                        @Override
-                                        public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                            StorageManager.createCollection(getActivity(), charSequence.toString());
-                                            CollectionActions.addComicToCollection(getActivity(), charSequence.toString(), mCurrentComic);
-                                        }
-                                    })
-                                    .positiveText(getString(R.string.confirm))
-                                    .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                                    .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                                    .negativeText(getString(R.string.cancel))
-                                    .dismissListener(new DialogInterface.OnDismissListener() {
-                                        @Override
-                                        public void onDismiss(DialogInterface dialog) {
-                                            ((AbstractDisplayComicActivity) getActivity()).setSystemVisibilitySettings();
-                                        }
-                                    })
-                                    .show();
-                        } else {
-                            CollectionActions.addComicToCollection(getActivity(), charSequence.toString(), mCurrentComic);
-                        }
-                    }
-                })
-                .dismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        ((AbstractDisplayComicActivity)getActivity()).setSystemVisibilitySettings();
-                    }
-                })
-                .show();
-    }
+    abstract void showChooseCollectionsDialog();
 
     private void setMetadataInfo() {
         setErrorTextView();

@@ -5,10 +5,11 @@ import android.net.Uri;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.comicviewer.cedric.comicviewer.CollectionDialogHelper;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.Utilities;
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 
 /**
  * Created by CV on 28/06/2015.
@@ -16,6 +17,7 @@ import com.melnykov.fab.FloatingActionButton;
 public class CollectionsFragment extends AbstractCollectionsFragment{
 
     private static CollectionsFragment mSingleton;
+    private CollectionDialogHelper mDialogHelper;
 
     public static CollectionsFragment getInstance()
     {
@@ -30,36 +32,20 @@ public class CollectionsFragment extends AbstractCollectionsFragment{
     }
 
     protected void createFab(View v) {
+
         mFab = (FloatingActionButton)v.findViewById(R.id.fab);
         mFab.setColorNormal(StorageManager.getAccentColor(getActivity()));
         mFab.setColorPressed(Utilities.darkenColor(StorageManager.getAccentColor(getActivity())));
         mFab.setColorRipple(Utilities.lightenColor(StorageManager.getAccentColor(getActivity())));
-        mFab.attachToRecyclerView(mRecyclerView);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (StorageManager.getCollectionList(getActivity()).size()<2) {
-                    MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                            .title("Add new collection")
-                            .input("Name", "", false, new MaterialDialog.InputCallback() {
-                                @Override
-                                public void onInput(MaterialDialog materialDialog, CharSequence charSequence) {
-                                    materialDialog.dismiss();
-                                    StorageManager.createCollection(getActivity(), charSequence.toString());
-                                    mAdapter.notifyDataSetChanged();
-                                }
-                            })
-                            .positiveText(getString(R.string.confirm))
-                            .positiveColor(StorageManager.getAppThemeColor(getActivity()))
-                            .negativeText(getString(R.string.cancel))
-                            .negativeColor(StorageManager.getAppThemeColor(getActivity()))
-                            .show();
+                if (StorageManager.getCollectionList(getActivity()).size() < 2) {
+                    mDialogHelper = new CollectionDialogHelper(getActivity());
+                    mDialogHelper.showCollectionNameDialog(mAdapter);
                 }
                 else
-                {
                     showGoProDialog();
-                }
             }
         });
     }
@@ -82,5 +68,10 @@ public class CollectionsFragment extends AbstractCollectionsFragment{
                         getActivity().startActivity(browse);
                     }
                 }).show();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 }
