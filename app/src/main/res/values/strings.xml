@@ -22,6 +22,7 @@
     <string name="muzei_source" translatable="false">Comic Viewer</string>
     <string name="google_plus_community_url" translatable="false">https://plus.google.com/u/0/communities/117118264783586161349</string>
     <string name="facebook_page_url" translatable="false">https://www.facebook.com/MaterialComicViewer</string>
+    <string name="reddit_page_url" translatable="false">https://www.reddit.com/r/materialcomicviewer</string>
     <string name="cloud_storage_4" translatable="false">BOX</string>
     <string name="box_client_id" translatable="false">a8f6tsc2oq3dvsxhmr13w0hobkqlpcsx</string>
     <string name="box_client_secret" translatable="false">tXojRoqQm8y0pbtS92raqprQTgcTKSbI</string>

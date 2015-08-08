@@ -144,7 +144,10 @@ public abstract class AbstractLastComicPageFragment extends Fragment {
             title.setTextColor(Utilities.lightenColor(mComicList.get(i).getTextColor()));
             ImageView image = (ImageView) layout.findViewById(R.id.simple_comic_image_view);
             ImageLoader.getInstance().displayImage(mComicList.get(i).getCoverImage(), image);
-            layout.setBackgroundColor(mComicList.get(i).getComicColor());
+            if (mComicList.get(i).getComicColor()!=-1)
+                layout.setBackgroundColor(mComicList.get(i).getComicColor());
+            else
+                layout.setBackgroundColor(StorageManager.getAppThemeColor(getActivity()));
             final int finalI = i;
             layout.setOnClickListener(new View.OnClickListener() {
                 @Override

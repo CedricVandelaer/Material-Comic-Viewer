@@ -33,6 +33,8 @@ public class AboutFragment extends BaseFragment {
     private TextView mGooglePlusTextView;
     private ImageView mFacebookLogo;
     private TextView mFacebookTextView;
+    private ImageView mRedditLogo;
+    private TextView mRedditTextView;
 
     public static AboutFragment newInstance() {
         return new AboutFragment();
@@ -75,6 +77,8 @@ public class AboutFragment extends BaseFragment {
         mGooglePlusTextView = (TextView) v.findViewById(R.id.google_plus_textview);
         mFacebookLogo = (ImageView) v.findViewById(R.id.facebook_logo);
         mFacebookTextView = (TextView) v.findViewById(R.id.facebook_textview);
+        mRedditLogo = (ImageView) v.findViewById(R.id.reddit_logo);
+        mRedditTextView = (TextView) v.findViewById(R.id.reddit_textview);
         mRateButton = (ButtonFlat) v.findViewById(R.id.rate_button);
         mChangelogButton = (ButtonFlat) v.findViewById(R.id.updates_button);
 
@@ -101,10 +105,21 @@ public class AboutFragment extends BaseFragment {
             }
         };
 
+        View.OnClickListener redditClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(getString(R.string.reddit_page_url)));
+                startActivity(i);
+            }
+        };
+
         mGooglePlusLogo.setOnClickListener(googlePlusClickListener);
         mGooglePlusTextView.setOnClickListener(googlePlusClickListener);
         mFacebookLogo.setOnClickListener(facebookClickListener);
         mFacebookTextView.setOnClickListener(facebookClickListener);
+        mRedditLogo.setOnClickListener(redditClickListener);
+        mRedditTextView.setOnClickListener(redditClickListener);
 
         mTitleTextView.setText(getActivity().getResources().getString(R.string.app_name) + " v" + getPackageInfo().versionName);
 
@@ -154,6 +169,7 @@ public class AboutFragment extends BaseFragment {
         mThanksTextView.setTextColor(color);
         mGooglePlusTextView.setTextColor(color);
         mFacebookTextView.setTextColor(color);
+        mRedditTextView.setTextColor(color);
     }
 
     @Override

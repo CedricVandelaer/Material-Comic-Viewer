@@ -22,6 +22,8 @@ import net.lingala.zip4j.core.ZipFile;
  */
 public class Extractor {
 
+    public static final String LAST_PAGE = "specialLastPageComicViewer";
+
     public static ArrayList<String> loadImageNamesFromComic(Context context, Comic comicToExtract)
     {
         String filename = comicToExtract.getFileName();
@@ -44,21 +46,6 @@ public class Extractor {
         {
             pages =  loadImageNamesFromComicRar(comicToExtract);
         }
-
-        if ((StorageManager.getBooleanSetting(context, StorageManager.MANGA_SETTING, false) && !StorageManager.isNormalComic(context, comicToExtract))
-            || (!(StorageManager.getBooleanSetting(context, StorageManager.MANGA_SETTING, false)) && StorageManager.isMangaComic(context, comicToExtract)))
-        {
-            if (pages.size()>0) {
-                ArrayList<String> mangaPages = new ArrayList<>();
-                for (int i=pages.size()-1;i>=0;i--)
-                {
-                    mangaPages.add(pages.get(i));
-                }
-
-                return mangaPages;
-            }
-        }
-
         return pages;
     }
 

@@ -93,51 +93,70 @@
                         android:id="@+id/find_us_text_view"
                         android:text="@string/find_comic_viewer_on"
                         android:layout_marginBottom="8dp"/>
-                    <RelativeLayout
+                    <LinearLayout
                         android:id="@+id/social_media_layout"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp">
-                        <ImageView
-                            android:id="@+id/google_plus_logo"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/google_plus_logo"
-                            android:layout_marginRight="2dp"
-                            android:layout_marginEnd="2dp"
-                            android:layout_marginBottom="6dp"/>
-                        <TextView
-                            android:id="@+id/google_plus_textview"
+                        <LinearLayout
+                            android:padding="2dp"
+                            android:orientation="horizontal"
+                            android:gravity="center"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
-                            android:layout_toEndOf="@id/google_plus_logo"
-                            android:layout_toRightOf="@id/google_plus_logo"
-                            android:layout_alignBottom="@id/google_plus_logo"
-                            android:text="Google+"/>
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:id="@+id/google_plus_logo"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginRight="4dp"
+                                android:src="@drawable/google_plus_logo"/>
+                            <TextView
+                                android:id="@+id/google_plus_textview"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Google+"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:padding="2dp"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:id="@+id/facebook_logo"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginRight="4dp"
+                                android:src="@drawable/facebook_logo"/>
+                            <TextView
+                                android:id="@+id/facebook_textview"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Facebook"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:padding="2dp"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:id="@+id/reddit_logo"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginRight="4dp"
+                                android:src="@drawable/reddit"/>
+                            <TextView
+                                android:id="@+id/reddit_textview"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Reddit"/>
+                        </LinearLayout>
 
-                        <ImageView
-                            android:layout_below="@id/google_plus_logo"
-                            android:id="@+id/facebook_logo"
-                            android:layout_alignLeft="@id/google_plus_logo"
-                            android:layout_alignStart="@id/google_plus_logo"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/facebook_logo"
-                            android:layout_marginRight="2dp"
-                            android:layout_marginEnd="2dp"/>
-                        <TextView
-                            android:id="@+id/facebook_textview"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
-                            android:layout_toEndOf="@id/facebook_logo"
-                            android:layout_toRightOf="@id/facebook_logo"
-                            android:layout_alignBottom="@id/facebook_logo"
-                            android:text="Facebook"/>
-                    </RelativeLayout>
+
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
