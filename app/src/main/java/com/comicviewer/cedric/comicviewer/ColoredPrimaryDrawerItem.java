@@ -1,5 +1,6 @@
 package com.comicviewer.cedric.comicviewer;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 /**
  * Created by Cédric on 19/07/2015.
  */
+
 public class ColoredPrimaryDrawerItem extends PrimaryDrawerItem{
 
     private int mBackgroundRes = -1;
@@ -25,7 +27,10 @@ public class ColoredPrimaryDrawerItem extends PrimaryDrawerItem{
         return this;
     }
 
-    public void setBackgroundColor(int color){ mBackgroundColor = color;}
+    public void setBackgroundColor(int color){
+        mBackgroundColor = color;
+
+    }
 
     @Override
     public View convertView(LayoutInflater inflater, View convertView, ViewGroup parent) {
@@ -40,4 +45,5 @@ public class ColoredPrimaryDrawerItem extends PrimaryDrawerItem{
 
         return convertView;
     }
+    
 }
