@@ -19,6 +19,8 @@
         Matteo - Spanish translations
     </string>
     <string name="updates" translatable="false">
+        v4.1\n
+        - Added support for Marshmallow\n\n
         v4.0.3\n
         - Updated libraries\n
         - Bugfixes\n\n

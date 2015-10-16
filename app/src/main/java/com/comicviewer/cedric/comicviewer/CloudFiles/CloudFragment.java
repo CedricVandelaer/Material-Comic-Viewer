@@ -26,6 +26,7 @@ import com.box.androidsdk.content.models.BoxSession;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.HttpUtilities;
 import com.comicviewer.cedric.comicviewer.Model.CloudService;
+import com.comicviewer.cedric.comicviewer.PermissionsManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -319,6 +320,7 @@ public class CloudFragment extends BaseFragment implements SwipeRefreshLayout.On
                                     mOneDriveAuth.login(getActivity(), scopes, CloudFragment.this);
                                 } else if (text.equals(getString(R.string.cloud_storage_2))) {
                                     //new ConnectGoogleAccountTask().execute();
+                                    PermissionsManager.checkAccountPermissions(getActivity());
                                     pickUserAccount();
                                 } else if (text.equals(getString(R.string.cloud_storage_4))) {
                                     authenticateBoxAccount();

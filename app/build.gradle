@@ -26,8 +26,8 @@ android {
         applicationId "com.comicviewer.cedric.comicviewer"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 40
-        versionName "4.0.3"
+        versionCode 41
+        versionName "4.1"
     }
     buildTypes {
         release {
@@ -38,13 +38,13 @@ android {
     productFlavors {
         free {
             applicationId "com.comicviewer.cedric.comicviewer.free"
-            versionName "4.0.3"
+            versionName "4.1"
             signingConfig signingConfigs.configFree
             targetSdkVersion 23
         }
         pro {
             applicationId "com.comicviewer.cedric.comicviewer.pro"
-            versionName "4.0.3"
+            versionName "4.1"
             signingConfig signingConfigs.configPro
             targetSdkVersion 23
         }

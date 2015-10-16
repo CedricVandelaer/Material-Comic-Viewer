@@ -36,6 +36,7 @@ import com.comicviewer.cedric.comicviewer.FragmentNavigation.BaseFragment;
 import com.comicviewer.cedric.comicviewer.FragmentNavigation.NavigationManager;
 import com.comicviewer.cedric.comicviewer.Model.Comic;
 import com.comicviewer.cedric.comicviewer.NewDrawerActivity;
+import com.comicviewer.cedric.comicviewer.PermissionsManager;
 import com.comicviewer.cedric.comicviewer.PreferenceFiles.StorageManager;
 import com.comicviewer.cedric.comicviewer.R;
 import com.comicviewer.cedric.comicviewer.RecyclerViewListFiles.DividerItemDecoration;
@@ -133,6 +134,12 @@ abstract public class AbstractComicListFragment extends BaseFragment {
     }
 
     protected class SearchComicsTask extends AsyncTask {
+
+        @Override
+        protected void onPreExecute()
+        {
+            PermissionsManager.checkFilePermissions(getActivity());
+        }
 
         @Override
         protected Object doInBackground(Object[] params) {

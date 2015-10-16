@@ -310,7 +310,7 @@ public class Utilities{
             return false;
         File files[] = folder.listFiles();
 
-        if (files.length<1)
+        if (files == null || files.length<1)
             return false;
 
         for (int i=0;i<files.length;i++)

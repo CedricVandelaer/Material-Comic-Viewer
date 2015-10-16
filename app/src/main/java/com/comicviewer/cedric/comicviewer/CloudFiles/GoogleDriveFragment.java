@@ -207,7 +207,11 @@ public class GoogleDriveFragment extends AbstractCloudServiceListFragment implem
             try
             {
                 JSONObject queryResults = new JSONObject(result);
-                JSONArray filesList = queryResults.getJSONArray("items");
+                JSONArray filesList;
+                if (queryResults.has("items"))
+                    filesList = queryResults.getJSONArray("items");
+                else
+                    filesList = new JSONArray();
 
                 ArrayList<GoogleDriveObject> driveObjects = new ArrayList<>();
 
