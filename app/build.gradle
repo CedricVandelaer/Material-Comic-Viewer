@@ -4,24 +4,28 @@ repositories {
     mavenCentral()
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def keypass = properties.getProperty('keystorePass')
+
 android {
     signingConfigs {
         configPro {
             keyAlias 'ComicViewerProKey'
-            keyPassword ''
-            storeFile file('C:/Users/Cédric/Documents/ComicViewerProKeyStore.jks')
-            storePassword ''
+            keyPassword keypass
+            storeFile file('D:/Documents/ComicViewerProKeyStore.jks')
+            storePassword keypass
         }
         configFree {
             keyAlias 'ComicViewerFreeKey'
-            keyPassword ''
-            storeFile file('C:/Users/Cédric/Documents/ComicViewerFreeKeyStore.jks')
-            storePassword ''
+            keyPassword keypass
+            storeFile file('D:/Documents/ComicViewerFreeKeyStore.jks')
+            storePassword keypass
         }
     }
 
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "com.comicviewer.cedric.comicviewer"
         minSdkVersion 14

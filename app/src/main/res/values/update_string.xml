@@ -19,8 +19,12 @@
         Matteo - Spanish translations
     </string>
     <string name="updates" translatable="false">
+        Announcement!\n\nWe are actively working on a complete overhaul of the app. This is just a small bugfix
+        release by popular demand. The new app will launch soon but will still take some time to
+        develop. So sit tight and good things are coming!\n\n
         v4.1\n
-        - Added support for Marshmallow\n\n
+        - Added support for Marshmallow\n
+        - Fixed a bug that prevented users from selecting the SD card\n\n
         v4.0.3\n
         - Updated libraries\n
         - Bugfixes\n\n
