@@ -4,11 +4,11 @@ The app was released some time ago, but because of school I didn't have that muc
 
 PRIVACY POLICY as required by Google Play
 ===========================
-This privacy policy governs your use of the software application Material Comic Viewer for mobile devices that was created by Cédric Vandelaer. The Application is a comic viewing application with support for cloud storage and some other features.
+This privacy policy governs your use of the software applications Material Comic Viewer and Flik Comic Viewer for mobile devices that was created by Cédric Vandelaer. The applications are comic viewing applications with support for cloud storage and some other features.
 
-The app does not explicitly collect or use any confidential information. It does however make use of the Google+ account manager. The only collected data is through this account manager and this only applies for users that make use of the Google Drive cloud storage functionality. As stated above, this data does not get processed or used or send to third parties in any way. 
+The applications don't explicitly collect or use any confidential information. They do however make use of the Google+ account manager. The only collected data is through this account manager and this only applies for users that make use of the Google Drive cloud storage functionality. As stated above, this data does not get processed or used or send to third parties in any way. 
 
-By using the Application, you are consenting to this Privacy Policy now and as amended by us. If you have any questions regarding privacy while using the Application, or have questions about our practices, please contact us via email at cedric.vandelaer@gmail.com .
+By using the applications, you are consenting to this Privacy Policy now and as amended by us. If you have any questions regarding privacy while using the Application, or have questions about our practices, please contact us via email at cedric.vandelaer@gmail.com .
 
 ===========================
 
